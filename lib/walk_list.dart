@@ -45,6 +45,7 @@ class _WalkListState extends State<WalkList> {
   _retrieveWalks(String date) async {
     List<Walk> newList;
     if (date != _selectedDate || _walks.length == 0) {
+      newList = List<Walk>();
       var response;
       try {
         response = await http.get(
@@ -52,7 +53,6 @@ class _WalkListState extends State<WalkList> {
                 date +
                 "&activites=M");
         var fixed = _fixCsv(response.body);
-        newList = List<Walk>();
         List<List<dynamic>> rowsAsListOfValues =
             const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
         for (List<dynamic> walk in rowsAsListOfValues) {
@@ -112,6 +112,7 @@ class _WalkListState extends State<WalkList> {
       onChanged: (String newValue) {
         setState(() {
           _loading = true;
+          _error = false;
         });
         _retrieveWalks(newValue);
       },
