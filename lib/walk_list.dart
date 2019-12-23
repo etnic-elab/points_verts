@@ -17,9 +17,10 @@ class _WalkListState extends State<WalkList> {
 
   List<DropdownMenuItem<String>> dropdownItems = _generateDropdownItems();
   List<Walk> _walks = List<Walk>();
-  String _selectedDate = "29-12-2019";
+  String _selectedDate = getNextSunday();
   Position _currentPosition;
   bool _loading = true;
+  bool _error = false;
 
   @override
   void initState() {
@@ -44,21 +45,30 @@ class _WalkListState extends State<WalkList> {
   _retrieveWalks(String date) async {
     List<Walk> newList;
     if (date != _selectedDate || _walks.length == 0) {
-      var response = await http.get(
-          "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=" +
-              date +
-              "&activites=M");
-      var fixed = _fixCsv(response.body);
-      newList = List<Walk>();
-      List<List<dynamic>> rowsAsListOfValues =
-      const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-      for (List<dynamic> walk in rowsAsListOfValues) {
-        newList.add(Walk(
-            city: walk[1],
-            province: walk[5],
-            lat: walk[3],
-            long: walk[4],
-            date: walk[6]));
+      var response;
+      try {
+        response = await http.get(
+            "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=" +
+                date +
+                "&activites=M");
+        var fixed = _fixCsv(response.body);
+        newList = List<Walk>();
+        List<List<dynamic>> rowsAsListOfValues =
+            const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
+        for (List<dynamic> walk in rowsAsListOfValues) {
+          newList.add(Walk(
+              city: walk[1],
+              province: walk[5],
+              lat: walk[3],
+              long: walk[4],
+              date: walk[6]));
+        }
+      } catch (_) {
+        setState(() {
+          _selectedDate = date;
+          _loading = false;
+          _error = true;
+        });
       }
     } else {
       newList = _walks;
@@ -81,6 +91,7 @@ class _WalkListState extends State<WalkList> {
       _selectedDate = date;
       _walks = newList;
       _loading = false;
+      _error = false;
     });
   }
 
@@ -108,30 +119,35 @@ class _WalkListState extends State<WalkList> {
   }
 
   Widget _buildWalks() {
-    var main = _loading
-        ? _loadingView
-        : ListView.separated(
-            itemBuilder: (context, i) {
-              if (_walks.length > i) {
-                Walk walk = _walks[i];
-                return ListTile(
-                  title: Text(walk.city),
-                  subtitle: Text(walk.province),
-                  trailing: _displayDistance(walk),
-                  onTap: () => _launchMaps(walk),
-                );
-              } else {
-                return ListTile();
-              }
-            },
-            separatorBuilder: (context, i) {
-              return new Divider();
-            },
-            itemCount: _walks.length);
-    return Column(children: <Widget>[
-      _dropdown(),
-      new Expanded(child: main)
-    ]);
+    var main = _defineMainPart();
+    return Column(children: <Widget>[_dropdown(), new Expanded(child: main)]);
+  }
+
+  _defineMainPart() {
+    if (_loading) {
+      return _loadingView;
+    } else if (_error) {
+      return Text("An error occurred, please try again later.");
+    } else {
+      return ListView.separated(
+          itemBuilder: (context, i) {
+            if (_walks.length > i) {
+              Walk walk = _walks[i];
+              return ListTile(
+                title: Text(walk.city),
+                subtitle: Text(walk.province),
+                trailing: _displayDistance(walk),
+                onTap: () => _launchMaps(walk),
+              );
+            } else {
+              return ListTile();
+            }
+          },
+          separatorBuilder: (context, i) {
+            return new Divider();
+          },
+          itemCount: _walks.length);
+    }
   }
 
   _displayDistance(walk) {
@@ -184,6 +200,17 @@ class _WalkListState extends State<WalkList> {
     } else if (await canLaunch(appleUrl)) {
       await launch(appleUrl);
     }
+  }
+
+
+  static String getNextSunday() {
+    DateTime current = new DateTime.now();
+    Duration oneDay = new Duration(days: 1);
+    DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
+    while (current.weekday != DateTime.sunday) {
+      current = current.add(oneDay);
+    }
+    return dateFormat.format(current);
   }
 
   static List<DropdownMenuItem<String>> _generateDropdownItems() {
