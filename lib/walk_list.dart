@@ -17,21 +17,21 @@ class _WalkListState extends State<WalkList> {
 
   List<DropdownMenuItem<String>> dropdownItems = _generateDropdownItems();
   List<Walk> _walks = List<Walk>();
-  String selectedDate = "29-12-2019";
+  String _selectedDate = "29-12-2019";
   Position _currentPosition;
   bool _loading = true;
 
   @override
   void initState() {
     _getCurrentLocation();
-    _retrieveWalks(selectedDate);
+    _retrieveWalks(_selectedDate);
     super.initState();
   }
 
   @override
   void reassemble() {
     _getCurrentLocation();
-    _retrieveWalks(selectedDate);
+    _retrieveWalks(_selectedDate);
     super.reassemble();
   }
 
@@ -42,22 +42,28 @@ class _WalkListState extends State<WalkList> {
   }
 
   _retrieveWalks(String date) async {
-    var response = await http.get(
-        "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=" +
-            date +
-            "&activites=M");
-    var fixed = _fixCsv(response.body);
-    var newList = List<Walk>();
-    List<List<dynamic>> rowsAsListOfValues =
-        const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-    for (List<dynamic> walk in rowsAsListOfValues) {
-      newList.add(Walk(
-          city: walk[1],
-          province: walk[5],
-          lat: walk[3],
-          long: walk[4],
-          date: walk[6]));
+    List<Walk> newList;
+    if (date != _selectedDate || _walks.length == 0) {
+      var response = await http.get(
+          "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=" +
+              date +
+              "&activites=M");
+      var fixed = _fixCsv(response.body);
+      newList = List<Walk>();
+      List<List<dynamic>> rowsAsListOfValues =
+      const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
+      for (List<dynamic> walk in rowsAsListOfValues) {
+        newList.add(Walk(
+            city: walk[1],
+            province: walk[5],
+            lat: walk[3],
+            long: walk[4],
+            date: walk[6]));
+      }
+    } else {
+      newList = _walks;
     }
+
     if (_currentPosition != null) {
       for (Walk walk in newList) {
         double distance = await geolocator.distanceBetween(
@@ -67,11 +73,12 @@ class _WalkListState extends State<WalkList> {
             walk.long);
         walk.distance = distance;
       }
+      newList.sort((a, b) {
+        return a.distance.compareTo(b.distance);
+      });
     }
-    newList.sort((a, b) {
-      return a.distance.compareTo(b.distance);
-    });
     setState(() {
+      _selectedDate = date;
       _walks = newList;
       _loading = false;
     });
@@ -89,12 +96,11 @@ class _WalkListState extends State<WalkList> {
 
   Widget _dropdown() {
     return new DropdownButton<String>(
-      value: selectedDate,
+      value: _selectedDate,
       items: dropdownItems,
       onChanged: (String newValue) {
         setState(() {
           _loading = true;
-          selectedDate = newValue;
         });
         _retrieveWalks(newValue);
       },
@@ -107,15 +113,15 @@ class _WalkListState extends State<WalkList> {
         : ListView.separated(
             itemBuilder: (context, i) {
               if (_walks.length > i) {
+                Walk walk = _walks[i];
                 return ListTile(
-                  title: Text(_walks[i].city),
-                  subtitle: Text(_walks[i].province),
-                  trailing: Text(
-                      (_walks[i].distance / 1000).round().toString() + " km"),
-                  onTap: () => _launchMaps(_walks[i]),
+                  title: Text(walk.city),
+                  subtitle: Text(walk.province),
+                  trailing: _displayDistance(walk),
+                  onTap: () => _launchMaps(walk),
                 );
               } else {
-                return null;
+                return ListTile();
               }
             },
             separatorBuilder: (context, i) {
@@ -124,9 +130,16 @@ class _WalkListState extends State<WalkList> {
             itemCount: _walks.length);
     return Column(children: <Widget>[
       _dropdown(),
-      sortExplanation(),
       new Expanded(child: main)
     ]);
+  }
+
+  _displayDistance(walk) {
+    if (walk.distance != null) {
+      return Text((walk.distance / 1000).round().toString() + " km");
+    } else {
+      return null;
+    }
   }
 
   String _fixCsv(String csv) {
@@ -149,15 +162,6 @@ class _WalkListState extends State<WalkList> {
     return result.join('\r\n');
   }
 
-  sortExplanation() {
-    if (_currentPosition != null) {
-      return Text(
-          "Les marches sont classées selon leur proximité géographique.");
-    } else {
-      return null;
-    }
-  }
-
   _getCurrentLocation() {
     geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
@@ -165,6 +169,7 @@ class _WalkListState extends State<WalkList> {
       setState(() {
         _currentPosition = position;
       });
+      _retrieveWalks(_selectedDate);
     }).catchError((e) {
       print(e);
     });
