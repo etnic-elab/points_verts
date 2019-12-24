@@ -16,11 +16,14 @@ class WalkList extends StatefulWidget {
 
 class _WalkListState extends State<WalkList> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+  final Widget loading = Center(
+    child: new CircularProgressIndicator(),
+  );
 
   List<DropdownMenuItem<String>> _dropdownItems =
       new List<DropdownMenuItem<String>>();
   List<Walk> _walks = List<Walk>();
-  String _selectedDate = _getNextSunday();
+  String _selectedDate;
   Position _currentPosition;
   bool _loading = true;
   bool _error = false;
@@ -28,26 +31,15 @@ class _WalkListState extends State<WalkList> {
   @override
   void initState() {
     _getCurrentLocation();
-    _retrieveDates();
-    _retrieveWalks(_selectedDate);
+    _retrieveDates().then((date) {
+      _retrieveWalks(date);
+    });
     super.initState();
   }
 
-  @override
-  void reassemble() {
-    _getCurrentLocation();
-    _retrieveDates();
-    _retrieveWalks(_selectedDate);
-    super.reassemble();
-  }
-
-  Widget get _loadingView {
-    return new Center(
-      child: new CircularProgressIndicator(),
-    );
-  }
-
   _retrieveWalks(String date) async {
+    if (date == null) return;
+    if (date == null && _selectedDate != null) date = _selectedDate;
     List<Walk> newList = List<Walk>();
     var response;
     try {
@@ -95,18 +87,22 @@ class _WalkListState extends State<WalkList> {
     });
   }
 
-  _retrieveDates() {
+  _retrieveDates() async {
+    String nearestDate;
     _retrieveDatesFromEndpoint().then((List<DropdownMenuItem> items) {
+      nearestDate = items.isNotEmpty ? items.first.value : _getNextSunday();
       setState(() {
         _dropdownItems = items;
-        _selectedDate = items.isNotEmpty ? items.first.value : _getNextSunday();
+        _selectedDate = nearestDate;
       });
     }).catchError((_) {
+      nearestDate = _getNextSunday();
       setState(() {
         _dropdownItems = _generateDropdownItems();
-        _selectedDate = _getNextSunday();
+        _selectedDate = nearestDate;
       });
     });
+    return nearestDate;
   }
 
   Future<List<DropdownMenuItem>> _retrieveDatesFromEndpoint() async {
@@ -152,16 +148,22 @@ class _WalkListState extends State<WalkList> {
 
   Widget _buildWalks() {
     var main = _defineMainPart();
-    return Column(children: <Widget>[
-      Card(
+    return Column(
+        children: <Widget>[_defineSearchPart(), Expanded(child: main)]);
+  }
+
+  _defineSearchPart() {
+    if (_dropdownItems.isNotEmpty) {
+      return Card(
           child: Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
               child: Row(children: <Widget>[
                 _dropdown(),
                 Expanded(child: _resultNumber())
-              ]))),
-      Expanded(child: main)
-    ]);
+              ])));
+    } else {
+      return loading;
+    }
   }
 
   _resultNumber() {
@@ -170,18 +172,19 @@ class _WalkListState extends State<WalkList> {
           alignment: Alignment.centerRight,
           child: Text(_walks.length.toString() + " résultat(s)"));
     } else {
-      return Text("");
+      return SizedBox.shrink();
     }
   }
 
   _defineMainPart() {
     if (_loading) {
-      return _loadingView;
+      return loading;
     } else if (_error) {
       return Row(children: [
-        Expanded(child: Center(
-            child:
-                Text("Une erreur est survenue, merci de réessayer plus tard.")))
+        Expanded(
+            child: Center(
+                child: Text(
+                    "Une erreur est survenue, merci de réessayer plus tard.")))
       ]);
     } else {
       return Card(
@@ -254,7 +257,7 @@ class _WalkListState extends State<WalkList> {
       setState(() {
         _currentPosition = position;
       });
-      _retrieveWalks(_selectedDate);
+      _retrieveWalks(null);
     }).catchError((e) {
       print(e);
     });
