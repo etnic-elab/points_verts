@@ -6,6 +6,8 @@ import 'package:csv/csv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:html/parser.dart' show parse;
+import 'package:html/dom.dart' as dom;
 
 class WalkList extends StatefulWidget {
   @override
@@ -15,9 +17,10 @@ class WalkList extends StatefulWidget {
 class _WalkListState extends State<WalkList> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
-  List<DropdownMenuItem<String>> dropdownItems = _generateDropdownItems();
+  List<DropdownMenuItem<String>> _dropdownItems =
+      new List<DropdownMenuItem<String>>();
   List<Walk> _walks = List<Walk>();
-  String _selectedDate = getNextSunday();
+  String _selectedDate = _getNextSunday();
   Position _currentPosition;
   bool _loading = true;
   bool _error = false;
@@ -25,6 +28,7 @@ class _WalkListState extends State<WalkList> {
   @override
   void initState() {
     _getCurrentLocation();
+    _retrieveDates();
     _retrieveWalks(_selectedDate);
     super.initState();
   }
@@ -32,6 +36,7 @@ class _WalkListState extends State<WalkList> {
   @override
   void reassemble() {
     _getCurrentLocation();
+    _retrieveDates();
     _retrieveWalks(_selectedDate);
     super.reassemble();
   }
@@ -43,36 +48,31 @@ class _WalkListState extends State<WalkList> {
   }
 
   _retrieveWalks(String date) async {
-    List<Walk> newList;
-    if (date != _selectedDate || _walks.length == 0) {
-      newList = List<Walk>();
+    List<Walk> newList = List<Walk>();
       var response;
       try {
         response = await http.get(
             "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=" +
                 date +
-                "&activites=M");
+                "&activites=M,O");
         var fixed = _fixCsv(response.body);
         List<List<dynamic>> rowsAsListOfValues =
             const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
         for (List<dynamic> walk in rowsAsListOfValues) {
           newList.add(Walk(
               city: walk[1],
-              province: walk[5],
+              type: walk[2],
               lat: walk[3],
               long: walk[4],
+              province: walk[5],
               date: walk[6]));
         }
       } catch (_) {
         setState(() {
-          _selectedDate = date;
           _loading = false;
           _error = true;
         });
       }
-    } else {
-      newList = _walks;
-    }
 
     if (_currentPosition != null) {
       for (Walk walk in newList) {
@@ -95,6 +95,36 @@ class _WalkListState extends State<WalkList> {
     });
   }
 
+  _retrieveDates() {
+    _retrieveDatesFromEndpoint().then((List<DropdownMenuItem> items) {
+      setState(() {
+        _dropdownItems = items;
+        _selectedDate = items.isNotEmpty ? items.first.value : _getNextSunday();
+      });
+    }).catchError((_) {
+      setState(() {
+        _dropdownItems = _generateDropdownItems();
+        _selectedDate = _getNextSunday();
+      });
+    });
+  }
+
+  Future<List<DropdownMenuItem>> _retrieveDatesFromEndpoint() async {
+    String url = "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=dates";
+    var response = await http.get(url);
+    var document = parse(response.body);
+    List<DropdownMenuItem<String>> results =
+        new List<DropdownMenuItem<String>>();
+    for (dom.Element element in document.getElementsByTagName('option')) {
+      String value = element.attributes['value'];
+      if (value != '0') {
+        results.add(new DropdownMenuItem<String>(
+            value: value, child: new Text(element.innerHtml)));
+      }
+    }
+    return results;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,9 +138,10 @@ class _WalkListState extends State<WalkList> {
   Widget _dropdown() {
     return new DropdownButton<String>(
       value: _selectedDate,
-      items: dropdownItems,
+      items: _dropdownItems,
       onChanged: (String newValue) {
         setState(() {
+          _selectedDate = newValue;
           _loading = true;
           _error = false;
         });
@@ -121,7 +152,10 @@ class _WalkListState extends State<WalkList> {
 
   Widget _buildWalks() {
     var main = _defineMainPart();
-    return Column(children: <Widget>[_dropdown(), new Expanded(child: main)]);
+    return Column(children: <Widget>[
+      Center(child: _dropdown()),
+      new Expanded(child: main)
+    ]);
   }
 
   _defineMainPart() {
@@ -135,6 +169,9 @@ class _WalkListState extends State<WalkList> {
             if (_walks.length > i) {
               Walk walk = _walks[i];
               return ListTile(
+                leading: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [_displayIcon(walk)]),
                 title: Text(walk.city),
                 subtitle: Text(walk.province),
                 trailing: _displayDistance(walk),
@@ -148,6 +185,16 @@ class _WalkListState extends State<WalkList> {
             return new Divider();
           },
           itemCount: _walks.length);
+    }
+  }
+
+  _displayIcon(walk) {
+    if (walk.type == 'M') {
+      return Icon(Icons.directions_walk);
+    } else if (walk.type == 'O') {
+      return Icon(Icons.map);
+    } else {
+      return Text('');
     }
   }
 
@@ -203,8 +250,7 @@ class _WalkListState extends State<WalkList> {
     }
   }
 
-
-  static String getNextSunday() {
+  static String _getNextSunday() {
     DateTime current = new DateTime.now();
     Duration oneDay = new Duration(days: 1);
     DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
