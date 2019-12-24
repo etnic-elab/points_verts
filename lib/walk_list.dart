@@ -49,30 +49,31 @@ class _WalkListState extends State<WalkList> {
 
   _retrieveWalks(String date) async {
     List<Walk> newList = List<Walk>();
-      var response;
-      try {
-        response = await http.get(
-            "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=" +
-                date +
-                "&activites=M,O");
-        var fixed = _fixCsv(response.body);
-        List<List<dynamic>> rowsAsListOfValues =
-            const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-        for (List<dynamic> walk in rowsAsListOfValues) {
-          newList.add(Walk(
-              city: walk[1],
-              type: walk[2],
-              lat: walk[3],
-              long: walk[4],
-              province: walk[5],
-              date: walk[6]));
-        }
-      } catch (_) {
-        setState(() {
-          _loading = false;
-          _error = true;
-        });
+    var response;
+    try {
+      response = await http.get(
+          "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=" +
+              date +
+              "&activites=M,O");
+      var fixed = _fixCsv(response.body);
+      List<List<dynamic>> rowsAsListOfValues =
+          const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
+      for (List<dynamic> walk in rowsAsListOfValues) {
+        newList.add(Walk(
+            city: walk[1],
+            type: walk[2],
+            lat: walk[3],
+            long: walk[4],
+            province: walk[5],
+            date: walk[6]));
       }
+    } catch (_) {
+      setState(() {
+        _loading = false;
+        _error = true;
+      });
+      return;
+    }
 
     if (_currentPosition != null) {
       for (Walk walk in newList) {
@@ -88,7 +89,6 @@ class _WalkListState extends State<WalkList> {
       });
     }
     setState(() {
-      _selectedDate = date;
       _walks = newList;
       _loading = false;
       _error = false;
@@ -136,7 +136,7 @@ class _WalkListState extends State<WalkList> {
   }
 
   Widget _dropdown() {
-    return new DropdownButton<String>(
+    return DropdownButton<String>(
       value: _selectedDate,
       items: _dropdownItems,
       onChanged: (String newValue) {
@@ -153,38 +153,59 @@ class _WalkListState extends State<WalkList> {
   Widget _buildWalks() {
     var main = _defineMainPart();
     return Column(children: <Widget>[
-      Center(child: _dropdown()),
-      new Expanded(child: main)
+      Card(
+          child: Container(
+              margin: const EdgeInsets.only(left: 10, right: 10),
+              child: Row(children: <Widget>[
+                _dropdown(),
+                Expanded(child: _resultNumber())
+              ]))),
+      Expanded(child: main)
     ]);
+  }
+
+  _resultNumber() {
+    if (_walks.length > 0 && !_loading) {
+      return Align(
+          alignment: Alignment.centerRight,
+          child: Text(_walks.length.toString() + " résultat(s)"));
+    } else {
+      return Text("");
+    }
   }
 
   _defineMainPart() {
     if (_loading) {
       return _loadingView;
     } else if (_error) {
-      return Text("An error occurred, please try again later.");
+      return Row(children: [
+        Expanded(child: Center(
+            child:
+                Text("Une erreur est survenue, merci de réessayer plus tard.")))
+      ]);
     } else {
-      return ListView.separated(
-          itemBuilder: (context, i) {
-            if (_walks.length > i) {
-              Walk walk = _walks[i];
-              return ListTile(
-                leading: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [_displayIcon(walk)]),
-                title: Text(walk.city),
-                subtitle: Text(walk.province),
-                trailing: _displayDistance(walk),
-                onTap: () => _launchMaps(walk),
-              );
-            } else {
-              return ListTile();
-            }
-          },
-          separatorBuilder: (context, i) {
-            return new Divider();
-          },
-          itemCount: _walks.length);
+      return Card(
+          child: ListView.separated(
+              itemBuilder: (context, i) {
+                if (_walks.length > i) {
+                  Walk walk = _walks[i];
+                  return ListTile(
+                    leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [_displayIcon(walk)]),
+                    title: Text(walk.city),
+                    subtitle: Text(walk.province),
+                    trailing: _displayDistance(walk),
+                    onTap: () => _launchMaps(walk),
+                  );
+                } else {
+                  return ListTile();
+                }
+              },
+              separatorBuilder: (context, i) {
+                return new Divider();
+              },
+              itemCount: _walks.length));
     }
   }
 
