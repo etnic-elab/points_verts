@@ -30,22 +30,24 @@ class _WalkListState extends State<WalkList> {
 
   @override
   void initState() {
+    _retrieveDates();
     _getCurrentLocation();
-    _retrieveDates().then((date) {
-      _retrieveWalks(date);
-    });
     super.initState();
   }
 
-  _retrieveWalks(String date) async {
-    if (date == null) return;
-    if (date == null && _selectedDate != null) date = _selectedDate;
+  _retrieveWalks() async {
+    if (_selectedDate == null) {
+      setState(() {
+        _loading = false;
+      });
+      return;
+    }
     List<Walk> newList = List<Walk>();
     var response;
     try {
       response = await http.get(
           "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=" +
-              date +
+              _selectedDate +
               "&activites=M,O");
       var fixed = _fixCsv(response.body);
       List<List<dynamic>> rowsAsListOfValues =
@@ -87,22 +89,20 @@ class _WalkListState extends State<WalkList> {
     });
   }
 
-  _retrieveDates() async {
-    String nearestDate;
+  void _retrieveDates() async {
     _retrieveDatesFromEndpoint().then((List<DropdownMenuItem> items) {
-      nearestDate = items.isNotEmpty ? items.first.value : _getNextSunday();
       setState(() {
         _dropdownItems = items;
-        _selectedDate = nearestDate;
+        _selectedDate = items.isNotEmpty ? items.first.value : _getNextSunday();
       });
+      _retrieveWalks();
     }).catchError((_) {
-      nearestDate = _getNextSunday();
       setState(() {
         _dropdownItems = _generateDropdownItems();
-        _selectedDate = nearestDate;
+        _selectedDate = _getNextSunday();
       });
+      _retrieveWalks();
     });
-    return nearestDate;
   }
 
   Future<List<DropdownMenuItem>> _retrieveDatesFromEndpoint() async {
@@ -141,7 +141,7 @@ class _WalkListState extends State<WalkList> {
           _loading = true;
           _error = false;
         });
-        _retrieveWalks(newValue);
+        _retrieveWalks();
       },
     );
   }
@@ -257,20 +257,16 @@ class _WalkListState extends State<WalkList> {
       setState(() {
         _currentPosition = position;
       });
-      _retrieveWalks(null);
+        _retrieveWalks();
     }).catchError((e) {
       print(e);
     });
   }
 
   _launchMaps(Walk walk) async {
-    String googleUrl =
-        'https://www.google.com/maps/search/?api=1&query=${walk.lat},${walk.long}';
-    String appleUrl = 'https://maps.apple.com/?sll=${walk..lat},${walk.long}';
-    if (await canLaunch(googleUrl)) {
-      await launch(googleUrl);
-    } else if (await canLaunch(appleUrl)) {
-      await launch(appleUrl);
+    String mapSchema = 'geo:${walk.lat},${walk.long}';
+    if (await canLaunch(mapSchema)) {
+      await launch(mapSchema);
     }
   }
 
