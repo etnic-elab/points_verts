@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:points_verts/recalculate_distances_button.dart';
 import 'package:points_verts/walk.dart';
 import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
@@ -124,9 +125,11 @@ class _WalkListState extends State<WalkList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Points Verts Adeps'),
-      ),
+      appBar: AppBar(title: Text('Points Verts Adeps'), actions: <Widget>[
+        RecalculateDistancesButton(onPressed: () {
+          _getCurrentLocation();
+        })
+      ]),
       body: _buildWalks(),
     );
   }
@@ -257,7 +260,7 @@ class _WalkListState extends State<WalkList> {
       setState(() {
         _currentPosition = position;
       });
-        _retrieveWalks();
+      _retrieveWalks();
     }).catchError((e) {
       print(e);
     });
