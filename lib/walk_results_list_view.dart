@@ -36,8 +36,7 @@ class WalkResultsListView extends StatelessWidget {
   _displayIcon(walk) {
     if (walk.status == 'ptvert_annule') {
       return Icon(Icons.cancel);
-    }
-    else if (walk.type == 'M') {
+    } else if (walk.type == 'M') {
       return Icon(Icons.directions_walk);
     } else if (walk.type == 'O') {
       return Icon(Icons.map);
@@ -55,9 +54,15 @@ class WalkResultsListView extends StatelessWidget {
   }
 
   _launchMaps(Walk walk) async {
-    String mapSchema = 'geo:${walk.lat},${walk.long}';
-    if (await canLaunch(mapSchema)) {
-      await launch(mapSchema);
+    if (walk.lat != null && walk.long != null) {
+      String googleUrl =
+          'https://www.google.com/maps/search/?api=1&query=${walk.lat},${walk.long}';
+      String mapSchema = 'geo:${walk.lat},${walk.long}';
+      if (await canLaunch(googleUrl)) {
+        await launch(googleUrl);
+      } else if (await canLaunch(mapSchema)) {
+        await launch(mapSchema);
+      }
     }
   }
 }

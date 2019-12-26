@@ -1,16 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:points_verts/recalculate_distances_button.dart';
-import 'package:points_verts/walk.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
-import 'package:points_verts/walk_results_list_view.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
 
-import 'nav_bar.dart';
+import 'recalculate_distances_button.dart';
+import 'walk.dart';
+import 'walk_results_list_view.dart';
 
 class WalkList extends StatefulWidget {
   @override
@@ -63,13 +65,14 @@ class _WalkListState extends State<WalkList> {
         newList.add(Walk(
             city: walk[1],
             type: walk[2],
-            lat: walk[3],
-            long: walk[4],
+            lat: walk[3] != "" ? walk[3] : null,
+            long: walk[4] != "" ? walk[4] : null,
             province: walk[5],
             date: walk[6],
             status: walk[9]));
       }
-    } catch (_) {
+    } catch (err) {
+      print(err);
       setState(() {
         _loading = false;
         _error = true;
@@ -79,15 +82,23 @@ class _WalkListState extends State<WalkList> {
 
     if (_currentPosition != null) {
       for (Walk walk in newList) {
-        double distance = await geolocator.distanceBetween(
-            _currentPosition.latitude,
-            _currentPosition.longitude,
-            walk.lat,
-            walk.long);
-        walk.distance = distance;
+        if (walk.lat != null && walk.long != null) {
+          double distance = await geolocator.distanceBetween(
+              _currentPosition.latitude,
+              _currentPosition.longitude,
+              walk.lat,
+              walk.long);
+          walk.distance = distance;
+        }
       }
       newList.sort((a, b) {
-        return a.distance.compareTo(b.distance);
+        if (a.distance != null && b.distance != null) {
+          return a.distance.compareTo(b.distance);
+        } else if (a.distance != null) {
+          return -1;
+        } else {
+          return 1;
+        }
       });
     }
     setState(() {
@@ -99,19 +110,42 @@ class _WalkListState extends State<WalkList> {
   }
 
   void _retrieveDates() async {
-    _retrieveDatesFromEndpoint().then((List<DropdownMenuItem> items) {
+    _retrieveDatesFromWorker().then((List<DropdownMenuItem> items) {
       setState(() {
         _dropdownItems = items;
         _selectedDate = items.isNotEmpty ? items.first.value : _getNextSunday();
       });
       _retrieveWalks();
-    }).catchError((_) {
+    }).catchError((err) {
+      print(err);
       setState(() {
         _dropdownItems = _generateDropdownItems();
         _selectedDate = _getNextSunday();
       });
       _retrieveWalks();
     });
+  }
+
+  Future<List<DropdownMenuItem>> _retrieveDatesFromWorker() async {
+    try {
+      String url = "https://points-verts.tbo.workers.dev/";
+      var response = await http.get(url);
+      var dates = jsonDecode(response.body);
+      List<DropdownMenuItem<String>> results =
+          new List<DropdownMenuItem<String>>();
+      await initializeDateFormatting("fr_FR", null);
+      DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
+      DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
+      for (String date in dates) {
+        DateTime dateTime = dateFormat.parse(date);
+        results.add(new DropdownMenuItem<String>(
+            value: date, child: new Text(fullDate.format(dateTime))));
+      }
+      return results;
+    } catch (err) {
+      print(err);
+      return _retrieveDatesFromEndpoint();
+    }
   }
 
   Future<List<DropdownMenuItem>> _retrieveDatesFromEndpoint() async {
@@ -134,9 +168,17 @@ class _WalkListState extends State<WalkList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Points Verts Adeps'), actions: <Widget>[
+        IconButton(
+            icon: Icon(Icons.calendar_today),
+            onPressed: () {
+              setState(() {
+                _selectedDate = _dropdownItems.first.value;
+              });
+              _refreshWalks();
+            }),
         RecalculateDistancesButton(onPressed: () {
           _getCurrentLocation();
-        })
+        }),
       ]),
 //      bottomNavigationBar: NavBar(),
       body: _buildWalks(),
@@ -165,11 +207,11 @@ class _WalkListState extends State<WalkList> {
   _defineSearchPart() {
     if (_dropdownItems.isNotEmpty) {
       return Container(
-              margin: const EdgeInsets.only(left: 10, right: 10),
-              child: Row(children: <Widget>[
-                _dropdown(),
-                Expanded(child: _resultNumber())
-              ]));
+          margin: const EdgeInsets.only(left: 10, right: 10),
+          child: Row(children: <Widget>[
+            _dropdown(),
+            Expanded(child: _resultNumber())
+          ]));
     } else {
       return loading;
     }
@@ -191,7 +233,8 @@ class _WalkListState extends State<WalkList> {
     } else if (_error) {
       return error;
     } else {
-      return RefreshIndicator(child: WalkResultsListView(_walks), onRefresh: () => _refreshWalks());
+      return RefreshIndicator(
+          child: WalkResultsListView(_walks), onRefresh: () => _refreshWalks());
     }
   }
 
