@@ -55,12 +55,8 @@ class WalkResultsListView extends StatelessWidget {
 
   _launchMaps(Walk walk) async {
     if (walk.lat != null && walk.long != null) {
-      String googleUrl =
-          'https://www.google.com/maps/search/?api=1&query=${walk.lat},${walk.long}';
       String mapSchema = 'geo:${walk.lat},${walk.long}';
-      if (await canLaunch(googleUrl)) {
-        await launch(googleUrl);
-      } else if (await canLaunch(mapSchema)) {
+      if (await canLaunch(mapSchema)) {
         await launch(mapSchema);
       }
     }
