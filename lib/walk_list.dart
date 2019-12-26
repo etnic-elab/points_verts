@@ -44,12 +44,12 @@ class _WalkListState extends State<WalkList> {
     super.initState();
   }
 
-  _retrieveWalks() async {
+  Future<List<Walk>> _retrieveWalks() async {
     if (_selectedDate == null) {
       setState(() {
         _loading = false;
       });
-      return;
+      return _walks;
     }
     List<Walk> newList = List<Walk>();
     var response;
@@ -74,7 +74,7 @@ class _WalkListState extends State<WalkList> {
         _loading = false;
         _error = true;
       });
-      return;
+      return newList;
     }
 
     if (_currentPosition != null) {
@@ -95,6 +95,7 @@ class _WalkListState extends State<WalkList> {
       _loading = false;
       _error = false;
     });
+    return _walks;
   }
 
   void _retrieveDates() async {
@@ -137,7 +138,7 @@ class _WalkListState extends State<WalkList> {
           _getCurrentLocation();
         })
       ]),
-      bottomNavigationBar: NavBar(),
+//      bottomNavigationBar: NavBar(),
       body: _buildWalks(),
     );
   }
@@ -149,10 +150,8 @@ class _WalkListState extends State<WalkList> {
       onChanged: (String newValue) {
         setState(() {
           _selectedDate = newValue;
-          _loading = true;
-          _error = false;
         });
-        _retrieveWalks();
+        _refreshWalks();
       },
     );
   }
@@ -165,13 +164,12 @@ class _WalkListState extends State<WalkList> {
 
   _defineSearchPart() {
     if (_dropdownItems.isNotEmpty) {
-      return Card(
-          child: Container(
+      return Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
               child: Row(children: <Widget>[
                 _dropdown(),
                 Expanded(child: _resultNumber())
-              ])));
+              ]));
     } else {
       return loading;
     }
@@ -193,8 +191,17 @@ class _WalkListState extends State<WalkList> {
     } else if (_error) {
       return error;
     } else {
-      return WalkResultsListView(_walks);
+      return RefreshIndicator(child: WalkResultsListView(_walks), onRefresh: () => _refreshWalks());
     }
+  }
+
+  Future<List<Walk>> _refreshWalks() {
+    setState(() {
+      _loading = true;
+      _error = false;
+      _walks = new List<Walk>();
+    });
+    return _retrieveWalks();
   }
 
   String _fixCsv(String csv) {
