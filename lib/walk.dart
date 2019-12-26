@@ -1,7 +1,12 @@
-import 'package:flutter/foundation.dart';
-
 class Walk {
-  Walk({@required this.city, this.type, this.province, this.long, this.lat, this.date});
+  Walk(
+      {this.city,
+      this.type,
+      this.province,
+      this.long,
+      this.lat,
+      this.date,
+      this.status});
 
   final String city;
   final String type;
@@ -9,6 +14,7 @@ class Walk {
   final String date;
   final double long;
   final double lat;
+  final String status;
 
   double distance;
 }

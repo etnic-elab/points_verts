@@ -25,8 +25,8 @@ class _WalkListState extends State<WalkList> {
   final Widget error = Row(children: [
     Expanded(
         child: Center(
-            child: Text(
-                "Une erreur est survenue, merci de réessayer plus tard.")))
+            child:
+                Text("Une erreur est survenue, merci de réessayer plus tard.")))
   ]);
 
   List<DropdownMenuItem<String>> _dropdownItems =
@@ -66,7 +66,8 @@ class _WalkListState extends State<WalkList> {
             lat: walk[3],
             long: walk[4],
             province: walk[5],
-            date: walk[6]));
+            date: walk[6],
+            status: walk[9]));
       }
     } catch (_) {
       setState(() {

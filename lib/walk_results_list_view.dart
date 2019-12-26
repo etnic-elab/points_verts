@@ -22,6 +22,7 @@ class WalkResultsListView extends StatelessWidget {
                   children: [_displayIcon(walk)]),
               title: Text(walk.city),
               subtitle: Text(walk.province),
+              enabled: walk.status != 'ptvert_annule',
               trailing: _displayDistance(walk),
               onTap: () => _launchMaps(walk),
             ));
@@ -33,7 +34,10 @@ class WalkResultsListView extends StatelessWidget {
   }
 
   _displayIcon(walk) {
-    if (walk.type == 'M') {
+    if (walk.status == 'ptvert_annule') {
+      return Icon(Icons.cancel);
+    }
+    else if (walk.type == 'M') {
       return Icon(Icons.directions_walk);
     } else if (walk.type == 'O') {
       return Icon(Icons.map);
