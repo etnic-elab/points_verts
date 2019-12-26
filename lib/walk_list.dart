@@ -6,9 +6,11 @@ import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:points_verts/walk_results_list_view.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
+
+import 'nav_bar.dart';
 
 class WalkList extends StatefulWidget {
   @override
@@ -20,6 +22,12 @@ class _WalkListState extends State<WalkList> {
   final Widget loading = Center(
     child: new CircularProgressIndicator(),
   );
+  final Widget error = Row(children: [
+    Expanded(
+        child: Center(
+            child: Text(
+                "Une erreur est survenue, merci de réessayer plus tard.")))
+  ]);
 
   List<DropdownMenuItem<String>> _dropdownItems =
       new List<DropdownMenuItem<String>>();
@@ -47,9 +55,7 @@ class _WalkListState extends State<WalkList> {
     var response;
     try {
       response = await http.get(
-          "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=" +
-              _selectedDate +
-              "&activites=M,O");
+          "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=$_selectedDate&activites=M,O");
       var fixed = _fixCsv(response.body);
       List<List<dynamic>> rowsAsListOfValues =
           const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
@@ -130,6 +136,7 @@ class _WalkListState extends State<WalkList> {
           _getCurrentLocation();
         })
       ]),
+      bottomNavigationBar: NavBar(),
       body: _buildWalks(),
     );
   }
@@ -173,7 +180,7 @@ class _WalkListState extends State<WalkList> {
     if (_walks.length > 0 && !_loading) {
       return Align(
           alignment: Alignment.centerRight,
-          child: Text(_walks.length.toString() + " résultat(s)"));
+          child: Text("${_walks.length.toString()} résultat(s)"));
     } else {
       return SizedBox.shrink();
     }
@@ -183,53 +190,9 @@ class _WalkListState extends State<WalkList> {
     if (_loading) {
       return loading;
     } else if (_error) {
-      return Row(children: [
-        Expanded(
-            child: Center(
-                child: Text(
-                    "Une erreur est survenue, merci de réessayer plus tard.")))
-      ]);
+      return error;
     } else {
-      return Card(
-          child: ListView.separated(
-              itemBuilder: (context, i) {
-                if (_walks.length > i) {
-                  Walk walk = _walks[i];
-                  return ListTile(
-                    leading: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [_displayIcon(walk)]),
-                    title: Text(walk.city),
-                    subtitle: Text(walk.province),
-                    trailing: _displayDistance(walk),
-                    onTap: () => _launchMaps(walk),
-                  );
-                } else {
-                  return ListTile();
-                }
-              },
-              separatorBuilder: (context, i) {
-                return new Divider();
-              },
-              itemCount: _walks.length));
-    }
-  }
-
-  _displayIcon(walk) {
-    if (walk.type == 'M') {
-      return Icon(Icons.directions_walk);
-    } else if (walk.type == 'O') {
-      return Icon(Icons.map);
-    } else {
-      return Text('');
-    }
-  }
-
-  _displayDistance(walk) {
-    if (walk.distance != null) {
-      return Text((walk.distance / 1000).round().toString() + " km");
-    } else {
-      return null;
+      return WalkResultsListView(_walks);
     }
   }
 
@@ -264,13 +227,6 @@ class _WalkListState extends State<WalkList> {
     }).catchError((e) {
       print(e);
     });
-  }
-
-  _launchMaps(Walk walk) async {
-    String mapSchema = 'geo:${walk.lat},${walk.long}';
-    if (await canLaunch(mapSchema)) {
-      await launch(mapSchema);
-    }
   }
 
   static String _getNextSunday() {
