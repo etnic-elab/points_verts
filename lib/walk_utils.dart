@@ -3,13 +3,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'walk.dart';
 
-Widget displayIcon(walk) {
+Widget displayIcon(walk, {Color color}) {
   if (walk.status == 'ptvert_annule') {
-    return Icon(Icons.cancel);
+    return Icon(Icons.cancel, color: color);
   } else if (walk.type == 'M') {
-    return Icon(Icons.directions_walk);
+    return Icon(Icons.directions_walk, color: color);
   } else if (walk.type == 'O') {
-    return Icon(Icons.map);
+    return Icon(Icons.map, color: color);
   } else {
     return SizedBox.shrink();
   }

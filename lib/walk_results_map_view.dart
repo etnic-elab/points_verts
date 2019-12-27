@@ -19,16 +19,17 @@ class WalkResultsMapView extends StatelessWidget {
     for (Walk walk in walks) {
       if (walk.lat != null && walk.long != null) {
         markers.add(Marker(
-            point: new LatLng(walk.lat, walk.long),
-            builder: (ctx) => new Container(
-                  child: IconButton(
-                    icon: displayIcon(walk),
-                    tooltip: walk.city,
-                    onPressed: () {
-                      launchMaps(walk);
-                    },
-                  ),
-                )));
+          point: new LatLng(walk.lat, walk.long),
+          builder: (ctx) => RawMaterialButton(
+            child: displayIcon(walk, color: Colors.white),
+            shape: new CircleBorder(),
+            elevation: 2.0,
+            fillColor: Colors.green,
+            onPressed: () {
+              launchMaps(walk);
+            },
+          ),
+        ));
       }
     }
     if (currentPosition != null) {
