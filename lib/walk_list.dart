@@ -36,6 +36,7 @@ class _WalkListState extends State<WalkList> {
   List<DropdownMenuItem<String>> _dropdownItems =
       new List<DropdownMenuItem<String>>();
   List<Walk> _walks = List<Walk>();
+  Walk _selectedWalk;
   String _selectedDate;
   Position _currentPosition;
   bool _loading = true;
@@ -237,9 +238,7 @@ class _WalkListState extends State<WalkList> {
   }
 
   _defineMainPart() {
-    if (_loading) {
-      return loading;
-    } else if (_error) {
+    if (_error) {
       return error;
     } else {
       return RefreshIndicator(
@@ -248,10 +247,15 @@ class _WalkListState extends State<WalkList> {
   }
 
   _displayMainPart() {
-    if(_index == 1) {
-      return WalkResultsMapView(_walks, _currentPosition);
+    if (_index == 1) {
+      return WalkResultsMapView(
+          _walks, _currentPosition, _loading, _selectedWalk, (walk) {
+        setState(() {
+          _selectedWalk = walk;
+        });
+      });
     } else {
-      return WalkResultsListView(_walks);
+      return WalkResultsListView(_walks, _loading);
     }
   }
 
@@ -260,6 +264,7 @@ class _WalkListState extends State<WalkList> {
       _loading = true;
       _error = false;
       _walks = new List<Walk>();
+      _selectedWalk = null;
     });
     return _retrieveWalks();
   }

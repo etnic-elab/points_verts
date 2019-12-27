@@ -5,32 +5,41 @@ import 'package:url_launcher/url_launcher.dart';
 import 'walk.dart';
 
 class WalkResultsListView extends StatelessWidget {
-  WalkResultsListView(this.walks);
+  WalkResultsListView(this.walks, this.isLoading);
+
+  final Widget loading = Center(
+    child: new CircularProgressIndicator(),
+  );
 
   final List<Walk> walks;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemBuilder: (context, i) {
-          if (walks.length > i) {
-            Walk walk = walks[i];
-            return Card(
-                child: ListTile(
-              leading: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [_displayIcon(walk)]),
-              title: Text(walk.city),
-              subtitle: Text(walk.province),
-              enabled: walk.status != 'ptvert_annule',
-              trailing: _displayDistance(walk),
-              onTap: () => _launchMaps(walk),
-            ));
-          } else {
-            return SizedBox.shrink();
-          }
-        },
-        itemCount: walks.length);
+    if (isLoading) {
+      return loading;
+    } else {
+      return ListView.builder(
+          itemBuilder: (context, i) {
+            if (walks.length > i) {
+              Walk walk = walks[i];
+              return Card(
+                  child: ListTile(
+                leading: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [_displayIcon(walk)]),
+                title: Text(walk.city),
+                subtitle: Text(walk.province),
+                enabled: walk.status != 'ptvert_annule',
+                trailing:  walk.status != 'ptvert_annule' ? _displayDistance(walk) : Text("Annulé"),
+                onTap: () => _launchMaps(walk),
+              ));
+            } else {
+              return SizedBox.shrink();
+            }
+          },
+          itemCount: walks.length);
+    }
   }
 
   _displayIcon(walk) {
