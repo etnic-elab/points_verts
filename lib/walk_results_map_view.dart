@@ -19,14 +19,18 @@ class WalkResultsMapView extends StatelessWidget {
     for (Walk walk in walks) {
       if (walk.lat != null && walk.long != null) {
         markers.add(Marker(
+          width: 25,
+          height: 25,
           point: new LatLng(walk.lat, walk.long),
           builder: (ctx) => RawMaterialButton(
-            child: displayIcon(walk, color: Colors.white),
+            child: displayIcon(walk, color: Colors.white, size: 20),
             shape: new CircleBorder(),
             elevation: 2.0,
             fillColor: Colors.green,
             onPressed: () {
-              launchMaps(walk);
+              if(walk.status != 'ptvert_annule') {
+                launchMaps(walk);
+              }
             },
           ),
         ));
@@ -40,10 +44,8 @@ class WalkResultsMapView extends StatelessWidget {
     }
     return new FlutterMap(
       options: new MapOptions(
-        center: currentPosition != null
-            ? LatLng(currentPosition.latitude, currentPosition.longitude)
-            : new LatLng(50.7372, 4.6828),
-        zoom: currentPosition != null ? 9 : 7.5,
+        center: new LatLng(50.3155646,5.009682),
+        zoom: 7.5,
       ),
       layers: [
         new TileLayerOptions(
