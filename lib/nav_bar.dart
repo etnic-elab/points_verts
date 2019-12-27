@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class NavBar extends StatefulWidget {
-  NavBar({Key key}) : super(key: key);
+  NavBar({Key key, this.onIconTap}) : super(key: key);
+
+  final void Function(int) onIconTap;
 
   @override
-  _NavBarState createState() => _NavBarState();
+  _NavBarState createState() => _NavBarState(onIconTap: onIconTap);
 }
 
 class _NavBarState extends State<NavBar> {
+  _NavBarState({this.onIconTap});
+
+  final void Function(int) onIconTap;
+
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
@@ -17,6 +23,7 @@ class _NavBarState extends State<NavBar> {
     setState(() {
       _selectedIndex = index;
     });
+    onIconTap(index);
   }
 
   @override

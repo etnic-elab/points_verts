@@ -10,9 +10,11 @@ import 'package:intl/intl.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
 
+import 'nav_bar.dart';
 import 'recalculate_distances_button.dart';
 import 'walk.dart';
 import 'walk_results_list_view.dart';
+import 'walk_results_map_view.dart';
 
 class WalkList extends StatefulWidget {
   @override
@@ -38,6 +40,7 @@ class _WalkListState extends State<WalkList> {
   Position _currentPosition;
   bool _loading = true;
   bool _error = false;
+  int _index = 0;
 
   @override
   void initState() {
@@ -180,7 +183,13 @@ class _WalkListState extends State<WalkList> {
           _getCurrentLocation();
         }),
       ]),
-//      bottomNavigationBar: NavBar(),
+      bottomNavigationBar: NavBar(
+        onIconTap: (int index) {
+          setState(() {
+            _index = index;
+          });
+        },
+      ),
       body: _buildWalks(),
     );
   }
@@ -234,7 +243,15 @@ class _WalkListState extends State<WalkList> {
       return error;
     } else {
       return RefreshIndicator(
-          child: WalkResultsListView(_walks), onRefresh: () => _refreshWalks());
+          child: _displayMainPart(), onRefresh: () => _refreshWalks());
+    }
+  }
+
+  _displayMainPart() {
+    if(_index == 1) {
+      return WalkResultsMapView(_walks, _currentPosition);
+    } else {
+      return WalkResultsListView(_walks);
     }
   }
 
