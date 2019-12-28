@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -35,7 +36,8 @@ class _WalkListState extends State<WalkList> {
 
   List<DropdownMenuItem<String>> _dropdownItems =
       new List<DropdownMenuItem<String>>();
-  List<Walk> _walks = List<Walk>();
+  Map<String, List<Walk>> _allWalks = HashMap<String, List<Walk>>();
+  List<Walk> _currentWalks = List<Walk>();
   Walk _selectedWalk;
   String _selectedDate;
   Position _currentPosition;
@@ -55,8 +57,28 @@ class _WalkListState extends State<WalkList> {
       setState(() {
         _loading = false;
       });
-      return _walks;
+      return _currentWalks;
     }
+    List<Walk> newList;
+    if (_allWalks.containsKey(_selectedDate)) {
+      newList = _allWalks[_selectedDate];
+    } else {
+      newList = await _retrieveWalksFromEndpoint();
+      _allWalks.putIfAbsent(_selectedDate, () => newList);
+    }
+
+    if (_currentPosition != null) {
+      newList = await _calculateDistances(newList);
+    }
+    setState(() {
+      _currentWalks = newList;
+      _loading = false;
+      _error = false;
+    });
+    return _currentWalks;
+  }
+
+  Future<List<Walk>> _retrieveWalksFromEndpoint() async {
     List<Walk> newList = List<Walk>();
     var response;
     try {
@@ -81,36 +103,31 @@ class _WalkListState extends State<WalkList> {
         _loading = false;
         _error = true;
       });
-      return newList;
     }
+    return newList;
+  }
 
-    if (_currentPosition != null) {
-      for (Walk walk in newList) {
-        if (walk.lat != null && walk.long != null) {
-          double distance = await geolocator.distanceBetween(
-              _currentPosition.latitude,
-              _currentPosition.longitude,
-              walk.lat,
-              walk.long);
-          walk.distance = distance;
-        }
+  Future<List<Walk>> _calculateDistances(List<Walk> walks) async {
+    for (Walk walk in walks) {
+      if (walk.lat != null && walk.long != null) {
+        double distance = await geolocator.distanceBetween(
+            _currentPosition.latitude,
+            _currentPosition.longitude,
+            walk.lat,
+            walk.long);
+        walk.distance = distance;
       }
-      newList.sort((a, b) {
-        if (a.distance != null && b.distance != null) {
-          return a.distance.compareTo(b.distance);
-        } else if (a.distance != null) {
-          return -1;
-        } else {
-          return 1;
-        }
-      });
     }
-    setState(() {
-      _walks = newList;
-      _loading = false;
-      _error = false;
+    walks.sort((a, b) {
+      if (a.distance != null && b.distance != null) {
+        return a.distance.compareTo(b.distance);
+      } else if (a.distance != null) {
+        return -1;
+      } else {
+        return 1;
+      }
     });
-    return _walks;
+    return walks;
   }
 
   void _retrieveDates() async {
@@ -228,10 +245,10 @@ class _WalkListState extends State<WalkList> {
   }
 
   _resultNumber() {
-    if (_walks.length > 0 && !_loading) {
+    if (_currentWalks.length > 0 && !_loading) {
       return Align(
           alignment: Alignment.centerRight,
-          child: Text("${_walks.length.toString()} résultat(s)"));
+          child: Text("${_currentWalks.length.toString()} résultat(s)"));
     } else {
       return SizedBox.shrink();
     }
@@ -242,28 +259,32 @@ class _WalkListState extends State<WalkList> {
       return error;
     } else {
       return RefreshIndicator(
-          child: _displayMainPart(), onRefresh: () => _refreshWalks());
+          child: _displayMainPart(),
+          onRefresh: () => _refreshWalks(clearDate: true));
     }
   }
 
   _displayMainPart() {
     if (_index == 1) {
       return WalkResultsMapView(
-          _walks, _currentPosition, _loading, _selectedWalk, (walk) {
+          _currentWalks, _currentPosition, _loading, _selectedWalk, (walk) {
         setState(() {
           _selectedWalk = walk;
         });
       });
     } else {
-      return WalkResultsListView(_walks, _loading);
+      return WalkResultsListView(_currentWalks, _loading);
     }
   }
 
-  Future<List<Walk>> _refreshWalks() {
+  Future<List<Walk>> _refreshWalks({bool clearDate = false}) {
+    if (clearDate) {
+      _allWalks.remove(_selectedDate);
+    }
     setState(() {
       _loading = true;
       _error = false;
-      _walks = new List<Walk>();
+      _currentWalks = new List<Walk>();
       _selectedWalk = null;
     });
     return _retrieveWalks();
