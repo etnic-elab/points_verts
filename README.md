@@ -1,16 +1,15 @@
-# points_verts
+# Points Verts
 
-A new Flutter application.
+Small Flutter application displaying future Adeps' walks. Non official.
 
-## Getting Started
+# Features
 
-This project is a starting point for a Flutter application.
+- Display walks list by date, either in list form or on a map
+- Calculate distance between your position and the walks (requires to allow the app to use your position)
+- Launch navigation to the selected walk
 
-A few resources to get you started if this is your first Flutter project:
+# Planned features
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Display more walk details?
+- Notifications indicating where the nearest walk is on Sunday morning?
+- Share walk infos button?
