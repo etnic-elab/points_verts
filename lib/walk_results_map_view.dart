@@ -75,7 +75,7 @@ class WalkResultsMapView extends StatelessWidget {
                       ? SizedBox.shrink()
                       : RaisedButton.icon(
                           icon: Icon(Icons.navigation),
-                          label: Text("S'Y RENDRE"),
+                          label: Text("Y ALLER"),
                           onPressed: () {
                             launchGeoApp(walk);
                           },
