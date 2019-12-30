@@ -15,7 +15,7 @@ Widget displayIcon(walk, {Color color, double size}) {
   }
 }
 
-void launchMaps(Walk walk) async {
+void launchGeoApp(Walk walk) async {
   if (walk.lat != null && walk.long != null) {
     String mapSchema = 'geo:${walk.lat},${walk.long}';
     if (await canLaunch(mapSchema)) {

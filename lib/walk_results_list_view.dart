@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'walk.dart';
+import 'walk_utils.dart';
 
 class WalkResultsListView extends StatelessWidget {
   WalkResultsListView(this.walks, this.isLoading);
@@ -32,7 +32,7 @@ class WalkResultsListView extends StatelessWidget {
                 subtitle: Text(walk.province),
                 enabled: walk.status != 'ptvert_annule',
                 trailing:  walk.status != 'ptvert_annule' ? _displayDistance(walk) : Text("Annulé"),
-                onTap: () => _launchMaps(walk),
+                onTap: () => launchGeoApp(walk),
               ));
             } else {
               return SizedBox.shrink();
@@ -59,15 +59,6 @@ class WalkResultsListView extends StatelessWidget {
       return Text((walk.distance / 1000).round().toString() + " km");
     } else {
       return SizedBox.shrink();
-    }
-  }
-
-  _launchMaps(Walk walk) async {
-    if (walk.lat != null && walk.long != null) {
-      String mapSchema = 'geo:${walk.lat},${walk.long}';
-      if (await canLaunch(mapSchema)) {
-        await launch(mapSchema);
-      }
     }
   }
 }

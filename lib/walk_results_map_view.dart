@@ -78,7 +78,7 @@ class WalkResultsMapView extends StatelessWidget {
                           textColor: Colors.white,
                           child: Text("S'Y RENDRE"),
                           onPressed: () {
-                            launchMaps(walk);
+                            launchGeoApp(walk);
                           },
                         )
                 ],
