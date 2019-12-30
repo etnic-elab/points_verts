@@ -92,12 +92,13 @@ class WalkResultsMapView extends StatelessWidget {
       height: 25,
       point: new LatLng(walk.lat, walk.long),
       builder: (ctx) => RawMaterialButton(
-        child: displayIcon(walk, size: 20),
+        child: displayIcon(walk, color: Colors.white, size: 20),
         shape: new CircleBorder(),
         elevation: selectedWalk == walk ? 5.0 : 2.0,
+        // TODO: find a way to not hardcode the colors here
         fillColor: selectedWalk == walk
-            ? Theme.of(context).splashColor
-            : Theme.of(context).primaryColor,
+            ? Colors.greenAccent
+            : Colors.green,
         onPressed: () {
           onWalkSelect(walk);
         },
