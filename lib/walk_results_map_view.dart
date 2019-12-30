@@ -57,7 +57,6 @@ class WalkResultsMapView extends StatelessWidget {
     if (walk == null) {
       return SizedBox.shrink();
     }
-    bool cancelled = walk.status == "ptvert_annule";
     if (walk == null) {
       return SizedBox.shrink();
     } else {
@@ -70,11 +69,13 @@ class WalkResultsMapView extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  cancelled ? Text('${walk.city} (annulé)') : Text(walk.city),
-                  cancelled
+                  displayIcon(walk),
+                  _buildWalkInfoLabel(walk),
+                  walk.isCancelled()
                       ? SizedBox.shrink()
-                      : RaisedButton(
-                          child: Text("S'Y RENDRE"),
+                      : RaisedButton.icon(
+                          icon: Icon(Icons.navigation),
+                          label: Text("S'Y RENDRE"),
                           onPressed: () {
                             launchGeoApp(walk);
                           },
@@ -83,6 +84,18 @@ class WalkResultsMapView extends StatelessWidget {
               ),
             ),
           ));
+    }
+  }
+
+  static Widget _buildWalkInfoLabel(Walk walk) {
+    if (walk.isCancelled()) {
+      return Text('${walk.city} (annulé)');
+    } else if (walk.distance != null) {
+      return Column(
+        children: <Widget>[Spacer(), Text(walk.city), Text(walk.getFormattedDistance()), Spacer()],
+      );
+    } else {
+      return Text(walk.city);
     }
   }
 
@@ -96,9 +109,7 @@ class WalkResultsMapView extends StatelessWidget {
         shape: new CircleBorder(),
         elevation: selectedWalk == walk ? 5.0 : 2.0,
         // TODO: find a way to not hardcode the colors here
-        fillColor: selectedWalk == walk
-            ? Colors.greenAccent
-            : Colors.green,
+        fillColor: selectedWalk == walk ? Colors.greenAccent : Colors.green,
         onPressed: () {
           onWalkSelect(walk);
         },
@@ -119,7 +130,9 @@ class WalkResultsMapView extends StatelessWidget {
           additionalOptions: {
             'accessToken':
                 'pk.eyJ1IjoidGJvcmxlZSIsImEiOiJjazRvNGI4ZXAycTBtM2txd2Z3eHk3Ymh1In0.12yn8XMdhqdoPByYti4g5g',
-            'id': brightness == Brightness.dark ? 'mapbox.dark' : 'mapbox.streets',
+            'id': brightness == Brightness.dark
+                ? 'mapbox.dark'
+                : 'mapbox.streets',
           },
         ),
         new MarkerLayerOptions(markers: markers),

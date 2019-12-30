@@ -17,4 +17,18 @@ class Walk {
   final String status;
 
   double distance;
+
+  bool isCancelled() {
+    return status == "ptvert_annule";
+  }
+
+  String getFormattedDistance() {
+    if (distance == null) {
+      return null;
+    } else if (distance < 1000) {
+      return '${distance.round().toString()} m';
+    } else {
+      return '${(distance / 1000).round().toString()} km';
+    }
+  }
 }

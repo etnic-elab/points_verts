@@ -27,11 +27,11 @@ class WalkResultsListView extends StatelessWidget {
                   child: ListTile(
                 leading: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [_displayIcon(walk)]),
+                    children: [displayIcon(walk)]),
                 title: Text(walk.city),
                 subtitle: Text(walk.province),
-                enabled: walk.status != 'ptvert_annule',
-                trailing:  walk.status != 'ptvert_annule' ? _displayDistance(walk) : Text("Annulé"),
+                enabled: !walk.isCancelled(),
+                trailing:  walk.isCancelled() ? Text("Annulé") : _displayDistance(walk),
                 onTap: () => launchGeoApp(walk),
               ));
             } else {
@@ -42,21 +42,9 @@ class WalkResultsListView extends StatelessWidget {
     }
   }
 
-  _displayIcon(walk) {
-    if (walk.status == 'ptvert_annule') {
-      return Icon(Icons.cancel);
-    } else if (walk.type == 'M') {
-      return Icon(Icons.directions_walk);
-    } else if (walk.type == 'O') {
-      return Icon(Icons.map);
-    } else {
-      return SizedBox.shrink();
-    }
-  }
-
-  _displayDistance(walk) {
+  _displayDistance(Walk walk) {
     if (walk.distance != null) {
-      return Text((walk.distance / 1000).round().toString() + " km");
+      return Text(walk.getFormattedDistance());
     } else {
       return SizedBox.shrink();
     }

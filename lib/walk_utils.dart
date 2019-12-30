@@ -3,8 +3,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'walk.dart';
 
-Widget displayIcon(walk, {Color color, double size}) {
-  if (walk.status == 'ptvert_annule') {
+Widget displayIcon(Walk walk, {Color color, double size}) {
+  if (walk.isCancelled()) {
     return Icon(Icons.cancel, color: color, size: size);
   } else if (walk.type == 'M') {
     return Icon(Icons.directions_walk, color: color, size: size);
