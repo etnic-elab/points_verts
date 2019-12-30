@@ -200,6 +200,7 @@ class _WalkListState extends State<WalkList> {
             ),
           ),
           body: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
               _buildTab(WalkResultsListView(_currentWalks, _loading)),
               _buildTab(WalkResultsMapView(
