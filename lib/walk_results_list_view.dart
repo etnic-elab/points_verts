@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -8,7 +11,7 @@ class WalkResultsListView extends StatelessWidget {
   WalkResultsListView(this.walks, this.isLoading);
 
   final Widget loading = Center(
-    child: new CircularProgressIndicator(),
+    child: Platform.isIOS ? CupertinoActivityIndicator() : CircularProgressIndicator(),
   );
 
   final List<Walk> walks;
@@ -19,12 +22,12 @@ class WalkResultsListView extends StatelessWidget {
     if (isLoading) {
       return loading;
     } else {
-      return ListView.builder(
+      return ListView.separated(
+          separatorBuilder: (context, i) => Divider(),
           itemBuilder: (context, i) {
             if (walks.length > i) {
               Walk walk = walks[i];
-              return Card(
-                  child: ListTile(
+              return ListTile(
                 leading: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [displayIcon(walk)]),
@@ -33,7 +36,7 @@ class WalkResultsListView extends StatelessWidget {
                 enabled: !walk.isCancelled(),
                 trailing:  walk.isCancelled() ? Text("Annulé") : _displayDistance(walk),
                 onTap: () => launchGeoApp(walk),
-              ));
+              );
             } else {
               return SizedBox.shrink();
             }

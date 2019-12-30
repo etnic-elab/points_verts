@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
+import 'package:points_verts/platform_widget.dart';
 
 import 'recalculate_distances_button.dart';
 import 'walk.dart';
@@ -179,6 +180,50 @@ class _WalkListState extends State<WalkList> {
 
   @override
   Widget build(BuildContext context) {
+    return PlatformWidget(
+      androidBuilder: _androidLayout,
+      iosBuilder: _iOSLayout,
+    );
+  }
+
+  Widget _iOSLayout(BuildContext buildContext) {
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+              icon: Icon(Icons.list), title: Text('Liste')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.map), title: Text('Carte'))
+        ],
+      ),
+      tabBuilder: (BuildContext context, int index) {
+        print(index);
+        if (index == 0) {
+          return CupertinoPageScaffold(
+              navigationBar:
+                  CupertinoNavigationBar(middle: Text('Points Verts Adeps')),
+              child: SafeArea(
+                  child: Scaffold(
+                      body: _buildTab(
+                          WalkResultsListView(_currentWalks, _loading)))));
+        } else {
+          return CupertinoPageScaffold(
+              navigationBar:
+                  CupertinoNavigationBar(middle: Text('Points Verts Adeps')),
+              child: SafeArea(
+                  child: Scaffold(
+                      body: _buildTab(WalkResultsMapView(_currentWalks,
+                          _currentPosition, _loading, _selectedWalk, (walk) {
+                setState(() {
+                  _selectedWalk = walk;
+                });
+              })))));
+        }
+      },
+    );
+  }
+
+  Widget _androidLayout(BuildContext buildContext) {
     return DefaultTabController(
         length: 2,
         child: Scaffold(
@@ -219,8 +264,7 @@ class _WalkListState extends State<WalkList> {
     return Column(
       children: <Widget>[
         _defineSearchPart(),
-        Expanded(
-                child: _error ? _errorWidget() : tabContent),
+        Expanded(child: _error ? _errorWidget() : tabContent),
       ],
     );
   }
