@@ -12,14 +12,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         accentColor: Colors.white,
         buttonTheme: ButtonThemeData(
-          buttonColor: Colors.green,
-          splashColor: Colors.greenAccent,
-          textTheme: ButtonTextTheme.accent
-        ),
+            buttonColor: Colors.green,
+            splashColor: Colors.greenAccent,
+            textTheme: ButtonTextTheme.accent),
       ),
       darkTheme: ThemeData(
-          brightness: Brightness.dark,
-          primarySwatch: Colors.green
+        brightness: Brightness.dark,
+        primarySwatch: Colors.green,
+        accentColor: Colors.white,
       ),
       home: WalkList(),
     );
