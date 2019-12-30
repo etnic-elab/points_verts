@@ -201,7 +201,7 @@ class _WalkListState extends State<WalkList> {
         if (index == 0) {
           return CupertinoPageScaffold(
               navigationBar:
-                  CupertinoNavigationBar(middle: Text('Points Verts Adeps')),
+                  CupertinoNavigationBar(middle: Text('Points Verts Adeps', style: TextStyle(color: Colors.white)), backgroundColor: Colors.green),
               child: SafeArea(
                   child: Scaffold(
                       body: _buildTab(buildContext,
