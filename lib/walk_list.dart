@@ -28,12 +28,12 @@ class _WalkListState extends State<WalkList> {
     child: new CircularProgressIndicator(),
   );
 
-  List<DropdownMenuItem<String>> _dropdownItems =
-      new List<DropdownMenuItem<String>>();
-  Map<String, List<Walk>> _allWalks = HashMap<String, List<Walk>>();
+  List<DateTime> _dates = new List<DateTime>();
+  Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
   List<Walk> _currentWalks = List<Walk>();
   Walk _selectedWalk;
-  String _selectedDate;
+  int _currentChoice = 0;
+  DateTime _selectedDate;
   Position _currentPosition;
   bool _calculatingPosition = false;
   bool _loading = true;
@@ -41,6 +41,7 @@ class _WalkListState extends State<WalkList> {
 
   @override
   void initState() {
+    initializeDateFormatting("fr_BE");
     _retrieveDates();
     _getCurrentLocation();
     super.initState();
@@ -81,9 +82,10 @@ class _WalkListState extends State<WalkList> {
   }
 
   Future<List<Walk>> _retrieveWalksFromEndpoint() async {
+    DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
     List<Walk> newList = List<Walk>();
     var response = await http.get(
-        "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=$_selectedDate&activites=M,O");
+        "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(_selectedDate)}&activites=M,O");
     var fixed = _fixCsv(response.body);
     List<List<dynamic>> rowsAsListOfValues =
         const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
@@ -124,58 +126,48 @@ class _WalkListState extends State<WalkList> {
   }
 
   void _retrieveDates() async {
-    _retrieveDatesFromWorker().then((List<DropdownMenuItem> items) {
+    _retrieveDatesFromWorker().then((List<DateTime> items) {
       setState(() {
-        _dropdownItems = items;
-        _selectedDate = items.isNotEmpty ? items.first.value : _getNextSunday();
+        _dates = items;
+        _selectedDate = items.isNotEmpty ? items.first : _getNextSunday();
       });
       _retrieveWalks();
     }).catchError((err) {
-      print(err);
+      print("Cannot retrieve dates: $err");
       setState(() {
-        _dropdownItems = _generateDropdownItems();
+        _dates = _generateDates();
         _selectedDate = _getNextSunday();
       });
       _retrieveWalks();
     });
   }
 
-  Future<List<DropdownMenuItem>> _retrieveDatesFromWorker() async {
+  Future<List<DateTime>> _retrieveDatesFromWorker() async {
     try {
       String url = "https://points-verts.tbo.workers.dev/";
       var response = await http.get(url);
-      var dates = jsonDecode(response.body);
-      List<DropdownMenuItem<String>> results =
-          new List<DropdownMenuItem<String>>();
-      await initializeDateFormatting("fr_FR", null);
+      List<dynamic> dates = jsonDecode(response.body);
       DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
-      DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
-      for (String date in dates) {
-        DateTime dateTime = dateFormat.parse(date);
-        results.add(new DropdownMenuItem<String>(
-            value: date, child: new Text(fullDate.format(dateTime))));
-      }
-      return results;
+      return dates.map((dynamic date) => dateFormat.parse(date)).toList();
     } catch (err) {
-      print(err);
+      print("Cannot retrieve dates from worker: $err");
       return _retrieveDatesFromEndpoint();
     }
   }
 
-  Future<List<DropdownMenuItem>> _retrieveDatesFromEndpoint() async {
+  Future<List<DateTime>> _retrieveDatesFromEndpoint() async {
     String url = "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=dates";
     var response = await http.get(url);
     var document = parse(response.body);
-    List<DropdownMenuItem<String>> results =
-        new List<DropdownMenuItem<String>>();
+    List<String> results = new List<String>();
     for (dom.Element element in document.getElementsByTagName('option')) {
       String value = element.attributes['value'];
       if (value != '0') {
-        results.add(new DropdownMenuItem<String>(
-            value: value, child: new Text(element.innerHtml)));
+        results.add(value);
       }
     }
-    return results;
+    DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
+    return results.map((String date) => dateFormat.parse(date)).toList();
   }
 
   @override
@@ -190,21 +182,18 @@ class _WalkListState extends State<WalkList> {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.list), title: Text('Liste')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.map), title: Text('Carte'))
+          BottomNavigationBarItem(icon: Icon(Icons.list), title: Text('Liste')),
+          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text('Carte'))
         ],
       ),
       tabBuilder: (BuildContext context, int index) {
-        print(index);
         if (index == 0) {
           return CupertinoPageScaffold(
               navigationBar:
                   CupertinoNavigationBar(middle: Text('Points Verts Adeps')),
               child: SafeArea(
                   child: Scaffold(
-                      body: _buildTab(
+                      body: _buildTab(buildContext,
                           WalkResultsListView(_currentWalks, _loading)))));
         } else {
           return CupertinoPageScaffold(
@@ -212,12 +201,14 @@ class _WalkListState extends State<WalkList> {
                   CupertinoNavigationBar(middle: Text('Points Verts Adeps')),
               child: SafeArea(
                   child: Scaffold(
-                      body: _buildTab(WalkResultsMapView(_currentWalks,
-                          _currentPosition, _loading, _selectedWalk, (walk) {
-                setState(() {
-                  _selectedWalk = walk;
-                });
-              })))));
+                      body: _buildTab(
+                          buildContext,
+                          WalkResultsMapView(_currentWalks, _currentPosition,
+                              _loading, _selectedWalk, (walk) {
+                            setState(() {
+                              _selectedWalk = walk;
+                            });
+                          })))));
         }
       },
     );
@@ -234,7 +225,7 @@ class _WalkListState extends State<WalkList> {
                   icon: Icon(Icons.calendar_today),
                   onPressed: () {
                     setState(() {
-                      _selectedDate = _dropdownItems.first.value;
+                      _selectedDate = _dates.first;
                     });
                     _refreshWalks();
                   }),
@@ -247,23 +238,29 @@ class _WalkListState extends State<WalkList> {
           body: TabBarView(
             physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
-              _buildTab(WalkResultsListView(_currentWalks, _loading)),
-              _buildTab(WalkResultsMapView(
-                  _currentWalks, _currentPosition, _loading, _selectedWalk,
-                  (walk) {
-                setState(() {
-                  _selectedWalk = walk;
-                });
-              })),
+              _buildTab(
+                  buildContext, WalkResultsListView(_currentWalks, _loading)),
+              _buildTab(
+                  buildContext,
+                  WalkResultsMapView(
+                      _currentWalks, _currentPosition, _loading, _selectedWalk,
+                      (walk) {
+                    setState(() {
+                      _selectedWalk = walk;
+                    });
+                  })),
             ],
           ),
         ));
   }
 
-  Widget _buildTab(Widget tabContent) {
+  Widget _buildTab(BuildContext context, Widget tabContent) {
+    if (_dates == null) {
+      return SizedBox.shrink();
+    }
     return Column(
       children: <Widget>[
-        _defineSearchPart(),
+        _defineSearchPart(context),
         Expanded(child: _error ? _errorWidget() : tabContent),
       ],
     );
@@ -273,6 +270,7 @@ class _WalkListState extends State<WalkList> {
     return Card(
         child: Column(
       children: <Widget>[
+        Spacer(),
         Spacer(),
         Icon(Icons.warning),
         Container(
@@ -302,25 +300,32 @@ class _WalkListState extends State<WalkList> {
     }
   }
 
-  Widget _dropdown() {
-    return DropdownButton<String>(
-      value: _selectedDate,
-      items: _dropdownItems,
-      onChanged: (String newValue) {
-        setState(() {
-          _selectedDate = newValue;
-        });
-        _refreshWalks();
-      },
-    );
+  Widget _dropdown(BuildContext context) {
+    if (_selectedDate != null) {
+      DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
+      return RaisedButton(
+        child: Text(fullDate.format(_selectedDate)),
+        onPressed: () {
+          showChoices(context, _dates, _currentChoice, (int value) {
+            setState(() {
+              _selectedDate = _dates[value];
+              _currentChoice = value;
+            });
+            _retrieveWalks();
+          });
+        },
+      );
+    } else {
+      return SizedBox.shrink();
+    }
   }
 
-  _defineSearchPart() {
-    if (_dropdownItems.isNotEmpty) {
+  _defineSearchPart(BuildContext context) {
+    if (_dates.isNotEmpty) {
       return Container(
           margin: const EdgeInsets.only(left: 10, right: 10),
           child: Row(children: <Widget>[
-            _dropdown(),
+            _dropdown(context),
             Expanded(child: _resultNumber())
           ]));
     } else {
@@ -384,38 +389,31 @@ class _WalkListState extends State<WalkList> {
       });
       _retrieveWalks();
     }).catchError((e) {
-      print(e);
+      print("Cannot retrieve current position: $e");
     });
   }
 
-  static String _getNextSunday() {
+  static DateTime _getNextSunday() {
     DateTime current = new DateTime.now();
     Duration oneDay = new Duration(days: 1);
-    DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
     while (current.weekday != DateTime.sunday) {
       current = current.add(oneDay);
     }
-    return dateFormat.format(current);
+    return current;
   }
 
-  static List<DropdownMenuItem<String>> _generateDropdownItems() {
-    List<String> results = new List<String>();
+  static List<DateTime> _generateDates() {
+    List<DateTime> results = new List<DateTime>();
     DateTime current = new DateTime.now();
     Duration oneDay = new Duration(days: 1);
     Duration aWeek = new Duration(days: 7);
-    DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
     while (current.weekday != DateTime.sunday) {
       current = current.add(oneDay);
     }
     while (results.length < 10) {
-      results.add(dateFormat.format(current));
+      results.add(current);
       current = current.add(aWeek);
     }
-    return results.map((String value) {
-      return new DropdownMenuItem<String>(
-        value: value,
-        child: new Text(value),
-      );
-    }).toList();
+    return results;
   }
 }
