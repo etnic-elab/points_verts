@@ -11,7 +11,6 @@ import 'package:intl/intl.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
 
-import 'nav_bar.dart';
 import 'recalculate_distances_button.dart';
 import 'walk.dart';
 import 'walk_results_list_view.dart';
@@ -24,10 +23,10 @@ class WalkList extends StatefulWidget {
 
 class _WalkListState extends State<WalkList> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-  final Widget loading = Center(
+  final Widget _loadingWidget = Center(
     child: new CircularProgressIndicator(),
   );
-  final Widget error = Row(children: [
+  final Widget _errorWidget = Row(children: [
     Expanded(
         child: Center(
             child:
@@ -44,7 +43,6 @@ class _WalkListState extends State<WalkList> {
   bool _calculatingPosition = false;
   bool _loading = true;
   bool _error = false;
-  int _index = 0;
 
   @override
   void initState() {
@@ -74,7 +72,6 @@ class _WalkListState extends State<WalkList> {
     setState(() {
       _currentWalks = newList;
       _loading = false;
-      _error = false;
     });
     return _currentWalks;
   }
@@ -98,6 +95,9 @@ class _WalkListState extends State<WalkList> {
             date: walk[6],
             status: walk[9]));
       }
+      setState(() {
+        _error = false;
+      });
     } catch (err) {
       print(err);
       setState(() {
@@ -188,31 +188,55 @@ class _WalkListState extends State<WalkList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Points Verts Adeps'), actions: <Widget>[
-        IconButton(
-            icon: Icon(Icons.calendar_today),
-            onPressed: () {
-              setState(() {
-                _selectedDate = _dropdownItems.first.value;
-              });
-              _refreshWalks();
-            }),
-        _positionAppBarActionButton(),
-      ]),
-      bottomNavigationBar: NavBar(
-        onIconTap: (int index) {
-          setState(() {
-            _index = index;
-          });
-        },
-      ),
-      body: _buildWalks(),
+    return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Points Verts Adeps'),
+            actions: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.calendar_today),
+                  onPressed: () {
+                    setState(() {
+                      _selectedDate = _dropdownItems.first.value;
+                    });
+                    _refreshWalks();
+                  }),
+              _positionAppBarActionButton(),
+            ],
+            bottom: TabBar(
+              tabs: <Widget>[Tab(text: "LISTE"), Tab(text: "CARTE")],
+            ),
+          ),
+          body: TabBarView(
+            children: <Widget>[
+              _buildTab(WalkResultsListView(_currentWalks, _loading)),
+              _buildTab(WalkResultsMapView(
+                  _currentWalks, _currentPosition, _loading, _selectedWalk,
+                  (walk) {
+                setState(() {
+                  _selectedWalk = walk;
+                });
+              })),
+            ],
+          ),
+        ));
+  }
+
+  Widget _buildTab(Widget tabContent) {
+    return Column(
+      children: <Widget>[
+        _defineSearchPart(),
+        Expanded(
+            child: RefreshIndicator(
+                child: _error ? _errorWidget : tabContent,
+                onRefresh: () => _refreshWalks(clearDate: true))),
+      ],
     );
   }
 
   Widget _positionAppBarActionButton() {
-    if(_calculatingPosition) {
+    if (_calculatingPosition) {
       return new IconButton(icon: Icon(Icons.my_location), onPressed: null);
     } else {
       return RecalculateDistancesButton(onPressed: () {
@@ -234,12 +258,6 @@ class _WalkListState extends State<WalkList> {
     );
   }
 
-  Widget _buildWalks() {
-    var main = _defineMainPart();
-    return Column(
-        children: <Widget>[_defineSearchPart(), Expanded(child: main)]);
-  }
-
   _defineSearchPart() {
     if (_dropdownItems.isNotEmpty) {
       return Container(
@@ -249,7 +267,7 @@ class _WalkListState extends State<WalkList> {
             Expanded(child: _resultNumber())
           ]));
     } else {
-      return loading;
+      return _loadingWidget;
     }
   }
 
@@ -260,29 +278,6 @@ class _WalkListState extends State<WalkList> {
           child: Text("${_currentWalks.length.toString()} résultat(s)"));
     } else {
       return SizedBox.shrink();
-    }
-  }
-
-  _defineMainPart() {
-    if (_error) {
-      return error;
-    } else {
-      return RefreshIndicator(
-          child: _displayMainPart(),
-          onRefresh: () => _refreshWalks(clearDate: true));
-    }
-  }
-
-  _displayMainPart() {
-    if (_index == 1) {
-      return WalkResultsMapView(
-          _currentWalks, _currentPosition, _loading, _selectedWalk, (walk) {
-        setState(() {
-          _selectedWalk = walk;
-        });
-      });
-    } else {
-      return WalkResultsListView(_currentWalks, _loading);
     }
   }
 
