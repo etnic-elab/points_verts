@@ -29,6 +29,7 @@ class _WalkListState extends State<WalkList> {
   );
 
   List<DateTime> _dates = new List<DateTime>();
+  List<DropdownMenuItem<DateTime>> dropdownMenuItems = new List<DropdownMenuItem<DateTime>>();
   Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
   List<Walk> _currentWalks = List<Walk>();
   Walk _selectedWalk;
@@ -129,6 +130,7 @@ class _WalkListState extends State<WalkList> {
     _retrieveDatesFromWorker().then((List<DateTime> items) {
       setState(() {
         _dates = items;
+        dropdownMenuItems = generateDropdownItems(items);
         _selectedDate = items.isNotEmpty ? items.first : _getNextSunday();
       });
       _retrieveWalks();
@@ -136,10 +138,19 @@ class _WalkListState extends State<WalkList> {
       print("Cannot retrieve dates: $err");
       setState(() {
         _dates = _generateDates();
+        dropdownMenuItems = generateDropdownItems(_generateDates());
         _selectedDate = _getNextSunday();
       });
       _retrieveWalks();
     });
+  }
+
+  static List<DropdownMenuItem<DateTime>> generateDropdownItems(List<DateTime> dates) {
+    DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
+    return dates.map((DateTime date) {
+      return DropdownMenuItem<DateTime>(
+          value: date, child: new Text(fullDate.format(date)));
+    }).toList();
   }
 
   Future<List<DateTime>> _retrieveDatesFromWorker() async {
@@ -301,10 +312,28 @@ class _WalkListState extends State<WalkList> {
   }
 
   Widget _dropdown(BuildContext context) {
+    DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
+    return DropdownButton(
+      value: _selectedDate,
+      items: _dates.map((DateTime date) {
+        return DropdownMenuItem<DateTime>(
+            value: date, child: new Text(fullDate.format(date)));
+      }).toList(),
+      onChanged: (DateTime newValue) {
+        setState(() {
+          _selectedDate = newValue;
+        });
+        _refreshWalks();
+      },
+    );
+  }
+
+  Widget _newdropdown(BuildContext context) {
     if (_selectedDate != null) {
       DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
-      return RaisedButton(
-        child: Text(fullDate.format(_selectedDate)),
+      return RaisedButton.icon(
+        icon: Icon(Icons.date_range),
+        label: Text(fullDate.format(_selectedDate)),
         onPressed: () {
           showChoices(context, _dates, _currentChoice, (int value) {
             setState(() {
