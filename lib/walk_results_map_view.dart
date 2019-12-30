@@ -12,7 +12,7 @@ class WalkResultsMapView extends StatelessWidget {
       this.selectedWalk, this.onWalkSelect);
 
   final Widget loading = Center(
-    child: new CircularProgressIndicator(),
+    child: new CircularProgressIndicator(backgroundColor: Colors.green),
   );
 
   final List<Walk> walks;
