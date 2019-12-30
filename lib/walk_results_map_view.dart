@@ -12,7 +12,7 @@ class WalkResultsMapView extends StatelessWidget {
       this.selectedWalk, this.onWalkSelect);
 
   final Widget loading = Center(
-    child: new CircularProgressIndicator(backgroundColor: Colors.green),
+    child: new CircularProgressIndicator(),
   );
 
   final List<Walk> walks;
@@ -38,7 +38,7 @@ class WalkResultsMapView extends StatelessWidget {
 
     return Stack(
       children: <Widget>[
-        _buildFlutterMap(markers),
+        _buildFlutterMap(markers, MediaQuery.of(context).platformBrightness),
         _buildWalkInfo(selectedWalk),
         _buildLoading()
       ],
@@ -92,10 +92,12 @@ class WalkResultsMapView extends StatelessWidget {
       height: 25,
       point: new LatLng(walk.lat, walk.long),
       builder: (ctx) => RawMaterialButton(
-        child: displayIcon(walk, color: Colors.white, size: 20),
+        child: displayIcon(walk, size: 20),
         shape: new CircleBorder(),
-        elevation: 2.0,
-        fillColor: selectedWalk == walk ? Theme.of(context).splashColor : Theme.of(context).primaryColor,
+        elevation: selectedWalk == walk ? 5.0 : 2.0,
+        fillColor: selectedWalk == walk
+            ? Theme.of(context).splashColor
+            : Theme.of(context).primaryColor,
         onPressed: () {
           onWalkSelect(walk);
         },
@@ -103,7 +105,7 @@ class WalkResultsMapView extends StatelessWidget {
     );
   }
 
-  static _buildFlutterMap(List<Marker> markers) {
+  static _buildFlutterMap(List<Marker> markers, Brightness brightness) {
     return FlutterMap(
       options: new MapOptions(
         center: new LatLng(50.3155646, 5.009682),
@@ -116,7 +118,7 @@ class WalkResultsMapView extends StatelessWidget {
           additionalOptions: {
             'accessToken':
                 'pk.eyJ1IjoidGJvcmxlZSIsImEiOiJjazRvNGI4ZXAycTBtM2txd2Z3eHk3Ymh1In0.12yn8XMdhqdoPByYti4g5g',
-            'id': 'mapbox.streets',
+            'id': brightness == Brightness.dark ? 'mapbox.dark' : 'mapbox.streets',
           },
         ),
         new MarkerLayerOptions(markers: markers),

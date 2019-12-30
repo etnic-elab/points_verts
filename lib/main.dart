@@ -9,19 +9,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.green,
-        splashColor: Colors.greenAccent,
-        accentColor: Colors.white,
-        buttonTheme: ButtonThemeData(
-            buttonColor: Colors.green,
-            splashColor: Colors.greenAccent,
-            textTheme: ButtonTextTheme.primary),
+        primarySwatch: Colors.green
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.green,
-        splashColor: Colors.grey,
-        accentColor: Colors.white,
+        primarySwatch: Colors.green
       ),
       home: WalkList(),
     );

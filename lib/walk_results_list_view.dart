@@ -8,7 +8,7 @@ class WalkResultsListView extends StatelessWidget {
   WalkResultsListView(this.walks, this.isLoading);
 
   final Widget loading = Center(
-    child: new CircularProgressIndicator(backgroundColor: Colors.green),
+    child: new CircularProgressIndicator(),
   );
 
   final List<Walk> walks;
