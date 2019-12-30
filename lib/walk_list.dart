@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
@@ -29,7 +30,8 @@ class _WalkListState extends State<WalkList> {
   );
 
   List<DateTime> _dates = new List<DateTime>();
-  List<DropdownMenuItem<DateTime>> dropdownMenuItems = new List<DropdownMenuItem<DateTime>>();
+  List<DropdownMenuItem<DateTime>> dropdownMenuItems =
+      new List<DropdownMenuItem<DateTime>>();
   Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
   List<Walk> _currentWalks = List<Walk>();
   Walk _selectedWalk;
@@ -145,7 +147,8 @@ class _WalkListState extends State<WalkList> {
     });
   }
 
-  static List<DropdownMenuItem<DateTime>> generateDropdownItems(List<DateTime> dates) {
+  static List<DropdownMenuItem<DateTime>> generateDropdownItems(
+      List<DateTime> dates) {
     DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
     return dates.map((DateTime date) {
       return DropdownMenuItem<DateTime>(
@@ -193,23 +196,25 @@ class _WalkListState extends State<WalkList> {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.list), title: Text('Liste')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.list), title: Text('Listes')),
           BottomNavigationBarItem(icon: Icon(Icons.map), title: Text('Carte'))
         ],
       ),
       tabBuilder: (BuildContext context, int index) {
+        var navBar = CupertinoNavigationBar(
+            middle: Text('Points Verts Adeps',
+            style: TextStyle(color: Colors.white)), backgroundColor: Colors.green);
         if (index == 0) {
           return CupertinoPageScaffold(
-              navigationBar:
-                  CupertinoNavigationBar(middle: Text('Points Verts Adeps', style: TextStyle(color: Colors.white)), backgroundColor: Colors.green),
+              navigationBar: navBar,
               child: SafeArea(
                   child: Scaffold(
                       body: _buildTab(buildContext,
                           WalkResultsListView(_currentWalks, _loading)))));
         } else {
           return CupertinoPageScaffold(
-              navigationBar:
-                  CupertinoNavigationBar(middle: Text('Points Verts Adeps')),
+              navigationBar: navBar,
               child: SafeArea(
                   child: Scaffold(
                       body: _buildTab(
@@ -281,7 +286,6 @@ class _WalkListState extends State<WalkList> {
     return Card(
         child: Column(
       children: <Widget>[
-        Spacer(),
         Spacer(),
         Icon(Icons.warning),
         Container(
@@ -363,7 +367,10 @@ class _WalkListState extends State<WalkList> {
   }
 
   _resultNumber() {
-    if (_currentWalks.length > 0 && !_loading) {
+    Size size = MediaQuery.of(context).size;
+    if (_currentWalks.length > 0 && !_loading && size.width > 400) {
+      print(size.height);
+      print(size.width);
       return Align(
           alignment: Alignment.centerRight,
           child: Text("${_currentWalks.length.toString()} résultat(s)"));

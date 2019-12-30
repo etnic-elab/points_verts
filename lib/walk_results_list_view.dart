@@ -23,7 +23,7 @@ class WalkResultsListView extends StatelessWidget {
       return loading;
     } else {
       return ListView.separated(
-          separatorBuilder: (context, i) => Divider(),
+          separatorBuilder: (context, i) => Divider(height: 1.0),
           itemBuilder: (context, i) {
             if (walks.length > i) {
               Walk walk = walks[i];
