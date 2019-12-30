@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -359,18 +360,16 @@ class _WalkListState extends State<WalkList> {
           margin: const EdgeInsets.only(left: 10, right: 10),
           child: Row(children: <Widget>[
             _dropdown(context),
-            Expanded(child: _resultNumber())
+            SizedBox.shrink(),
+            Expanded(child: _resultNumber(context))
           ]));
     } else {
       return _loadingWidget;
     }
   }
 
-  _resultNumber() {
-    Size size = MediaQuery.of(context).size;
-    if (_currentWalks.length > 0 && !_loading && size.width > 400) {
-      print(size.height);
-      print(size.width);
+  _resultNumber(BuildContext context) {
+    if (_currentWalks.length > 0 && !_loading && window.physicalSize.width >= 1080) {
       return Align(
           alignment: Alignment.centerRight,
           child: Text("${_currentWalks.length.toString()} résultat(s)"));
