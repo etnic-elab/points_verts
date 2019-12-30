@@ -44,5 +44,11 @@
 
 	<key>NSLocationWhenInUseUsageDescription</key>
     <string>This app needs access to location when open.</string>
+
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>comgooglemaps</string>
+        <string>waze</string>
+    </array>
 </dict>
 </plist>

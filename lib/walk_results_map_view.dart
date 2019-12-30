@@ -56,34 +56,32 @@ class WalkResultsMapView extends StatelessWidget {
   static Widget _buildWalkInfo(Walk walk) {
     if (walk == null) {
       return SizedBox.shrink();
-    }
-    if (walk == null) {
-      return SizedBox.shrink();
     } else {
-      return Align(
-          alignment: Alignment.bottomCenter,
-          child: Card(
-            child: Container(
-              height: 50.0,
-              padding: EdgeInsets.only(left: 10.0, right: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  displayIcon(walk),
-                  _buildWalkInfoLabel(walk),
-                  walk.isCancelled()
-                      ? SizedBox.shrink()
-                      : RaisedButton.icon(
-                          icon: Icon(Icons.navigation),
-                          label: Text("Y ALLER"),
-                          onPressed: () {
-                            launchGeoApp(walk);
-                          },
-                        )
-                ],
-              ),
-            ),
-          ));
+      return SafeArea(
+//        child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Card(
+                child: Container(
+                  height: 50.0,
+                  padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      displayIcon(walk),
+                      _buildWalkInfoLabel(walk),
+                      walk.isCancelled()
+                          ? SizedBox.shrink()
+                          : RaisedButton.icon(
+                              icon: Icon(Icons.navigation),
+                              label: Text("Y ALLER"),
+                              onPressed: () {
+                                launchGeoApp(walk);
+                              },
+                            )
+                    ],
+                  ),
+                ),
+              )));
     }
   }
 
@@ -92,7 +90,12 @@ class WalkResultsMapView extends StatelessWidget {
       return Text('${walk.city} (annulé)');
     } else if (walk.distance != null) {
       return Column(
-        children: <Widget>[Spacer(), Text(walk.city), Text(walk.getFormattedDistance()), Spacer()],
+        children: <Widget>[
+          Spacer(),
+          Text(walk.city),
+          Text(walk.getFormattedDistance()),
+          Spacer()
+        ],
       );
     } else {
       return Text(walk.city);

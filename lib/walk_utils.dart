@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,9 +19,16 @@ Widget displayIcon(Walk walk, {Color color, double size}) {
 
 void launchGeoApp(Walk walk) async {
   if (walk.lat != null && walk.long != null) {
-    String mapSchema = 'geo:${walk.lat},${walk.long}';
-    if (await canLaunch(mapSchema)) {
-      await launch(mapSchema);
+    if (Platform.isIOS) {
+      String mapSchema = 'https://maps.apple.com/?q=${walk.lat},${walk.long}';
+      if (await canLaunch(mapSchema)) {
+        await launch(mapSchema);
+      }
+    } else {
+      String mapSchema = 'geo:${walk.lat},${walk.long}';
+      if (await canLaunch(mapSchema)) {
+        await launch(mapSchema);
+      }
     }
   }
 }
