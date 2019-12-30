@@ -14,7 +14,7 @@ class RecalculateDistancesButton extends StatelessWidget {
           Scaffold.of(context).showSnackBar(
             SnackBar(
               content:
-              Text('Distances recalculées selon la position actuelle.'),
+              Text('Recalcul des distances selon la position actuelle.'),
             ),
           );
         });

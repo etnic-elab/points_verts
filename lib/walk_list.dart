@@ -41,6 +41,7 @@ class _WalkListState extends State<WalkList> {
   Walk _selectedWalk;
   String _selectedDate;
   Position _currentPosition;
+  bool _calculatingPosition = false;
   bool _loading = true;
   bool _error = false;
   int _index = 0;
@@ -197,9 +198,7 @@ class _WalkListState extends State<WalkList> {
               });
               _refreshWalks();
             }),
-        RecalculateDistancesButton(onPressed: () {
-          _getCurrentLocation();
-        }),
+        _positionAppBarActionButton(),
       ]),
       bottomNavigationBar: NavBar(
         onIconTap: (int index) {
@@ -210,6 +209,16 @@ class _WalkListState extends State<WalkList> {
       ),
       body: _buildWalks(),
     );
+  }
+
+  Widget _positionAppBarActionButton() {
+    if(_calculatingPosition) {
+      return new IconButton(icon: Icon(Icons.my_location), onPressed: null);
+    } else {
+      return RecalculateDistancesButton(onPressed: () {
+        _getCurrentLocation();
+      });
+    }
   }
 
   Widget _dropdown() {
@@ -311,11 +320,15 @@ class _WalkListState extends State<WalkList> {
   }
 
   _getCurrentLocation() {
+    setState(() {
+      _calculatingPosition = true;
+    });
     geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((Position position) {
       setState(() {
         _currentPosition = position;
+        _calculatingPosition = false;
       });
       _retrieveWalks();
     }).catchError((e) {
