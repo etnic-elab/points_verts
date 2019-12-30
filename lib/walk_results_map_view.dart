@@ -73,9 +73,7 @@ class WalkResultsMapView extends StatelessWidget {
                   cancelled ? Text('${walk.city} (annulé)') : Text(walk.city),
                   cancelled
                       ? SizedBox.shrink()
-                      : FlatButton(
-                          color: Colors.green,
-                          textColor: Colors.white,
+                      : RaisedButton(
                           child: Text("S'Y RENDRE"),
                           onPressed: () {
                             launchGeoApp(walk);

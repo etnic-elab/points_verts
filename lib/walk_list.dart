@@ -26,12 +26,6 @@ class _WalkListState extends State<WalkList> {
   final Widget _loadingWidget = Center(
     child: new CircularProgressIndicator(),
   );
-  final Widget _errorWidget = Row(children: [
-    Expanded(
-        child: Center(
-            child:
-                Text("Une erreur est survenue, merci de réessayer plus tard.")))
-  ]);
 
   List<DropdownMenuItem<String>> _dropdownItems =
       new List<DropdownMenuItem<String>>();
@@ -62,8 +56,16 @@ class _WalkListState extends State<WalkList> {
     if (_allWalks.containsKey(_selectedDate)) {
       newList = _allWalks[_selectedDate];
     } else {
-      newList = await _retrieveWalksFromEndpoint();
-      _allWalks.putIfAbsent(_selectedDate, () => newList);
+      try {
+        newList = await _retrieveWalksFromEndpoint();
+        _allWalks.putIfAbsent(_selectedDate, () => newList);
+      } catch (err) {
+        setState(() {
+          _error = true;
+          _loading = false;
+        });
+        return newList;
+      }
     }
 
     if (_currentPosition != null) {
@@ -71,6 +73,7 @@ class _WalkListState extends State<WalkList> {
     }
     setState(() {
       _currentWalks = newList;
+      _error = false;
       _loading = false;
     });
     return _currentWalks;
@@ -78,32 +81,20 @@ class _WalkListState extends State<WalkList> {
 
   Future<List<Walk>> _retrieveWalksFromEndpoint() async {
     List<Walk> newList = List<Walk>();
-    var response;
-    try {
-      response = await http.get(
-          "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=$_selectedDate&activites=M,O");
-      var fixed = _fixCsv(response.body);
-      List<List<dynamic>> rowsAsListOfValues =
-          const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-      for (List<dynamic> walk in rowsAsListOfValues) {
-        newList.add(Walk(
-            city: walk[1],
-            type: walk[2],
-            lat: walk[3] != "" ? walk[3] : null,
-            long: walk[4] != "" ? walk[4] : null,
-            province: walk[5],
-            date: walk[6],
-            status: walk[9]));
-      }
-      setState(() {
-        _error = false;
-      });
-    } catch (err) {
-      print(err);
-      setState(() {
-        _loading = false;
-        _error = true;
-      });
+    var response = await http.get(
+        "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=$_selectedDate&activites=M,O");
+    var fixed = _fixCsv(response.body);
+    List<List<dynamic>> rowsAsListOfValues =
+        const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
+    for (List<dynamic> walk in rowsAsListOfValues) {
+      newList.add(Walk(
+          city: walk[1],
+          type: walk[2],
+          lat: walk[3] != "" ? walk[3] : null,
+          long: walk[4] != "" ? walk[4] : null,
+          province: walk[5],
+          date: walk[6],
+          status: walk[9]));
     }
     return newList;
   }
@@ -228,11 +219,32 @@ class _WalkListState extends State<WalkList> {
       children: <Widget>[
         _defineSearchPart(),
         Expanded(
-            child: RefreshIndicator(
-                child: _error ? _errorWidget : tabContent,
-                onRefresh: () => _refreshWalks(clearDate: true))),
+                child: _error ? _errorWidget() : tabContent),
       ],
     );
+  }
+
+  Widget _errorWidget() {
+    return Card(
+        child: Column(
+      children: <Widget>[
+        Spacer(),
+        Icon(Icons.warning),
+        Container(
+            padding: EdgeInsets.all(5.0),
+            child: Row(children: [
+              Expanded(
+                  child: Center(
+                      child: Text(
+                          "Une erreur est survenue lors de la récupération des données. Merci de réessayer plus tard.",
+                          textAlign: TextAlign.center)))
+            ])),
+        RaisedButton(
+            child: Text("Réessayer"),
+            onPressed: () => _refreshWalks(clearDate: true)),
+        Spacer()
+      ],
+    ));
   }
 
   Widget _positionAppBarActionButton() {
