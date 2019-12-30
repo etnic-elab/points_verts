@@ -95,7 +95,7 @@ class WalkResultsMapView extends StatelessWidget {
         child: displayIcon(walk, color: Colors.white, size: 20),
         shape: new CircleBorder(),
         elevation: 2.0,
-        fillColor: selectedWalk == walk ? Colors.greenAccent : Colors.green,
+        fillColor: selectedWalk == walk ? Theme.of(context).splashColor : Theme.of(context).primaryColor,
         onPressed: () {
           onWalkSelect(walk);
         },
