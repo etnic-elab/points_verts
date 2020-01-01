@@ -1,3 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+import 'trip.dart';
+import 'walk_utils.dart';
+
 class Walk {
   Walk(
       {this.city,
@@ -17,6 +23,7 @@ class Walk {
   final String status;
 
   double distance;
+  Trip trip;
 
   bool isCancelled() {
     return status == "ptvert_annule";

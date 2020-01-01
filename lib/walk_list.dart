@@ -12,9 +12,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
+import 'package:points_verts/mapbox.dart';
 import 'package:points_verts/platform_widget.dart';
 
 import 'recalculate_distances_button.dart';
+import 'trip.dart';
 import 'walk.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
@@ -115,6 +117,12 @@ class _WalkListState extends State<WalkList> {
             walk.lat,
             walk.long);
         walk.distance = distance;
+        retrieveTrip(_currentPosition.longitude, _currentPosition.latitude, walk.long, walk.lat).then((Trip trip) {
+          walk.trip = trip;
+          setState(() {
+
+          });
+        });
       }
     }
     walks.sort((a, b) {

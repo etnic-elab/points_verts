@@ -11,7 +11,9 @@ class WalkResultsListView extends StatelessWidget {
   WalkResultsListView(this.walks, this.isLoading);
 
   final Widget loading = Center(
-    child: Platform.isIOS ? CupertinoActivityIndicator() : CircularProgressIndicator(),
+    child: Platform.isIOS
+        ? CupertinoActivityIndicator()
+        : CircularProgressIndicator(),
   );
 
   final List<Walk> walks;
@@ -32,24 +34,17 @@ class WalkResultsListView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [displayIcon(walk)]),
                 title: Text(walk.city),
-                subtitle: Text(walk.province),
+                subtitle: Text('${walk.province} - ${walk.getFormattedDistance()}'),
                 enabled: !walk.isCancelled(),
-                trailing:  walk.isCancelled() ? Text("Annulé") : _displayDistance(walk),
-                onTap: () => launchGeoApp(walk),
+                trailing: walk.isCancelled()
+                    ? Text("Annulé")
+                    : displayTripButton(walk),
               );
             } else {
               return SizedBox.shrink();
             }
           },
           itemCount: walks.length);
-    }
-  }
-
-  _displayDistance(Walk walk) {
-    if (walk.distance != null) {
-      return Text(walk.getFormattedDistance());
-    } else {
-      return SizedBox.shrink();
     }
   }
 }

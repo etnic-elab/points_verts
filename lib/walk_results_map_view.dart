@@ -71,13 +71,7 @@ class WalkResultsMapView extends StatelessWidget {
                       _buildWalkInfoLabel(walk),
                       walk.isCancelled()
                           ? SizedBox.shrink()
-                          : RaisedButton.icon(
-                              icon: Icon(Icons.navigation),
-                              label: Text("Y ALLER"),
-                              onPressed: () {
-                                launchGeoApp(walk);
-                              },
-                            )
+                          : displayTripButton(walk)
                     ],
                   ),
                 ),
