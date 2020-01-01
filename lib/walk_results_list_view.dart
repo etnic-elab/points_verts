@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,13 +26,15 @@ class WalkResultsListView extends StatelessWidget {
     if (isLoading) {
       return loading;
     } else {
+      bool smallScreen = window.physicalSize.width < 1080;
       return ListView.separated(
           separatorBuilder: (context, i) => Divider(height: 1.0),
           itemBuilder: (context, i) {
             if (walks.length > i) {
               Walk walk = walks[i];
               return ListTile(
-                leading: Column(
+                dense: smallScreen,
+                leading: smallScreen ? null : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [displayIcon(walk)]),
                 title: Text(walk.city),

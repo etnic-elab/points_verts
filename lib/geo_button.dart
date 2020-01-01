@@ -10,7 +10,8 @@ class GeoButton extends StatelessWidget {
   GeoButton({this.walk});
 
   final Walk walk;
-  final Icon carIcon = Icon(Icons.directions_car, size: 15.0);
+  final Icon carIcon = Icon(Icons.directions_car);
+  final TextStyle textStyle = TextStyle();
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +42,8 @@ class GeoButton extends StatelessWidget {
           launchGeoApp(walk);
         },
         label: Text(
-          ' ${Duration(seconds: walk.trip.duration.round()).inMinutes} min',
-          style: TextStyle(fontSize: 12.0),
+          '${Duration(seconds: walk.trip.duration.round()).inMinutes} min',
+          style: textStyle,
         ));
   }
 
@@ -53,8 +54,7 @@ class GeoButton extends StatelessWidget {
           launchGeoApp(walk);
         },
         label: Text(
-          walk.getFormattedDistance(),
-          style: TextStyle(fontSize: 12.0),
+          walk.getFormattedDistance(), style: textStyle,
         ));
   }
 
