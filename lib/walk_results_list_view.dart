@@ -26,7 +26,8 @@ class WalkResultsListView extends StatelessWidget {
     if (isLoading) {
       return loading;
     } else {
-      bool smallScreen = window.physicalSize.width < 1080;
+      print(window.physicalSize.width);
+      bool smallScreen = window.physicalSize.width <= 640;
       return ListView.separated(
           separatorBuilder: (context, i) => Divider(height: 1.0),
           itemBuilder: (context, i) {
