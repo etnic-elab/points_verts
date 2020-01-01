@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:points_verts/geo_button.dart';
 
 import 'walk.dart';
 import 'walk_utils.dart';
@@ -38,7 +39,7 @@ class WalkResultsListView extends StatelessWidget {
                 enabled: !walk.isCancelled(),
                 trailing: walk.isCancelled()
                     ? Text("Annulé")
-                    : displayTripButton(walk),
+                    : GeoButton(walk: walk),
               );
             } else {
               return SizedBox.shrink();

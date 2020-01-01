@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'walk.dart';
+
+final Icon carIcon = Icon(Icons.directions_car, size: 15.0);
 
 Widget displayIcon(Walk walk, {Color color, double size}) {
   if (walk.isCancelled()) {
@@ -14,34 +17,6 @@ Widget displayIcon(Walk walk, {Color color, double size}) {
     return Icon(Icons.map, color: color, size: size);
   } else {
     return SizedBox.shrink();
-  }
-}
-
-Widget displayTripButton(Walk walk) {
-  if (walk.isCancelled()) {
-    return SizedBox.shrink();
-  } else if (walk.trip != null &&
-      walk.trip.distance != null &&
-      walk.trip.duration != null) {
-    return RaisedButton.icon(
-        icon: Icon(Icons.directions_car, size: 15.0),
-        onPressed: () {
-          launchGeoApp(walk);
-        },
-        label: Text(
-          ' ${Duration(seconds: walk.trip.duration.round()).inMinutes} min',
-          style: TextStyle(fontSize: 12.0),
-        ));
-  } else {
-    return RaisedButton.icon(
-        icon: Icon(Icons.directions_car, size: 15.0),
-        onPressed: () {
-          launchGeoApp(walk);
-        },
-        label: Text(
-          walk.getFormattedDistance(),
-          style: TextStyle(fontSize: 12.0),
-        ));
   }
 }
 

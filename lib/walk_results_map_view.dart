@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong/latlong.dart';
+import 'package:points_verts/geo_button.dart';
 
 import 'walk.dart';
 import 'walk_utils.dart';
@@ -71,7 +72,7 @@ class WalkResultsMapView extends StatelessWidget {
                       _buildWalkInfoLabel(walk),
                       walk.isCancelled()
                           ? SizedBox.shrink()
-                          : displayTripButton(walk)
+                          : GeoButton(walk: walk)
                     ],
                   ),
                 ),
