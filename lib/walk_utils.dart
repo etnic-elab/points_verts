@@ -18,7 +18,9 @@ Widget displayIcon(Walk walk, {Color color, double size}) {
 }
 
 Widget displayTripButton(Walk walk) {
-  if (walk.trip != null &&
+  if (walk.isCancelled()) {
+    return SizedBox.shrink();
+  } else if (walk.trip != null &&
       walk.trip.distance != null &&
       walk.trip.duration != null) {
     return RaisedButton.icon(
@@ -27,9 +29,19 @@ Widget displayTripButton(Walk walk) {
           launchGeoApp(walk);
         },
         label: Text(
-          ' ${Duration(seconds: walk.trip.duration.round()).inMinutes} min', style: TextStyle(fontSize: 12.0),));
+          ' ${Duration(seconds: walk.trip.duration.round()).inMinutes} min',
+          style: TextStyle(fontSize: 12.0),
+        ));
   } else {
-    return SizedBox.shrink();
+    return RaisedButton.icon(
+        icon: Icon(Icons.directions_car, size: 15.0),
+        onPressed: () {
+          launchGeoApp(walk);
+        },
+        label: Text(
+          walk.getFormattedDistance(),
+          style: TextStyle(fontSize: 12.0),
+        ));
   }
 }
 

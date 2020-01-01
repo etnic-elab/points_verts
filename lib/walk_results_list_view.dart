@@ -34,7 +34,7 @@ class WalkResultsListView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [displayIcon(walk)]),
                 title: Text(walk.city),
-                subtitle: Text('${walk.province} - ${walk.getFormattedDistance()}'),
+                subtitle: Text(subtitle(walk)),
                 enabled: !walk.isCancelled(),
                 trailing: walk.isCancelled()
                     ? Text("Annulé")
@@ -45,6 +45,14 @@ class WalkResultsListView extends StatelessWidget {
             }
           },
           itemCount: walks.length);
+    }
+  }
+
+  String subtitle(Walk walk) {
+    if(walk.trip != null) {
+      return '${walk.province} - ${walk.getFormattedDistance()}';
+    } else {
+      return walk.province;
     }
   }
 }

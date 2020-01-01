@@ -30,12 +30,13 @@ class Walk {
   }
 
   String getFormattedDistance() {
-    if (distance == null) {
+    double dist = trip != null && trip.distance != null ? trip.distance : distance;
+    if (dist == null) {
       return null;
-    } else if (distance < 1000) {
-      return '${distance.round().toString()} m';
+    } else if (dist < 1000) {
+      return '${dist.round().toString()} m';
     } else {
-      return '${(distance / 1000).round().toString()} km';
+      return '${(dist / 1000).round().toString()} km';
     }
   }
 }

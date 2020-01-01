@@ -117,12 +117,16 @@ class _WalkListState extends State<WalkList> {
             walk.lat,
             walk.long);
         walk.distance = distance;
-        retrieveTrip(_currentPosition.longitude, _currentPosition.latitude, walk.long, walk.lat).then((Trip trip) {
-          walk.trip = trip;
-          setState(() {
-
+        try {
+          retrieveTrip(_currentPosition.longitude, _currentPosition.latitude,
+                  walk.long, walk.lat)
+              .then((Trip trip) {
+            walk.trip = trip;
+            setState(() {});
           });
-        });
+        } catch (err) {
+          print('Cannot retrieve trip: $err');
+        }
       }
     }
     walks.sort((a, b) {
@@ -213,7 +217,8 @@ class _WalkListState extends State<WalkList> {
       tabBuilder: (BuildContext context, int index) {
         var navBar = CupertinoNavigationBar(
             middle: Text('Points Verts Adeps',
-            style: TextStyle(color: Colors.white)), backgroundColor: Colors.green);
+                style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.green);
         if (index == 0) {
           return CupertinoPageScaffold(
               navigationBar: navBar,
@@ -377,7 +382,9 @@ class _WalkListState extends State<WalkList> {
   }
 
   _resultNumber(BuildContext context) {
-    if (_currentWalks.length > 0 && !_loading && window.physicalSize.width >= 1080) {
+    if (_currentWalks.length > 0 &&
+        !_loading &&
+        window.physicalSize.width >= 1080) {
       return Align(
           alignment: Alignment.centerRight,
           child: Text("${_currentWalks.length.toString()} résultat(s)"));
