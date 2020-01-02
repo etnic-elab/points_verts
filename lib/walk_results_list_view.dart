@@ -33,10 +33,10 @@ class WalkResultsListView extends StatelessWidget {
           itemBuilder: (context, i) {
             if (userPosition != null) {
               if (i == 0) {
-                return _buildListHeader(context, "Marches les plus proches");
+                return _buildListHeader(context, "Points les plus proches");
               }
               if (i == 6) {
-                return _buildListHeader(context, "Autres marches");
+                return _buildListHeader(context, "Autres points");
               }
               if (i < 6) {
                 i = i - 1;
