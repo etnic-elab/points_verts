@@ -117,16 +117,6 @@ class _WalkListState extends State<WalkList> {
             walk.lat,
             walk.long);
         walk.distance = distance;
-        try {
-          retrieveTrip(_currentPosition.longitude, _currentPosition.latitude,
-                  walk.long, walk.lat)
-              .then((Trip trip) {
-            walk.trip = trip;
-            setState(() {});
-          });
-        } catch (err) {
-          print('Cannot retrieve trip: $err');
-        }
       }
     }
     walks.sort((a, b) {
@@ -138,6 +128,23 @@ class _WalkListState extends State<WalkList> {
         return 1;
       }
     });
+    for(int i = 0; i < walks.length; i++) {
+      if(i < 5) {
+        try {
+          Walk walk = walks[i];
+          retrieveTrip(_currentPosition.longitude, _currentPosition.latitude,
+              walk.long, walk.lat)
+              .then((Trip trip) {
+            walk.trip = trip;
+            setState(() {});
+          });
+        } catch (err) {
+          print('Cannot retrieve trip: $err');
+        }
+      } else {
+        break;
+      }
+    }
     return walks;
   }
 

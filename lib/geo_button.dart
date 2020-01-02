@@ -48,12 +48,11 @@ class GeoButton extends StatelessWidget {
   }
 
   Widget _androidDistance() {
-    return RaisedButton.icon(
-        icon: carIcon,
+    return RaisedButton(
         onPressed: () {
           launchGeoApp(walk);
         },
-        label: Text(
+        child: Text(
           walk.getFormattedDistance(), style: textStyle,
         ));
   }
