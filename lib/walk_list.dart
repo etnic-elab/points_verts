@@ -232,7 +232,7 @@ class _WalkListState extends State<WalkList> {
               child: SafeArea(
                   child: Scaffold(
                       body: _buildTab(buildContext,
-                          WalkResultsListView(_currentWalks, _loading)))));
+                          WalkResultsListView(_currentWalks, _currentPosition, _loading)))));
         } else {
           return CupertinoPageScaffold(
               navigationBar: navBar,
@@ -276,7 +276,7 @@ class _WalkListState extends State<WalkList> {
             physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
               _buildTab(
-                  buildContext, WalkResultsListView(_currentWalks, _loading)),
+                  buildContext, WalkResultsListView(_currentWalks, _currentPosition, _loading)),
               _buildTab(
                   buildContext,
                   WalkResultsMapView(
