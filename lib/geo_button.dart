@@ -31,7 +31,7 @@ class GeoButton extends StatelessWidget {
     } else if (walk.distance != null) {
       return _androidDistance();
     } else {
-      return _androidNoLabel();
+      return _androidNoLabel(context);
     }
   }
 
@@ -57,19 +57,17 @@ class GeoButton extends StatelessWidget {
         ));
   }
 
-  Widget _androidNoLabel() {
+  Widget _androidNoLabel(BuildContext context) {
     return Material(
-      color: Colors.white,
       child: Ink(
         height: 40.0,
         width: 40.0,
-        decoration: const ShapeDecoration(
-          color: Colors.green,
+        decoration: ShapeDecoration(
+          color: Theme.of(context).buttonColor,
           shape: RoundedRectangleBorder(),
         ),
         child: IconButton(
           icon: carIcon,
-          color: Colors.white,
           onPressed: () {},
         ),
       ),

@@ -56,7 +56,7 @@ class WalkResultsListView extends StatelessWidget {
 
   int _defineItemCount() {
     if (userPosition != null) {
-      if(walks.length > 5) {
+      if (walks.length > 5) {
         return walks.length + 2;
       } else {
         return walks.length + 1;
@@ -68,14 +68,10 @@ class WalkResultsListView extends StatelessWidget {
 
   Widget _buildListHeader(BuildContext context, String title) {
     return Container(
-      color: Colors.green,
+      color: Theme.of(context).primaryColor,
       child: Center(
-          child: Text(title,
-              style: TextStyle(
-                fontSize: 16.0,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ))),
+          child:
+              Text(title, style: Theme.of(context).primaryTextTheme.subtitle)),
       padding: EdgeInsets.all(10.0),
     );
   }
@@ -87,13 +83,12 @@ class WalkResultsListView extends StatelessWidget {
       leading: smallScreen
           ? null
           : Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [displayIcon(walk)]),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [displayIcon(walk)]),
       title: Text(walk.city),
       subtitle: Text(subtitle(walk)),
       enabled: !walk.isCancelled(),
-      trailing:
-      walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
+      trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
     );
   }
 

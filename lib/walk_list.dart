@@ -224,8 +224,8 @@ class _WalkListState extends State<WalkList> {
       tabBuilder: (BuildContext context, int index) {
         var navBar = CupertinoNavigationBar(
             middle: Text('Points Verts Adeps',
-                style: TextStyle(color: Colors.white)),
-            backgroundColor: Colors.green);
+            style: Theme.of(context).primaryTextTheme.title),
+            backgroundColor: Theme.of(context).primaryColor);
         if (index == 0) {
           return CupertinoPageScaffold(
               navigationBar: navBar,
