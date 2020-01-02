@@ -28,16 +28,15 @@ class WalkResultsListView extends StatelessWidget {
     if (isLoading) {
       return loading;
     } else {
-      bool smallScreen = window.physicalSize.width <= 640;
       return ListView.separated(
           separatorBuilder: (context, i) => Divider(height: 0.5),
           itemBuilder: (context, i) {
             if (userPosition != null) {
               if (i == 0) {
-                return _buildListHeader("Marches les plus proches");
+                return _buildListHeader(context, "Marches les plus proches");
               }
               if (i == 6) {
-                return _buildListHeader("Autres marches");
+                return _buildListHeader(context, "Autres marches");
               }
               if (i < 6) {
                 i = i - 1;
@@ -46,20 +45,7 @@ class WalkResultsListView extends StatelessWidget {
               }
             }
             if (walks.length > i) {
-              Walk walk = walks[i];
-              return ListTile(
-                dense: smallScreen,
-                leading: smallScreen
-                    ? null
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [displayIcon(walk)]),
-                title: Text(walk.city),
-                subtitle: Text(subtitle(walk)),
-                enabled: !walk.isCancelled(),
-                trailing:
-                    walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
-              );
+              return _buildListItem(context, walks[i]);
             } else {
               return SizedBox.shrink();
             }
@@ -80,17 +66,34 @@ class WalkResultsListView extends StatelessWidget {
     }
   }
 
-  Widget _buildListHeader(String title) {
+  Widget _buildListHeader(BuildContext context, String title) {
     return Container(
       color: Colors.green,
       child: Center(
           child: Text(title,
               style: TextStyle(
-                fontSize: 20.0,
+                fontSize: 16.0,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ))),
       padding: EdgeInsets.all(10.0),
+    );
+  }
+
+  Widget _buildListItem(BuildContext context, Walk walk) {
+    bool smallScreen = window.physicalSize.width <= 640;
+    return ListTile(
+      dense: smallScreen,
+      leading: smallScreen
+          ? null
+          : Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [displayIcon(walk)]),
+      title: Text(walk.city),
+      subtitle: Text(subtitle(walk)),
+      enabled: !walk.isCancelled(),
+      trailing:
+      walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
     );
   }
 
