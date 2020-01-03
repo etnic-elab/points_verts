@@ -1,4 +1,4 @@
-package be.borlee.points_verts
+package dev.alpagaga.points_verts
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
