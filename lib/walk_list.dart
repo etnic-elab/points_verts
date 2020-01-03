@@ -128,12 +128,12 @@ class _WalkListState extends State<WalkList> {
         return 1;
       }
     });
-    for(int i = 0; i < walks.length; i++) {
-      if(i < 5) {
+    for (int i = 0; i < walks.length; i++) {
+      if (i < 5) {
         try {
           Walk walk = walks[i];
           retrieveTrip(_currentPosition.longitude, _currentPosition.latitude,
-              walk.long, walk.lat)
+                  walk.long, walk.lat)
               .then((Trip trip) {
             walk.trip = trip;
             setState(() {});
@@ -224,15 +224,17 @@ class _WalkListState extends State<WalkList> {
       tabBuilder: (BuildContext context, int index) {
         var navBar = CupertinoNavigationBar(
             middle: Text('Points Verts Adeps',
-            style: Theme.of(context).primaryTextTheme.title),
+                style: Theme.of(context).primaryTextTheme.title),
             backgroundColor: Theme.of(context).primaryColor);
         if (index == 0) {
           return CupertinoPageScaffold(
               navigationBar: navBar,
               child: SafeArea(
                   child: Scaffold(
-                      body: _buildTab(buildContext,
-                          WalkResultsListView(_currentWalks, _currentPosition, _loading)))));
+                      body: _buildTab(
+                          buildContext,
+                          WalkResultsListView(
+                              _currentWalks, _currentPosition, _loading)))));
         } else {
           return CupertinoPageScaffold(
               navigationBar: navBar,
@@ -259,6 +261,7 @@ class _WalkListState extends State<WalkList> {
             title: Text('Points Verts Adeps'),
             actions: <Widget>[
               IconButton(
+                tooltip: "Sélectionner la date la plus proche",
                   icon: Icon(Icons.calendar_today),
                   onPressed: () {
                     setState(() {
@@ -276,7 +279,9 @@ class _WalkListState extends State<WalkList> {
             physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
               _buildTab(
-                  buildContext, WalkResultsListView(_currentWalks, _currentPosition, _loading)),
+                  buildContext,
+                  WalkResultsListView(
+                      _currentWalks, _currentPosition, _loading)),
               _buildTab(
                   buildContext,
                   WalkResultsMapView(

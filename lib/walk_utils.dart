@@ -6,15 +6,16 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'walk.dart';
 
-final Icon carIcon = Icon(Icons.directions_car, size: 15.0);
-
 Widget displayIcon(Walk walk, {Color color, double size}) {
   if (walk.isCancelled()) {
-    return Icon(Icons.cancel, color: color, size: size);
+    return Icon(Icons.cancel,
+        color: color, size: size, semanticLabel: "Point annulé");
   } else if (walk.type == 'M') {
-    return Icon(Icons.directions_walk, color: color, size: size);
+    return Icon(Icons.directions_walk,
+        color: color, size: size, semanticLabel: "Marche");
   } else if (walk.type == 'O') {
-    return Icon(Icons.map, color: color, size: size);
+    return Icon(Icons.map,
+        color: color, size: size, semanticLabel: "Orientation");
   } else {
     return SizedBox.shrink();
   }

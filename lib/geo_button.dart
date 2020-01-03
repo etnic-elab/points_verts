@@ -53,7 +53,8 @@ class GeoButton extends StatelessWidget {
           launchGeoApp(walk);
         },
         child: Text(
-          walk.getFormattedDistance(), style: textStyle,
+          walk.getFormattedDistance(),
+          style: textStyle,
         ));
   }
 
@@ -67,8 +68,11 @@ class GeoButton extends StatelessWidget {
           shape: RoundedRectangleBorder(),
         ),
         child: IconButton(
+          tooltip: "Lancer la navigation vers ce point",
           icon: carIcon,
-          onPressed: () {},
+          onPressed: () {
+            launchGeoApp(walk);
+          },
         ),
       ),
     );
