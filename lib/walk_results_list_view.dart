@@ -56,7 +56,9 @@ class WalkResultsListView extends StatelessWidget {
 
   int _defineItemCount() {
     if (userPosition != null) {
-      if (walks.length > 5) {
+      if (walks.length == 0) {
+        return walks.length;
+      } else if (walks.length > 5) {
         return walks.length + 2;
       } else {
         return walks.length + 1;
