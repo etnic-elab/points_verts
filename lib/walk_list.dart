@@ -15,11 +15,12 @@ import 'package:html/dom.dart' as dom;
 import 'package:points_verts/mapbox.dart';
 import 'package:points_verts/platform_widget.dart';
 
-import 'recalculate_distances_button.dart';
 import 'trip.dart';
 import 'walk.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
+
+enum PopupMenuActions { recalculatePosition }
 
 class WalkList extends StatefulWidget {
   @override
@@ -38,7 +39,6 @@ class _WalkListState extends State<WalkList> {
   Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
   List<Walk> _currentWalks = List<Walk>();
   Walk _selectedWalk;
-  int _currentChoice = 0;
   DateTime _selectedDate;
   Position _currentPosition;
   bool _calculatingPosition = false;
@@ -260,16 +260,21 @@ class _WalkListState extends State<WalkList> {
           appBar: AppBar(
             title: Text('Points Verts Adeps'),
             actions: <Widget>[
-              IconButton(
-                tooltip: "Sélectionner la date la plus proche",
-                  icon: Icon(Icons.calendar_today),
-                  onPressed: () {
-                    setState(() {
-                      _selectedDate = _dates.first;
-                    });
-                    _refreshWalks();
-                  }),
-              _positionAppBarActionButton(),
+              PopupMenuButton<PopupMenuActions>(
+                onSelected: (PopupMenuActions result) {
+                  if (result == PopupMenuActions.recalculatePosition) {
+                    _getCurrentLocation();
+                  }
+                },
+                itemBuilder: (BuildContext context) =>
+                    <PopupMenuEntry<PopupMenuActions>>[
+                  PopupMenuItem<PopupMenuActions>(
+                    value: PopupMenuActions.recalculatePosition,
+                    enabled: _calculatingPosition == false,
+                    child: Text('Recalculer ma position'),
+                  )
+                ],
+              )
             ],
             bottom: TabBar(
               tabs: <Widget>[Tab(text: "LISTE"), Tab(text: "CARTE")],
@@ -331,16 +336,6 @@ class _WalkListState extends State<WalkList> {
     ));
   }
 
-  Widget _positionAppBarActionButton() {
-    if (_calculatingPosition) {
-      return new IconButton(icon: Icon(Icons.my_location), onPressed: null);
-    } else {
-      return RecalculateDistancesButton(onPressed: () {
-        _getCurrentLocation();
-      });
-    }
-  }
-
   Widget _dropdown(BuildContext context) {
     DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
     return DropdownButton(
@@ -356,27 +351,6 @@ class _WalkListState extends State<WalkList> {
         _refreshWalks();
       },
     );
-  }
-
-  Widget _newdropdown(BuildContext context) {
-    if (_selectedDate != null) {
-      DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
-      return RaisedButton.icon(
-        icon: Icon(Icons.date_range),
-        label: Text(fullDate.format(_selectedDate)),
-        onPressed: () {
-          showChoices(context, _dates, _currentChoice, (int value) {
-            setState(() {
-              _selectedDate = _dates[value];
-              _currentChoice = value;
-            });
-            _retrieveWalks();
-          });
-        },
-      );
-    } else {
-      return SizedBox.shrink();
-    }
   }
 
   _defineSearchPart(BuildContext context) {
