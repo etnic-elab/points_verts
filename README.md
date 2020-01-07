@@ -13,3 +13,14 @@ Small Flutter application displaying future Adeps' walks. Non official.
 - Display more walk details?
 - Notifications indicating where the nearest walk is on Sunday morning?
 - Share walk infos button?
+
+# Releasing the application
+
+Information about the keystore should be set in the `android/local.properties`:
+
+```properties
+storePassword=<password>
+keyPassword=<password>
+keyAlias=key
+storeFile=<path>/key.jks
+```
