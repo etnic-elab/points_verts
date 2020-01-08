@@ -1,23 +1,20 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:http/http.dart' as http;
-import 'package:csv/csv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' as dom;
-import 'package:points_verts/mapbox.dart';
-import 'package:points_verts/platform_widget.dart';
 
+import 'api.dart';
+import 'mapbox.dart';
+import 'platform_widget.dart';
 import 'trip.dart';
 import 'walk.dart';
+import 'walk_date_utils.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 
@@ -44,7 +41,6 @@ class _WalkListState extends State<WalkList> {
   DateTime _selectedDate;
   Position _currentPosition;
   bool _calculatingPosition = false;
-  bool _error = false;
 
   @override
   void initState() {
@@ -54,55 +50,32 @@ class _WalkListState extends State<WalkList> {
     super.initState();
   }
 
-  Future<List<Walk>> _retrieveWalks() async {
+  _retrieveWalks() {
     if (_selectedDate == null) {
-      return _currentWalks;
+      return;
     }
+
+    setState(() {
+      _currentWalks = null;
+    });
+    _retrieveWalksHelper();
+  }
+
+  _retrieveWalksHelper() async {
     Future<List<Walk>> newList;
     if (_allWalks.containsKey(_selectedDate)) {
-      print("Retrieving walks from cache");
       newList = _allWalks[_selectedDate];
     } else {
-      try {
-        print("Retrieving walks from endpoint");
-        newList = _retrieveWalksFromEndpoint();
-        _allWalks.putIfAbsent(_selectedDate, () => newList);
-        if (_currentPosition != null) {
-          newList = _calculateDistances(await newList);
-        }
-      } catch (err) {
-        setState(() {
-          _error = true;
-        });
-        return newList;
+      newList = retrieveWalksFromEndpoint(_selectedDate);
+      _allWalks.putIfAbsent(_selectedDate, () => newList);
+      if (_currentPosition != null) {
+        newList = _calculateDistances(await newList);
       }
     }
 
     setState(() {
       _currentWalks = newList;
     });
-    return _currentWalks;
-  }
-
-  Future<List<Walk>> _retrieveWalksFromEndpoint() async {
-    DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
-    List<Walk> newList = List<Walk>();
-    var response = await http.get(
-        "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(_selectedDate)}&activites=M,O");
-    var fixed = _fixCsv(response.body);
-    List<List<dynamic>> rowsAsListOfValues =
-        const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-    for (List<dynamic> walk in rowsAsListOfValues) {
-      newList.add(Walk(
-          city: walk[1],
-          type: walk[2],
-          lat: walk[3] != "" ? walk[3] : null,
-          long: walk[4] != "" ? walk[4] : null,
-          province: walk[5],
-          date: walk[6],
-          status: walk[9]));
-    }
-    return newList;
   }
 
   Future<List<Walk>> _calculateDistances(List<Walk> walks) async {
@@ -146,22 +119,22 @@ class _WalkListState extends State<WalkList> {
   }
 
   void _retrieveDates() async {
-    _retrieveDatesFromWorker().then((List<DateTime> items) {
+    retrieveDatesFromWorker().then((List<DateTime> items) {
       setState(() {
         _dates = items;
         dropdownMenuItems = generateDropdownItems(items);
-        _selectedDate = items.isNotEmpty ? items.first : _getNextSunday();
+        _selectedDate = items.isNotEmpty ? items.first : getNextSunday();
       });
-      _retrieveWalks();
     }).catchError((err) {
       print("Cannot retrieve dates: $err");
+      List<DateTime> dates = generateDates();
       setState(() {
-        _dates = _generateDates();
-        dropdownMenuItems = generateDropdownItems(_generateDates());
-        _selectedDate = _getNextSunday();
+        _dates = dates;
+        dropdownMenuItems = generateDropdownItems(dates);
+        _selectedDate = getNextSunday();
       });
-      _retrieveWalks();
     });
+    _retrieveWalks();
   }
 
   static List<DropdownMenuItem<DateTime>> generateDropdownItems(
@@ -171,34 +144,6 @@ class _WalkListState extends State<WalkList> {
       return DropdownMenuItem<DateTime>(
           value: date, child: new Text(fullDate.format(date)));
     }).toList();
-  }
-
-  Future<List<DateTime>> _retrieveDatesFromWorker() async {
-    try {
-      String url = "https://points-verts.tbo.workers.dev/";
-      var response = await http.get(url);
-      List<dynamic> dates = jsonDecode(response.body);
-      DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
-      return dates.map((dynamic date) => dateFormat.parse(date)).toList();
-    } catch (err) {
-      print("Cannot retrieve dates from worker: $err");
-      return _retrieveDatesFromEndpoint();
-    }
-  }
-
-  Future<List<DateTime>> _retrieveDatesFromEndpoint() async {
-    String url = "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=dates";
-    var response = await http.get(url);
-    var document = parse(response.body);
-    List<String> results = new List<String>();
-    for (dom.Element element in document.getElementsByTagName('option')) {
-      String value = element.attributes['value'];
-      if (value != '0') {
-        results.add(value);
-      }
-    }
-    DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
-    return results.map((String date) => dateFormat.parse(date)).toList();
   }
 
   @override
@@ -230,8 +175,8 @@ class _WalkListState extends State<WalkList> {
                   child: Scaffold(
                       body: _buildTab(
                           buildContext,
-                          WalkResultsListView(
-                              _currentWalks, _currentPosition)))));
+                          WalkResultsListView(_currentWalks, _currentPosition,
+                              _refreshWalks)))));
         } else {
           return CupertinoPageScaffold(
               navigationBar: navBar,
@@ -245,7 +190,7 @@ class _WalkListState extends State<WalkList> {
                             setState(() {
                               _selectedWalk = walk;
                             });
-                          })))));
+                          }, _refreshWalks)))));
         }
       },
     );
@@ -284,9 +229,7 @@ class _WalkListState extends State<WalkList> {
               _buildTab(
                   buildContext,
                   WalkResultsListView(
-                    _currentWalks,
-                    _currentPosition,
-                  )),
+                      _currentWalks, _currentPosition, _refreshWalks)),
               _buildTab(
                   buildContext,
                   WalkResultsMapView(
@@ -294,7 +237,7 @@ class _WalkListState extends State<WalkList> {
                     setState(() {
                       _selectedWalk = walk;
                     });
-                  })),
+                  }, _refreshWalks)),
             ],
           ),
         ));
@@ -307,32 +250,9 @@ class _WalkListState extends State<WalkList> {
     return Column(
       children: <Widget>[
         _defineSearchPart(context),
-        Expanded(child: _error ? _errorWidget() : tabContent),
+        Expanded(child: tabContent),
       ],
     );
-  }
-
-  Widget _errorWidget() {
-    return Card(
-        child: Column(
-      children: <Widget>[
-        Spacer(),
-        Icon(Icons.warning),
-        Container(
-            padding: EdgeInsets.all(5.0),
-            child: Row(children: [
-              Expanded(
-                  child: Center(
-                      child: Text(
-                          "Une erreur est survenue lors de la récupération des données. Merci de réessayer plus tard.",
-                          textAlign: TextAlign.center)))
-            ])),
-        RaisedButton(
-            child: Text("Réessayer"),
-            onPressed: () => _refreshWalks(clearDate: true)),
-        Spacer()
-      ],
-    ));
   }
 
   Widget _dropdown(BuildContext context) {
@@ -381,36 +301,11 @@ class _WalkListState extends State<WalkList> {
     );
   }
 
-  Future<List<Walk>> _refreshWalks({bool clearDate = false}) {
+  void _refreshWalks({bool clearDate = false}) {
     if (clearDate) {
       _allWalks.remove(_selectedDate);
     }
-    setState(() {
-      _error = false;
-      _currentWalks = null;
-      _selectedWalk = null;
-    });
-    return _retrieveWalks();
-  }
-
-  String _fixCsv(String csv) {
-    List<String> result = new List<String>();
-    List<String> splitted = csv.split(';');
-    String current = "";
-    int tokens = 0;
-    for (String token in splitted) {
-      if (tokens == 0) {
-        current = token;
-      } else {
-        current = current + ";" + token;
-      }
-      tokens++;
-      if (tokens == 10) {
-        result.add(current);
-        tokens = 0;
-      }
-    }
-    return result.join('\r\n');
+    _retrieveWalks();
   }
 
   _getCurrentLocation() {
@@ -430,27 +325,5 @@ class _WalkListState extends State<WalkList> {
     });
   }
 
-  static DateTime _getNextSunday() {
-    DateTime current = new DateTime.now();
-    Duration oneDay = new Duration(days: 1);
-    while (current.weekday != DateTime.sunday) {
-      current = current.add(oneDay);
-    }
-    return current;
-  }
 
-  static List<DateTime> _generateDates() {
-    List<DateTime> results = new List<DateTime>();
-    DateTime current = new DateTime.now();
-    Duration oneDay = new Duration(days: 1);
-    Duration aWeek = new Duration(days: 7);
-    while (current.weekday != DateTime.sunday) {
-      current = current.add(oneDay);
-    }
-    while (results.length < 10) {
-      results.add(current);
-      current = current.add(aWeek);
-    }
-    return results;
-  }
 }

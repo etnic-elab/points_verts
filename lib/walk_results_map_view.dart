@@ -4,13 +4,14 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong/latlong.dart';
 import 'package:points_verts/geo_button.dart';
+import 'package:points_verts/walk_list_error.dart';
 
 import 'walk.dart';
 import 'walk_utils.dart';
 
 class WalkResultsMapView extends StatelessWidget {
-  WalkResultsMapView(this.walks, this.currentPosition,
-      this.selectedWalk, this.onWalkSelect);
+  WalkResultsMapView(this.walks, this.currentPosition, this.selectedWalk,
+      this.onWalkSelect, this.refreshWalks);
 
   final Widget loading = Center(
     child: new CircularProgressIndicator(),
@@ -20,34 +21,41 @@ class WalkResultsMapView extends StatelessWidget {
   final Position currentPosition;
   final Walk selectedWalk;
   final Function(Walk) onWalkSelect;
+  final Function refreshWalks;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: walks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
-        if (snapshot.hasData) {
-          List<Marker> markers = new List<Marker>();
-          for (Walk walk in snapshot.data) {
-            if (walk.lat != null && walk.long != null) {
-              markers.add(_buildMarker(walk, context));
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData) {
+            List<Marker> markers = new List<Marker>();
+            for (Walk walk in snapshot.data) {
+              if (walk.lat != null && walk.long != null) {
+                markers.add(_buildMarker(walk, context));
+              }
             }
-          }
-          if (currentPosition != null) {
-            markers.add(Marker(
-              point: new LatLng(
-                  currentPosition.latitude, currentPosition.longitude),
-              builder: (ctx) => new Container(child: Icon(Icons.location_on)),
-            ));
-          }
+            if (currentPosition != null) {
+              markers.add(Marker(
+                point: new LatLng(
+                    currentPosition.latitude, currentPosition.longitude),
+                builder: (ctx) => new Container(child: Icon(Icons.location_on)),
+              ));
+            }
 
-          return Stack(
-            children: <Widget>[
-              _buildFlutterMap(
-                  markers, MediaQuery.of(context).platformBrightness),
-              _buildWalkInfo(selectedWalk),
-            ],
-          );
+            return Stack(
+              children: <Widget>[
+                _buildFlutterMap(
+                    markers, MediaQuery.of(context).platformBrightness),
+                _buildWalkInfo(selectedWalk),
+              ],
+            );
+          } else if (snapshot.hasError) {
+            return WalkListError(refreshWalks);
+          } else {
+            return loading;
+          }
         } else {
           return loading;
         }

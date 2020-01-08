@@ -6,12 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/geo_button.dart';
+import 'package:points_verts/walk_list_error.dart';
 
 import 'walk.dart';
 import 'walk_utils.dart';
 
 class WalkResultsListView extends StatelessWidget {
-  WalkResultsListView(this.walks, this.userPosition);
+  WalkResultsListView(this.walks, this.userPosition, this.refreshWalks);
 
   final Widget loading = Center(
     child: Platform.isIOS
@@ -21,63 +22,50 @@ class WalkResultsListView extends StatelessWidget {
 
   final Future<List<Walk>> walks;
   final Position userPosition;
+  final Function refreshWalks;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Walk>>(
       future: walks,
+      initialData: List<Walk>(),
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
-        if (snapshot.hasData) {
-          return ListView.separated(
-              separatorBuilder: (context, i) => Divider(height: 0.5),
-              itemBuilder: (context, i) {
-                if (userPosition != null) {
-                  if (i == 0) {
-                    return _buildListHeader(context, "Points les plus proches");
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData) {
+            return ListView.separated(
+                separatorBuilder: (context, i) => Divider(height: 0.5),
+                itemBuilder: (context, i) {
+                  if (userPosition != null) {
+                    if (i == 0) {
+                      return _buildListHeader(
+                          context, "Points les plus proches");
+                    }
+                    if (i == 6) {
+                      return _buildListHeader(context, "Autres points");
+                    }
+                    if (i < 6) {
+                      i = i - 1;
+                    } else {
+                      i = i - 2;
+                    }
                   }
-                  if (i == 6) {
-                    return _buildListHeader(context, "Autres points");
-                  }
-                  if (i < 6) {
-                    i = i - 1;
+                  if (snapshot.data.length > i) {
+                    return _buildListItem(context, snapshot.data[i]);
                   } else {
-                    i = i - 2;
+                    return SizedBox.shrink();
                   }
-                }
-                if (snapshot.data.length > i) {
-                  return _buildListItem(context, snapshot.data[i]);
-                } else {
-                  return SizedBox.shrink();
-                }
-              },
-              itemCount: _defineItemCount(snapshot.data));
-        } else if (snapshot.hasError) {
-          return _errorWidget();
+                },
+                itemCount: _defineItemCount(snapshot.data));
+          } else if (snapshot.hasError) {
+            return WalkListError(refreshWalks);
+          } else {
+            return loading;
+          }
         } else {
           return loading;
         }
       },
     );
-  }
-
-  Widget _errorWidget() {
-    return Card(
-        child: Column(
-      children: <Widget>[
-        Spacer(),
-        Icon(Icons.warning),
-        Container(
-            padding: EdgeInsets.all(5.0),
-            child: Row(children: [
-              Expanded(
-                  child: Center(
-                      child: Text(
-                          "Une erreur est survenue lors de la récupération des données. Merci de réessayer plus tard.",
-                          textAlign: TextAlign.center)))
-            ])),
-        Spacer()
-      ],
-    ));
   }
 
   int _defineItemCount(List<Walk> walks) {
