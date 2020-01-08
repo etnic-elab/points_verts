@@ -32,8 +32,7 @@ class _WalkListState extends State<WalkList> {
   List<DateTime> _dates = new List<DateTime>();
   List<DropdownMenuItem<DateTime>> dropdownMenuItems =
       new List<DropdownMenuItem<DateTime>>();
-  Map<DateTime, Future<List<Walk>>> _allWalks =
-      HashMap<DateTime, Future<List<Walk>>>();
+  Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
   Future<List<Walk>> _currentWalks;
   Walk _selectedWalk;
   DateTime _selectedDate;
@@ -62,18 +61,21 @@ class _WalkListState extends State<WalkList> {
   _retrieveWalksHelper() async {
     Future<List<Walk>> newList;
     if (_allWalks.containsKey(_selectedDate)) {
-      newList = _allWalks[_selectedDate];
+      newList = Future.value(_allWalks[_selectedDate]);
     } else {
       newList = retrieveWalksFromEndpoint(_selectedDate);
-      _allWalks.putIfAbsent(_selectedDate, () => newList);
-      if (_currentPosition != null) {
-        newList = _calculateDistances(await newList);
-      }
     }
-
     setState(() {
       _currentWalks = newList;
     });
+    if (_currentPosition != null) {
+      newList = _calculateDistances(await newList);
+      setState(() {
+        _currentWalks = newList;
+      });
+    }
+    List<Walk> results = await newList;
+    _allWalks.putIfAbsent(_selectedDate, () => results);
   }
 
   Future<List<Walk>> _calculateDistances(List<Walk> walks) async {
@@ -288,14 +290,14 @@ class _WalkListState extends State<WalkList> {
     return FutureBuilder(
       future: _currentWalks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            window.physicalSize.width >= 1080) {
-          return Align(
-              alignment: Alignment.centerRight,
-              child: Text("${snapshot.data.length.toString()} résultat(s)"));
-        } else {
-          return SizedBox.shrink();
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData && window.physicalSize.width >= 1080) {
+            return Align(
+                alignment: Alignment.centerRight,
+                child: Text("${snapshot.data.length.toString()} résultat(s)"));
+          }
         }
+        return SizedBox.shrink();
       },
     );
   }
