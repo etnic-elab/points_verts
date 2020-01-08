@@ -16,7 +16,7 @@ Small Flutter application displaying future Adeps' walks. Non official.
 
 # Releasing the application
 
-Information about the keystore should be set in the `android/local.properties`:
+Information about the keystore should be set in the `android/key.properties`:
 
 ```properties
 storePassword=<password>
