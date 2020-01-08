@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
 import 'api.dart';
+import 'loading.dart';
 import 'mapbox.dart';
 import 'platform_widget.dart';
 import 'trip.dart';
@@ -27,9 +28,6 @@ class WalkList extends StatefulWidget {
 
 class _WalkListState extends State<WalkList> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-  final Widget _loadingWidget = Center(
-    child: new CircularProgressIndicator(),
-  );
 
   List<DateTime> _dates = new List<DateTime>();
   List<DropdownMenuItem<DateTime>> dropdownMenuItems =
@@ -282,7 +280,7 @@ class _WalkListState extends State<WalkList> {
             Expanded(child: _resultNumber(context))
           ]));
     } else {
-      return _loadingWidget;
+      return Loading;
     }
   }
 
@@ -290,7 +288,8 @@ class _WalkListState extends State<WalkList> {
     return FutureBuilder(
       future: _currentWalks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
-        if (snapshot.hasData && window.physicalSize.width >= 1080) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            window.physicalSize.width >= 1080) {
           return Align(
               alignment: Alignment.centerRight,
               child: Text("${snapshot.data.length.toString()} résultat(s)"));
@@ -324,6 +323,4 @@ class _WalkListState extends State<WalkList> {
       print("Cannot retrieve current position: $e");
     });
   }
-
-
 }

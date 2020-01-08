@@ -6,16 +6,13 @@ import 'package:latlong/latlong.dart';
 import 'package:points_verts/geo_button.dart';
 import 'package:points_verts/walk_list_error.dart';
 
+import 'loading.dart';
 import 'walk.dart';
 import 'walk_utils.dart';
 
 class WalkResultsMapView extends StatelessWidget {
   WalkResultsMapView(this.walks, this.currentPosition, this.selectedWalk,
       this.onWalkSelect, this.refreshWalks);
-
-  final Widget loading = Center(
-    child: new CircularProgressIndicator(),
-  );
 
   final Future<List<Walk>> walks;
   final Position currentPosition;
@@ -54,10 +51,10 @@ class WalkResultsMapView extends StatelessWidget {
           } else if (snapshot.hasError) {
             return WalkListError(refreshWalks);
           } else {
-            return loading;
+            return Loading();
           }
         } else {
-          return loading;
+          return Loading();
         }
       },
     );

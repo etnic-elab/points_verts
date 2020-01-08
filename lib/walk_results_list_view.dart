@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -8,17 +7,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/geo_button.dart';
 import 'package:points_verts/walk_list_error.dart';
 
+import 'loading.dart';
 import 'walk.dart';
 import 'walk_utils.dart';
 
 class WalkResultsListView extends StatelessWidget {
   WalkResultsListView(this.walks, this.userPosition, this.refreshWalks);
-
-  final Widget loading = Center(
-    child: Platform.isIOS
-        ? CupertinoActivityIndicator()
-        : CircularProgressIndicator(),
-  );
 
   final Future<List<Walk>> walks;
   final Position userPosition;
@@ -59,10 +53,10 @@ class WalkResultsListView extends StatelessWidget {
           } else if (snapshot.hasError) {
             return WalkListError(refreshWalks);
           } else {
-            return loading;
+            return Loading();
           }
         } else {
-          return loading;
+          return Loading();
         }
       },
     );
