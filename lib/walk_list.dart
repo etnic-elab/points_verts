@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:ui';
@@ -36,13 +37,13 @@ class _WalkListState extends State<WalkList> {
   List<DateTime> _dates = new List<DateTime>();
   List<DropdownMenuItem<DateTime>> dropdownMenuItems =
       new List<DropdownMenuItem<DateTime>>();
-  Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
-  List<Walk> _currentWalks = List<Walk>();
+  Map<DateTime, Future<List<Walk>>> _allWalks =
+      HashMap<DateTime, Future<List<Walk>>>();
+  Future<List<Walk>> _currentWalks;
   Walk _selectedWalk;
   DateTime _selectedDate;
   Position _currentPosition;
   bool _calculatingPosition = false;
-  bool _loading = true;
   bool _error = false;
 
   @override
@@ -55,34 +56,30 @@ class _WalkListState extends State<WalkList> {
 
   Future<List<Walk>> _retrieveWalks() async {
     if (_selectedDate == null) {
-      setState(() {
-        _loading = false;
-      });
       return _currentWalks;
     }
-    List<Walk> newList;
+    Future<List<Walk>> newList;
     if (_allWalks.containsKey(_selectedDate)) {
+      print("Retrieving walks from cache");
       newList = _allWalks[_selectedDate];
     } else {
       try {
-        newList = await _retrieveWalksFromEndpoint();
+        print("Retrieving walks from endpoint");
+        newList = _retrieveWalksFromEndpoint();
         _allWalks.putIfAbsent(_selectedDate, () => newList);
+        if (_currentPosition != null) {
+          newList = _calculateDistances(await newList);
+        }
       } catch (err) {
         setState(() {
           _error = true;
-          _loading = false;
         });
         return newList;
       }
     }
 
-    if (_currentPosition != null) {
-      newList = await _calculateDistances(newList);
-    }
     setState(() {
       _currentWalks = newList;
-      _error = false;
-      _loading = false;
     });
     return _currentWalks;
   }
@@ -234,7 +231,7 @@ class _WalkListState extends State<WalkList> {
                       body: _buildTab(
                           buildContext,
                           WalkResultsListView(
-                              _currentWalks, _currentPosition, _loading)))));
+                              _currentWalks, _currentPosition)))));
         } else {
           return CupertinoPageScaffold(
               navigationBar: navBar,
@@ -242,8 +239,9 @@ class _WalkListState extends State<WalkList> {
                   child: Scaffold(
                       body: _buildTab(
                           buildContext,
-                          WalkResultsMapView(_currentWalks, _currentPosition,
-                              _loading, _selectedWalk, (walk) {
+                          WalkResultsMapView(
+                              _currentWalks, _currentPosition, _selectedWalk,
+                              (walk) {
                             setState(() {
                               _selectedWalk = walk;
                             });
@@ -286,12 +284,13 @@ class _WalkListState extends State<WalkList> {
               _buildTab(
                   buildContext,
                   WalkResultsListView(
-                      _currentWalks, _currentPosition, _loading)),
+                    _currentWalks,
+                    _currentPosition,
+                  )),
               _buildTab(
                   buildContext,
                   WalkResultsMapView(
-                      _currentWalks, _currentPosition, _loading, _selectedWalk,
-                      (walk) {
+                      _currentWalks, _currentPosition, _selectedWalk, (walk) {
                     setState(() {
                       _selectedWalk = walk;
                     });
@@ -368,15 +367,18 @@ class _WalkListState extends State<WalkList> {
   }
 
   _resultNumber(BuildContext context) {
-    if (_currentWalks.length > 0 &&
-        !_loading &&
-        window.physicalSize.width >= 1080) {
-      return Align(
-          alignment: Alignment.centerRight,
-          child: Text("${_currentWalks.length.toString()} résultat(s)"));
-    } else {
-      return SizedBox.shrink();
-    }
+    return FutureBuilder(
+      future: _currentWalks,
+      builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
+        if (snapshot.hasData && window.physicalSize.width >= 1080) {
+          return Align(
+              alignment: Alignment.centerRight,
+              child: Text("${snapshot.data.length.toString()} résultat(s)"));
+        } else {
+          return SizedBox.shrink();
+        }
+      },
+    );
   }
 
   Future<List<Walk>> _refreshWalks({bool clearDate = false}) {
@@ -384,9 +386,8 @@ class _WalkListState extends State<WalkList> {
       _allWalks.remove(_selectedDate);
     }
     setState(() {
-      _loading = true;
       _error = false;
-      _currentWalks = new List<Walk>();
+      _currentWalks = null;
       _selectedWalk = null;
     });
     return _retrieveWalks();

@@ -9,49 +9,50 @@ import 'walk.dart';
 import 'walk_utils.dart';
 
 class WalkResultsMapView extends StatelessWidget {
-  WalkResultsMapView(this.walks, this.currentPosition, this.isLoading,
+  WalkResultsMapView(this.walks, this.currentPosition,
       this.selectedWalk, this.onWalkSelect);
 
   final Widget loading = Center(
     child: new CircularProgressIndicator(),
   );
 
-  final List<Walk> walks;
+  final Future<List<Walk>> walks;
   final Position currentPosition;
-  final bool isLoading;
   final Walk selectedWalk;
   final Function(Walk) onWalkSelect;
 
   @override
   Widget build(BuildContext context) {
-    List<Marker> markers = new List<Marker>();
-    for (Walk walk in walks) {
-      if (walk.lat != null && walk.long != null) {
-        markers.add(_buildMarker(walk, context));
-      }
-    }
-    if (currentPosition != null) {
-      markers.add(Marker(
-        point: new LatLng(currentPosition.latitude, currentPosition.longitude),
-        builder: (ctx) => new Container(child: Icon(Icons.location_on)),
-      ));
-    }
+    return FutureBuilder(
+      future: walks,
+      builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
+        if (snapshot.hasData) {
+          List<Marker> markers = new List<Marker>();
+          for (Walk walk in snapshot.data) {
+            if (walk.lat != null && walk.long != null) {
+              markers.add(_buildMarker(walk, context));
+            }
+          }
+          if (currentPosition != null) {
+            markers.add(Marker(
+              point: new LatLng(
+                  currentPosition.latitude, currentPosition.longitude),
+              builder: (ctx) => new Container(child: Icon(Icons.location_on)),
+            ));
+          }
 
-    return Stack(
-      children: <Widget>[
-        _buildFlutterMap(markers, MediaQuery.of(context).platformBrightness),
-        _buildWalkInfo(selectedWalk),
-        _buildLoading()
-      ],
+          return Stack(
+            children: <Widget>[
+              _buildFlutterMap(
+                  markers, MediaQuery.of(context).platformBrightness),
+              _buildWalkInfo(selectedWalk),
+            ],
+          );
+        } else {
+          return loading;
+        }
+      },
     );
-  }
-
-  Widget _buildLoading() {
-    if (isLoading) {
-      return loading;
-    } else {
-      return SizedBox.shrink();
-    }
   }
 
   static Widget _buildWalkInfo(Walk walk) {
