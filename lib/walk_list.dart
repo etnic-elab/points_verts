@@ -282,7 +282,7 @@ class _WalkListState extends State<WalkList> {
             Expanded(child: _resultNumber(context))
           ]));
     } else {
-      return Loading;
+      return Loading();
     }
   }
 
