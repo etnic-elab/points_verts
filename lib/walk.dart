@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:points_verts/walk_details.dart';
 
 import 'trip.dart';
-import 'walk_utils.dart';
 
 class Walk {
   Walk(
-      {this.city,
+      {this.id,
+      this.city,
       this.type,
       this.province,
       this.long,
@@ -14,6 +13,7 @@ class Walk {
       this.date,
       this.status});
 
+  final int id;
   final String city;
   final String type;
   final String province;
@@ -24,13 +24,15 @@ class Walk {
 
   double distance;
   Trip trip;
+  WalkDetails details;
 
   bool isCancelled() {
     return status == "ptvert_annule";
   }
 
   String getFormattedDistance() {
-    double dist = trip != null && trip.distance != null ? trip.distance : distance;
+    double dist =
+        trip != null && trip.distance != null ? trip.distance : distance;
     if (dist == null) {
       return null;
     } else if (dist < 1000) {

@@ -88,18 +88,94 @@ class WalkResultsListView extends StatelessWidget {
 
   Widget _buildListItem(BuildContext context, Walk walk) {
     bool smallScreen = window.physicalSize.width <= 640;
-    return ListTile(
-      dense: smallScreen,
-      leading: smallScreen
-          ? null
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [displayIcon(walk)]),
-      title: Text(walk.city),
-      subtitle: Text(subtitle(walk)),
-      enabled: !walk.isCancelled(),
-      trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
-    );
+    if (walk.details != null) {
+      return ExpansionTile(
+        leading: smallScreen
+            ? null
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [displayIcon(walk)]),
+        title: Text(walk.city),
+        subtitle: Text(subtitle(walk)),
+        trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
+        children: <Widget>[_buildListItemDetails(context, walk)],
+      );
+    } else {
+      return ListTile(
+        dense: smallScreen,
+        leading: smallScreen
+            ? null
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [displayIcon(walk)]),
+        title: Text(walk.city),
+        subtitle: Text(subtitle(walk)),
+        enabled: !walk.isCancelled(),
+        trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
+      );
+    }
+  }
+
+  Widget _buildListItemDetails(BuildContext context, Walk walk) {
+    List<Widget> list = [];
+    if (walk.details.fifteenKm) {
+      list.add(ListTile(
+        leading: Icon(Icons.info),
+        title: Text('Parcours suppplémentaire de marche de 15 km'),
+      ));
+    }
+    if (walk.details.wheelchair) {
+      list.add(ListTile(
+        leading: Icon(Icons.info),
+        title: Text(
+            'Parcours de 5 km accessible aux personnes à mobilité réduite'),
+      ));
+    }
+    if (walk.details.stroller) {
+      list.add(ListTile(
+        leading: Icon(Icons.info),
+        title: Text('Parcours de 5 km accessible aux landaus'),
+      ));
+    }
+    if (walk.details.orientation) {
+      list.add(ListTile(
+        leading: Icon(Icons.info),
+        title: Text("Parcours supplémentaire d'orentation de +/- 8 km"),
+      ));
+    }
+    if (walk.details.guided) {
+      list.add(ListTile(
+        leading: Icon(Icons.info),
+        title: Text("Balade guidée Nature"),
+      ));
+    }
+    if (walk.details.bike) {
+      list.add(ListTile(
+        leading: Icon(Icons.info),
+        title: Text("Parcours supplémentaire de vélo de +/- 20 km"),
+      ));
+    }
+    if (walk.details.mountainBike) {
+      list.add(ListTile(
+        leading: Icon(Icons.info),
+        title:
+            Text("Parcours supplémentaire de vélo tout-terrain de +/- 20 km"),
+      ));
+    }
+    if (walk.details.supplying) {
+      list.add(ListTile(
+        leading: Icon(Icons.info),
+        title: Text("Ravitaillement"),
+      ));
+    }
+    if (list.isEmpty) {
+      list.add(ListTile(
+        leading: Icon(Icons.info),
+        title: Text("Pas d'information supplémentaire"),
+      ));
+    }
+    return ListView(
+        shrinkWrap: true, physics: ClampingScrollPhysics(), children: list);
   }
 
   String subtitle(Walk walk) {

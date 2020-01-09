@@ -8,6 +8,7 @@ import 'package:html/dom.dart' as dom;
 import 'package:http/http.dart' as http;
 
 import 'walk.dart';
+import 'walk_details.dart';
 
 Future<List<DateTime>> retrieveDatesFromWorker() async {
   try {
@@ -47,6 +48,7 @@ Future<List<Walk>> retrieveWalksFromEndpoint(DateTime date) async {
       const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
   for (List<dynamic> walk in rowsAsListOfValues) {
     newList.add(Walk(
+        id: walk[0],
         city: walk[1],
         type: walk[2],
         lat: walk[3] != "" ? walk[3] : null,
@@ -56,6 +58,22 @@ Future<List<Walk>> retrieveWalksFromEndpoint(DateTime date) async {
         status: walk[9]));
   }
   return newList;
+}
+
+Future<WalkDetails> retrieveWalkDetails(int id) async {
+  var response =
+      await http.get('https://www.am-sport.cfwb.be/adeps/pv_detail.asp?i=$id');
+  String body = response.body;
+  return WalkDetails(
+    fifteenKm: body.contains("15.gif"),
+    wheelchair: body.contains("handi.gif"),
+    stroller: body.contains("poussette.gif"),
+    orientation: body.contains("orientation.gif"),
+    guided: body.contains("nature.gif"),
+    bike: body.contains("velo.gif"),
+    mountainBike: body.contains("vtt.gif"),
+    supplying: body.contains("ravito.gif"),
+  );
 }
 
 String _fixCsv(String csv) {

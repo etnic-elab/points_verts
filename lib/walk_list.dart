@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/walk_details.dart';
 
 import 'api.dart';
 import 'loading.dart';
@@ -106,6 +107,10 @@ class _WalkListState extends State<WalkList> {
                   walk.long, walk.lat)
               .then((Trip trip) {
             walk.trip = trip;
+            setState(() {});
+          });
+          retrieveWalkDetails(walk.id).then((WalkDetails details) {
+            walk.details = details;
             setState(() {});
           });
         } catch (err) {
