@@ -4,11 +4,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/api.dart';
 import 'package:points_verts/geo_button.dart';
 import 'package:points_verts/walk_list_error.dart';
 
 import 'loading.dart';
 import 'walk.dart';
+import 'walk_details.dart';
 import 'walk_utils.dart';
 
 class WalkResultsListView extends StatelessWidget {
@@ -88,7 +90,7 @@ class WalkResultsListView extends StatelessWidget {
 
   Widget _buildListItem(BuildContext context, Walk walk) {
     bool smallScreen = window.physicalSize.width <= 640;
-    if (walk.details != null) {
+    if (walk.trip != null) {
       return ExpansionTile(
         leading: smallScreen
             ? null
@@ -117,52 +119,69 @@ class WalkResultsListView extends StatelessWidget {
   }
 
   Widget _buildListItemDetails(BuildContext context, Walk walk) {
+    if(walk.details == null) {
+      walk.details = retrieveWalkDetails(walk.id);
+    }
+    return FutureBuilder(future: walk.details, builder: (BuildContext context, AsyncSnapshot<WalkDetails> snapshot) {
+      if(snapshot.connectionState == ConnectionState.done) {
+        if(snapshot.hasData) {
+          return _buildDetailsList(snapshot.data);
+        } else {
+          return SizedBox.shrink();
+        }
+      } else {
+        return Loading();
+      }
+    });
+  }
+
+  Widget _buildDetailsList(WalkDetails walkDetails) {
     List<Widget> list = [];
-    if (walk.details.fifteenKm) {
+    if (walkDetails.fifteenKm) {
       list.add(ListTile(
         leading: Icon(Icons.info),
         title: Text('Parcours suppplémentaire de marche de 15 km'),
       ));
     }
-    if (walk.details.wheelchair) {
+    if (walkDetails.wheelchair) {
       list.add(ListTile(
         leading: Icon(Icons.info),
         title: Text(
             'Parcours de 5 km accessible aux personnes à mobilité réduite'),
       ));
     }
-    if (walk.details.stroller) {
+    if (walkDetails.stroller) {
       list.add(ListTile(
         leading: Icon(Icons.info),
         title: Text('Parcours de 5 km accessible aux landaus'),
       ));
     }
-    if (walk.details.orientation) {
+    if (walkDetails.orientation) {
       list.add(ListTile(
         leading: Icon(Icons.info),
         title: Text("Parcours supplémentaire d'orentation de +/- 8 km"),
       ));
     }
-    if (walk.details.guided) {
+    if (walkDetails.guided) {
       list.add(ListTile(
         leading: Icon(Icons.info),
         title: Text("Balade guidée Nature"),
       ));
     }
-    if (walk.details.bike) {
+    if (walkDetails.bike) {
       list.add(ListTile(
         leading: Icon(Icons.info),
         title: Text("Parcours supplémentaire de vélo de +/- 20 km"),
       ));
     }
-    if (walk.details.mountainBike) {
+    if (walkDetails.mountainBike) {
       list.add(ListTile(
         leading: Icon(Icons.info),
         title:
-            Text("Parcours supplémentaire de vélo tout-terrain de +/- 20 km"),
+        Text("Parcours supplémentaire de vélo tout-terrain de +/- 20 km"),
       ));
     }
-    if (walk.details.supplying) {
+    if (walkDetails.supplying) {
       list.add(ListTile(
         leading: Icon(Icons.info),
         title: Text("Ravitaillement"),

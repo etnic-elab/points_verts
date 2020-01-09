@@ -24,7 +24,7 @@ class Walk {
 
   double distance;
   Trip trip;
-  WalkDetails details;
+  Future<WalkDetails> details;
 
   bool isCancelled() {
     return status == "ptvert_annule";

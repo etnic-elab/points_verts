@@ -109,10 +109,6 @@ class _WalkListState extends State<WalkList> {
             walk.trip = trip;
             setState(() {});
           });
-          retrieveWalkDetails(walk.id).then((WalkDetails details) {
-            walk.details = details;
-            setState(() {});
-          });
         } catch (err) {
           print('Cannot retrieve trip: $err');
         }
