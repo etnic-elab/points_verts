@@ -3,11 +3,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong/latlong.dart';
-import 'package:points_verts/geo_button.dart';
-import 'package:points_verts/walk_list_error.dart';
 
+import 'geo_button.dart';
 import 'loading.dart';
+import 'mapbox.dart';
 import 'walk.dart';
+import 'walk_list_error.dart';
 import 'walk_utils.dart';
 
 class WalkResultsMapView extends StatelessWidget {
@@ -43,7 +44,7 @@ class WalkResultsMapView extends StatelessWidget {
 
             return Stack(
               children: <Widget>[
-                _buildFlutterMap(
+                retrieveMap(
                     markers, MediaQuery.of(context).platformBrightness),
                 _buildWalkInfo(selectedWalk),
               ],
@@ -118,29 +119,6 @@ class WalkResultsMapView extends StatelessWidget {
           onWalkSelect(walk);
         },
       ),
-    );
-  }
-
-  static _buildFlutterMap(List<Marker> markers, Brightness brightness) {
-    return FlutterMap(
-      options: new MapOptions(
-        center: new LatLng(50.3155646, 5.009682),
-        zoom: 7.5,
-      ),
-      layers: [
-        new TileLayerOptions(
-          urlTemplate: "https://api.tiles.mapbox.com/v4/"
-              "{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}",
-          additionalOptions: {
-            'accessToken':
-                'pk.eyJ1IjoidGJvcmxlZSIsImEiOiJjazRvNGI4ZXAycTBtM2txd2Z3eHk3Ymh1In0.12yn8XMdhqdoPByYti4g5g',
-            'id': brightness == Brightness.dark
-                ? 'mapbox.dark'
-                : 'mapbox.streets',
-          },
-        ),
-        new MarkerLayerOptions(markers: markers),
-      ],
     );
   }
 }
