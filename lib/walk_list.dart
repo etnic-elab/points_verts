@@ -324,6 +324,7 @@ class _WalkListState extends State<WalkList> {
       _retrieveWalks();
     }).catchError((e) {
       print("Cannot retrieve current position: $e");
+      _retrieveWalks();
     });
   }
 }
