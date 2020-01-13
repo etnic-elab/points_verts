@@ -32,7 +32,7 @@ class PlatformWidget extends StatelessWidget {
 
 void showChoices(
     BuildContext context, List<DateTime> choices, int currentChoice, Function(int) onChoice) {
-  DateFormat dateFormat = DateFormat.yMMMMEEEEd("fr_BE");
+  DateFormat dateFormat = DateFormat.yMMMEd("fr_BE");
   switch (defaultTargetPlatform) {
     case TargetPlatform.android:
       showDialog<void>(

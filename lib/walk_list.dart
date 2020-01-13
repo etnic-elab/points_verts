@@ -133,7 +133,7 @@ class _WalkListState extends State<WalkList> {
       setState(() {
         _dates = dates;
         dropdownMenuItems = generateDropdownItems(dates);
-        _selectedDate = getNextSunday();
+        _selectedDate = dates.first;
       });
       _retrieveWalks();
     });
@@ -141,7 +141,7 @@ class _WalkListState extends State<WalkList> {
 
   static List<DropdownMenuItem<DateTime>> generateDropdownItems(
       List<DateTime> dates) {
-    DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
+    DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
     return dates.map((DateTime date) {
       return DropdownMenuItem<DateTime>(
           value: date, child: new Text(fullDate.format(date)));
@@ -258,13 +258,9 @@ class _WalkListState extends State<WalkList> {
   }
 
   Widget _dropdown(BuildContext context) {
-    DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
     return DropdownButton(
       value: _selectedDate,
-      items: _dates.map((DateTime date) {
-        return DropdownMenuItem<DateTime>(
-            value: date, child: new Text(fullDate.format(date)));
-      }).toList(),
+      items: dropdownMenuItems,
       onChanged: (DateTime newValue) {
         setState(() {
           _selectedDate = newValue;
@@ -293,11 +289,9 @@ class _WalkListState extends State<WalkList> {
       future: _currentWalks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData && window.physicalSize.width >= 1080) {
-            return Align(
-                alignment: Alignment.centerRight,
-                child: Text("${snapshot.data.length.toString()} résultat(s)"));
-          }
+          return Align(
+              alignment: Alignment.centerRight,
+              child: Text("${snapshot.data.length.toString()} résultat(s)"));
         }
         return SizedBox.shrink();
       },
