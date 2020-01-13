@@ -4,11 +4,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong/latlong.dart';
 
-import 'geo_button.dart';
 import 'loading.dart';
 import 'mapbox.dart';
 import 'walk.dart';
 import 'walk_list_error.dart';
+import 'walk_tile.dart';
 import 'walk_utils.dart';
 
 class WalkResultsMapView extends StatelessWidget {
@@ -44,8 +44,7 @@ class WalkResultsMapView extends StatelessWidget {
 
             return Stack(
               children: <Widget>[
-                retrieveMap(
-                    markers, MediaQuery.of(context).platformBrightness),
+                retrieveMap(markers, MediaQuery.of(context).platformBrightness),
                 _buildWalkInfo(selectedWalk),
               ],
             );
@@ -70,37 +69,9 @@ class WalkResultsMapView extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Card(
                 child: Container(
-                  height: 50.0,
-                  padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      displayIcon(walk),
-                      _buildWalkInfoLabel(walk),
-                      walk.isCancelled()
-                          ? SizedBox.shrink()
-                          : GeoButton(walk: walk)
-                    ],
-                  ),
+                  child: WalkTile(walk: walk),
                 ),
               )));
-    }
-  }
-
-  static Widget _buildWalkInfoLabel(Walk walk) {
-    if (walk.isCancelled()) {
-      return Text('${walk.city} (annulé)');
-    } else if (walk.distance != null) {
-      return Column(
-        children: <Widget>[
-          Spacer(),
-          Text(walk.city),
-          Text(walk.getFormattedDistance()),
-          Spacer()
-        ],
-      );
-    } else {
-      return Text(walk.city);
     }
   }
 
