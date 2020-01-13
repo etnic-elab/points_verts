@@ -126,6 +126,7 @@ class _WalkListState extends State<WalkList> {
         dropdownMenuItems = generateDropdownItems(items);
         _selectedDate = items.isNotEmpty ? items.first : getNextSunday();
       });
+      _retrieveWalks();
     }).catchError((err) {
       print("Cannot retrieve dates: $err");
       List<DateTime> dates = generateDates();
@@ -134,8 +135,8 @@ class _WalkListState extends State<WalkList> {
         dropdownMenuItems = generateDropdownItems(dates);
         _selectedDate = getNextSunday();
       });
+      _retrieveWalks();
     });
-    _retrieveWalks();
   }
 
   static List<DropdownMenuItem<DateTime>> generateDropdownItems(
