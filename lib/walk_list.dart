@@ -1,22 +1,18 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
-import 'package:points_verts/walk_details.dart';
 
 import 'api.dart';
-import 'loading.dart';
+import 'dates_dropdown.dart';
 import 'mapbox.dart';
 import 'platform_widget.dart';
 import 'trip.dart';
 import 'walk.dart';
-import 'walk_date_utils.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 
@@ -30,7 +26,7 @@ class WalkList extends StatefulWidget {
 class _WalkListState extends State<WalkList> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
-  List<DateTime> _dates = new List<DateTime>();
+  Future<List<DateTime>> _dates;
   List<DropdownMenuItem<DateTime>> dropdownMenuItems =
       new List<DropdownMenuItem<DateTime>>();
   Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
@@ -49,10 +45,6 @@ class _WalkListState extends State<WalkList> {
   }
 
   _retrieveWalks() {
-    if (_selectedDate == null) {
-      return;
-    }
-
     setState(() {
       _currentWalks = null;
     });
@@ -120,32 +112,18 @@ class _WalkListState extends State<WalkList> {
   }
 
   void _retrieveDates() async {
-    retrieveDatesFromWorker().then((List<DateTime> items) {
+    _dates = retrieveDatesFromWorker();
+    _dates.then((List<DateTime> items) {
       setState(() {
-        _dates = items;
-        dropdownMenuItems = generateDropdownItems(items);
-        _selectedDate = items.isNotEmpty ? items.first : getNextSunday();
+        _selectedDate = items.first;
       });
       _retrieveWalks();
     }).catchError((err) {
       print("Cannot retrieve dates: $err");
-      List<DateTime> dates = generateDates();
       setState(() {
-        _dates = dates;
-        dropdownMenuItems = generateDropdownItems(dates);
-        _selectedDate = dates.first;
+        _currentWalks = Future.error(err);
       });
-      _retrieveWalks();
     });
-  }
-
-  static List<DropdownMenuItem<DateTime>> generateDropdownItems(
-      List<DateTime> dates) {
-    DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
-    return dates.map((DateTime date) {
-      return DropdownMenuItem<DateTime>(
-          value: date, child: new Text(fullDate.format(date)));
-    }).toList();
   }
 
   @override
@@ -173,26 +151,13 @@ class _WalkListState extends State<WalkList> {
         if (index == 0) {
           return CupertinoPageScaffold(
               navigationBar: navBar,
-              child: SafeArea(
-                  child: Scaffold(
-                      body: _buildTab(
-                          buildContext,
-                          WalkResultsListView(_currentWalks, _currentPosition,
-                              _refreshWalks)))));
+              child:
+                  SafeArea(child: Scaffold(body: _buildListTab(buildContext))));
         } else {
           return CupertinoPageScaffold(
               navigationBar: navBar,
-              child: SafeArea(
-                  child: Scaffold(
-                      body: _buildTab(
-                          buildContext,
-                          WalkResultsMapView(
-                              _currentWalks, _currentPosition, _selectedWalk,
-                              (walk) {
-                            setState(() {
-                              _selectedWalk = walk;
-                            });
-                          }, _refreshWalks)))));
+              child:
+                  SafeArea(child: Scaffold(body: _buildMapTab(buildContext))));
         }
       },
     );
@@ -228,18 +193,8 @@ class _WalkListState extends State<WalkList> {
           body: TabBarView(
             physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
-              _buildTab(
-                  buildContext,
-                  WalkResultsListView(
-                      _currentWalks, _currentPosition, _refreshWalks)),
-              _buildTab(
-                  buildContext,
-                  WalkResultsMapView(
-                      _currentWalks, _currentPosition, _selectedWalk, (walk) {
-                    setState(() {
-                      _selectedWalk = walk;
-                    });
-                  }, _refreshWalks)),
+              _buildListTab(buildContext),
+              _buildMapTab(buildContext),
             ],
           ),
         ));
@@ -257,31 +212,38 @@ class _WalkListState extends State<WalkList> {
     );
   }
 
-  Widget _dropdown(BuildContext context) {
-    return DropdownButton(
-      value: _selectedDate,
-      items: dropdownMenuItems,
-      onChanged: (DateTime newValue) {
-        setState(() {
-          _selectedDate = newValue;
-        });
-        _refreshWalks();
-      },
-    );
+  Widget _buildListTab(BuildContext buildContext) {
+    return _buildTab(buildContext,
+        WalkResultsListView(_currentWalks, _currentPosition, _refreshWalks));
+  }
+
+  Widget _buildMapTab(BuildContext buildContext) {
+    return _buildTab(
+        buildContext,
+        WalkResultsMapView(_currentWalks, _currentPosition, _selectedWalk,
+            (walk) {
+          setState(() {
+            _selectedWalk = walk;
+          });
+        }, _refreshWalks));
   }
 
   _defineSearchPart(BuildContext context) {
-    if (_dates.isNotEmpty) {
-      return Container(
-          margin: const EdgeInsets.only(left: 10, right: 10),
-          child: Row(children: <Widget>[
-            _dropdown(context),
-            SizedBox.shrink(),
-            Expanded(child: _resultNumber(context))
-          ]));
-    } else {
-      return Loading();
-    }
+    return Container(
+        margin: const EdgeInsets.only(left: 10, right: 10),
+        child: Row(children: <Widget>[
+          DatesDropdown(
+              dates: _dates,
+              selectedDate: _selectedDate,
+              onChanged: (DateTime date) {
+                setState(() {
+                  _selectedDate = date;
+                  _retrieveWalks();
+                });
+              }),
+          SizedBox.shrink(),
+          Expanded(child: _resultNumber(context))
+        ]));
   }
 
   _resultNumber(BuildContext context) {
@@ -289,7 +251,7 @@ class _WalkListState extends State<WalkList> {
       future: _currentWalks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          if(snapshot.hasData) {
+          if (snapshot.hasData) {
             return Align(
                 alignment: Alignment.centerRight,
                 child: Text("${snapshot.data.length.toString()} résultat(s)"));
@@ -304,7 +266,7 @@ class _WalkListState extends State<WalkList> {
     if (clearDate) {
       _allWalks.remove(_selectedDate);
     }
-    _retrieveWalks();
+    _retrieveDates();
   }
 
   _getCurrentLocation() {
@@ -318,7 +280,9 @@ class _WalkListState extends State<WalkList> {
         _currentPosition = position;
         _calculatingPosition = false;
       });
-      _retrieveWalks();
+      if (_selectedDate != null) {
+        _retrieveWalks();
+      }
     }).catchError((e) {
       print("Cannot retrieve current position: $e");
       _retrieveWalks();
