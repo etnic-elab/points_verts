@@ -27,8 +27,6 @@ class _WalkListState extends State<WalkList> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
   Future<List<DateTime>> _dates;
-  List<DropdownMenuItem<DateTime>> dropdownMenuItems =
-      new List<DropdownMenuItem<DateTime>>();
   Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
   Future<List<Walk>> _currentWalks;
   Walk _selectedWalk;
