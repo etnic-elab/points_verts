@@ -2,19 +2,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'walk_date.dart';
+
 class DatesDropdown extends StatelessWidget {
   DatesDropdown({this.dates, this.selectedDate, this.onChanged});
 
-  final Future<List<DateTime>> dates;
-  final DateTime selectedDate;
-  final ValueChanged<DateTime> onChanged;
+  final Future<List<WalkDate>> dates;
+  final WalkDate selectedDate;
+  final ValueChanged<WalkDate> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<DateTime>>(
+    return FutureBuilder<List<WalkDate>>(
         future: dates,
         builder:
-            (BuildContext context, AsyncSnapshot<List<DateTime>> snapshot) {
+            (BuildContext context, AsyncSnapshot<List<WalkDate>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               return DropdownButton(
@@ -30,12 +32,12 @@ class DatesDropdown extends StatelessWidget {
         });
   }
 
-  static List<DropdownMenuItem<DateTime>> generateDropdownItems(
-      List<DateTime> dates) {
+  static List<DropdownMenuItem<WalkDate>> generateDropdownItems(
+      List<WalkDate> dates) {
     DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
-    return dates.map((DateTime date) {
-      return DropdownMenuItem<DateTime>(
-          value: date, child: new Text(fullDate.format(date)));
+    return dates.map((WalkDate walkDate) {
+      return DropdownMenuItem<WalkDate>(
+          value: walkDate, child: new Text(fullDate.format(walkDate.date)));
     }).toList();
   }
 }

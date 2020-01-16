@@ -8,11 +8,13 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'api.dart';
+import 'database.dart';
 import 'dates_dropdown.dart';
 import 'mapbox.dart';
 import 'platform_widget.dart';
 import 'trip.dart';
 import 'walk.dart';
+import 'walk_date.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 
@@ -26,11 +28,11 @@ class WalkList extends StatefulWidget {
 class _WalkListState extends State<WalkList> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
-  Future<List<DateTime>> _dates;
+  Future<List<WalkDate>> _dates;
   Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
   Future<List<Walk>> _currentWalks;
   Walk _selectedWalk;
-  DateTime _selectedDate;
+  WalkDate _selectedDate;
   Position _currentPosition;
   bool _calculatingPosition = false;
 
@@ -51,10 +53,10 @@ class _WalkListState extends State<WalkList> {
 
   _retrieveWalksHelper() async {
     Future<List<Walk>> newList;
-    if (_allWalks.containsKey(_selectedDate)) {
-      newList = Future.value(_allWalks[_selectedDate]);
+    if (_allWalks.containsKey(_selectedDate?.date)) {
+      newList = Future.value(_allWalks[_selectedDate.date]);
     } else {
-      newList = retrieveWalksFromEndpoint(_selectedDate);
+      newList = retrieveWalksFromEndpoint(_selectedDate?.date);
     }
     setState(() {
       _currentWalks = newList;
@@ -66,7 +68,7 @@ class _WalkListState extends State<WalkList> {
       });
     }
     List<Walk> results = await newList;
-    _allWalks.putIfAbsent(_selectedDate, () => results);
+    _allWalks.putIfAbsent(_selectedDate.date, () => results);
   }
 
   Future<List<Walk>> _calculateDistances(List<Walk> walks) async {
@@ -110,8 +112,8 @@ class _WalkListState extends State<WalkList> {
   }
 
   void _retrieveDates() async {
-    _dates = retrieveDatesFromWorker();
-    _dates.then((List<DateTime> items) {
+    _dates = _getWalkDates();
+    _dates.then((List<WalkDate> items) {
       setState(() {
         _selectedDate = items.first;
       });
@@ -122,6 +124,18 @@ class _WalkListState extends State<WalkList> {
         _currentWalks = Future.error(err);
       });
     });
+  }
+
+  Future<List<WalkDate>> _getWalkDates() async {
+    List<WalkDate> walkDates = await getWalkDates();
+    if(walkDates.length == 0) {
+      List<DateTime> dates = await retrieveDatesFromWorker();
+      walkDates = dates.map((DateTime date) {
+        return WalkDate(date: date);
+      }).toList();
+      insertWalkDates(walkDates);
+    }
+    return walkDates;
   }
 
   @override
@@ -233,7 +247,7 @@ class _WalkListState extends State<WalkList> {
           DatesDropdown(
               dates: _dates,
               selectedDate: _selectedDate,
-              onChanged: (DateTime date) {
+              onChanged: (WalkDate date) {
                 setState(() {
                   _selectedDate = date;
                   _retrieveWalks();
