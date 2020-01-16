@@ -289,9 +289,11 @@ class _WalkListState extends State<WalkList> {
       future: _currentWalks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Align(
-              alignment: Alignment.centerRight,
-              child: Text("${snapshot.data.length.toString()} résultat(s)"));
+          if(snapshot.hasData) {
+            return Align(
+                alignment: Alignment.centerRight,
+                child: Text("${snapshot.data.length.toString()} résultat(s)"));
+          }
         }
         return SizedBox.shrink();
       },
