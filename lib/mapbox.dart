@@ -8,7 +8,7 @@ import 'trip.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-const _token =
+const String _token =
     'pk.eyJ1IjoidGJvcmxlZSIsImEiOiJjazRvNGI4ZXAycTBtM2txd2Z3eHk3Ymh1In0.12yn8XMdhqdoPByYti4g5g';
 
 Future<Trip> retrieveTrip(
@@ -26,12 +26,16 @@ Future<Trip> retrieveTrip(
   }
 }
 
-Widget retrieveMap(List<Marker> markers, Brightness brightness) {
+Widget retrieveMap(List<Marker> markers, Brightness brightness,
+    {double centerLat = 50.3155646,
+    double centerLong = 5.009682,
+    double zoom = 7.5,
+    bool interactive = true}) {
   return FlutterMap(
     options: new MapOptions(
-      center: new LatLng(50.3155646, 5.009682),
-      zoom: 7.5,
-    ),
+        center: LatLng(centerLat, centerLong),
+        zoom: zoom,
+        interactive: interactive),
     layers: [
       new TileLayerOptions(
         urlTemplate: "https://api.tiles.mapbox.com/v4/"

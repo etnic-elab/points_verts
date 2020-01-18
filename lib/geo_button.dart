@@ -10,8 +10,8 @@ class GeoButton extends StatelessWidget {
   GeoButton({this.walk});
 
   final Walk walk;
-  final Icon carIcon = Icon(Icons.directions_car);
-  final TextStyle textStyle = TextStyle();
+  static final Icon carIcon = Icon(Icons.directions_car);
+  static final Icon navIcon = Icon(Icons.near_me);
 
   @override
   Widget build(BuildContext context) {
@@ -41,21 +41,24 @@ class GeoButton extends StatelessWidget {
         onPressed: () {
           launchGeoApp(walk);
         },
-        label: Text(
-          '${Duration(seconds: walk.trip.duration.round()).inMinutes} min',
-          style: textStyle,
+        label: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            Text(walk.getFormattedDistance()),
+            Text(
+                '${Duration(seconds: walk.trip.duration.round()).inMinutes} min')
+          ],
         ));
   }
 
   Widget _androidDistance() {
-    return RaisedButton(
+    return RaisedButton.icon(
+        icon: navIcon,
         onPressed: () {
           launchGeoApp(walk);
         },
-        child: Text(
-          walk.getFormattedDistance(),
-          style: textStyle,
-        ));
+        label: Text(walk.getFormattedDistance()));
   }
 
   Widget _androidNoLabel(BuildContext context) {
