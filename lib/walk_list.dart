@@ -127,13 +127,13 @@ class _WalkListState extends State<WalkList> {
   }
 
   Future<List<WalkDate>> _getWalkDates() async {
-    List<WalkDate> walkDates = await getWalkDates();
+    List<WalkDate> walkDates = await DBProvider.db.getWalkDates();
     if(walkDates.length == 0) {
       List<DateTime> dates = await retrieveDatesFromWorker();
       walkDates = dates.map((DateTime date) {
         return WalkDate(date: date);
       }).toList();
-      insertWalkDates(walkDates);
+      DBProvider.db.insertWalkDates(walkDates);
     }
     return walkDates;
   }
