@@ -18,32 +18,38 @@ class WalkTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool smallScreen = window.physicalSize.width <= 640;
-    if (walk.trip != null) {
-      return ExpansionTile(
-        leading: smallScreen
-            ? null
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [displayIcon(walk)]),
-        title: Text(walk.city),
-        subtitle: Text(subtitle(walk)),
-        trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
-        children: <Widget>[_buildListItemDetails(context, walk)],
-      );
-    } else {
-      return ListTile(
-        dense: smallScreen,
-        leading: smallScreen
-            ? null
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [displayIcon(walk)]),
-        title: Text(walk.city),
-        subtitle: Text(subtitle(walk)),
-        enabled: !walk.isCancelled(),
-        trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
-      );
-    }
+    return ListTile(
+      dense: smallScreen,
+      leading: smallScreen
+          ? null
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [displayIcon(walk)]),
+      title: Text(walk.city),
+      subtitle: Text(subtitle(walk)),
+      enabled: !walk.isCancelled(),
+      onTap: () => showDialog<void>(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(walk.city),
+            content: SingleChildScrollView(
+              child: _buildListItemDetails(context, walk),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
+    );
   }
 
   Widget _buildListItemDetails(BuildContext context, Walk walk) {
@@ -55,7 +61,11 @@ class WalkTile extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<WalkDetails> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              return _buildDetailsList(snapshot.data);
+              final details = _buildDetailsList(snapshot.data);
+              return Container(
+                  height: details.semanticChildCount * 50.0,
+                  width: double.maxFinite,
+                  child: details);
             } else {
               return SizedBox.shrink();
             }
@@ -65,66 +75,42 @@ class WalkTile extends StatelessWidget {
         });
   }
 
-  Widget _buildDetailsList(WalkDetails walkDetails) {
+  ListView _buildDetailsList(WalkDetails walkDetails) {
     List<Widget> list = [];
     if (walkDetails.fifteenKm) {
-      list.add(ListTile(
-        leading: Icon(Icons.info),
-        title: Text('Parcours suppplémentaire de marche de 15 km'),
-      ));
+      list.add(_detailTile('Parcours suppplémentaire de marche de 15 km'));
     }
     if (walkDetails.wheelchair) {
-      list.add(ListTile(
-        leading: Icon(Icons.info),
-        title: Text(
-            'Parcours de 5 km accessible aux personnes à mobilité réduite'),
-      ));
+      list.add(_detailTile(
+          'Parcours de 5 km accessible aux personnes à mobilité réduite'));
     }
     if (walkDetails.stroller) {
-      list.add(ListTile(
-        leading: Icon(Icons.info),
-        title: Text('Parcours de 5 km accessible aux landaus'),
-      ));
+      list.add(_detailTile('Parcours de 5 km accessible aux landaus'));
     }
     if (walkDetails.orientation) {
-      list.add(ListTile(
-        leading: Icon(Icons.info),
-        title: Text("Parcours supplémentaire d'orentation de +/- 8 km"),
-      ));
+      list.add(_detailTile("Parcours supplémentaire d'orentation de +/- 8 km"));
     }
     if (walkDetails.guided) {
-      list.add(ListTile(
-        leading: Icon(Icons.info),
-        title: Text("Balade guidée Nature"),
-      ));
+      list.add(_detailTile("Balade guidée Nature"));
     }
     if (walkDetails.bike) {
-      list.add(ListTile(
-        leading: Icon(Icons.info),
-        title: Text("Parcours supplémentaire de vélo de +/- 20 km"),
-      ));
+      list.add(_detailTile("Parcours supplémentaire de vélo de +/- 20 km"));
     }
     if (walkDetails.mountainBike) {
-      list.add(ListTile(
-        leading: Icon(Icons.info),
-        title:
-            Text("Parcours supplémentaire de vélo tout-terrain de +/- 20 km"),
-      ));
+      list.add(_detailTile(
+          "Parcours supplémentaire de vélo tout-terrain de +/- 20 km"));
     }
     if (walkDetails.supplying) {
-      list.add(ListTile(
-        leading: Icon(Icons.info),
-        title: Text("Ravitaillement"),
-      ));
+      list.add(_detailTile("Ravitaillement"));
     }
     if (list.isEmpty) {
-      list.add(ListTile(
-        leading: Icon(Icons.info),
-        title: Text("Pas d'information supplémentaire"),
-      ));
+      list.add(_detailTile("Pas d'information supplémentaire"));
     }
-    return ListView(
-        shrinkWrap: true, physics: ClampingScrollPhysics(), children: list);
+    return ListView(children: list);
+  }
+
+  ListTile _detailTile(String text) {
+    return ListTile(dense: true, title: Text(text));
   }
 
   String subtitle(Walk walk) {
