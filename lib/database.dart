@@ -5,7 +5,9 @@ import 'walk_date.dart';
 
 Future<List<WalkDate>> getWalkDates() async {
   final Database db = await _database();
-  final List<Map<String, dynamic>> maps = await db.query('walk_dates');
+  final DateTime today = DateTime.now();
+  final List<Map<String, dynamic>> maps = await db.query('walk_dates',
+      where: 'date >= ?', whereArgs: [today.toIso8601String()]);
   return List.generate(maps.length, (i) {
     return WalkDate(id: maps[i]['id'], date: DateTime.parse(maps[i]['date']));
   });
