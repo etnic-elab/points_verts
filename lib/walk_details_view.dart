@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -7,6 +8,7 @@ import 'package:points_verts/geo_button.dart';
 import 'api.dart';
 import 'loading.dart';
 import 'mapbox.dart';
+import 'platform_widget.dart';
 import 'walk.dart';
 import 'walk_details.dart';
 
@@ -17,6 +19,29 @@ class WalkDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return PlatformWidget(
+      androidBuilder: _androidLayout,
+      iosBuilder: _iOSLayout,
+    );
+  }
+
+  Widget _iOSLayout(BuildContext context) {
+    return CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+            backgroundColor: Theme.of(context).primaryColor,
+            middle: Text(walk.city,
+                style: Theme.of(context).primaryTextTheme.title)),
+        child: SafeArea(
+            child: Scaffold(
+                body: Column(children: <Widget>[
+          _buildMap(context),
+          _basicDetails(context),
+          Divider(),
+          Expanded(child: _buildListItemDetails(context))
+        ]))));
+  }
+
+  Widget _androidLayout(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(walk.city),
@@ -36,11 +61,9 @@ class WalkDetailsView extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            /*1*/
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /*2*/
                 Container(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
@@ -59,7 +82,6 @@ class WalkDetailsView extends StatelessWidget {
               ],
             ),
           ),
-          /*3*/
           GeoButton(walk: walk),
         ],
       ),
