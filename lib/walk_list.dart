@@ -240,7 +240,7 @@ class _WalkListState extends State<WalkList> {
         }, _refreshWalks));
   }
 
-  _defineSearchPart(BuildContext context) {
+  Widget _defineSearchPart(BuildContext context) {
     return Container(
         margin: const EdgeInsets.only(left: 10, right: 10),
         child: Row(children: <Widget>[
@@ -258,7 +258,7 @@ class _WalkListState extends State<WalkList> {
         ]));
   }
 
-  _resultNumber(BuildContext context) {
+  Widget _resultNumber(BuildContext context) {
     return FutureBuilder(
       future: _currentWalks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
