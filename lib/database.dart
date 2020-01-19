@@ -11,7 +11,6 @@ class DBProvider {
   Database _database;
 
   Future<Database> get database async {
-    await Sqflite.devSetDebugModeOn(true);
     if (_database != null) return _database;
     _database = await getDatabaseInstance();
     return _database;
@@ -31,7 +30,8 @@ class DBProvider {
   Future<List<WalkDate>> getWalkDates() async {
     log("Retrieving walk dates from database", name: "dev.alpagaga.points_verts.DBProvider");
     final Database db = await database;
-    final DateTime today = DateTime.now();
+    final DateTime now = DateTime.now();
+    final DateTime today = DateTime(now.year, now.month, now.day);
     final List<Map<String, dynamic>> maps = await db.query('walk_dates',
         where: 'date >= ?', whereArgs: [today.toIso8601String()]);
     return List.generate(maps.length, (i) {
