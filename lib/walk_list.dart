@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/app_drawer.dart';
 import 'package:points_verts/settings.dart';
 
 import 'api.dart';
@@ -198,10 +199,6 @@ class _WalkListState extends State<WalkList> {
                     value: PopupMenuActions.recalculatePosition,
                     enabled: _calculatingPosition == false,
                     child: Text('Recalculer ma position'),
-                  ),
-                  PopupMenuItem<PopupMenuActions>(
-                    value: PopupMenuActions.settings,
-                    child: Text('Paramètres'),
                   )
                 ],
               )
@@ -210,6 +207,7 @@ class _WalkListState extends State<WalkList> {
               tabs: <Widget>[Tab(text: "LISTE"), Tab(text: "CARTE")],
             ),
           ),
+          drawer: AppDrawer(),
           body: TabBarView(
             physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
