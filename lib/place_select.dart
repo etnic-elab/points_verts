@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'walk_list.dart';
 
 class PlaceSelect extends StatelessWidget {
-
   PlaceSelect({this.currentPlace, this.onChanged});
 
   final Places currentPlace;

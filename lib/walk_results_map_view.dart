@@ -7,16 +7,18 @@ import 'package:latlong/latlong.dart';
 import 'loading.dart';
 import 'mapbox.dart';
 import 'walk.dart';
+import 'walk_list.dart';
 import 'walk_list_error.dart';
 import 'walk_tile.dart';
 import 'walk_utils.dart';
 
 class WalkResultsMapView extends StatelessWidget {
-  WalkResultsMapView(this.walks, this.currentPosition, this.selectedWalk,
-      this.onWalkSelect, this.refreshWalks);
+  WalkResultsMapView(this.walks, this.position, this.currentPlace,
+      this.selectedWalk, this.onWalkSelect, this.refreshWalks);
 
   final Future<List<Walk>> walks;
-  final Position currentPosition;
+  final Position position;
+  final Places currentPlace;
   final Walk selectedWalk;
   final Function(Walk) onWalkSelect;
   final Function refreshWalks;
@@ -34,11 +36,13 @@ class WalkResultsMapView extends StatelessWidget {
                 markers.add(_buildMarker(walk, context));
               }
             }
-            if (currentPosition != null) {
+            if (position != null) {
               markers.add(Marker(
-                point: new LatLng(
-                    currentPosition.latitude, currentPosition.longitude),
-                builder: (ctx) => new Container(child: Icon(Icons.location_on)),
+                point: new LatLng(position.latitude, position.longitude),
+                builder: (ctx) => new Container(
+                    child: Icon(currentPlace == Places.current
+                        ? Icons.location_on
+                        : Icons.home)),
               ));
             }
 

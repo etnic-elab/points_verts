@@ -31,8 +31,7 @@ class WalkResultsListView extends StatelessWidget {
                 itemBuilder: (context, i) {
                   if (position != null) {
                     if (i == 0) {
-                      return _buildListHeader(
-                          context, _defineTopHeader());
+                      return _buildListHeader(context, _defineTopHeader());
                     }
                     if (i == 6) {
                       return _buildListHeader(context, "Autres points");

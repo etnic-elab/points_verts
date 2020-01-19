@@ -58,14 +58,17 @@ class WalkDetailsView extends StatelessWidget {
   }
 
   Widget _sectionTitle(BuildContext context, String title) {
-    return Align(alignment: Alignment.centerLeft,child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Text(
-        title,
-        style: TextStyle(
-            color: Theme.of(context).accentColor, fontWeight: FontWeight.bold),
-      ),
-    ));
+    return Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            title,
+            style: TextStyle(
+                color: Theme.of(context).accentColor,
+                fontWeight: FontWeight.bold),
+          ),
+        ));
   }
 
   Widget _basicDetails(BuildContext context) {

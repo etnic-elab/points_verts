@@ -35,7 +35,8 @@ class WalkTile extends StatelessWidget {
 
   PageRoute _pageRoute() {
     if (Platform.isIOS) {
-      return CupertinoPageRoute(title: walk.city, builder: (context) => WalkDetailsView(walk));
+      return CupertinoPageRoute(
+          title: walk.city, builder: (context) => WalkDetailsView(walk));
     } else {
       return MaterialPageRoute(builder: (context) => WalkDetailsView(walk));
     }

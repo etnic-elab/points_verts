@@ -40,7 +40,7 @@ class _WalkListState extends State<WalkList> {
   WalkDate _selectedDate;
   Position _currentPosition;
   Position _homePosition;
-  Places _currentPlace;
+  Places _selectedPlace;
   bool _calculatingPosition = false;
 
   @override
@@ -59,15 +59,15 @@ class _WalkListState extends State<WalkList> {
         _homePosition = Position(
             latitude: double.parse(split[0]),
             longitude: double.parse(split[1]));
-        _currentPlace = Places.home;
+        _selectedPlace = Places.home;
       });
     }
   }
 
   Position get selectedPosition {
-    if (_currentPlace == Places.current) {
+    if (_selectedPlace == Places.current) {
       return _currentPosition;
-    } else if (_currentPlace == Places.home) {
+    } else if (_selectedPlace == Places.home) {
       return _homePosition;
     } else {
       return null;
@@ -260,14 +260,17 @@ class _WalkListState extends State<WalkList> {
   }
 
   Widget _buildListTab(BuildContext buildContext) {
-    return _buildTab(buildContext,
-        WalkResultsListView(_currentWalks, selectedPosition, _currentPlace, _refreshWalks));
+    return _buildTab(
+        buildContext,
+        WalkResultsListView(
+            _currentWalks, selectedPosition, _selectedPlace, _refreshWalks));
   }
 
   Widget _buildMapTab(BuildContext buildContext) {
     return _buildTab(
         buildContext,
-        WalkResultsMapView(_currentWalks, selectedPosition, _selectedWalk,
+        WalkResultsMapView(
+            _currentWalks, selectedPosition, _selectedPlace, _selectedWalk,
             (walk) {
           setState(() {
             _selectedWalk = walk;
@@ -292,10 +295,10 @@ class _WalkListState extends State<WalkList> {
                   }),
               _homePosition != null && _currentPosition != null
                   ? PlaceSelect(
-                      currentPlace: _currentPlace,
+                      currentPlace: _selectedPlace,
                       onChanged: (Places place) {
                         setState(() {
-                          _currentPlace = place;
+                          _selectedPlace = place;
                         });
                         _retrieveWalksHelper();
                       })
@@ -335,7 +338,8 @@ class _WalkListState extends State<WalkList> {
         .then((Position position) {
       setState(() {
         _currentPosition = position;
-        _currentPlace = _currentPlace == null ? Places.current : _currentPlace;
+        _selectedPlace =
+            _selectedPlace == null ? Places.current : _selectedPlace;
         _calculatingPosition = false;
       });
       if (_selectedDate != null) {

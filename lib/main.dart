@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(theme == "light") {
+    if (theme == "light") {
       return _lightTheme();
     } else if (theme == "dark") {
       return _darkTheme();

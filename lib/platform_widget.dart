@@ -30,8 +30,8 @@ class PlatformWidget extends StatelessWidget {
   }
 }
 
-void showChoices(
-    BuildContext context, List<DateTime> choices, int currentChoice, Function(int) onChoice) {
+void showChoices(BuildContext context, List<DateTime> choices,
+    int currentChoice, Function(int) onChoice) {
   DateFormat dateFormat = DateFormat.yMMMEd("fr_BE");
   switch (defaultTargetPlatform) {
     case TargetPlatform.android:
@@ -64,7 +64,8 @@ void showChoices(
                 child: Text('OK'),
                 onPressed: () {
                   onChoice(selectedRadio);
-                  Navigator.of(context).pop();},
+                  Navigator.of(context).pop();
+                },
               ),
               FlatButton(
                 child: Text('ANNULER'),
@@ -85,10 +86,12 @@ void showChoices(
               useMagnifier: true,
               magnification: 1.1,
               itemExtent: 40,
-              scrollController: FixedExtentScrollController(initialItem: currentChoice),
+              scrollController:
+                  FixedExtentScrollController(initialItem: currentChoice),
               children: List<Widget>.generate(choices.length, (index) {
                 return Center(
-                  child: Text(dateFormat.format(choices[index]),
+                  child: Text(
+                    dateFormat.format(choices[index]),
                     style: TextStyle(
                       fontSize: 21,
                     ),

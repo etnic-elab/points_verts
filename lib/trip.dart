@@ -8,6 +8,4 @@ class Trip {
   String toString() {
     return 'Trip{distance: $distance, duration: $duration}';
   }
-
-
 }

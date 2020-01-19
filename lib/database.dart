@@ -17,7 +17,8 @@ class DBProvider {
   }
 
   Future<Database> getDatabaseInstance() async {
-    log("Creating new database client", name: "dev.alpagaga.points_verts.DBProvider");
+    log("Creating new database client",
+        name: "dev.alpagaga.points_verts.DBProvider");
     return openDatabase(
         join(await getDatabasesPath(), 'points_verts_database.db'),
         onCreate: (db, version) {
@@ -28,7 +29,8 @@ class DBProvider {
   }
 
   Future<List<WalkDate>> getWalkDates() async {
-    log("Retrieving walk dates from database", name: "dev.alpagaga.points_verts.DBProvider");
+    log("Retrieving walk dates from database",
+        name: "dev.alpagaga.points_verts.DBProvider");
     final Database db = await database;
     final DateTime now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
@@ -40,7 +42,8 @@ class DBProvider {
   }
 
   Future<void> insertWalkDates(List<WalkDate> walkDates) async {
-    log("Inserting walk dates in database", name: "dev.alpagaga.points_verts.DBProvider");
+    log("Inserting walk dates in database",
+        name: "dev.alpagaga.points_verts.DBProvider");
     final Database db = await database;
     final Batch batch = db.batch();
     for (WalkDate walkDate in walkDates) {
