@@ -7,7 +7,8 @@ class WalkDetails {
       this.guided,
       this.bike,
       this.mountainBike,
-      this.supplying});
+      this.supplying,
+      this.organizer});
 
   final bool fifteenKm;
   final bool wheelchair;
@@ -17,4 +18,5 @@ class WalkDetails {
   final bool bike;
   final bool mountainBike;
   final bool supplying;
+  final String organizer;
 }

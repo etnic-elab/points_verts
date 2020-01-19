@@ -13,9 +13,9 @@ const String _token =
 
 Future<Trip> retrieveTrip(
     double fromLong, double fromLat, double toLong, double toLat) async {
-  String url =
+  final String url =
       'https://api.mapbox.com/optimized-trips/v1/mapbox/driving/$fromLong,$fromLat;$toLong,$toLat?roundtrip=false&source=first&destination=last&access_token=$_token';
-  var response = await http.get(url);
+  final http.Response response = await http.get(url);
   var decoded = json.decode(response.body);
   if (decoded['trips'] != null && decoded['trips'].length > 0) {
     return Trip(
@@ -49,4 +49,10 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
       new MarkerLayerOptions(markers: markers),
     ],
   );
+}
+
+retrieveSuggestions(String search) async {
+  final String url = "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token";
+  final http.Response response = await http.get(url);
+  var decoded = json.decode(response.body);
 }

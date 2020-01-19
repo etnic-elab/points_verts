@@ -37,6 +37,7 @@ class WalkDetailsView extends StatelessWidget {
           _buildMap(context),
           _basicDetails(context),
           Divider(),
+          Text("Informations supplémentaires"),
           Expanded(child: _buildListItemDetails(context))
         ]))));
   }
@@ -49,10 +50,22 @@ class WalkDetailsView extends StatelessWidget {
       body: Column(children: <Widget>[
         _buildMap(context),
         _basicDetails(context),
-        Divider(),
-        Expanded(child: _buildListItemDetails(context))
+        _sectionTitle(context, "Informations supplémentaires"),
+        _buildListItemDetails(context),
+        _sectionTitle(context, "Groupement organisateur")
       ]),
     );
+  }
+
+  Widget _sectionTitle(BuildContext context, String title) {
+    return Align(alignment: Alignment.centerLeft,child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Text(
+        title,
+        style: TextStyle(
+            color: Theme.of(context).accentColor, fontWeight: FontWeight.bold),
+      ),
+    ));
   }
 
   Widget _basicDetails(BuildContext context) {
@@ -152,7 +165,7 @@ class WalkDetailsView extends StatelessWidget {
     if (list.isEmpty) {
       list.add(_detailTile("Pas d'information supplémentaire"));
     }
-    return ListView(children: list);
+    return ListView(shrinkWrap: true, children: list);
   }
 
   ListTile _detailTile(String text) {

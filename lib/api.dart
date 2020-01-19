@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
+import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
@@ -26,7 +27,7 @@ Future<List<DateTime>> retrieveDatesFromWorker() async {
 Future<List<DateTime>> retrieveDatesFromEndpoint() async {
   String url = "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=dates";
   var response = await http.get(url);
-  var document = parse(response.body);
+  Document document = parse(response.body);
   List<String> results = new List<String>();
   for (dom.Element element in document.getElementsByTagName('option')) {
     String value = element.attributes['value'];
@@ -64,6 +65,7 @@ Future<WalkDetails> retrieveWalkDetails(int id) async {
   var response =
       await http.get('https://www.am-sport.cfwb.be/adeps/pv_detail.asp?i=$id');
   String body = response.body;
+  Document document = parse(response.body);
   return WalkDetails(
     fifteenKm: body.contains("15.gif"),
     wheelchair: body.contains("handi.gif"),

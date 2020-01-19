@@ -33,6 +33,7 @@ dependencies:
   url_launcher: ^5.4.0
   html: ^0.14.0
   flutter_map: ^0.8.0
+  settings_ui: ^0.2.0
 
 dev_dependencies:
   flutter_test:

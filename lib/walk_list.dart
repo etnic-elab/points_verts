@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/settings.dart';
 
 import 'api.dart';
 import 'database.dart';
@@ -18,7 +19,7 @@ import 'walk_date.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 
-enum PopupMenuActions { recalculatePosition }
+enum PopupMenuActions { recalculatePosition, settings }
 
 class WalkList extends StatefulWidget {
   @override
@@ -128,7 +129,7 @@ class _WalkListState extends State<WalkList> {
 
   Future<List<WalkDate>> _getWalkDates() async {
     List<WalkDate> walkDates = await DBProvider.db.getWalkDates();
-    if(walkDates.length == 0) {
+    if (walkDates.length == 0) {
       List<DateTime> dates = await retrieveDatesFromWorker();
       walkDates = dates.map((DateTime date) {
         return WalkDate(date: date);
@@ -186,6 +187,9 @@ class _WalkListState extends State<WalkList> {
                 onSelected: (PopupMenuActions result) {
                   if (result == PopupMenuActions.recalculatePosition) {
                     _getCurrentLocation();
+                  } else if (result == PopupMenuActions.settings) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Settings()));
                   }
                 },
                 itemBuilder: (BuildContext context) =>
@@ -194,6 +198,10 @@ class _WalkListState extends State<WalkList> {
                     value: PopupMenuActions.recalculatePosition,
                     enabled: _calculatingPosition == false,
                     child: Text('Recalculer ma position'),
+                  ),
+                  PopupMenuItem<PopupMenuActions>(
+                    value: PopupMenuActions.settings,
+                    child: Text('Paramètres'),
                   )
                 ],
               )
