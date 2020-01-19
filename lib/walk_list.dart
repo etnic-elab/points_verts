@@ -40,7 +40,7 @@ class _WalkListState extends State<WalkList> {
   WalkDate _selectedDate;
   Position _currentPosition;
   Position _homePosition;
-  Places _currentPlace = Places.current;
+  Places _currentPlace;
   bool _calculatingPosition = false;
 
   @override
@@ -261,7 +261,7 @@ class _WalkListState extends State<WalkList> {
 
   Widget _buildListTab(BuildContext buildContext) {
     return _buildTab(buildContext,
-        WalkResultsListView(_currentWalks, selectedPosition, _refreshWalks));
+        WalkResultsListView(_currentWalks, selectedPosition, _currentPlace, _refreshWalks));
   }
 
   Widget _buildMapTab(BuildContext buildContext) {
@@ -290,7 +290,7 @@ class _WalkListState extends State<WalkList> {
                       _retrieveWalks();
                     });
                   }),
-              _homePosition != null
+              _homePosition != null && _currentPosition != null
                   ? PlaceSelect(
                       currentPlace: _currentPlace,
                       onChanged: (Places place) {
@@ -335,6 +335,7 @@ class _WalkListState extends State<WalkList> {
         .then((Position position) {
       setState(() {
         _currentPosition = position;
+        _currentPlace = _currentPlace == null ? Places.current : _currentPlace;
         _calculatingPosition = false;
       });
       if (_selectedDate != null) {

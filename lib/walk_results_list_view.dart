@@ -7,12 +7,15 @@ import 'package:points_verts/walk_tile.dart';
 
 import 'loading.dart';
 import 'walk.dart';
+import 'walk_list.dart';
 
 class WalkResultsListView extends StatelessWidget {
-  WalkResultsListView(this.walks, this.userPosition, this.refreshWalks);
+  WalkResultsListView(
+      this.walks, this.position, this.currentPlace, this.refreshWalks);
 
   final Future<List<Walk>> walks;
-  final Position userPosition;
+  final Position position;
+  final Places currentPlace;
   final Function refreshWalks;
 
   @override
@@ -26,10 +29,10 @@ class WalkResultsListView extends StatelessWidget {
             return ListView.separated(
                 separatorBuilder: (context, i) => Divider(height: 0.5),
                 itemBuilder: (context, i) {
-                  if (userPosition != null) {
+                  if (position != null) {
                     if (i == 0) {
                       return _buildListHeader(
-                          context, "Points les plus proches");
+                          context, _defineTopHeader());
                     }
                     if (i == 6) {
                       return _buildListHeader(context, "Autres points");
@@ -59,8 +62,18 @@ class WalkResultsListView extends StatelessWidget {
     );
   }
 
+  String _defineTopHeader() {
+    if (currentPlace == Places.home) {
+      return "Points les plus proches du domicile";
+    } else if (currentPlace == Places.current) {
+      return "Points les plus proches de votre position";
+    } else {
+      return "Points les plus proches";
+    }
+  }
+
   int _defineItemCount(List<Walk> walks) {
-    if (userPosition != null) {
+    if (position != null) {
       if (walks.length == 0) {
         return walks.length;
       } else if (walks.length > 5) {
