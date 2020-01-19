@@ -104,6 +104,9 @@ class _SettingsState extends State<Settings> {
                             return Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
+                                Divider(),
+                                ListTile(leading: Icon(Icons.info), title: Text("Tout changement de thème nécessite un redémarrage de l'application.", style: Theme.of(context).textTheme.caption)),
+                                Divider(),
                                 RadioListTile(
                                   title: Text("Automatique"),
                                   subtitle: Text("Laisse le système décider"),
