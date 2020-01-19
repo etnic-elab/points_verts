@@ -7,6 +7,8 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/app_drawer.dart';
+import 'package:points_verts/place_select.dart';
+import 'package:points_verts/prefs.dart';
 import 'package:points_verts/settings.dart';
 
 import 'api.dart';
@@ -21,6 +23,7 @@ import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 
 enum PopupMenuActions { recalculatePosition, settings }
+enum Places { home, current }
 
 class WalkList extends StatefulWidget {
   @override
@@ -36,6 +39,8 @@ class _WalkListState extends State<WalkList> {
   Walk _selectedWalk;
   WalkDate _selectedDate;
   Position _currentPosition;
+  Position _homePosition;
+  Places _currentPlace = Places.current;
   bool _calculatingPosition = false;
 
   @override
@@ -44,6 +49,29 @@ class _WalkListState extends State<WalkList> {
     _retrieveDates();
     _getCurrentLocation();
     super.initState();
+  }
+
+  _retrieveHomePosition() async {
+    String homePos = await PrefsProvider.prefs.getString("home_coords");
+    if (homePos != null) {
+      List<String> split = homePos.split(",");
+      setState(() {
+        _homePosition = Position(
+            latitude: double.parse(split[0]),
+            longitude: double.parse(split[1]));
+        _currentPlace = Places.home;
+      });
+    }
+  }
+
+  Position get selectedPosition {
+    if (_currentPlace == Places.current) {
+      return _currentPosition;
+    } else if (_currentPlace == Places.home) {
+      return _homePosition;
+    } else {
+      return null;
+    }
   }
 
   _retrieveWalks() {
@@ -63,7 +91,7 @@ class _WalkListState extends State<WalkList> {
     setState(() {
       _currentWalks = newList;
     });
-    if (_currentPosition != null) {
+    if (selectedPosition != null) {
       newList = _calculateDistances(await newList);
       setState(() {
         _currentWalks = newList;
@@ -77,8 +105,8 @@ class _WalkListState extends State<WalkList> {
     for (Walk walk in walks) {
       if (walk.lat != null && walk.long != null) {
         double distance = await geolocator.distanceBetween(
-            _currentPosition.latitude,
-            _currentPosition.longitude,
+            selectedPosition.latitude,
+            selectedPosition.longitude,
             walk.lat,
             walk.long);
         walk.distance = distance;
@@ -97,7 +125,7 @@ class _WalkListState extends State<WalkList> {
       if (i < 5) {
         try {
           Walk walk = walks[i];
-          retrieveTrip(_currentPosition.longitude, _currentPosition.latitude,
+          retrieveTrip(selectedPosition.longitude, selectedPosition.latitude,
                   walk.long, walk.lat)
               .then((Trip trip) {
             walk.trip = trip;
@@ -115,6 +143,7 @@ class _WalkListState extends State<WalkList> {
 
   void _retrieveDates() async {
     _dates = _getWalkDates();
+    await _retrieveHomePosition();
     _dates.then((List<WalkDate> items) {
       setState(() {
         _selectedDate = items.first;
@@ -232,13 +261,13 @@ class _WalkListState extends State<WalkList> {
 
   Widget _buildListTab(BuildContext buildContext) {
     return _buildTab(buildContext,
-        WalkResultsListView(_currentWalks, _currentPosition, _refreshWalks));
+        WalkResultsListView(_currentWalks, selectedPosition, _refreshWalks));
   }
 
   Widget _buildMapTab(BuildContext buildContext) {
     return _buildTab(
         buildContext,
-        WalkResultsMapView(_currentWalks, _currentPosition, _selectedWalk,
+        WalkResultsMapView(_currentWalks, selectedPosition, _selectedWalk,
             (walk) {
           setState(() {
             _selectedWalk = walk;
@@ -249,19 +278,29 @@ class _WalkListState extends State<WalkList> {
   Widget _defineSearchPart(BuildContext context) {
     return Container(
         margin: const EdgeInsets.only(left: 10, right: 10),
-        child: Row(children: <Widget>[
-          DatesDropdown(
-              dates: _dates,
-              selectedDate: _selectedDate,
-              onChanged: (WalkDate date) {
-                setState(() {
-                  _selectedDate = date;
-                  _retrieveWalks();
-                });
-              }),
-          SizedBox.shrink(),
-          Expanded(child: _resultNumber(context))
-        ]));
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              DatesDropdown(
+                  dates: _dates,
+                  selectedDate: _selectedDate,
+                  onChanged: (WalkDate date) {
+                    setState(() {
+                      _selectedDate = date;
+                      _retrieveWalks();
+                    });
+                  }),
+              _homePosition != null
+                  ? PlaceSelect(
+                      currentPlace: _currentPlace,
+                      onChanged: (Places place) {
+                        setState(() {
+                          _currentPlace = place;
+                        });
+                        _retrieveWalksHelper();
+                      })
+                  : Expanded(child: _resultNumber(context))
+            ]));
   }
 
   Widget _resultNumber(BuildContext context) {

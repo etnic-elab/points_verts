@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/prefs.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_drawer.dart';
 import 'mapbox.dart';
@@ -14,7 +14,6 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-  SharedPreferences _prefs;
   String _home;
   String _theme;
   bool value = true;
@@ -28,46 +27,37 @@ class _SettingsState extends State<Settings> {
     super.dispose();
   }
 
-  Future<SharedPreferences> _getPrefs() async {
-    if (_prefs == null) {
-      _prefs = await SharedPreferences.getInstance();
-    }
-    return _prefs;
-  }
-
   Future<void> _retrievePrefs() async {
-    SharedPreferences prefs = await _getPrefs();
+    String theme = await PrefsProvider.prefs.getString("theme");
+    String home = await PrefsProvider.prefs.getString("home_label");
     setState(() {
-      _theme = prefs.get("theme");
-      _home = prefs.get("home_label");
+      _theme = theme;
+      _home = home;
     });
   }
 
   Future<void> _setHome(Position position) async {
-    SharedPreferences prefs = await _getPrefs();
-    await prefs.setString(
-        "home_coords", "${position.latitude},${position.longitude}");
-    await prefs.setString("home_label",
+    await PrefsProvider.prefs
+        .setString("home_coords", "${position.latitude},${position.longitude}");
+    String label = await PrefsProvider.prefs.setString("home_label",
         await retrieveAddress(position.longitude, position.latitude));
     setState(() {
-      _home = prefs.get("home_label");
+      _home = label;
     });
   }
 
-  Future<void> _setTheme(String theme) async {
-    SharedPreferences prefs = await _getPrefs();
-    await prefs.setString("theme", theme);
+  Future<void> _setTheme(String newTheme) async {
+    String theme = await PrefsProvider.prefs.setString("theme", newTheme);
     setState(() {
-      _theme = prefs.get("theme");
+      _theme = theme;
     });
   }
 
   Future<void> _removeHome() async {
-    SharedPreferences prefs = await _getPrefs();
-    await prefs.remove("home_coords");
-    await prefs.remove("home_label");
+    await PrefsProvider.prefs.setString("home_coords", null);
+    await PrefsProvider.prefs.setString("home_label", null);
     setState(() {
-      _home = prefs.get("home_label");
+      _home = null;
     });
   }
 
@@ -105,7 +95,13 @@ class _SettingsState extends State<Settings> {
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 Divider(),
-                                ListTile(leading: Icon(Icons.info), title: Text("Tout changement de thème nécessite un redémarrage de l'application.", style: Theme.of(context).textTheme.caption)),
+                                ListTile(
+                                    leading: Icon(Icons.info),
+                                    title: Text(
+                                        "Tout changement de thème nécessite un redémarrage de l'application.",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .caption)),
                                 Divider(),
                                 RadioListTile(
                                   title: Text("Automatique"),
