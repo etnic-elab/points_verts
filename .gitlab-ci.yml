@@ -1,0 +1,22 @@
+image: cirrusci/flutter:stable
+
+stages:
+  - build
+  - analyze
+  - test
+
+before_script:
+  - flutter pub get
+  - flutter clean
+
+build:
+  stage: build
+  script: 'flutter build aot'
+
+unit_test:
+  stage: test
+  script: 'flutter test test/*'
+
+analyze:
+  stage: analyze
+  script: 'flutter analyze'

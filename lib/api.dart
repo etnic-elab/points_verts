@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:html/dom.dart';
@@ -65,7 +64,6 @@ Future<WalkDetails> retrieveWalkDetails(int id) async {
   var response =
       await http.get('https://www.am-sport.cfwb.be/adeps/pv_detail.asp?i=$id');
   String body = response.body;
-  Document document = parse(response.body);
   return WalkDetails(
     fifteenKm: body.contains("15.gif"),
     wheelchair: body.contains("handi.gif"),

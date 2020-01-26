@@ -55,7 +55,7 @@ retrieveSuggestions(String search) async {
   final String url =
       "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token";
   final http.Response response = await http.get(url);
-  var decoded = json.decode(response.body);
+  json.decode(response.body);
 }
 
 Future<String> retrieveAddress(double long, double lat) async {

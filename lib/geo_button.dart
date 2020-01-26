@@ -133,24 +133,4 @@ class GeoButton extends StatelessWidget {
       ),
     );
   }
-
-  Widget _iOSNoLabel(BuildContext context) {
-    return Material(
-      child: Ink(
-        height: 40.0,
-        width: 40.0,
-        decoration: ShapeDecoration(
-          color: Theme.of(context).buttonColor,
-          shape: RoundedRectangleBorder(),
-        ),
-        child: IconButton(
-          tooltip: "Lancer la navigation vers ce point",
-          icon: carIcon,
-          onPressed: () {
-            launchGeoApp(walk);
-          },
-        ),
-      ),
-    );
-  }
 }
