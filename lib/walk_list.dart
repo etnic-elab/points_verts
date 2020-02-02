@@ -98,7 +98,9 @@ class _WalkListState extends State<WalkList> {
       });
     }
     List<Walk> results = await newList;
-    _allWalks.putIfAbsent(_selectedDate.date, () => results);
+    if (results.isNotEmpty && _selectedDate != null) {
+      _allWalks.putIfAbsent(_selectedDate.date, () => results);
+    }
   }
 
   Future<List<Walk>> _calculateDistances(List<Walk> walks) async {

@@ -41,6 +41,9 @@ Future<List<DateTime>> retrieveDatesFromEndpoint() async {
 Future<List<Walk>> retrieveWalksFromEndpoint(DateTime date) async {
   DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
   List<Walk> newList = List<Walk>();
+  if (date == null) {
+    return newList;
+  }
   var response = await http.get(
       "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O");
   var fixed = _fixCsv(response.body);
