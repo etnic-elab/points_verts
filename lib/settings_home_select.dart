@@ -75,8 +75,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                 icon: Icon(Icons.delete),
                 onPressed: () {
                   removeHomeCallback();
-                  _homeSearchController
-                      .removeListener(_onSearchChanged);
+                  _homeSearchController.removeListener(_onSearchChanged);
                   Navigator.of(context).pop();
                 })
           ],
@@ -87,11 +86,13 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
 
   Widget _pageContent(BuildContext context) {
     return Column(children: <Widget>[
-      TextField(
-        controller: _homeSearchController,
-        decoration:
-            InputDecoration(hintText: "Rechercher l'adresse du domicile"),
-      ),
+      Padding(
+          padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0, bottom: 20.0),
+          child: TextField(
+            controller: _homeSearchController,
+            decoration:
+                InputDecoration(hintText: "Rechercher l'adresse du domicile"),
+          )),
       Expanded(child: _suggestionList())
     ]);
   }
