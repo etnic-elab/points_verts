@@ -48,7 +48,7 @@ class WalkResultsMapView extends StatelessWidget {
 
             return Stack(
               children: <Widget>[
-                retrieveMap(markers, MediaQuery.of(context).platformBrightness),
+                retrieveMap(markers, Theme.of(context).brightness),
                 _buildWalkInfo(selectedWalk),
               ],
             );
