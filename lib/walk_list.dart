@@ -77,6 +77,7 @@ class _WalkListState extends State<WalkList> {
   _retrieveWalks() {
     setState(() {
       _currentWalks = null;
+      _selectedWalk = null;
     });
     _retrieveWalksHelper();
   }
@@ -88,16 +89,13 @@ class _WalkListState extends State<WalkList> {
     } else {
       newList = retrieveWalksFromEndpoint(_selectedDate?.date);
     }
+    if (selectedPosition != null) {
+      newList = _calculateDistances(await newList);
+    }
+    List<Walk> results = await newList;
     setState(() {
       _currentWalks = newList;
     });
-    if (selectedPosition != null) {
-      newList = _calculateDistances(await newList);
-      setState(() {
-        _currentWalks = newList;
-      });
-    }
-    List<Walk> results = await newList;
     if (results.isNotEmpty && _selectedDate != null) {
       _allWalks.putIfAbsent(_selectedDate.date, () => results);
     }
