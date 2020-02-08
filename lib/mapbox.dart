@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
 
+import 'mapbox_suggestion.dart';
 import 'trip.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -51,11 +52,22 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
   );
 }
 
-retrieveSuggestions(String search) async {
-  final String url =
-      "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token";
-  final http.Response response = await http.get(url);
-  json.decode(response.body);
+Future<List<MapBoxSuggestion>> retrieveSuggestions(String search) async {
+  if (search.isNotEmpty) {
+    final String url =
+        "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token&country=BE&language=fr_BE&limit=10&types=address";
+    final http.Response response = await http.get(url);
+    var decoded = json.decode(response.body);
+    List<MapBoxSuggestion> results = List<MapBoxSuggestion>();
+    if (decoded['features'] != null) {
+      for (var result in decoded['features']) {
+        results.add(MapBoxSuggestion(address: result['place_name'], longitude: result['center'][0], latitude: result['center'][1]));
+      }
+    }
+    return results;
+  } else {
+    return List<MapBoxSuggestion>();
+  }
 }
 
 Future<String> retrieveAddress(double long, double lat) async {

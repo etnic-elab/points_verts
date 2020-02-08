@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:points_verts/prefs.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'app_drawer.dart';
-import 'mapbox.dart';
+import 'mapbox_suggestion.dart';
+import 'prefs.dart';
+import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -36,11 +37,11 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  Future<void> _setHome(Position position) async {
-    await PrefsProvider.prefs
-        .setString("home_coords", "${position.latitude},${position.longitude}");
-    String label = await PrefsProvider.prefs.setString("home_label",
-        await retrieveAddress(position.longitude, position.latitude));
+  Future<void> _setHome(MapBoxSuggestion suggestion) async {
+    await PrefsProvider.prefs.setString(
+        "home_coords", "${suggestion.latitude},${suggestion.longitude}");
+    String label =
+        await PrefsProvider.prefs.setString("home_label", suggestion.address);
     setState(() {
       _home = label;
     });
@@ -154,46 +155,11 @@ class _SettingsState extends State<Settings> {
               tiles: [
                 SettingsTile(
                   title: 'Domicile',
-                  subtitle: _home != null ? _home : "Non defini",
+                  subtitle: _home != null ? _home : "Aucun - appuyez ici pour le définir",
                   leading: Icon(Icons.home),
                   onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text("Domicile"),
-                            content: Text(
-                                "Définir la position actuelle comme votre domicile?"),
-                            actions: <Widget>[
-                              FlatButton(
-                                child: Text("REINITIALISER"),
-                                onPressed: () {
-                                  _removeHome();
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              FlatButton(
-                                child: Text("NON"),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              FlatButton(
-                                child: Text("OUI"),
-                                onPressed: () {
-                                  geolocator
-                                      .getCurrentPosition(
-                                          desiredAccuracy:
-                                              LocationAccuracy.best)
-                                      .then((Position position) {
-                                    _setHome(position);
-                                    Navigator.of(context).pop();
-                                  });
-                                },
-                              ),
-                            ],
-                          );
-                        });
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => SettingsHomeSelect(_setHome, _removeHome)));
                   },
                 ),
               ],
