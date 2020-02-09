@@ -17,7 +17,7 @@ String _token = DotEnv().env['MAPBOX_TOKEN'];
 Future<void> retrieveTrips(
     double fromLong, double fromLat, List<Walk> walks) async {
   String coordinates = "$fromLong,$fromLat";
-  for (int i = 0; i < min(walks.length, 24); i++) {
+  for (int i = 0; i < min(walks.length, 5); i++) {
     Walk walk = walks[i];
     if (walk.isPositionable()) {
       coordinates = coordinates + ";${walk.long},${walk.lat}";
@@ -32,7 +32,7 @@ Future<void> retrieveTrips(
   final durations =
       decoded['durations']?.length == 1 ? decoded['durations'][0] : null;
   if (distances != null && durations != null) {
-    for (int i = 0; i < min(walks.length, 24); i++) {
+    for (int i = 0; i < min(walks.length, 5); i++) {
       Walk walk = walks[i];
       if (walk.isPositionable() && distances.length >= i) {
         walk.trip =
