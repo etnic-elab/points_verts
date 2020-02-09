@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 import 'package:points_verts/settings.dart';
 import 'package:points_verts/walk_list.dart';
 
@@ -8,7 +9,6 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
-        // Important: Remove any padding from the ListView.
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
@@ -37,6 +37,21 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                   context, MaterialPageRoute(builder: (context) => Settings()));
             },
+          ),
+          Divider(),
+          ListTile(
+            title: FutureBuilder(
+                future: PackageInfo.fromPlatform(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<PackageInfo> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData) {
+                      PackageInfo info = snapshot.data;
+                      return Text("${info.version}+${info.buildNumber}");
+                    }
+                  }
+                  return SizedBox();
+                }),
           ),
         ],
       ),
