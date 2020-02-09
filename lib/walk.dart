@@ -41,4 +41,8 @@ class Walk {
       return '${(dist / 1000).round().toString()} km';
     }
   }
+
+  bool isPositionable() {
+    return long != null && lat != null && !isCancelled();
+  }
 }

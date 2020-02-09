@@ -16,7 +16,6 @@ import 'database.dart';
 import 'dates_dropdown.dart';
 import 'mapbox.dart';
 import 'platform_widget.dart';
-import 'trip.dart';
 import 'walk.dart';
 import 'walk_date.dart';
 import 'walk_results_list_view.dart';
@@ -116,33 +115,27 @@ class _WalkListState extends State<WalkList> {
         }
       }
     }
-    walks.sort((a, b) {
-      if (a.distance != null && b.distance != null) {
-        return a.distance.compareTo(b.distance);
-      } else if (a.distance != null) {
-        return -1;
-      } else {
-        return 1;
-      }
-    });
-    for (int i = 0; i < walks.length; i++) {
-      if (i < 5) {
-        try {
-          Walk walk = walks[i];
-          retrieveTrip(selectedPosition.longitude, selectedPosition.latitude,
-                  walk.long, walk.lat)
-              .then((Trip trip) {
-            walk.trip = trip;
-            setState(() {});
-          });
-        } catch (err) {
-          print('Cannot retrieve trip: $err');
-        }
-      } else {
-        break;
-      }
+    walks.sort((a, b) => sortWalks(a, b));
+    try {
+      await retrieveTrips(
+          selectedPosition.longitude, selectedPosition.latitude, walks);
+    } catch (err) {
+      print("Cannot retrieve trips: $err");
     }
+    walks.sort((a, b) => sortWalks(a, b));
     return walks;
+  }
+
+  int sortWalks(Walk a, Walk b) {
+    if (a.trip != null && b.trip != null) {
+      return a.trip.duration.compareTo(b.trip.duration);
+    } else if (a.distance != null && b.distance != null) {
+      return a.distance.compareTo(b.distance);
+    } else if (a.distance != null) {
+      return -1;
+    } else {
+      return 1;
+    }
   }
 
   void _retrieveDates() async {
