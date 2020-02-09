@@ -22,15 +22,17 @@ class WalkResultsMapView extends StatelessWidget {
   final Walk selectedWalk;
   final Function(Walk) onWalkSelect;
   final Function refreshWalks;
+  final List<Marker> markers = List<Marker>();
 
   @override
   Widget build(BuildContext context) {
+
     return FutureBuilder(
       future: walks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
-            List<Marker> markers = new List<Marker>();
+            markers.clear();
             for (Walk walk in snapshot.data) {
               if (walk.lat != null && walk.long != null) {
                 markers.add(_buildMarker(walk, context));
@@ -54,12 +56,15 @@ class WalkResultsMapView extends StatelessWidget {
             );
           } else if (snapshot.hasError) {
             return WalkListError(refreshWalks);
-          } else {
-            return Loading();
           }
-        } else {
-          return Loading();
         }
+        return Stack(
+          children: <Widget>[
+            retrieveMap(markers, Theme.of(context).brightness),
+            Loading(),
+            _buildWalkInfo(selectedWalk),
+          ],
+        );
       },
     );
   }
