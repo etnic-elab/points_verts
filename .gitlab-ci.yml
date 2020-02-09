@@ -6,6 +6,7 @@ stages:
   - test
 
 before_script:
+  - touch .env
   - flutter pub get
   - flutter clean
 

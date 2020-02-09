@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
 
@@ -9,8 +10,7 @@ import 'trip.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-const String _token =
-    'pk.eyJ1IjoidGJvcmxlZSIsImEiOiJjazRvNGI4ZXAycTBtM2txd2Z3eHk3Ymh1In0.12yn8XMdhqdoPByYti4g5g';
+String _token = DotEnv().env['MAPBOX_TOKEN'];
 
 Future<Trip> retrieveTrip(
     double fromLong, double fromLat, double toLong, double toLat) async {
