@@ -10,11 +10,17 @@ Small Flutter application displaying future Adeps' walks. Non official.
 
 # Planned features
 
-- Display more walk details?
-- Notifications indicating where the nearest walk is on Sunday morning?
+- Notifications indicating where the nearest walk is on Sunday morning or Saturday night?
+- Weather forecast for each location?
 - Share walk infos button?
 
 # Releasing the application
+
+The Mapbox API key should be defined in a `.env` file in root folder:
+
+```properties
+MAPBOX_TOKEN=token
+```
 
 Information about the keystore should be set in the `android/key.properties`:
 
