@@ -330,27 +330,23 @@ class _WalkListState extends State<WalkList> {
     if (_selectedPlace == Places.home) {
       return;
     }
-    geolocator.isLocationServiceEnabled().then((bool enabled) {
-      if (enabled) {
-        setState(() {
-          _calculatingPosition = true;
-        });
-        geolocator
-            .getCurrentPosition(desiredAccuracy: LocationAccuracy.medium)
-            .then((Position position) {
-          setState(() {
-            _currentPosition = position;
-            _selectedPlace = Places.current;
-            _calculatingPosition = false;
-          });
-          if (_selectedDate != null) {
-            _retrieveWalks();
-          }
-        }).catchError((e) {
-          print("Cannot retrieve current position: $e");
-          _retrieveWalks();
-        });
+    setState(() {
+      _calculatingPosition = true;
+    });
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.medium)
+        .then((Position position) {
+      setState(() {
+        _currentPosition = position;
+        _selectedPlace = Places.current;
+        _calculatingPosition = false;
+      });
+      if (_selectedDate != null) {
+        _retrieveWalks();
       }
+    }).catchError((e) {
+      print("Cannot retrieve current position: $e");
+      _retrieveWalks();
     });
   }
 }
