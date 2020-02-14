@@ -1,4 +1,5 @@
 import 'package:points_verts/walk_details.dart';
+import 'package:points_verts/weather.dart';
 
 import 'trip.dart';
 
@@ -25,6 +26,7 @@ class Walk {
   double distance;
   Trip trip;
   Future<WalkDetails> details;
+  Future<List<Weather>> weathers;
 
   bool isCancelled() {
     return status == "ptvert_annule";

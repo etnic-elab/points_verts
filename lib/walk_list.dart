@@ -15,6 +15,7 @@ import 'api.dart';
 import 'database.dart';
 import 'dates_dropdown.dart';
 import 'mapbox.dart';
+import 'openweather.dart';
 import 'platform_widget.dart';
 import 'walk.dart';
 import 'walk_date.dart';
@@ -91,6 +92,13 @@ class _WalkListState extends State<WalkList> {
     if (selectedPosition != null) {
       newList = _calculateDistances(await newList);
     }
+    if (_selectedDate.date.difference(DateTime.now()).inDays < 5) {
+      try {
+        await _retrieveWeathers(await newList);
+      } catch (err) {
+        print("Cannot retrieve weather info: $err");
+      }
+    }
     List<Walk> results = await newList;
     setState(() {
       _currentWalks = newList;
@@ -124,6 +132,17 @@ class _WalkListState extends State<WalkList> {
     }
     walks.sort((a, b) => sortWalks(a, b));
     return walks;
+  }
+
+  Future _retrieveWeathers(List<Walk> walks) async {
+    List<Future> weathers = List<Future>();
+    for (Walk walk in walks) {
+      if (walk.weathers == null && !walk.isCancelled()) {
+        walk.weathers = getWeather(walk.long, walk.lat, _selectedDate.date);
+        weathers.add(walk.weathers);
+      }
+    }
+    return Future.wait(weathers);
   }
 
   int sortWalks(Walk a, Walk b) {
