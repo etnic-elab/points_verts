@@ -47,11 +47,10 @@ class _WalkListState extends State<WalkList> {
   void initState() {
     initializeDateFormatting("fr_BE");
     _retrieveDates();
-    _getCurrentLocation();
     super.initState();
   }
 
-  _retrieveHomePosition() async {
+  _retrievePosition() async {
     String homePos = await PrefsProvider.prefs.getString("home_coords");
     if (homePos != null) {
       List<String> split = homePos.split(",");
@@ -61,7 +60,12 @@ class _WalkListState extends State<WalkList> {
             longitude: double.parse(split[1]));
         _selectedPlace = Places.home;
       });
+    } else {
+      setState(() {
+        _selectedPlace = Places.current;
+      });
     }
+    _getCurrentLocation();
   }
 
   Position get selectedPosition {
@@ -120,6 +124,7 @@ class _WalkListState extends State<WalkList> {
               walk.lat,
               walk.long);
           walk.distance = distance;
+          walk.trip = null;
         }
       }
     }
@@ -159,7 +164,7 @@ class _WalkListState extends State<WalkList> {
 
   void _retrieveDates() async {
     _dates = _getWalkDates();
-    await _retrieveHomePosition();
+    await _retrievePosition();
     _dates.then((List<WalkDate> items) {
       setState(() {
         _selectedDate = items.first;
@@ -316,7 +321,7 @@ class _WalkListState extends State<WalkList> {
                         setState(() {
                           _selectedPlace = place;
                         });
-                        _retrieveWalksHelper();
+                        _retrieveWalks();
                       })
                   : Expanded(child: _resultNumber(context))
             ]));
@@ -346,26 +351,23 @@ class _WalkListState extends State<WalkList> {
   }
 
   _getCurrentLocation() {
-    if (_selectedPlace == Places.home) {
-      return;
-    }
     setState(() {
       _calculatingPosition = true;
     });
     geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.medium)
+        .getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.medium,
+            locationPermissionLevel: GeolocationPermission.locationWhenInUse)
         .then((Position position) {
       setState(() {
         _currentPosition = position;
-        _selectedPlace = Places.current;
         _calculatingPosition = false;
       });
-      if (_selectedDate != null) {
+      if (_selectedPlace == Places.current && _selectedDate != null) {
         _retrieveWalks();
       }
     }).catchError((e) {
       print("Cannot retrieve current position: $e");
-      _retrieveWalks();
     });
   }
 }
