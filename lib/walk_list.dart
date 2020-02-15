@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,8 @@ import 'walk_results_map_view.dart';
 
 enum PopupMenuActions { recalculatePosition, settings }
 enum Places { home, current }
+
+const String TAG = "dev.alpagaga.points_verts.WalkList";
 
 class WalkList extends StatefulWidget {
   @override
@@ -89,8 +92,12 @@ class _WalkListState extends State<WalkList> {
   _retrieveWalksHelper() async {
     Future<List<Walk>> newList;
     if (_allWalks.containsKey(_selectedDate?.date)) {
+      log("Retrieving walk list for ${_selectedDate.date} from cache",
+          name: TAG);
       newList = Future.value(_allWalks[_selectedDate.date]);
     } else {
+      log("Retrieving walk list for ${_selectedDate.date} from endpoint",
+          name: TAG);
       newList = retrieveWalksFromEndpoint(_selectedDate?.date);
     }
     if (selectedPosition != null) {
@@ -351,6 +358,7 @@ class _WalkListState extends State<WalkList> {
   }
 
   _getCurrentLocation() {
+    log("Retrieving current user location", name: TAG);
     setState(() {
       _calculatingPosition = true;
     });
@@ -359,12 +367,15 @@ class _WalkListState extends State<WalkList> {
             desiredAccuracy: LocationAccuracy.medium,
             locationPermissionLevel: GeolocationPermission.locationWhenInUse)
         .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-        _calculatingPosition = false;
-      });
-      if (_selectedPlace == Places.current && _selectedDate != null) {
-        _retrieveWalks();
+      log("Current user location is $position", name: TAG);
+      if (this.mounted) {
+        setState(() {
+          _currentPosition = position;
+          _calculatingPosition = false;
+        });
+        if (_selectedPlace == Places.current && _selectedDate != null) {
+          _retrieveWalks();
+        }
       }
     }).catchError((e) {
       print("Cannot retrieve current position: $e");
