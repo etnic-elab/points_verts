@@ -186,6 +186,13 @@ class _WalkListState extends State<WalkList> {
   }
 
   Future<List<WalkDate>> _getWalkDates() async {
+    int datesLastUpdate = await PrefsProvider.prefs.getInt("dates_last_update");
+    if (datesLastUpdate == null ||
+        DateTime.fromMillisecondsSinceEpoch(datesLastUpdate)
+                .difference(DateTime.now()) >
+            Duration(days: 7)) {
+      DBProvider.db.removeWalkDates();
+    }
     List<WalkDate> walkDates = await DBProvider.db.getWalkDates();
     if (walkDates.length == 0) {
       List<DateTime> dates = await retrieveDatesFromWorker();
@@ -193,6 +200,8 @@ class _WalkListState extends State<WalkList> {
         return WalkDate(date: date);
       }).toList();
       DBProvider.db.insertWalkDates(walkDates);
+      PrefsProvider.prefs
+          .setInt("dates_last_update", DateTime.now().millisecondsSinceEpoch);
     }
     return walkDates;
   }

@@ -4,6 +4,8 @@ import 'dart:developer';
 
 import 'walk_date.dart';
 
+const String TAG = "dev.alpagaga.points_verts.DBProvider";
+
 class DBProvider {
   DBProvider._();
 
@@ -17,8 +19,7 @@ class DBProvider {
   }
 
   Future<Database> getDatabaseInstance() async {
-    log("Creating new database client",
-        name: "dev.alpagaga.points_verts.DBProvider");
+    log("Creating new database client", name: TAG);
     return openDatabase(
         join(await getDatabasesPath(), 'points_verts_database.db'),
         onCreate: (db, version) {
@@ -29,8 +30,7 @@ class DBProvider {
   }
 
   Future<List<WalkDate>> getWalkDates() async {
-    log("Retrieving walk dates from database",
-        name: "dev.alpagaga.points_verts.DBProvider");
+    log("Retrieving walk dates from database", name: TAG);
     final Database db = await database;
     final DateTime now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
@@ -42,13 +42,18 @@ class DBProvider {
   }
 
   Future<void> insertWalkDates(List<WalkDate> walkDates) async {
-    log("Inserting walk dates in database",
-        name: "dev.alpagaga.points_verts.DBProvider");
+    log("Inserting walk dates in database", name: TAG);
     final Database db = await database;
     final Batch batch = db.batch();
     for (WalkDate walkDate in walkDates) {
       batch.insert("walk_dates", walkDate.toMap());
     }
     await batch.commit();
+  }
+
+  Future<int> removeWalkDates() async {
+    log("Removing walk dates from database", name: TAG);
+    final Database db = await database;
+    return db.delete('walk_dates');
   }
 }
