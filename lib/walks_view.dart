@@ -13,13 +13,13 @@ import 'package:points_verts/prefs.dart';
 import 'package:points_verts/settings.dart';
 
 import 'services/adeps/api.dart';
-import 'database.dart';
 import 'dates_dropdown.dart';
 import 'services/mapbox/mapbox.dart';
 import 'services/openweather/openweather.dart';
 import 'platform_widget.dart';
 import 'walk.dart';
 import 'walk_date.dart';
+import 'walk_date_utils.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 
@@ -170,7 +170,7 @@ class _WalksViewState extends State<WalksView> {
   }
 
   void _retrieveDates() async {
-    _dates = _getWalkDates();
+    _dates = getWalkDates();
     await _retrievePosition();
     _dates.then((List<WalkDate> items) {
       setState(() {
@@ -183,42 +183,6 @@ class _WalksViewState extends State<WalksView> {
         _currentWalks = Future.error(err);
       });
     });
-  }
-
-  Future<List<WalkDate>> _getWalkDates() async {
-    int datesLastUpdate = await PrefsProvider.prefs.getInt("dates_last_update");
-    bool needsUpdate = datesLastUpdate == null ||
-        DateTime.fromMillisecondsSinceEpoch(datesLastUpdate)
-                .difference(DateTime.now()) >
-            Duration(days: 7);
-    List<WalkDate> walkDates;
-    if (needsUpdate) {
-      try {
-        walkDates = await _getWalkDatesFromEndpoint();
-        if (walkDates.length != 0) {
-          DBProvider.db.removeWalkDates();
-          DBProvider.db.insertWalkDates(walkDates);
-          return walkDates;
-        }
-      } catch (err) {
-        print("Cannot update walk dates: $err");
-      }
-    }
-    walkDates = await DBProvider.db.getWalkDates();
-    if (walkDates.length == 0) {
-      walkDates = await _getWalkDatesFromEndpoint();
-    }
-    return walkDates;
-  }
-
-  Future<List<WalkDate>> _getWalkDatesFromEndpoint() async {
-    List<DateTime> dates = await retrieveDatesFromWorker();
-    List<WalkDate> walkDates = dates.map((DateTime date) {
-      return WalkDate(date: date);
-    }).toList();
-    PrefsProvider.prefs
-        .setInt("dates_last_update", DateTime.now().millisecondsSinceEpoch);
-    return walkDates;
   }
 
   @override
