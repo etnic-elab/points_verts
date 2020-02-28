@@ -28,12 +28,12 @@ enum Places { home, current }
 
 const String TAG = "dev.alpagaga.points_verts.WalkList";
 
-class WalkList extends StatefulWidget {
+class WalksView extends StatefulWidget {
   @override
-  _WalkListState createState() => _WalkListState();
+  _WalksViewState createState() => _WalksViewState();
 }
 
-class _WalkListState extends State<WalkList> {
+class _WalksViewState extends State<WalksView> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
   Future<List<WalkDate>> _dates;
@@ -186,14 +186,38 @@ class _WalkListState extends State<WalkList> {
   }
 
   Future<List<WalkDate>> _getWalkDates() async {
-    List<WalkDate> walkDates = await DBProvider.db.getWalkDates();
-    if (walkDates.length == 0) {
-      List<DateTime> dates = await retrieveDatesFromWorker();
-      walkDates = dates.map((DateTime date) {
-        return WalkDate(date: date);
-      }).toList();
-      DBProvider.db.insertWalkDates(walkDates);
+    int datesLastUpdate = await PrefsProvider.prefs.getInt("dates_last_update");
+    bool needsUpdate = datesLastUpdate == null ||
+        DateTime.fromMillisecondsSinceEpoch(datesLastUpdate)
+                .difference(DateTime.now()) >
+            Duration(days: 7);
+    List<WalkDate> walkDates;
+    if (needsUpdate) {
+      try {
+        walkDates = await _getWalkDatesFromEndpoint();
+        if (walkDates.length != 0) {
+          DBProvider.db.removeWalkDates();
+          DBProvider.db.insertWalkDates(walkDates);
+          return walkDates;
+        }
+      } catch (err) {
+        print("Cannot update walk dates: $err");
+      }
     }
+    walkDates = await DBProvider.db.getWalkDates();
+    if (walkDates.length == 0) {
+      walkDates = await _getWalkDatesFromEndpoint();
+    }
+    return walkDates;
+  }
+
+  Future<List<WalkDate>> _getWalkDatesFromEndpoint() async {
+    List<DateTime> dates = await retrieveDatesFromWorker();
+    List<WalkDate> walkDates = dates.map((DateTime date) {
+      return WalkDate(date: date);
+    }).toList();
+    PrefsProvider.prefs
+        .setInt("dates_last_update", DateTime.now().millisecondsSinceEpoch);
     return walkDates;
   }
 

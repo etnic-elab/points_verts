@@ -7,7 +7,7 @@ import 'package:points_verts/walk_tile.dart';
 
 import 'loading.dart';
 import 'walk.dart';
-import 'walk_list.dart';
+import 'walks_view.dart';
 
 class WalkResultsListView extends StatelessWidget {
   WalkResultsListView(

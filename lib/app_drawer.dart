@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
-import 'package:points_verts/settings.dart';
-import 'package:points_verts/walk_list.dart';
+
+import 'settings.dart';
+import 'walks_view.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -33,7 +34,7 @@ class AppDrawer extends StatelessWidget {
                 title: Text('Prochains Points Verts'),
                 onTap: () {
                   Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => WalkList()));
+                      MaterialPageRoute(builder: (context) => WalksView()));
                 },
               ),
               ListTile(

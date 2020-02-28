@@ -7,7 +7,7 @@ import 'package:latlong/latlong.dart';
 import 'loading.dart';
 import 'mapbox.dart';
 import 'walk.dart';
-import 'walk_list.dart';
+import 'walks_view.dart';
 import 'walk_list_error.dart';
 import 'walk_tile.dart';
 import 'walk_utils.dart';

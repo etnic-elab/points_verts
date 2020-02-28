@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:points_verts/walk_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'walks_view.dart';
 
 void main() async {
   await DotEnv().load('.env');
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme:
           ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
-      home: WalkList(),
+      home: WalksView(),
     );
   }
 
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: WalkList(),
+      home: WalksView(),
     );
   }
 
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
       title: 'Points Verts',
       theme:
           ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
-      home: WalkList(),
+      home: WalksView(),
     );
   }
 }

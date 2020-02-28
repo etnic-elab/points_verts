@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'walk_list.dart';
+import 'walks_view.dart';
 
 class PlaceSelect extends StatelessWidget {
   PlaceSelect({this.currentPlace, this.onChanged});

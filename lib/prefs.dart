@@ -22,4 +22,15 @@ class PrefsProvider {
     SharedPreferences prefs = await preferences;
     return prefs.getString(key);
   }
+
+  Future<int> setInt(String key, int value) async {
+    SharedPreferences prefs = await preferences;
+    await prefs.setInt(key, value);
+    return prefs.getInt(key);
+  }
+
+  Future<int> getInt(String key) async {
+    SharedPreferences prefs = await preferences;
+    return prefs.getInt(key);
+  }
 }
