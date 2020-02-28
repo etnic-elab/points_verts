@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:points_verts/mapbox.dart';
-import 'package:points_verts/mapbox_suggestion.dart';
+import 'package:points_verts/services/mapbox/mapbox.dart';
+import 'package:points_verts/services/mapbox/mapbox_suggestion.dart';
 
 import 'loading.dart';
 import 'platform_widget.dart';

@@ -7,8 +7,8 @@ import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
 import 'package:http/http.dart' as http;
 
-import 'walk.dart';
-import 'walk_details.dart';
+import '../../walk.dart';
+import '../../walk_details.dart';
 
 Future<List<DateTime>> retrieveDatesFromWorker() async {
   try {

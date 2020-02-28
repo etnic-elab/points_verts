@@ -10,8 +10,8 @@ import 'geo_button.dart';
 import 'walk.dart';
 import 'walk_details_view.dart';
 import 'walk_utils.dart';
-import 'weather.dart';
-import 'openweather.dart';
+import 'services/openweather/weather.dart';
+import 'services/openweather/openweather.dart';
 
 class WalkTile extends StatelessWidget {
   WalkTile({this.walk});

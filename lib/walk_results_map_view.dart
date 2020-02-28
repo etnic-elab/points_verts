@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong/latlong.dart';
 
 import 'loading.dart';
-import 'mapbox.dart';
+import 'services/mapbox/mapbox.dart';
 import 'walk.dart';
 import 'walks_view.dart';
 import 'walk_list_error.dart';

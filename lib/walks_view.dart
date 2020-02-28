@@ -12,11 +12,11 @@ import 'package:points_verts/place_select.dart';
 import 'package:points_verts/prefs.dart';
 import 'package:points_verts/settings.dart';
 
-import 'api.dart';
+import 'services/adeps/api.dart';
 import 'database.dart';
 import 'dates_dropdown.dart';
-import 'mapbox.dart';
-import 'openweather.dart';
+import 'services/mapbox/mapbox.dart';
+import 'services/openweather/openweather.dart';
 import 'platform_widget.dart';
 import 'walk.dart';
 import 'walk_date.dart';
