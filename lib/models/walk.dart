@@ -1,7 +1,7 @@
-import 'package:points_verts/walk_details.dart';
-import 'package:points_verts/services/openweather/weather.dart';
+import 'package:points_verts/models/walk_details.dart';
+import 'package:points_verts/models/weather.dart';
 
-import 'services/mapbox/trip.dart';
+import 'trip.dart';
 
 class Walk {
   Walk(

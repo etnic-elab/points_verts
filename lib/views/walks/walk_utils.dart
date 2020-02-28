@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'walk.dart';
+import '../../models/walk.dart';
 
 Widget displayIcon(Walk walk, {Color color, double size}) {
   if (walk.isCancelled()) {

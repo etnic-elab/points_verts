@@ -4,8 +4,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../app_drawer.dart';
-import '../../services/mapbox/mapbox_suggestion.dart';
-import '../../prefs.dart';
+import '../../models/address_suggestion.dart';
+import '../../services/prefs.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
@@ -37,7 +37,7 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  Future<void> _setHome(MapBoxSuggestion suggestion) async {
+  Future<void> _setHome(AddressSuggestion suggestion) async {
     await PrefsProvider.prefs.setString(
         "home_coords", "${suggestion.latitude},${suggestion.longitude}");
     String label =

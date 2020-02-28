@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../walk_date.dart';
+import '../../models/walk_date.dart';
 
 class DatesDropdown extends StatelessWidget {
   DatesDropdown({this.dates, this.selectedDate, this.onChanged});

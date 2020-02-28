@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:points_verts/services/openweather/openweather.dart';
+import 'package:points_verts/services/openweather.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../platform_widget.dart';
-import '../../walk.dart';
-import '../../walk_utils.dart';
-import '../../services/openweather/weather.dart';
+import '../../models/walk.dart';
+import 'walk_utils.dart';
+import '../../models/weather.dart';
 
 class WalkDetailsView extends StatelessWidget {
   WalkDetailsView(this.walk);

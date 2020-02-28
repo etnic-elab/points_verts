@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:points_verts/services/mapbox/mapbox.dart';
-import 'package:points_verts/services/mapbox/mapbox_suggestion.dart';
+import 'package:points_verts/services/mapbox.dart';
+import 'package:points_verts/models/address_suggestion.dart';
 
 import '../loading.dart';
 import '../platform_widget.dart';
@@ -11,7 +11,7 @@ import '../platform_widget.dart';
 class SettingsHomeSelect extends StatefulWidget {
   SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback);
 
-  final Function(MapBoxSuggestion) setHomeCallback;
+  final Function(AddressSuggestion) setHomeCallback;
   final Function removeHomeCallback;
 
   @override
@@ -22,12 +22,12 @@ class SettingsHomeSelect extends StatefulWidget {
 class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   _SettingsHomeSelectState(this.setHomeCallback, this.removeHomeCallback);
 
-  final Function(MapBoxSuggestion) setHomeCallback;
+  final Function(AddressSuggestion) setHomeCallback;
   final Function removeHomeCallback;
   final _homeSearchController = TextEditingController();
   Timer _debounce;
-  Future<List<MapBoxSuggestion>> _suggestions =
-      Future.value(List<MapBoxSuggestion>());
+  Future<List<AddressSuggestion>> _suggestions =
+      Future.value(List<AddressSuggestion>());
 
   @override
   void initState() {
@@ -101,15 +101,15 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
     return FutureBuilder(
         future: _suggestions,
         builder: (BuildContext context,
-            AsyncSnapshot<List<MapBoxSuggestion>> snapshot) {
+            AsyncSnapshot<List<AddressSuggestion>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              List<MapBoxSuggestion> suggestions = snapshot.data;
+              List<AddressSuggestion> suggestions = snapshot.data;
               return ListView.separated(
                   itemCount: suggestions.length,
                   separatorBuilder: (context, i) => Divider(height: 0.5),
                   itemBuilder: (context, i) {
-                    MapBoxSuggestion suggestion = suggestions[i];
+                    AddressSuggestion suggestion = suggestions[i];
                     return ListTile(
                         title: Text(suggestion.address),
                         dense: true,

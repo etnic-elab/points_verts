@@ -2,7 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:developer';
 
-import 'walk_date.dart';
+import '../models/walk_date.dart';
 
 const String TAG = "dev.alpagaga.points_verts.DBProvider";
 

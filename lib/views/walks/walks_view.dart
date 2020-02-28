@@ -9,17 +9,17 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/views/app_drawer.dart';
 import 'package:points_verts/views/walks/place_select.dart';
-import 'package:points_verts/prefs.dart';
+import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/settings/settings.dart';
 
-import '../../services/adeps/api.dart';
+import '../../services/adeps.dart';
 import 'dates_dropdown.dart';
-import '../../services/mapbox/mapbox.dart';
-import '../../services/openweather/openweather.dart';
+import '../../services/mapbox.dart';
+import '../../services/openweather.dart';
 import '../platform_widget.dart';
-import '../../walk.dart';
-import '../../walk_date.dart';
-import '../../walk_date_utils.dart';
+import '../../models/walk.dart';
+import '../../models/walk_date.dart';
+import 'walk_date_utils.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 

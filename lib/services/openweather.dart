@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:weather_icons/weather_icons.dart';
 import 'dart:convert';
 
-import 'weather.dart';
+import '../models/weather.dart';
 
 String _token = DotEnv().env['OPENWEATHER_TOKEN'];
 

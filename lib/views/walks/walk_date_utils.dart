@@ -1,7 +1,7 @@
-import 'database.dart';
-import 'prefs.dart';
-import 'services/adeps/api.dart';
-import 'walk_date.dart';
+import '../../services/database.dart';
+import '../../services/prefs.dart';
+import '../../services/adeps.dart';
+import '../../models/walk_date.dart';
 
 DateTime getNextSunday() {
   DateTime current = new DateTime.now();
