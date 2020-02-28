@@ -3,9 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-import 'app_drawer.dart';
-import 'services/mapbox/mapbox_suggestion.dart';
-import 'prefs.dart';
+import '../app_drawer.dart';
+import '../../services/mapbox/mapbox_suggestion.dart';
+import '../../prefs.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {

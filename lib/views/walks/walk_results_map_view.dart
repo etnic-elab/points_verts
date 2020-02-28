@@ -4,13 +4,13 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong/latlong.dart';
 
-import 'loading.dart';
-import 'services/mapbox/mapbox.dart';
-import 'walk.dart';
+import '../loading.dart';
+import '../../services/mapbox/mapbox.dart';
+import '../../walk.dart';
 import 'walks_view.dart';
 import 'walk_list_error.dart';
 import 'walk_tile.dart';
-import 'walk_utils.dart';
+import '../../walk_utils.dart';
 
 class WalkResultsMapView extends StatelessWidget {
   WalkResultsMapView(this.walks, this.position, this.currentPlace,

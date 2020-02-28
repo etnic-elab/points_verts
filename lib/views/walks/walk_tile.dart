@@ -7,11 +7,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'geo_button.dart';
-import 'walk.dart';
+import '../../walk.dart';
 import 'walk_details_view.dart';
-import 'walk_utils.dart';
-import 'services/openweather/weather.dart';
-import 'services/openweather/openweather.dart';
+import '../../walk_utils.dart';
+import '../../services/openweather/weather.dart';
+import '../../services/openweather/openweather.dart';
 
 class WalkTile extends StatelessWidget {
   WalkTile({this.walk});

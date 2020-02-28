@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:points_verts/services/mapbox/mapbox.dart';
 import 'package:points_verts/services/mapbox/mapbox_suggestion.dart';
 
-import 'loading.dart';
-import 'platform_widget.dart';
+import '../loading.dart';
+import '../platform_widget.dart';
 
 class SettingsHomeSelect extends StatefulWidget {
   SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback);

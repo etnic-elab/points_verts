@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:points_verts/walk_list_error.dart';
-import 'package:points_verts/walk_tile.dart';
+import 'package:points_verts/views/walks/walk_list_error.dart';
+import 'package:points_verts/views/walks/walk_tile.dart';
 
-import 'loading.dart';
-import 'walk.dart';
+import '../loading.dart';
+import '../../walk.dart';
 import 'walks_view.dart';
 
 class WalkResultsListView extends StatelessWidget {

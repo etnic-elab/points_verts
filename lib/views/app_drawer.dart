@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 
-import 'settings.dart';
-import 'walks_view.dart';
+import 'settings/settings.dart';
+import 'walks/walks_view.dart';
 
 class AppDrawer extends StatelessWidget {
   @override

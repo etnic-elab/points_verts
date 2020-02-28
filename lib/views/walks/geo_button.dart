@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:points_verts/platform_widget.dart';
+import 'package:points_verts/views/platform_widget.dart';
 import 'package:points_verts/walk.dart';
 
-import 'walk_utils.dart';
+import '../../walk_utils.dart';
 
 class GeoButton extends StatelessWidget {
   GeoButton({this.walk});
