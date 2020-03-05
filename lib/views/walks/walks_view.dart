@@ -22,6 +22,7 @@ import '../../models/walk_date.dart';
 import 'walk_date_utils.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
+import 'walk_utils.dart';
 
 enum PopupMenuActions { recalculatePosition, settings }
 enum Places { home, current }
@@ -155,18 +156,6 @@ class _WalksViewState extends State<WalksView> {
       }
     }
     return Future.wait(weathers);
-  }
-
-  int sortWalks(Walk a, Walk b) {
-    if (a.trip != null && b.trip != null) {
-      return a.trip.duration.compareTo(b.trip.duration);
-    } else if (a.distance != null && b.distance != null) {
-      return a.distance.compareTo(b.distance);
-    } else if (a.distance != null) {
-      return -1;
-    } else {
-      return 1;
-    }
   }
 
   void _retrieveDates() async {
