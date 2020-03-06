@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:animations/animations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -14,6 +15,9 @@ import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
 class WalkTile extends StatelessWidget {
+
+  final ContainerTransitionType _transitionType = ContainerTransitionType.fade;
+
   WalkTile({this.walk});
 
   final Walk walk;
@@ -21,15 +25,26 @@ class WalkTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool smallScreen = window.physicalSize.width <= 640;
-    return ListTile(
-      dense: smallScreen,
-      leading: _weatherIcon(),
-      title: Text(walk.city),
-      subtitle: Text(
-          "${walk.type == 'M' ? 'Marche' : 'Orientation'} - ${walk.province}"),
-      enabled: !walk.isCancelled(),
-      onTap: () => Navigator.push(context, _pageRoute()),
-      trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
+    return OpenContainer(
+      transitionType: _transitionType,
+      openBuilder: (BuildContext _, VoidCallback openContainer) {
+        return WalkDetailsView(walk);
+      },
+      tappable: false,
+      closedShape: const RoundedRectangleBorder(),
+      closedElevation: 0.0,
+      closedBuilder: (BuildContext _, VoidCallback openContainer) {
+        return ListTile(
+          dense: smallScreen,
+          leading: _weatherIcon(),
+          title: Text(walk.city),
+          subtitle: Text(
+              "${walk.type == 'M' ? 'Marche' : 'Orientation'} - ${walk.province}"),
+          enabled: !walk.isCancelled(),
+          onTap: openContainer,
+          trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
+        );
+      },
     );
   }
 
@@ -58,14 +73,5 @@ class WalkTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[displayIcon(walk)]);
         });
-  }
-
-  PageRoute _pageRoute() {
-    if (Platform.isIOS) {
-      return CupertinoPageRoute(
-          title: walk.city, builder: (context) => WalkDetailsView(walk));
-    } else {
-      return MaterialPageRoute(builder: (context) => WalkDetailsView(walk));
-    }
   }
 }
