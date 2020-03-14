@@ -45,24 +45,25 @@ class NotificationManager {
           androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
       FlutterLocalNotificationsPlugin instance = await plugin;
       await _flutterLocalNotificationsPlugin.cancel(NEXT_NEAREST_WALK);
+      DateTime scheduledAt = walkDate.date.subtract(Duration(hours: 4));
       if (walk.trip != null) {
         await instance.schedule(
             NEXT_NEAREST_WALK,
-            'Points le plus proche demain de votre domicile',
+            'Point le plus proche demain de votre domicile',
             "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture",
-            walkDate.date.subtract(Duration(hours: 4)),
+            scheduledAt,
             platformChannelSpecifics,
             payload: walk.id.toString());
       } else {
         await instance.schedule(
             NEXT_NEAREST_WALK,
-            'Points le plus proche demain de votre domicile',
+            'Point le plus proche demain de votre domicile',
             "${walk.city} - ${walk.province}",
-            walkDate.date.subtract(Duration(hours: 4)),
+            scheduledAt,
             platformChannelSpecifics,
             payload: walk.id.toString());
       }
-      print('Notification scheduled for ${walkDate.date.subtract(Duration(hours: 3)).toString()}');
+      print('Notification scheduled for ${scheduledAt.toString()}');
     } catch (err) {
       print("cannot display notification: $err");
     }

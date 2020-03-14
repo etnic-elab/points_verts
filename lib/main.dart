@@ -40,17 +40,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     print('Initializing MyApp');
     super.initState();
-    initBackgroundTask();
-  }
-
-  void initBackgroundTask() async {
-    initPlatformState().then((_) {
-      BackgroundFetch.start().then((int status) {
-        print('[BackgroundFetch] start success: $status');
-      }).catchError((e) {
-        print('[BackgroundFetch] start FAILURE: $e');
-      });
-    });
+    initPlatformState();
   }
 
   @override
