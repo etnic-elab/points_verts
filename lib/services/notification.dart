@@ -78,6 +78,11 @@ Future<void> scheduleNextNearestWalkNotification() async {
       latitude: double.parse(split[0]), longitude: double.parse(split[1]));
   List<WalkDate> dates = await getWalkDates();
   if (dates.length >= 1) {
+    if (dates[0].date.isBefore(DateTime.now())) {
+      // don't say that the next walk is tomorrow if it's today, user normally
+      // already got the notification yesterday
+      return;
+    }
     List<Walk> walks = await retrieveWalksFromEndpoint(dates[0].date);
     final Geolocator geolocator = Geolocator();
     for (Walk walk in walks) {
