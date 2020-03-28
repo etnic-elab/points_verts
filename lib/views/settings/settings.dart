@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../models/address_suggestion.dart';
@@ -19,10 +20,10 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+  final Geolocator geoLocator = Geolocator()..forceAndroidLocationManager;
   String _home;
   String _theme;
-  bool value = true;
+  bool _useLocation = false;
 
   _SettingsState({this.callback});
 
@@ -40,9 +41,11 @@ class _SettingsState extends State<Settings> {
   Future<void> _retrievePrefs() async {
     String theme = await PrefsProvider.prefs.getString("theme");
     String home = await PrefsProvider.prefs.getString("home_label");
+    bool useLocation = await PrefsProvider.prefs.getBoolean("use_location");
     setState(() {
       _theme = theme;
       _home = home;
+      _useLocation = useLocation;
     });
   }
 
@@ -75,6 +78,42 @@ class _SettingsState extends State<Settings> {
     if (callback != null) {
       callback();
     }
+  }
+
+  Future<void> _setUseLocation(bool newValue) async {
+    bool validated = false;
+    if (newValue == true) {
+      validated = await checkLocationPermission() == PermissionStatus.granted;
+    } else {
+      validated = true;
+    }
+    if (validated) {
+      await PrefsProvider.prefs.setBoolean("use_location", newValue);
+      setState(() {
+        _useLocation = newValue;
+      });
+      if (callback != null) {
+        callback();
+      }
+    }
+  }
+
+  Future<PermissionStatus> checkLocationPermission() async {
+    PermissionGroup group = PermissionGroup.locationWhenInUse;
+    PermissionHandler permissionHandler = PermissionHandler();
+    PermissionStatus permission =
+        await permissionHandler.checkPermissionStatus(group);
+    print("PermissionStatus is $permission");
+    switch (permission) {
+      case PermissionStatus.neverAskAgain:
+        await permissionHandler.openAppSettings();
+        break;
+      case PermissionStatus.denied:
+        Map<PermissionGroup, PermissionStatus> results =
+            await permissionHandler.requestPermissions([group]);
+        return results[group];
+    }
+    return permission;
   }
 
   String _defineThemeSubtitle() {
@@ -162,10 +201,17 @@ class _SettingsState extends State<Settings> {
           )
         ]),
         SettingsSection(
-          title: 'Navigation',
+          title: 'Tri des points selon leur emplacement',
           tiles: [
+            SettingsTile.switchTile(
+                title: "Ma position actuelle",
+                leading: Icon(Icons.location_on),
+                onToggle: (bool value) {
+                  _setUseLocation(value);
+                },
+                switchValue: _useLocation),
             SettingsTile(
-              title: 'Domicile',
+              title: 'Mon domicile',
               subtitle: _home != null
                   ? "${_home.substring(0, min(30, _home.length))}..."
                   : "Aucun - appuyez ici pour le définir",

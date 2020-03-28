@@ -33,4 +33,16 @@ class PrefsProvider {
     SharedPreferences prefs = await preferences;
     return prefs.getInt(key);
   }
+
+  Future<bool> setBoolean(String key, bool value) async {
+    SharedPreferences prefs = await preferences;
+    await prefs.setBool(key, value);
+    return prefs.getBool(key);
+  }
+
+  Future<bool> getBoolean(String key) async {
+    SharedPreferences prefs = await preferences;
+    bool result = prefs.getBool(key);
+    return result != null ? result : false;
+  }
 }

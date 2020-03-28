@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/services/database.dart';
@@ -54,6 +55,8 @@ class _WalksViewState extends State<WalksView> {
     setState(() {
       _currentWalks = null;
       _selectedWalk = null;
+      _currentPosition = null;
+      _homePosition = null;
     });
     String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
     DateTime now = DateTime.now().toUtc();
@@ -104,7 +107,9 @@ class _WalksViewState extends State<WalksView> {
         _selectedPlace = Places.current;
       });
     }
-    _getCurrentLocation();
+    if (await PrefsProvider.prefs.getBoolean("use_location") == true) {
+      _getCurrentLocation();
+    }
   }
 
   Position get selectedPosition {
@@ -233,7 +238,7 @@ class _WalksViewState extends State<WalksView> {
           return CupertinoPageScaffold(
               navigationBar: navBar,
               child: SafeArea(
-                  child: Scaffold(body: Settings(callback: _retrieveDates))));
+                  child: Scaffold(body: Settings(callback: _retrieveData))));
         }
       },
     );
@@ -272,7 +277,7 @@ class _WalksViewState extends State<WalksView> {
     } else if (_selectedIndex == 1) {
       return _buildMapTab();
     } else {
-      return Settings(callback: _retrieveDates);
+      return Settings(callback: _retrieveData);
     }
   }
 
@@ -371,6 +376,12 @@ class _WalksViewState extends State<WalksView> {
         }
       }
     }).catchError((e) {
+      if (e is PlatformException) {
+        PlatformException platformException = e;
+        if (platformException.code == 'PERMISSION_DENIED') {
+          PrefsProvider.prefs.setBoolean("use_location", false);
+        }
+      }
       print("Cannot retrieve current position: $e");
     });
   }
