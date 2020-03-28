@@ -56,10 +56,15 @@ class WalkResultsListView extends StatelessWidget {
             return Loading();
           }
         } else {
-          return Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Loading(),
-            Container(padding: EdgeInsets.all(10),child: Text("Chargement des points..."))
-          ],);
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Loading(),
+              Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text("Chargement des points..."))
+            ],
+          );
         }
       },
     );

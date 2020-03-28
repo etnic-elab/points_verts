@@ -26,7 +26,6 @@ class WalkResultsMapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder(
       future: walks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {

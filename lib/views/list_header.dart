@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 class ListHeader extends StatelessWidget {
   ListHeader(this.title);
+
   final String title;
 
   @override

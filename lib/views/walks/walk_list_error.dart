@@ -22,9 +22,7 @@ class WalkListError extends StatelessWidget {
                           "Une erreur est survenue lors de la récupération des données. Merci de réessayer plus tard.",
                           textAlign: TextAlign.center)))
             ])),
-        RaisedButton(
-            child: Text("Réessayer"),
-            onPressed: () => refreshWalks()),
+        RaisedButton(child: Text("Réessayer"), onPressed: () => refreshWalks()),
         Spacer()
       ],
     ));

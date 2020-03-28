@@ -10,7 +10,6 @@ import '../../services/prefs.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
-
   Settings({this.callback});
 
   final Function callback;
@@ -73,6 +72,9 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = null;
     });
+    if (callback != null) {
+      callback();
+    }
   }
 
   String _defineThemeSubtitle() {
@@ -164,8 +166,9 @@ class _SettingsState extends State<Settings> {
           tiles: [
             SettingsTile(
               title: 'Domicile',
-              subtitle:
-                  _home != null ? "${_home.substring(0, min(30, _home.length))}..." : "Aucun - appuyez ici pour le définir",
+              subtitle: _home != null
+                  ? "${_home.substring(0, min(30, _home.length))}..."
+                  : "Aucun - appuyez ici pour le définir",
               leading: Icon(Icons.home),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(

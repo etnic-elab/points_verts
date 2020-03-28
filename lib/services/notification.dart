@@ -91,7 +91,7 @@ Future<void> scheduleNextNearestWalkNotification() async {
         PrefsProvider.prefs
             .setString("last_walk_update", DateTime.now().toIso8601String());
       }
-    } catch(err) {
+    } catch (err) {
       print("Cannot refresh walks list: $err");
     }
     List<Walk> walks = await DBProvider.db.getWalks(dates[0]);

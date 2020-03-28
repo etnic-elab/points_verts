@@ -7,7 +7,6 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/views/app_drawer.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/place_select.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -23,7 +22,6 @@ import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
 
-enum PopupMenuActions { recalculatePosition, settings }
 enum Places { home, current }
 
 const String TAG = "dev.alpagaga.points_verts.WalkList";
@@ -43,7 +41,7 @@ class _WalksViewState extends State<WalksView> {
   Position _currentPosition;
   Position _homePosition;
   Places _selectedPlace;
-  bool _calculatingPosition = false;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -226,13 +224,11 @@ class _WalksViewState extends State<WalksView> {
         if (index == 0) {
           return CupertinoPageScaffold(
               navigationBar: navBar,
-              child:
-                  SafeArea(child: Scaffold(body: _buildListTab(buildContext))));
+              child: SafeArea(child: Scaffold(body: _buildListTab())));
         } else if (index == 1) {
           return CupertinoPageScaffold(
               navigationBar: navBar,
-              child:
-                  SafeArea(child: Scaffold(body: _buildMapTab(buildContext))));
+              child: SafeArea(child: Scaffold(body: _buildMapTab())));
         } else {
           return CupertinoPageScaffold(
               navigationBar: navBar,
@@ -243,48 +239,44 @@ class _WalksViewState extends State<WalksView> {
     );
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   Widget _androidLayout(BuildContext buildContext) {
     return DefaultTabController(
         length: 2,
         child: Scaffold(
-          appBar: AppBar(
-            title: Text('Points Verts Adeps'),
-            actions: <Widget>[
-              PopupMenuButton<PopupMenuActions>(
-                onSelected: (PopupMenuActions result) {
-                  if (result == PopupMenuActions.recalculatePosition) {
-                    _getCurrentLocation();
-                  } else if (result == PopupMenuActions.settings) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Settings()));
-                  }
-                },
-                itemBuilder: (BuildContext context) =>
-                    <PopupMenuEntry<PopupMenuActions>>[
-                  PopupMenuItem<PopupMenuActions>(
-                    value: PopupMenuActions.recalculatePosition,
-                    enabled: _calculatingPosition == false,
-                    child: Text('Recalculer ma position'),
-                  )
-                ],
-              )
-            ],
-            bottom: TabBar(
-              tabs: <Widget>[Tab(text: "LISTE"), Tab(text: "CARTE")],
+            appBar: AppBar(
+              title: Text('Points Verts Adeps'),
             ),
-          ),
-          drawer: AppDrawer(),
-          body: TabBarView(
-            physics: NeverScrollableScrollPhysics(),
-            children: <Widget>[
-              _buildListTab(buildContext),
-              _buildMapTab(buildContext),
-            ],
-          ),
-        ));
+            bottomNavigationBar: BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                items: const <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.list), title: Text('Liste')),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.map), title: Text('Carte')),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.settings), title: Text('Paramètres'))
+                ]),
+            body: _buildSubScreen()));
   }
 
-  Widget _buildTab(BuildContext context, Widget tabContent) {
+  Widget _buildSubScreen() {
+    if (_selectedIndex == 0) {
+      return _buildListTab();
+    } else if (_selectedIndex == 1) {
+      return _buildMapTab();
+    } else {
+      return Settings(callback: _retrieveDates);
+    }
+  }
+
+  Widget _buildTab(Widget tabContent) {
     if (_dates == null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -298,32 +290,27 @@ class _WalksViewState extends State<WalksView> {
     }
     return Column(
       children: <Widget>[
-        _defineSearchPart(context),
+        _defineSearchPart(),
         Expanded(child: tabContent),
       ],
     );
   }
 
-  Widget _buildListTab(BuildContext buildContext) {
-    return _buildTab(
-        buildContext,
-        WalkResultsListView(
-            _currentWalks, selectedPosition, _selectedPlace, _retrieveData));
+  Widget _buildListTab() {
+    return _buildTab(WalkResultsListView(
+        _currentWalks, selectedPosition, _selectedPlace, _retrieveData));
   }
 
-  Widget _buildMapTab(BuildContext buildContext) {
-    return _buildTab(
-        buildContext,
-        WalkResultsMapView(
-            _currentWalks, selectedPosition, _selectedPlace, _selectedWalk,
-            (walk) {
-          setState(() {
-            _selectedWalk = walk;
-          });
-        }, _retrieveData));
+  Widget _buildMapTab() {
+    return _buildTab(WalkResultsMapView(
+        _currentWalks, selectedPosition, _selectedPlace, _selectedWalk, (walk) {
+      setState(() {
+        _selectedWalk = walk;
+      });
+    }, _retrieveData));
   }
 
-  Widget _defineSearchPart(BuildContext context) {
+  Widget _defineSearchPart() {
     return Container(
         margin: const EdgeInsets.only(left: 10, right: 10),
         child: Row(
@@ -347,11 +334,11 @@ class _WalksViewState extends State<WalksView> {
                         });
                         _retrieveWalks();
                       })
-                  : Expanded(child: _resultNumber(context))
+                  : Expanded(child: _resultNumber())
             ]));
   }
 
-  Widget _resultNumber(BuildContext context) {
+  Widget _resultNumber() {
     return FutureBuilder(
       future: _currentWalks,
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
@@ -369,9 +356,6 @@ class _WalksViewState extends State<WalksView> {
 
   _getCurrentLocation() {
     log("Retrieving current user location", name: TAG);
-    setState(() {
-      _calculatingPosition = true;
-    });
     geolocator
         .getCurrentPosition(
             desiredAccuracy: LocationAccuracy.medium,
@@ -381,7 +365,6 @@ class _WalksViewState extends State<WalksView> {
       if (this.mounted) {
         setState(() {
           _currentPosition = position;
-          _calculatingPosition = false;
         });
         if (_selectedPlace == Places.current && _selectedDate != null) {
           _retrieveWalks();

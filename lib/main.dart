@@ -88,7 +88,8 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     BackgroundFetch.configure(
         BackgroundFetchConfig(
-            minimumFetchInterval: 60 * 12, // twice per day
+            minimumFetchInterval: 60 * 12,
+            // twice per day
             stopOnTerminate: false,
             enableHeadless: true,
             requiredNetworkType: NetworkType.ANY,
