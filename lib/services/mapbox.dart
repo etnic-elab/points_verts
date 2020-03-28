@@ -5,12 +5,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
-import 'package:points_verts/models/walk.dart';
 
 import '../models/address_suggestion.dart';
 import '../models/trip.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import '../models/walk.dart';
+import 'trip_cache_manager.dart';
 
 String _token = DotEnv().env['MAPBOX_TOKEN'];
 
@@ -25,7 +27,7 @@ Future<void> retrieveTrips(
   }
   final String url =
       "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/$coordinates?sources=0&annotations=distance,duration&access_token=$_token";
-  final http.Response response = await http.get(url);
+  final http.Response response = await TripCacheManager().getData(url, null);
   final decoded = json.decode(response.body);
   final distances =
       decoded['distances']?.length == 1 ? decoded['distances'][0] : null;
