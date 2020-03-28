@@ -1,16 +1,22 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-import '../app_drawer.dart';
 import '../../models/address_suggestion.dart';
 import '../../services/prefs.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
+
+  Settings({this.callback});
+
+  final Function callback;
+
   @override
-  State<StatefulWidget> createState() => _SettingsState();
+  State<StatefulWidget> createState() => _SettingsState(callback: callback);
 }
 
 class _SettingsState extends State<Settings> {
@@ -18,6 +24,10 @@ class _SettingsState extends State<Settings> {
   String _home;
   String _theme;
   bool value = true;
+
+  _SettingsState({this.callback});
+
+  Function callback;
 
   void initState() {
     super.initState();
@@ -45,6 +55,9 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = label;
     });
+    if (callback != null) {
+      callback();
+    }
   }
 
   Future<void> _setTheme(String newTheme) async {
@@ -73,98 +86,96 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text("Paramètres")),
-        drawer: AppDrawer(),
-        body: SettingsList(
-          sections: [
-            SettingsSection(title: 'Affichage', tiles: [
-              SettingsTile(
-                title: 'Thème',
-                leading: Icon(Icons.palette),
-                subtitle: _defineThemeSubtitle(),
-                onTap: () {
-                  showDialog<void>(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        contentPadding: EdgeInsets.only(top: 12),
-                        title: Text("Thème"),
-                        content: SingleChildScrollView(child: StatefulBuilder(
-                          builder: (context, setState) {
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Divider(),
-                                ListTile(
-                                    leading: Icon(Icons.info),
-                                    title: Text(
-                                        "Tout changement de thème nécessite un redémarrage de l'application.",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .caption)),
-                                Divider(),
-                                RadioListTile(
-                                  title: Text("Automatique"),
-                                  subtitle: Text("Laisse le système décider"),
-                                  value: null,
-                                  groupValue: _theme,
-                                  onChanged: (String value) {
-                                    _setTheme(value);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                RadioListTile(
-                                  title: Text("Clair"),
-                                  subtitle: Text("Force le mode clair"),
-                                  value: "light",
-                                  groupValue: _theme,
-                                  onChanged: (String value) {
-                                    _setTheme(value);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                RadioListTile(
-                                  title: Text("Sombre"),
-                                  subtitle: Text("Force le mode sombre"),
-                                  value: "dark",
-                                  groupValue: _theme,
-                                  onChanged: (String value) {
-                                    _setTheme(value);
-                                    Navigator.of(context).pop();
-                                  },
-                                )
-                              ],
-                            );
-                          },
-                        )),
-                        actions: [
-                          FlatButton(
-                            child: Text('ANNULER'),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                        ],
-                      );
-                    },
+    return SettingsList(
+      sections: [
+        SettingsSection(title: 'Affichage', tiles: [
+          SettingsTile(
+            title: 'Thème',
+            leading: Icon(Icons.palette),
+            subtitle: _defineThemeSubtitle(),
+            onTap: () {
+              showDialog<void>(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    contentPadding: EdgeInsets.only(top: 12),
+                    title: Text("Thème"),
+                    content: SingleChildScrollView(child: StatefulBuilder(
+                      builder: (context, setState) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Divider(),
+                            ListTile(
+                                leading: Icon(Icons.info),
+                                title: Text(
+                                    "Tout changement de thème nécessite un redémarrage de l'application.",
+                                    style:
+                                        Theme.of(context).textTheme.caption)),
+                            Divider(),
+                            RadioListTile(
+                              title: Text("Automatique"),
+                              subtitle: Text("Laisse le système décider"),
+                              value: null,
+                              groupValue: _theme,
+                              onChanged: (String value) {
+                                _setTheme(value);
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            RadioListTile(
+                              title: Text("Clair"),
+                              subtitle: Text("Force le mode clair"),
+                              value: "light",
+                              groupValue: _theme,
+                              onChanged: (String value) {
+                                _setTheme(value);
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            RadioListTile(
+                              title: Text("Sombre"),
+                              subtitle: Text("Force le mode sombre"),
+                              value: "dark",
+                              groupValue: _theme,
+                              onChanged: (String value) {
+                                _setTheme(value);
+                                Navigator.of(context).pop();
+                              },
+                            )
+                          ],
+                        );
+                      },
+                    )),
+                    actions: [
+                      FlatButton(
+                        child: Text('ANNULER'),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
                   );
                 },
-              )
-            ]),
-            SettingsSection(
-              title: 'Navigation',
-              tiles: [
-                SettingsTile(
-                  title: 'Domicile',
-                  subtitle: _home != null ? _home : "Aucun - appuyez ici pour le définir",
-                  leading: Icon(Icons.home),
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => SettingsHomeSelect(_setHome, _removeHome)));
-                  },
-                ),
-              ],
+              );
+            },
+          )
+        ]),
+        SettingsSection(
+          title: 'Navigation',
+          tiles: [
+            SettingsTile(
+              title: 'Domicile',
+              subtitle:
+                  _home != null ? "${_home.substring(0, min(30, _home.length))}..." : "Aucun - appuyez ici pour le définir",
+              leading: Icon(Icons.home),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        SettingsHomeSelect(_setHome, _removeHome)));
+              },
             ),
           ],
-        ));
+        ),
+      ],
+    );
   }
 }

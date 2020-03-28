@@ -41,8 +41,13 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(Icons.settings),
                 title: Text('Paramètres'),
                 onTap: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => Settings()));
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Scaffold(
+                              appBar: AppBar(title: Text("Paramètres")),
+                              drawer: AppDrawer(),
+                              body: Settings())));
                 },
               ),
             ],

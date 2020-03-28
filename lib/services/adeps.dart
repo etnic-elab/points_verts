@@ -1,100 +1,54 @@
 import 'dart:convert';
+import 'dart:developer';
 
-import 'package:csv/csv.dart';
-import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' as dom;
 import 'package:http/http.dart' as http;
 
 import '../models/walk.dart';
-import '../models/walk_details.dart';
 
-Future<List<DateTime>> retrieveDatesFromWorker() async {
-  try {
-    String url = "https://points-verts.tbo.workers.dev/";
+const String TAG = "dev.alpagaga.points_verts.Adeps";
+
+Future<List<Walk>> fetchAllWalks() async {
+  log("Fetching all future walks", name: TAG);
+  List<Walk> walks = List<Walk>();
+  DateFormat dateFormat = new DateFormat("yyyy/MM/dd");
+  bool finished = false;
+  int start = 0;
+  while (!finished) {
+    String url =
+        "https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date+>%3D+${dateFormat.format(DateTime.now())}&sort=-date&rows=500&start=$start";
+    print(url);
     var response = await http.get(url);
-    List<dynamic> dates = jsonDecode(response.body);
-    DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
-    return dates.map((dynamic date) => dateFormat.parse(date)).toList();
-  } catch (err) {
-    print("Cannot retrieve dates from worker: $err");
-    return retrieveDatesFromEndpoint();
-  }
-}
-
-Future<List<DateTime>> retrieveDatesFromEndpoint() async {
-  String url = "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=dates";
-  var response = await http.get(url);
-  Document document = parse(response.body);
-  List<String> results = new List<String>();
-  for (dom.Element element in document.getElementsByTagName('option')) {
-    String value = element.attributes['value'];
-    if (value != '0') {
-      results.add(value);
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      walks.addAll(_convertWalks(data));
+      start = start + 500;
+      finished = data['nhits'] <= start;
+    } else {
+      throw Exception('Failed to load walks');
     }
   }
-  DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
-  return results.map((String date) => dateFormat.parse(date)).toList();
+  return walks;
 }
 
-Future<List<Walk>> retrieveWalksFromEndpoint(DateTime date) async {
-  DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
-  List<Walk> newList = List<Walk>();
-  if (date == null) {
-    return newList;
+Future<List<Walk>> refreshAllWalks(String lastUpdate) async {
+  log("Refreshing future walks list since $lastUpdate", name: TAG);
+  DateFormat dateFormat = new DateFormat("yyyy/MM/dd");
+  String url =
+      "https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=(date+>%3D+${dateFormat.format(DateTime.now())}+AND+record_timestamp+>$lastUpdate)&sort=-date&rows=1000";
+  var response = await http.get(url);
+  if (response.statusCode == 200) {
+    return _convertWalks(json.decode(response.body));
+  } else {
+    throw Exception('Failed to refresh walks');
   }
-  var response = await http.get(
-      "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O");
-  var fixed = _fixCsv(response.body);
-  List<List<dynamic>> rowsAsListOfValues =
-      const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-  for (List<dynamic> walk in rowsAsListOfValues) {
-    newList.add(Walk(
-        id: walk[0],
-        city: walk[1],
-        type: walk[2],
-        lat: walk[3] != "" ? walk[3] : null,
-        long: walk[4] != "" ? walk[4] : null,
-        province: walk[5],
-        date: walk[6],
-        status: walk[9]));
+}
+
+List<Walk> _convertWalks(var data) {
+  List<Walk> newList = List<Walk>();
+  List<dynamic> list = data['records'];
+  for (Map<String, dynamic> walkJson in list) {
+    newList.add(Walk.fromJson(walkJson));
   }
   return newList;
-}
-
-Future<WalkDetails> retrieveWalkDetails(int id) async {
-  var response =
-      await http.get('https://www.am-sport.cfwb.be/adeps/pv_detail.asp?i=$id');
-  String body = response.body;
-  return WalkDetails(
-    fifteenKm: body.contains("15.gif"),
-    wheelchair: body.contains("handi.gif"),
-    stroller: body.contains("poussette.gif"),
-    orientation: body.contains("orientation.gif"),
-    guided: body.contains("nature.gif"),
-    bike: body.contains("velo.gif"),
-    mountainBike: body.contains("vtt.gif"),
-    supplying: body.contains("ravito.gif"),
-  );
-}
-
-String _fixCsv(String csv) {
-  List<String> result = new List<String>();
-  List<String> splitted = csv.split(';');
-  String current = "";
-  int tokens = 0;
-  for (String token in splitted) {
-    if (tokens == 0) {
-      current = token;
-    } else {
-      current = current + ";" + token;
-    }
-    tokens++;
-    if (tokens == 10) {
-      result.add(current);
-      tokens = 0;
-    }
-  }
-  return result.join('\r\n');
 }

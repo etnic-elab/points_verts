@@ -25,8 +25,7 @@ class WalkTile extends StatelessWidget {
       dense: smallScreen,
       leading: _weatherIcon(),
       title: Text(walk.city),
-      subtitle: Text(
-          "${walk.type == 'M' ? 'Marche' : 'Orientation'} - ${walk.province}"),
+      subtitle: Text("${walk.type} - ${walk.province}"),
       enabled: !walk.isCancelled(),
       onTap: () => Navigator.push(context, _pageRoute()),
       trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),

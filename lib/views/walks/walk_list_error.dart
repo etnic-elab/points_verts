@@ -24,7 +24,7 @@ class WalkListError extends StatelessWidget {
             ])),
         RaisedButton(
             child: Text("Réessayer"),
-            onPressed: () => refreshWalks(clearDate: true)),
+            onPressed: () => refreshWalks()),
         Spacer()
       ],
     ));

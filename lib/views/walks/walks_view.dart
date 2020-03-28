@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
@@ -7,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/app_drawer.dart';
+import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/place_select.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/settings/settings.dart';
@@ -18,8 +19,6 @@ import '../../services/mapbox.dart';
 import '../../services/openweather.dart';
 import '../platform_widget.dart';
 import '../../models/walk.dart';
-import '../../models/walk_date.dart';
-import 'walk_date_utils.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
@@ -37,11 +36,10 @@ class WalksView extends StatefulWidget {
 class _WalksViewState extends State<WalksView> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
-  Future<List<WalkDate>> _dates;
-  Map<DateTime, List<Walk>> _allWalks = HashMap<DateTime, List<Walk>>();
+  Future<List<DateTime>> _dates;
   Future<List<Walk>> _currentWalks;
   Walk _selectedWalk;
-  WalkDate _selectedDate;
+  DateTime _selectedDate;
   Position _currentPosition;
   Position _homePosition;
   Places _selectedPlace;
@@ -50,8 +48,47 @@ class _WalksViewState extends State<WalksView> {
   @override
   void initState() {
     initializeDateFormatting("fr_BE");
-    _retrieveDates();
+    _retrieveData();
     super.initState();
+  }
+
+  Future<void> _retrieveData() async {
+    setState(() {
+      _currentWalks = null;
+      _selectedWalk = null;
+    });
+    String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
+    DateTime now = DateTime.now().toUtc();
+    if (lastUpdate == null) {
+      try {
+        List<Walk> newWalks = await fetchAllWalks();
+        if (newWalks.isNotEmpty) {
+          await DBProvider.db.insertWalks(newWalks);
+          PrefsProvider.prefs
+              .setString("last_walk_update", now.toIso8601String());
+        }
+      } catch (err) {
+        print("Cannot fetch walks list: $err");
+      }
+    } else {
+      DateTime lastUpdateDate = DateTime.parse(lastUpdate);
+      if (now.difference(lastUpdateDate) > Duration(hours: 1)) {
+        try {
+          List<Walk> updatedWalks = await refreshAllWalks(lastUpdate);
+          if (updatedWalks.isNotEmpty) {
+            await DBProvider.db.insertWalks(updatedWalks);
+          }
+          PrefsProvider.prefs
+              .setString("last_walk_update", now.toIso8601String());
+        } catch (err) {
+          print("Cannot refresh walks list: $err");
+        }
+      } else {
+        log("Not refreshing walks list since it has been done less than an hour ago",
+            name: TAG);
+      }
+    }
+    _retrieveDates();
   }
 
   _retrievePosition() async {
@@ -91,33 +128,20 @@ class _WalksViewState extends State<WalksView> {
   }
 
   _retrieveWalksHelper() async {
-    Future<List<Walk>> newList;
-    if (_allWalks.containsKey(_selectedDate?.date)) {
-      log("Retrieving walk list for ${_selectedDate.date} from cache",
-          name: TAG);
-      newList = Future.value(_allWalks[_selectedDate.date]);
-    } else {
-      log("Retrieving walk list for ${_selectedDate.date} from endpoint",
-          name: TAG);
-      newList = retrieveWalksFromEndpoint(_selectedDate?.date);
-    }
+    Future<List<Walk>> newList = DBProvider.db.getWalks(_selectedDate);
     if (selectedPosition != null) {
       newList = _calculateDistances(await newList);
     }
-    if (_selectedDate.date.difference(DateTime.now()).inDays < 5) {
+    if (_selectedDate.difference(DateTime.now()).inDays < 5) {
       try {
         await _retrieveWeathers(await newList);
       } catch (err) {
         print("Cannot retrieve weather info: $err");
       }
     }
-    List<Walk> results = await newList;
     setState(() {
       _currentWalks = newList;
     });
-    if (results.isNotEmpty && _selectedDate != null) {
-      _allWalks.putIfAbsent(_selectedDate.date, () => results);
-    }
   }
 
   Future<List<Walk>> _calculateDistances(List<Walk> walks) async {
@@ -151,7 +175,7 @@ class _WalksViewState extends State<WalksView> {
     List<Future> weathers = List<Future>();
     for (Walk walk in walks) {
       if (walk.weathers == null && !walk.isCancelled()) {
-        walk.weathers = getWeather(walk.long, walk.lat, _selectedDate.date);
+        walk.weathers = getWeather(walk.long, walk.lat, _selectedDate);
         weathers.add(walk.weathers);
       }
     }
@@ -159,9 +183,9 @@ class _WalksViewState extends State<WalksView> {
   }
 
   void _retrieveDates() async {
-    _dates = getWalkDates();
+    _dates = DBProvider.db.getWalkDates();
     await _retrievePosition();
-    _dates.then((List<WalkDate> items) {
+    _dates.then((List<DateTime> items) {
       setState(() {
         _selectedDate = items.first;
       });
@@ -188,11 +212,14 @@ class _WalksViewState extends State<WalksView> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(Icons.list), title: Text('Listes')),
-          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text('Carte'))
+          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text('Carte')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), title: Text('Paramètres'))
         ],
       ),
       tabBuilder: (BuildContext context, int index) {
         var navBar = CupertinoNavigationBar(
+            transitionBetweenRoutes: false,
             middle: Text('Points Verts Adeps',
                 style: Theme.of(context).primaryTextTheme.title),
             backgroundColor: Theme.of(context).primaryColor);
@@ -201,11 +228,16 @@ class _WalksViewState extends State<WalksView> {
               navigationBar: navBar,
               child:
                   SafeArea(child: Scaffold(body: _buildListTab(buildContext))));
-        } else {
+        } else if (index == 1) {
           return CupertinoPageScaffold(
               navigationBar: navBar,
               child:
                   SafeArea(child: Scaffold(body: _buildMapTab(buildContext))));
+        } else {
+          return CupertinoPageScaffold(
+              navigationBar: navBar,
+              child: SafeArea(
+                  child: Scaffold(body: Settings(callback: _retrieveDates))));
         }
       },
     );
@@ -254,7 +286,15 @@ class _WalksViewState extends State<WalksView> {
 
   Widget _buildTab(BuildContext context, Widget tabContent) {
     if (_dates == null) {
-      return SizedBox.shrink();
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Loading(),
+          Container(
+              padding: EdgeInsets.all(10),
+              child: Text("Récupération des données..."))
+        ],
+      );
     }
     return Column(
       children: <Widget>[
@@ -268,7 +308,7 @@ class _WalksViewState extends State<WalksView> {
     return _buildTab(
         buildContext,
         WalkResultsListView(
-            _currentWalks, selectedPosition, _selectedPlace, _refreshWalks));
+            _currentWalks, selectedPosition, _selectedPlace, _retrieveData));
   }
 
   Widget _buildMapTab(BuildContext buildContext) {
@@ -280,7 +320,7 @@ class _WalksViewState extends State<WalksView> {
           setState(() {
             _selectedWalk = walk;
           });
-        }, _refreshWalks));
+        }, _retrieveData));
   }
 
   Widget _defineSearchPart(BuildContext context) {
@@ -292,7 +332,7 @@ class _WalksViewState extends State<WalksView> {
               DatesDropdown(
                   dates: _dates,
                   selectedDate: _selectedDate,
-                  onChanged: (WalkDate date) {
+                  onChanged: (DateTime date) {
                     setState(() {
                       _selectedDate = date;
                       _retrieveWalks();
@@ -325,13 +365,6 @@ class _WalksViewState extends State<WalksView> {
         return SizedBox.shrink();
       },
     );
-  }
-
-  void _refreshWalks({bool clearDate = false}) {
-    if (clearDate) {
-      _allWalks.remove(_selectedDate);
-    }
-    _retrieveDates();
   }
 
   _getCurrentLocation() {

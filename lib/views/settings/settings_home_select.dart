@@ -61,10 +61,17 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   Widget _iOSLayout(BuildContext context) {
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+            trailing: GestureDetector(
+                onTap: () {
+                  removeHomeCallback();
+                  _homeSearchController.removeListener(_onSearchChanged);
+                  Navigator.of(context).pop();
+                },
+                child: Icon(CupertinoIcons.delete)),
             backgroundColor: Theme.of(context).primaryColor,
             middle: Text("Recherche du domicile",
                 style: Theme.of(context).primaryTextTheme.title)),
-        child: SafeArea(child: _pageContent(context)));
+        child: SafeArea(child: Scaffold(body: _pageContent(context))));
   }
 
   Widget _androidLayout(BuildContext context) {
@@ -87,7 +94,8 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   Widget _pageContent(BuildContext context) {
     return Column(children: <Widget>[
       Padding(
-          padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0, bottom: 20.0),
+          padding:
+              EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0, bottom: 20.0),
           child: TextField(
             controller: _homeSearchController,
             decoration:

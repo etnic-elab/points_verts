@@ -27,15 +27,12 @@ dependencies:
   cupertino_icons: ^0.1.2
 
   http: ^0.12.0
-  csv: ^4.0.0
   geolocator: ^5.1.5
   intl: ^0.16.0
   url_launcher: ^5.4.0
-  html: ^0.14.0
   flutter_map: ^0.8.0
   settings_ui: ^0.2.0
   shared_preferences: ^0.5.6
-  webview_flutter: ^0.3.19+5
   flutter_dotenv: ^2.1.0
   package_info: ^0.4.0+13
   weather_icons: ^2.0.0

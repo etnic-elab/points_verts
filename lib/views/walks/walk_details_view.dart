@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:points_verts/services/openweather.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong/latlong.dart';
+import 'package:points_verts/services/mapbox.dart';
+import 'package:points_verts/views/walks/walk_details.dart';
 
 import '../platform_widget.dart';
 import '../../models/walk.dart';
-import 'walk_utils.dart';
-import '../../models/weather.dart';
 
 class WalkDetailsView extends StatelessWidget {
   WalkDetailsView(this.walk);
@@ -29,87 +29,99 @@ class WalkDetailsView extends StatelessWidget {
             backgroundColor: Theme.of(context).primaryColor,
             middle: Text(walk.city,
                 style: Theme.of(context).primaryTextTheme.title)),
-        child: SafeArea(child: _webView(walk)));
+        child: SafeArea(child: Scaffold(
+          body: OrientationBuilder(
+            builder: (context, orientation) {
+              if (orientation == Orientation.portrait) {
+                return Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      _buildMap(context),
+                      pictogramRow(),
+                      WalkDetails(walk)
+                    ]);
+              } else {
+                return Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[pictogramRow(), WalkDetails(walk)]);
+              }
+            },
+          ),
+        )));
   }
 
   Widget _androidLayout(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          actions: <Widget>[
-            IconButton(
-                icon: Icon(Icons.directions_car),
-                onPressed: () {
-                  launchGeoApp(walk);
-                })
-          ],
-          title: Text(walk.city),
-        ),
-        body: Column(children: <Widget>[
-          walk.weathers != null ? _sectionTitle(context, "Météo du ${walk.date}") : SizedBox(),
-          walk.weathers != null ? _weather() : SizedBox(),
-          walk.weathers != null ? Divider() : SizedBox(),
-          Expanded(child: _webView(walk))
-        ]));
+      appBar: AppBar(
+        title: Text(walk.city),
+      ),
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          if (orientation == Orientation.portrait) {
+            return Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
+              _buildMap(context),
+              pictogramRow(),
+              WalkDetails(walk)
+            ]);
+          } else {
+            return Column(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[pictogramRow(), WalkDetails(walk)]);
+          }
+        },
+      ),
+    );
   }
 
-  Widget _sectionTitle(BuildContext context, String title) {
-    return Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Text(
-            title,
-            style: TextStyle(
-                color: Theme.of(context).accentColor,
-                fontWeight: FontWeight.bold),
-          ),
+  Widget pictogramRow() {
+    return Container(
+      padding: EdgeInsets.only(top: 15, bottom: 15),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          _pictogram("15", walk.fifteenKm,
+              "Parcours supplémentaire de marche de 15 km"),
+          _pictogram("handi", walk.wheelchair,
+              "Parcours de 5 km accessible aux personnes à mobilité réduite"),
+          _pictogram("poussette", walk.stroller,
+              "Parcours de 5 km accessible aux landaus"),
+          _pictogram("orientation", walk.extraOrientation,
+              "Parcours supplémentaire de marche de 10 km"),
+          _pictogram("marche", walk.extraWalk,
+              "Parcours supplémentaire de marche de 15 km"),
+          _pictogram("nature", walk.guided, "Balade guidée Nature"),
+          _pictogram("velo", walk.bike,
+              "Parcours supplémentaire de vélo de +/- 20 km"),
+          _pictogram("vtt", walk.mountainBike,
+              "Parcours supplémentaire de vélo tout-terrain de +/- 20 km"),
+          _pictogram("ravito", walk.waterSupply, "Ravitaillement"),
+        ],
+      ),
+    );
+  }
+
+  Widget _pictogram(String field, bool value, String message) {
+    return Tooltip(
+        message: message,
+        child: Image.network(
+          "https://www.am-sport.cfwb.be/adeps/med/cont/pv/$field${value ? "" : "_off"}.gif",
+          semanticLabel: message,
         ));
   }
 
-  Widget _weather() {
-    return FutureBuilder(
-        future: walk.weathers,
-        builder: (BuildContext context, AsyncSnapshot<List<Weather>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              List<Weather> weathers = snapshot.data;
-              List<Widget> widgets = List<Widget>();
-              for (Weather weather in weathers) {
-                widgets.add(Card(
-                    margin: EdgeInsets.all(0),
-                    child: Padding(
-                        padding: EdgeInsets.only(
-                            left: 10, right: 10, top: 5, bottom: 5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text("${weather.timestamp.hour}h"),
-                            getWeatherIcon(weather, context),
-                            Text("${weather.temperature.round()}°"),
-                            Text("${weather.windSpeed.round()} km/h")
-                          ],
-                        ))));
-              }
-              return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: widgets);
-            }
-          }
-          return SizedBox();
-        });
-  }
-
-  Widget _webView(Walk walk) {
-    return WebView(
-        initialUrl:
-            "https://www.am-sport.cfwb.be/adeps/pv_detail.asp?i=${walk.id}",
-        navigationDelegate: (NavigationRequest request) {
-          if (request.url.startsWith("https://www.google.be/maps/")) {
-            launchGeoApp(walk);
-            return NavigationDecision.prevent;
-          } else {
-            return NavigationDecision.navigate;
-          }
-        });
+  Widget _buildMap(BuildContext context) {
+    final Marker marker = Marker(
+      point: new LatLng(walk.lat, walk.long),
+      builder: (ctx) => new Container(child: Icon(Icons.location_on)),
+    );
+    return Container(
+      height: 200.0,
+      child: retrieveMap([marker], Theme.of(context).brightness,
+          centerLat: walk.lat,
+          centerLong: walk.long,
+          zoom: 16.0,
+          interactive: false),
+    );
   }
 }

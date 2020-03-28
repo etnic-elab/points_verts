@@ -1,8 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/walk.dart';
-import 'package:points_verts/models/walk_date.dart';
-import 'package:points_verts/views/walks/walk_date_utils.dart';
+import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 import 'adeps.dart';
@@ -31,7 +30,7 @@ class NotificationManager {
     return _flutterLocalNotificationsPlugin;
   }
 
-  scheduleNextNearestWalk(Walk walk, WalkDate walkDate) async {
+  scheduleNextNearestWalk(Walk walk, DateTime walkDate) async {
     try {
       var androidPlatformChannelSpecifics = AndroidNotificationDetails(
           'NEXT_NEAREST_WALK',
@@ -45,7 +44,7 @@ class NotificationManager {
           androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
       FlutterLocalNotificationsPlugin instance = await plugin;
       await _flutterLocalNotificationsPlugin.cancel(NEXT_NEAREST_WALK);
-      DateTime scheduledAt = walkDate.date.subtract(Duration(hours: 4));
+      DateTime scheduledAt = walkDate.subtract(Duration(hours: 4));
       if (walk.trip != null) {
         await instance.schedule(
             NEXT_NEAREST_WALK,
@@ -72,18 +71,30 @@ class NotificationManager {
 
 Future<void> scheduleNextNearestWalkNotification() async {
   String homePos = await PrefsProvider.prefs.getString("home_coords");
+  String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
   if (homePos == null) return;
   List<String> split = homePos.split(",");
   Position home = Position(
       latitude: double.parse(split[0]), longitude: double.parse(split[1]));
-  List<WalkDate> dates = await getWalkDates();
+  DBProvider.db.deleteOldWalks();
+  List<DateTime> dates = await DBProvider.db.getWalkDates();
   if (dates.length >= 1) {
-    if (dates[0].date.isBefore(DateTime.now())) {
+    if (dates[0].isBefore(DateTime.now())) {
       // don't say that the next walk is tomorrow if it's today, user normally
       // already got the notification yesterday
       return;
     }
-    List<Walk> walks = await retrieveWalksFromEndpoint(dates[0].date);
+    try {
+      List<Walk> updatedWalks = await refreshAllWalks(lastUpdate);
+      if (updatedWalks.isNotEmpty) {
+        await DBProvider.db.insertWalks(updatedWalks);
+        PrefsProvider.prefs
+            .setString("last_walk_update", DateTime.now().toIso8601String());
+      }
+    } catch(err) {
+      print("Cannot refresh walks list: $err");
+    }
+    List<Walk> walks = await DBProvider.db.getWalks(dates[0]);
     final Geolocator geolocator = Geolocator();
     for (Walk walk in walks) {
       if (walk.isPositionable()) {

@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_tile.dart';
 
+import '../list_header.dart';
 import '../loading.dart';
 import '../../models/walk.dart';
 import 'walks_view.dart';
@@ -31,10 +32,10 @@ class WalkResultsListView extends StatelessWidget {
                 itemBuilder: (context, i) {
                   if (position != null) {
                     if (i == 0) {
-                      return _buildListHeader(context, _defineTopHeader());
+                      return ListHeader(_defineTopHeader());
                     }
                     if (i == 6) {
-                      return _buildListHeader(context, "Autres points");
+                      return ListHeader("Autres points");
                     }
                     if (i < 6) {
                       i = i - 1;
@@ -55,7 +56,10 @@ class WalkResultsListView extends StatelessWidget {
             return Loading();
           }
         } else {
-          return Loading();
+          return Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            Loading(),
+            Container(padding: EdgeInsets.all(10),child: Text("Chargement des points..."))
+          ],);
         }
       },
     );
@@ -83,15 +87,5 @@ class WalkResultsListView extends StatelessWidget {
     } else {
       return walks.length;
     }
-  }
-
-  Widget _buildListHeader(BuildContext context, String title) {
-    return Container(
-      color: Theme.of(context).primaryColor,
-      child: Center(
-          child:
-              Text(title, style: Theme.of(context).primaryTextTheme.subtitle)),
-      padding: EdgeInsets.all(10.0),
-    );
   }
 }
