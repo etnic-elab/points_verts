@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
 
 import 'settings/settings.dart';
 import 'walks/walks_view.dart';
@@ -53,19 +52,6 @@ class AppDrawer extends StatelessWidget {
             ],
           ),
         ),
-        FutureBuilder(
-            future: PackageInfo.fromPlatform(),
-            builder:
-                (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasData) {
-                  PackageInfo info = snapshot.data;
-                  return Container(
-                      padding: EdgeInsets.all(5.0), child: Text(info.version));
-                }
-              }
-              return SizedBox();
-            })
       ],
     ));
   }
