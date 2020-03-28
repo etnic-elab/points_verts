@@ -18,8 +18,12 @@ class WalkDetails extends StatelessWidget {
     return Expanded(
       child: ListView(
         children: <Widget>[
-          ListHeader("Prévisions météo"),
-          ListTile(title: _weather()),
+          walk.weathers != null
+              ? ListHeader("Prévisions météo")
+              : SizedBox.shrink(),
+          walk.weathers != null
+              ? ListTile(title: _weather())
+              : SizedBox.shrink(),
           ListHeader("Autres informations"),
           ListTile(
             leading: Column(
