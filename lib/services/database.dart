@@ -42,13 +42,14 @@ class DBProvider {
 
   Future<List<DateTime>> getWalkDates() async {
     final Database db = await database;
-    final DateTime now = DateTime.now();
+    final now = DateTime.now();
+    final lastMidnight = new DateTime(now.year, now.month, now.day);
     final List<Map<String, dynamic>> maps = await db.query('walks',
         columns: ['date'],
         groupBy: "date",
         orderBy: "date ASC",
         where: 'date >= ?',
-        whereArgs: [now.toIso8601String()]);
+        whereArgs: [lastMidnight.toIso8601String()]);
     return List.generate(maps.length, (i) {
       return DateTime.parse(maps[i]['date']);
     });
