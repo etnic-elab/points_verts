@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -45,10 +46,11 @@ class NotificationManager {
       FlutterLocalNotificationsPlugin instance = await plugin;
       await _flutterLocalNotificationsPlugin.cancel(NEXT_NEAREST_WALK);
       DateTime scheduledAt = walkDate.subtract(Duration(hours: 4));
+      DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
       if (walk.trip != null) {
         await instance.schedule(
             NEXT_NEAREST_WALK,
-            'Point le plus proche demain de votre domicile',
+            'Point le plus proche le ${fullDate.format(walkDate)}',
             "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture",
             scheduledAt,
             platformChannelSpecifics,
@@ -56,7 +58,7 @@ class NotificationManager {
       } else {
         await instance.schedule(
             NEXT_NEAREST_WALK,
-            'Point le plus proche demain de votre domicile',
+            'Point le plus proche le ${fullDate.format(walkDate)}',
             "${walk.city} - ${walk.province}",
             scheduledAt,
             platformChannelSpecifics,
