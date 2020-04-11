@@ -18,15 +18,19 @@ String _token = DotEnv().env['MAPBOX_TOKEN'];
 
 Future<void> retrieveTrips(
     double fromLong, double fromLat, List<Walk> walks) async {
-  String coordinates = "$fromLong,$fromLat";
+  String origin = "$fromLong,$fromLat";
+  String destinations = "";
   for (int i = 0; i < min(walks.length, 5); i++) {
     Walk walk = walks[i];
     if (walk.isPositionable()) {
-      coordinates = coordinates + ";${walk.long},${walk.lat}";
+      destinations = destinations + ";${walk.long},${walk.lat}";
     }
   }
+  if (destinations.isEmpty) {
+    return;
+  }
   final String url =
-      "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/$coordinates?sources=0&annotations=distance,duration&access_token=$_token";
+      "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/$origin$destinations?sources=0&annotations=distance,duration&access_token=$_token";
   final http.Response response = await TripCacheManager().getData(url, null);
   final decoded = json.decode(response.body);
   final distances =
