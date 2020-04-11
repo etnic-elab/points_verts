@@ -1,0 +1,56 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image:  google/dart:latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create .env file
+      run: touch .env
+    - name: Install dependencies
+      run: flutter pub get
+    - name: Build application
+      run: flutter build aot
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image:  google/dart:latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create .env file
+      run: touch .env
+    - name: Install dependencies
+      run: flutter pub get
+    - name: Test application
+      run: flutter test test/*
+
+  analyze:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image:  google/dart:latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create .env file
+      run: touch .env
+    - name: Install dependencies
+      run: flutter pub get
+    - name: Analyze application
+      run: flutter analyze
