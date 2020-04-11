@@ -15,19 +15,11 @@ class TripCacheManager extends BaseCacheManager {
     return _instance;
   }
 
-  TripCacheManager._()
-      : super(key,
-            maxAgeCacheObject: Duration(days: 30),
-            fileFetcher: _customHttpGetter);
+  TripCacheManager._() : super(key, maxAgeCacheObject: Duration(days: 30));
 
   Future<String> getFilePath() async {
     var directory = await getTemporaryDirectory();
     return path.join(directory.path, key);
-  }
-
-  static Future<FileFetcherResponse> _customHttpGetter(String url,
-      {Map<String, String> headers}) async {
-    return HttpFileFetcherResponse(await http.get(url, headers: headers));
   }
 
   Future<http.Response> getData(String url, Map<String, String> headers) async {

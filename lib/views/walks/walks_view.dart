@@ -107,7 +107,7 @@ class _WalksViewState extends State<WalksView> {
         _selectedPlace = Places.current;
       });
     }
-    if (await PrefsProvider.prefs.getBoolean("use_location") == true) {
+    if (await PrefsProvider.prefs.getBoolean(key: "use_location") == true) {
       _getCurrentLocation();
     }
   }

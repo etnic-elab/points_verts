@@ -15,19 +15,11 @@ class WeatherCacheManager extends BaseCacheManager {
     return _instance;
   }
 
-  WeatherCacheManager._()
-      : super(key,
-            maxAgeCacheObject: Duration(hours: 3),
-            fileFetcher: _customHttpGetter);
+  WeatherCacheManager._() : super(key, maxAgeCacheObject: Duration(hours: 3));
 
   Future<String> getFilePath() async {
     var directory = await getTemporaryDirectory();
     return path.join(directory.path, key);
-  }
-
-  static Future<FileFetcherResponse> _customHttpGetter(String url,
-      {Map<String, String> headers}) async {
-    return HttpFileFetcherResponse(await http.get(url, headers: headers));
   }
 
   Future<http.Response> getData(String url, Map<String, String> headers) async {

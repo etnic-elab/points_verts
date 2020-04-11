@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:settings_ui/settings_ui.dart';
+import 'package:points_verts/views/list_header.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../services/prefs.dart';
@@ -24,6 +24,7 @@ class _SettingsState extends State<Settings> {
   String _home;
   String _theme;
   bool _useLocation = false;
+  bool _showNotification = false;
 
   _SettingsState({this.callback});
 
@@ -41,11 +42,15 @@ class _SettingsState extends State<Settings> {
   Future<void> _retrievePrefs() async {
     String theme = await PrefsProvider.prefs.getString("theme");
     String home = await PrefsProvider.prefs.getString("home_label");
-    bool useLocation = await PrefsProvider.prefs.getBoolean("use_location");
+    bool useLocation =
+        await PrefsProvider.prefs.getBoolean(key: "use_location");
+    bool showNotification = await PrefsProvider.prefs
+        .getBoolean(key: "show_notification", defaultValue: true);
     setState(() {
       _theme = theme;
       _home = home;
       _useLocation = useLocation;
+      _showNotification = showNotification;
     });
   }
 
@@ -98,6 +103,13 @@ class _SettingsState extends State<Settings> {
     }
   }
 
+  Future<void> _setShowNotification(bool newValue) async {
+    await PrefsProvider.prefs.setBoolean("show_notification", newValue);
+    setState(() {
+      _showNotification = newValue;
+    });
+  }
+
   Future<PermissionStatus> checkLocationPermission() async {
     PermissionGroup group = PermissionGroup.locationWhenInUse;
     PermissionHandler permissionHandler = PermissionHandler();
@@ -127,102 +139,128 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget build(BuildContext context) {
-    return SettingsList(
-      sections: [
-        SettingsSection(title: 'Affichage', tiles: [
-          SettingsTile(
-            title: 'Thème',
-            leading: Icon(Icons.palette),
-            subtitle: _defineThemeSubtitle(),
-            onTap: () {
-              showDialog<void>(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    contentPadding: EdgeInsets.only(top: 12),
-                    title: Text("Thème"),
-                    content: SingleChildScrollView(child: StatefulBuilder(
-                      builder: (context, setState) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Divider(),
-                            ListTile(
-                                leading: Icon(Icons.info),
-                                title: Text(
-                                    "Tout changement de thème nécessite un redémarrage de l'application.",
-                                    style:
-                                        Theme.of(context).textTheme.caption)),
-                            Divider(),
-                            RadioListTile(
-                              title: Text("Automatique"),
-                              subtitle: Text("Laisse le système décider"),
-                              value: null,
-                              groupValue: _theme,
-                              onChanged: (String value) {
-                                _setTheme(value);
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            RadioListTile(
-                              title: Text("Clair"),
-                              subtitle: Text("Force le mode clair"),
-                              value: "light",
-                              groupValue: _theme,
-                              onChanged: (String value) {
-                                _setTheme(value);
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            RadioListTile(
-                              title: Text("Sombre"),
-                              subtitle: Text("Force le mode sombre"),
-                              value: "dark",
-                              groupValue: _theme,
-                              onChanged: (String value) {
-                                _setTheme(value);
-                                Navigator.of(context).pop();
-                              },
-                            )
-                          ],
-                        );
-                      },
-                    )),
-                    actions: [
-                      FlatButton(
-                        child: Text('ANNULER'),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          )
-        ]),
-        SettingsSection(
-          title: 'Tri des points selon leur emplacement',
-          tiles: [
-            SettingsTile.switchTile(
-                title: "Ma position actuelle",
-                leading: Icon(Icons.location_on),
-                onToggle: (bool value) {
-                  _setUseLocation(value);
-                },
-                switchValue: _useLocation),
-            SettingsTile(
-              title: 'Mon domicile',
-              subtitle: _home != null
-                  ? "${_home.substring(0, min(30, _home.length))}..."
-                  : "Aucun - appuyez ici pour le définir",
-              leading: Icon(Icons.home),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                        SettingsHomeSelect(_setHome, _removeHome)));
+    return ListView(
+      children: <Widget>[
+        ListTile(
+          leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[Icon(Icons.palette)]),
+          title: Text('Thème'),
+          subtitle: Text(_defineThemeSubtitle()),
+          onTap: () {
+            showDialog<void>(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  contentPadding: EdgeInsets.only(top: 12),
+                  title: Text("Thème"),
+                  content: SingleChildScrollView(child: StatefulBuilder(
+                    builder: (context, setState) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Divider(),
+                          ListTile(
+                              leading: Icon(Icons.info),
+                              title: Text(
+                                  "Tout changement de thème nécessite un redémarrage de l'application.",
+                                  style: Theme.of(context).textTheme.caption)),
+                          Divider(),
+                          RadioListTile(
+                            title: Text("Automatique"),
+                            subtitle: Text("Laisse le système décider"),
+                            value: null,
+                            groupValue: _theme,
+                            onChanged: (String value) {
+                              _setTheme(value);
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          RadioListTile(
+                            title: Text("Clair"),
+                            subtitle: Text("Force le mode clair"),
+                            value: "light",
+                            groupValue: _theme,
+                            onChanged: (String value) {
+                              _setTheme(value);
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          RadioListTile(
+                            title: Text("Sombre"),
+                            subtitle: Text("Force le mode sombre"),
+                            value: "dark",
+                            groupValue: _theme,
+                            onChanged: (String value) {
+                              _setTheme(value);
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      );
+                    },
+                  )),
+                  actions: [
+                    FlatButton(
+                      child: Text('ANNULER'),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                );
               },
-            ),
-          ],
+            );
+          },
+        ),
+        ListHeader("Tri des points selon leur emplacement"),
+        ListTile(
+            title: Text(
+                "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches.",
+                style: Theme.of(context).textTheme.caption)),
+        Divider(height: 0.5),
+        SwitchListTile(
+          secondary: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[Icon(Icons.location_on)]),
+          title: Text("Ma position actuelle"),
+          value: _useLocation,
+          onChanged: (bool value) {
+            _setUseLocation(value);
+          },
+        ),
+        Divider(height: 0.5),
+        ListTile(
+          leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[Icon(Icons.home)]),
+          title: Text('Mon domicile'),
+          subtitle: Text(
+              _home != null
+                  ? "${_home.substring(0, min(50, _home.length))}..."
+                  : "Aucun - appuyez ici pour le définir",
+              style: Theme.of(context).textTheme.caption,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) =>
+                    SettingsHomeSelect(_setHome, _removeHome)));
+          },
+        ),
+        ListHeader("Notifications"),
+        ListTile(
+            title: Text(
+                "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
+                style: Theme.of(context).textTheme.caption)),
+        Divider(height: 0.5),
+        SwitchListTile(
+          secondary: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[Icon(Icons.notifications)]),
+          title: Text("Notifier la veille (vers 20h)"),
+          value: _showNotification,
+          onChanged: (bool value) {
+            _setShowNotification(value);
+          },
         ),
       ],
     );
