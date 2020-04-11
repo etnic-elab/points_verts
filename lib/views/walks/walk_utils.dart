@@ -40,6 +40,10 @@ void launchGeoApp(Walk walk) async {
 int sortWalks(Walk a, Walk b) {
   if (a.trip != null && b.trip != null) {
     return a.trip.duration.compareTo(b.trip.duration);
+  } else if (!a.isCancelled() && b.isCancelled()) {
+    return -1;
+  } else if (a.isCancelled() && !b.isCancelled()) {
+    return 1;
   } else if (a.distance != null && b.distance != null) {
     return a.distance.compareTo(b.distance);
   } else if (a.distance != null) {

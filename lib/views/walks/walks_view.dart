@@ -150,17 +150,13 @@ class _WalksViewState extends State<WalksView> {
   Future<List<Walk>> _calculateDistances(List<Walk> walks) async {
     for (Walk walk in walks) {
       if (walk.lat != null && walk.long != null) {
-        if (walk.isCancelled()) {
-          walk.distance = double.maxFinite;
-        } else {
-          double distance = await geolocator.distanceBetween(
-              selectedPosition.latitude,
-              selectedPosition.longitude,
-              walk.lat,
-              walk.long);
-          walk.distance = distance;
-          walk.trip = null;
-        }
+        double distance = await geolocator.distanceBetween(
+            selectedPosition.latitude,
+            selectedPosition.longitude,
+            walk.lat,
+            walk.long);
+        walk.distance = distance;
+        walk.trip = null;
       }
     }
     walks.sort((a, b) => sortWalks(a, b));
