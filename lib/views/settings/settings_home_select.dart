@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:points_verts/services/mapbox.dart';
 import 'package:points_verts/models/address_suggestion.dart';
 
 import '../loading.dart';
-import '../platform_widget.dart';
 
 class SettingsHomeSelect extends StatefulWidget {
   SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback);
@@ -52,29 +50,6 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformWidget(
-      androidBuilder: _androidLayout,
-      iosBuilder: _iOSLayout,
-    );
-  }
-
-  Widget _iOSLayout(BuildContext context) {
-    return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-            trailing: GestureDetector(
-                onTap: () {
-                  removeHomeCallback();
-                  _homeSearchController.removeListener(_onSearchChanged);
-                  Navigator.of(context).pop();
-                },
-                child: Icon(CupertinoIcons.delete)),
-            backgroundColor: Theme.of(context).primaryColor,
-            middle: Text("Recherche du domicile",
-                style: Theme.of(context).primaryTextTheme.title)),
-        child: SafeArea(child: Scaffold(body: _pageContent(context))));
-  }
-
-  Widget _androidLayout(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           actions: <Widget>[

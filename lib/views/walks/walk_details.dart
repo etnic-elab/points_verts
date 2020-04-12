@@ -34,7 +34,6 @@ class WalkDetails extends StatelessWidget {
             subtitle: _getGeoText(),
             onTap: () => launchGeoApp(walk),
           ),
-          Divider(height: 0.5),
           ListTile(
             leading: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -49,7 +48,6 @@ class WalkDetails extends StatelessWidget {
               }
             },
           ),
-          Divider(height: 0.5),
           walk.transport != null
               ? ListTile(
                   leading: Column(
@@ -58,7 +56,6 @@ class WalkDetails extends StatelessWidget {
                   ),
                   title: Text(walk.transport))
               : SizedBox.shrink(),
-          walk.transport != null ? Divider(height: 0.5) : SizedBox.shrink(),
         ],
       ),
     );

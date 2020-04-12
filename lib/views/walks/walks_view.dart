@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +16,6 @@ import '../../services/adeps.dart';
 import 'dates_dropdown.dart';
 import '../../services/mapbox.dart';
 import '../../services/openweather.dart';
-import '../platform_widget.dart';
 import '../../models/walk.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
@@ -199,54 +197,6 @@ class _WalksViewState extends State<WalksView> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformWidget(
-      androidBuilder: _androidLayout,
-      iosBuilder: _iOSLayout,
-    );
-  }
-
-  Widget _iOSLayout(BuildContext buildContext) {
-    return CupertinoTabScaffold(
-      tabBar: CupertinoTabBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.list), title: Text('Listes')),
-          BottomNavigationBarItem(icon: Icon(Icons.map), title: Text('Carte')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), title: Text('Paramètres'))
-        ],
-      ),
-      tabBuilder: (BuildContext context, int index) {
-        var navBar = CupertinoNavigationBar(
-            transitionBetweenRoutes: false,
-            middle: Text('Points Verts Adeps',
-                style: Theme.of(context).primaryTextTheme.title),
-            backgroundColor: Theme.of(context).primaryColor);
-        if (index == 0) {
-          return CupertinoPageScaffold(
-              navigationBar: navBar,
-              child: SafeArea(child: Scaffold(body: _buildListTab())));
-        } else if (index == 1) {
-          return CupertinoPageScaffold(
-              navigationBar: navBar,
-              child: SafeArea(child: Scaffold(body: _buildMapTab())));
-        } else {
-          return CupertinoPageScaffold(
-              navigationBar: navBar,
-              child: SafeArea(
-                  child: Scaffold(body: Settings(callback: _retrieveData))));
-        }
-      },
-    );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  Widget _androidLayout(BuildContext buildContext) {
     return DefaultTabController(
         length: 2,
         child: Scaffold(
@@ -265,6 +215,13 @@ class _WalksViewState extends State<WalksView> {
                       icon: Icon(Icons.settings), title: Text('Paramètres'))
                 ]),
             body: _buildSubScreen()));
+  }
+
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   Widget _buildSubScreen() {

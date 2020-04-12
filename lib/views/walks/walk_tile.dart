@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -58,11 +56,6 @@ class WalkTile extends StatelessWidget {
   }
 
   PageRoute _pageRoute() {
-    if (Platform.isIOS) {
-      return CupertinoPageRoute(
-          title: walk.city, builder: (context) => WalkDetailsView(walk));
-    } else {
       return MaterialPageRoute(builder: (context) => WalkDetailsView(walk));
-    }
   }
 }

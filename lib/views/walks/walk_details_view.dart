@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -7,7 +6,6 @@ import 'package:latlong/latlong.dart';
 import 'package:points_verts/services/mapbox.dart';
 import 'package:points_verts/views/walks/walk_details.dart';
 
-import '../platform_widget.dart';
 import '../../models/walk.dart';
 
 class WalkDetailsView extends StatelessWidget {
@@ -17,40 +15,6 @@ class WalkDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformWidget(
-      androidBuilder: _androidLayout,
-      iosBuilder: _iOSLayout,
-    );
-  }
-
-  Widget _iOSLayout(BuildContext context) {
-    return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            middle: Text(walk.city,
-                style: Theme.of(context).primaryTextTheme.title)),
-        child: SafeArea(child: Scaffold(
-          body: OrientationBuilder(
-            builder: (context, orientation) {
-              if (orientation == Orientation.portrait) {
-                return Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      _buildMap(context),
-                      pictogramRow(),
-                      WalkDetails(walk)
-                    ]);
-              } else {
-                return Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[pictogramRow(), WalkDetails(walk)]);
-              }
-            },
-          ),
-        )));
-  }
-
-  Widget _androidLayout(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(walk.city),
