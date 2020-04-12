@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 class TileIcon extends StatelessWidget {
   TileIcon(this.icon);
 
-  final Icon icon;
+  final Widget icon;
 
   @override
   Widget build(BuildContext context) {

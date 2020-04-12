@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import '../tile_icon.dart';
 import 'geo_button.dart';
 import '../../models/walk.dart';
 import 'walk_details_view.dart';
@@ -53,9 +54,7 @@ class WalkTile extends StatelessWidget {
               );
             }
           }
-          return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[WalkIcon(walk)]);
+          return TileIcon(WalkIcon(walk));
         });
   }
 

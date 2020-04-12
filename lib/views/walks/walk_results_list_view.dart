@@ -27,8 +27,7 @@ class WalkResultsListView extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
-            return ListView.separated(
-                separatorBuilder: (context, i) => Divider(height: 0.5),
+            return ListView.builder(
                 itemBuilder: (context, i) {
                   if (position != null) {
                     if (i == 0) {
