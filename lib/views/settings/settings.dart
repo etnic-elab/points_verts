@@ -130,51 +130,55 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        ListHeader("Affichage"),
-        ThemeChoice(_theme, _setTheme),
-        ListHeader("Tri des points selon leur emplacement"),
-        ListTile(
-            title: Text(
-                "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches.",
-                style: Theme.of(context).textTheme.caption)),
-        SwitchListTile(
-          secondary: TileIcon(Icon(Icons.location_on)),
-          title: Text("Ma position actuelle"),
-          value: _useLocation,
-          onChanged: (bool value) {
-            _setUseLocation(value);
-          },
-        ),
-        ListTile(
-          leading: TileIcon(Icon(Icons.home)),
-          title: Text('Mon domicile'),
-          subtitle: Text(
-              _home != null ? _home : "Aucun - appuyez ici pour le définir",
-              overflow: TextOverflow.ellipsis),
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) =>
-                    SettingsHomeSelect(_setHome, _removeHome)));
-          },
-        ),
-        ListHeader("Notifications"),
-        ListTile(
-            title: Text(
-                "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
-                style: Theme.of(context).textTheme.caption)),
-        SwitchListTile(
-          secondary: TileIcon(Icon(Icons.notifications)),
-          title: Text("Notifier la veille (vers 20h)"),
-          value: _showNotification,
-          onChanged: (bool value) {
-            _setShowNotification(value);
-          },
-        ),
-        ListHeader("Divers"),
-        About()
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Paramètres"),
+        actions: <Widget>[About()],
+      ),
+      body: ListView(
+        children: <Widget>[
+          ListHeader("Affichage"),
+          ThemeChoice(_theme, _setTheme),
+          ListHeader("Tri des points selon leur emplacement"),
+          ListTile(
+              title: Text(
+                  "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches.",
+                  style: Theme.of(context).textTheme.caption)),
+          SwitchListTile(
+            secondary: TileIcon(Icon(Icons.location_on)),
+            title: Text("Ma position actuelle"),
+            value: _useLocation,
+            onChanged: (bool value) {
+              _setUseLocation(value);
+            },
+          ),
+          ListTile(
+            leading: TileIcon(Icon(Icons.home)),
+            title: Text('Mon domicile'),
+            subtitle: Text(
+                _home != null ? _home : "Aucun - appuyez ici pour le définir",
+                overflow: TextOverflow.ellipsis),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) =>
+                      SettingsHomeSelect(_setHome, _removeHome)));
+            },
+          ),
+          ListHeader("Notifications"),
+          ListTile(
+              title: Text(
+                  "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
+                  style: Theme.of(context).textTheme.caption)),
+          SwitchListTile(
+            secondary: TileIcon(Icon(Icons.notifications)),
+            title: Text("Notifier la veille (vers 20h)"),
+            value: _showNotification,
+            onChanged: (bool value) {
+              _setShowNotification(value);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

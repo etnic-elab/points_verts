@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:points_verts/views/tile_icon.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class About extends StatelessWidget {
@@ -11,10 +10,9 @@ class About extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-        leading: TileIcon(Icon(Icons.info)),
-        title: Text("À propos de cette application"),
-        onTap: () {
+    return IconButton(
+        icon: Icon(Icons.info),
+        onPressed: () {
           showAboutDialog(
               context: context,
               applicationIcon:
@@ -32,7 +30,8 @@ class About extends StatelessWidget {
                     label: Text("Code source")),
                 RaisedButton.icon(
                     onPressed: () {
-                      _launchURL("mailto:android@alpagaga.dev?subject=Points Verts");
+                      _launchURL(
+                          "mailto:android@alpagaga.dev?subject=Points Verts");
                     },
                     icon: Icon(Icons.email),
                     label: Text("Contact")),

@@ -8,9 +8,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/loading.dart';
+import 'package:points_verts/views/settings/settings.dart';
 import 'package:points_verts/views/walks/place_select.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/settings/settings.dart';
 
 import '../../services/adeps.dart';
 import 'dates_dropdown.dart';
@@ -40,7 +40,6 @@ class _WalksViewState extends State<WalksView> {
   Position _currentPosition;
   Position _homePosition;
   Places _selectedPlace;
-  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -200,38 +199,26 @@ class _WalksViewState extends State<WalksView> {
     return DefaultTabController(
         length: 2,
         child: Scaffold(
-            appBar: AppBar(
-              title: Text('Points Verts Adeps'),
+          appBar: AppBar(
+            title: Text('Points Verts Adeps'),
+            actions: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(callback: _retrieveData)));
+                  }),
+            ],
+            bottom: TabBar(
+              tabs: <Widget>[Tab(text: "LISTE"), Tab(text: "CARTE")],
             ),
-            bottomNavigationBar: BottomNavigationBar(
-                currentIndex: _selectedIndex,
-                onTap: _onItemTapped,
-                items: const <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.list), title: Text('Liste')),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.map), title: Text('Carte')),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.settings), title: Text('Paramètres'))
-                ]),
-            body: _buildSubScreen()));
-  }
-
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  Widget _buildSubScreen() {
-    if (_selectedIndex == 0) {
-      return _buildListTab();
-    } else if (_selectedIndex == 1) {
-      return _buildMapTab();
-    } else {
-      return Settings(callback: _retrieveData);
-    }
+          ),
+          body: TabBarView(
+            children: <Widget>[
+              _buildListTab(),
+              _buildMapTab(),
+            ],
+          ),
+        ));
   }
 
   Widget _buildTab(Widget tabContent) {
