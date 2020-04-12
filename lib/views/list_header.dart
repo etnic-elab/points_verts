@@ -9,10 +9,10 @@ class ListHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).primaryColor,
-      child: Center(
-          child:
-              Text(title, style: Theme.of(context).primaryTextTheme.subtitle)),
+      child: Text(title,
+          style: TextStyle(
+              color: Theme.of(context).accentColor,
+              fontWeight: FontWeight.bold)),
       padding: EdgeInsets.all(10.0),
     );
   }

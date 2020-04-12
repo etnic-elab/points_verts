@@ -132,6 +132,7 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
+        ListHeader("Affichage"),
         ThemeChoice(_theme, _setTheme),
         ListHeader("Tri des points selon leur emplacement"),
         ListTile(

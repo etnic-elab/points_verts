@@ -14,14 +14,15 @@ import 'walk_icon.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
+bool smallScreen = window.physicalSize.width <= 640;
+
 class WalkTile extends StatelessWidget {
-  WalkTile({this.walk});
+  WalkTile(this.walk);
 
   final Walk walk;
 
   @override
   Widget build(BuildContext context) {
-    bool smallScreen = window.physicalSize.width <= 640;
     return ListTile(
       dense: smallScreen,
       leading: _weatherIcon(),
@@ -35,9 +36,7 @@ class WalkTile extends StatelessWidget {
 
   Widget _weatherIcon() {
     if (walk.isCancelled()) {
-      return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[WalkIcon(walk)]);
+      return TileIcon(WalkIcon(walk));
     }
     return FutureBuilder(
         future: walk.weathers,
