@@ -6,6 +6,7 @@ import 'package:points_verts/services/openweather.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../list_header.dart';
+import '../tile_icon.dart';
 import 'walk_utils.dart';
 
 class WalkDetails extends StatelessWidget {
@@ -21,10 +22,9 @@ class WalkDetails extends StatelessWidget {
           walk.weathers != null
               ? ListHeader("Prévisions météo")
               : SizedBox.shrink(),
-          walk.weathers != null
-              ? ListTile(title: _weather())
-              : SizedBox.shrink(),
+          walk.weathers != null ? _WeatherSection(walk) : SizedBox.shrink(),
           ListHeader("Autres informations"),
+          _StatusTile(walk),
           ListTile(
             leading: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -71,8 +71,15 @@ class WalkDetails extends StatelessWidget {
       return null;
     }
   }
+}
 
-  Widget _weather() {
+class _WeatherSection extends StatelessWidget {
+  _WeatherSection(this.walk);
+
+  final Walk walk;
+
+  @override
+  Widget build(BuildContext context) {
     return FutureBuilder(
         future: walk.weathers,
         builder: (BuildContext context, AsyncSnapshot<List<Weather>> snapshot) {
@@ -93,12 +100,39 @@ class WalkDetails extends StatelessWidget {
                   ],
                 ));
               }
-              return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: widgets);
+              return ListTile(
+                  title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: widgets));
             }
           }
           return SizedBox();
         });
+  }
+}
+
+class _StatusTile extends StatelessWidget {
+  _StatusTile(this.walk);
+
+  final Walk walk;
+
+  @override
+  Widget build(BuildContext context) {
+    if (walk.isCancelled()) {
+      return ListTile(
+          leading: TileIcon(Icon(Icons.cancel, color: Colors.red)),
+          title: Text(
+            "Ce Point Vert est annulé !",
+            style: TextStyle(color: Colors.red),
+          ));
+    } else if (walk.isModified()) {
+      return ListTile(
+          leading: TileIcon(Icon(Icons.warning, color: Colors.orange)),
+          title: Text(
+              "Ce Point Vert a été modifié par rapport au calendrier papier.",
+              style: TextStyle(color: Colors.orange)));
+    } else {
+      return SizedBox.shrink();
+    }
   }
 }

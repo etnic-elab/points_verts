@@ -122,6 +122,10 @@ class Walk {
     return status == "Annulé";
   }
 
+  bool isModified() {
+    return status == "Modifié";
+  }
+
   String getFormattedDistance() {
     double dist =
         trip != null && trip.distance != null ? trip.distance : distance;

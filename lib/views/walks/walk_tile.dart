@@ -26,9 +26,10 @@ class WalkTile extends StatelessWidget {
       leading: _weatherIcon(),
       title: Text(walk.city),
       subtitle: Text("${walk.type} - ${walk.province}"),
-      enabled: !walk.isCancelled(),
       onTap: () => Navigator.push(context, _pageRoute()),
-      trailing: walk.isCancelled() ? Text("Annulé") : GeoButton(walk: walk),
+      trailing: walk.isCancelled()
+          ? Text("Annulé", style: TextStyle(color: Colors.red))
+          : GeoButton(walk: walk),
     );
   }
 
@@ -56,6 +57,6 @@ class WalkTile extends StatelessWidget {
   }
 
   PageRoute _pageRoute() {
-      return MaterialPageRoute(builder: (context) => WalkDetailsView(walk));
+    return MaterialPageRoute(builder: (context) => WalkDetailsView(walk));
   }
 }
