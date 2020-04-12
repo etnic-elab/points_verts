@@ -1,13 +1,14 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:points_verts/views/list_header.dart';
+import 'package:points_verts/views/settings/theme.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../services/prefs.dart';
+import '../tile_icon.dart';
+import 'about.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
@@ -128,117 +129,28 @@ class _SettingsState extends State<Settings> {
     return permission;
   }
 
-  String _defineThemeSubtitle() {
-    if (_theme == "light") {
-      return "Clair";
-    } else if (_theme == "dark") {
-      return "Sombre";
-    } else {
-      return "Automatique";
-    }
-  }
-
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
-        ListTile(
-          leading: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[Icon(Icons.palette)]),
-          title: Text('Thème'),
-          subtitle: Text(_defineThemeSubtitle()),
-          onTap: () {
-            showDialog<void>(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  contentPadding: EdgeInsets.only(top: 12),
-                  title: Text("Thème"),
-                  content: SingleChildScrollView(child: StatefulBuilder(
-                    builder: (context, setState) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Divider(),
-                          ListTile(
-                              leading: Icon(Icons.info),
-                              title: Text(
-                                  "Tout changement de thème nécessite un redémarrage de l'application.",
-                                  style: Theme.of(context).textTheme.caption)),
-                          Divider(),
-                          RadioListTile(
-                            title: Text("Automatique"),
-                            subtitle: Text("Laisse le système décider"),
-                            value: null,
-                            groupValue: _theme,
-                            onChanged: (String value) {
-                              _setTheme(value);
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          RadioListTile(
-                            title: Text("Clair"),
-                            subtitle: Text("Force le mode clair"),
-                            value: "light",
-                            groupValue: _theme,
-                            onChanged: (String value) {
-                              _setTheme(value);
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          RadioListTile(
-                            title: Text("Sombre"),
-                            subtitle: Text("Force le mode sombre"),
-                            value: "dark",
-                            groupValue: _theme,
-                            onChanged: (String value) {
-                              _setTheme(value);
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      );
-                    },
-                  )),
-                  actions: [
-                    FlatButton(
-                      child: Text('ANNULER'),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        ),
+        ThemeChoice(_theme, _setTheme),
         ListHeader("Tri des points selon leur emplacement"),
         ListTile(
             title: Text(
                 "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches.",
                 style: Theme.of(context).textTheme.caption)),
-        Divider(height: 0.5),
         SwitchListTile(
-          secondary: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[Icon(Icons.location_on)]),
+          secondary: TileIcon(Icon(Icons.location_on)),
           title: Text("Ma position actuelle"),
           value: _useLocation,
           onChanged: (bool value) {
             _setUseLocation(value);
           },
         ),
-        Divider(height: 0.5),
         ListTile(
-          leading: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[Icon(Icons.home)]),
+          leading: TileIcon(Icon(Icons.home)),
           title: Text('Mon domicile'),
           subtitle: Text(
-              _home != null
-                  ? "${_home.substring(0, min(50, _home.length))}..."
-                  : "Aucun - appuyez ici pour le définir",
-              style: Theme.of(context).textTheme.caption,
-              maxLines: 1,
+              _home != null ? _home : "Aucun - appuyez ici pour le définir",
               overflow: TextOverflow.ellipsis),
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
@@ -251,17 +163,16 @@ class _SettingsState extends State<Settings> {
             title: Text(
                 "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
                 style: Theme.of(context).textTheme.caption)),
-        Divider(height: 0.5),
         SwitchListTile(
-          secondary: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[Icon(Icons.notifications)]),
+          secondary: TileIcon(Icon(Icons.notifications)),
           title: Text("Notifier la veille (vers 20h)"),
           value: _showNotification,
           onChanged: (bool value) {
             _setShowNotification(value);
           },
         ),
+        ListHeader("Divers"),
+        About()
       ],
     );
   }

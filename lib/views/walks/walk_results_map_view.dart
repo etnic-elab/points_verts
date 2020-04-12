@@ -7,10 +7,10 @@ import 'package:latlong/latlong.dart';
 import '../loading.dart';
 import '../../services/mapbox.dart';
 import '../../models/walk.dart';
+import 'walk_icon.dart';
 import 'walks_view.dart';
 import 'walk_list_error.dart';
 import 'walk_tile.dart';
-import 'walk_utils.dart';
 
 class WalkResultsMapView extends StatelessWidget {
   WalkResultsMapView(this.walks, this.position, this.currentPlace,
@@ -89,7 +89,7 @@ class WalkResultsMapView extends StatelessWidget {
       height: 25,
       point: new LatLng(walk.lat, walk.long),
       builder: (ctx) => RawMaterialButton(
-        child: displayIcon(walk, color: Colors.white, size: 20),
+        child: WalkIcon(walk, color: Colors.white, size: 20),
         shape: new CircleBorder(),
         elevation: selectedWalk == walk ? 5.0 : 2.0,
         // TODO: find a way to not hardcode the colors here

@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'geo_button.dart';
 import '../../models/walk.dart';
 import 'walk_details_view.dart';
-import 'walk_utils.dart';
+import 'walk_icon.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
@@ -36,7 +36,7 @@ class WalkTile extends StatelessWidget {
     if (walk.isCancelled()) {
       return Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[displayIcon(walk)]);
+          children: <Widget>[WalkIcon(walk)]);
     }
     return FutureBuilder(
         future: walk.weathers,
@@ -55,7 +55,7 @@ class WalkTile extends StatelessWidget {
           }
           return Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[displayIcon(walk)]);
+              children: <Widget>[WalkIcon(walk)]);
         });
   }
 

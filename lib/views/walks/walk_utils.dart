@@ -1,25 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/walk.dart';
-
-Widget displayIcon(Walk walk, {Color color, double size}) {
-  if (walk.isCancelled()) {
-    return Icon(Icons.cancel,
-        color: color, size: size, semanticLabel: "Point annulé");
-  } else if (walk.type == 'Marche') {
-    return Icon(Icons.directions_walk,
-        color: color, size: size, semanticLabel: "Marche");
-  } else if (walk.type == 'Orientation') {
-    return Icon(Icons.map,
-        color: color, size: size, semanticLabel: "Orientation");
-  } else {
-    return SizedBox.shrink();
-  }
-}
 
 void launchGeoApp(Walk walk) async {
   if (walk.lat != null && walk.long != null) {
