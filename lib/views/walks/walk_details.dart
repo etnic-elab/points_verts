@@ -122,14 +122,14 @@ class _StatusTile extends StatelessWidget {
       return ListTile(
           leading: TileIcon(Icon(Icons.cancel, color: Colors.red)),
           title: Text(
-            "Ce Point Vert est annulé !",
+            "Ce Point Vert est annulé",
             style: TextStyle(color: Colors.red),
           ));
     } else if (walk.isModified()) {
       return ListTile(
           leading: TileIcon(Icon(Icons.warning, color: Colors.orange)),
           title: Text(
-              "Ce Point Vert a été modifié par rapport au calendrier papier.",
+              "Modifié par rapport au calendrier papier",
               style: TextStyle(color: Colors.orange)));
     } else {
       return SizedBox.shrink();

@@ -37,6 +37,7 @@ dependencies:
   background_fetch: ^0.5.4
   flutter_local_notifications: ^1.2.0+4
   permission_handler: ^4.4.0+hotfix.2
+  animations: 1.0.0+5
 
 dev_dependencies:
   flutter_test:

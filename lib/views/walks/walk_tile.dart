@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -21,15 +22,27 @@ class WalkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      dense: smallScreen,
-      leading: _weatherIcon(),
-      title: Text(walk.city),
-      subtitle: Text("${walk.type} - ${walk.province}"),
-      onTap: () => Navigator.push(context, _pageRoute()),
-      trailing: walk.isCancelled()
-          ? Text("Annulé", style: TextStyle(color: Colors.red))
-          : GeoButton(walk: walk),
+    return OpenContainer(
+      transitionType: ContainerTransitionType.fade,
+      openBuilder: (BuildContext _, VoidCallback openContainer) {
+        return WalkDetailsView(walk);
+      },
+      tappable: false,
+      closedShape: const RoundedRectangleBorder(),
+      closedElevation: 0.0,
+      closedColor: Theme.of(context).canvasColor,
+      closedBuilder: (BuildContext _, VoidCallback openContainer) {
+        return ListTile(
+          dense: smallScreen,
+          leading: _weatherIcon(),
+          title: Text(walk.city),
+          subtitle: Text("${walk.type} - ${walk.province}"),
+          onTap: openContainer,
+          trailing: walk.isCancelled()
+              ? Text("Annulé", style: TextStyle(color: Colors.red))
+              : GeoButton(walk: walk),
+        );
+      },
     );
   }
 

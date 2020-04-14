@@ -58,9 +58,22 @@ class _MyAppState extends State<MyApp> {
       title: 'Points Verts',
       theme: ThemeData(
         primarySwatch: Colors.green,
+      ).copyWith(
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: <TargetPlatform, PageTransitionsBuilder>{
+            TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          },
+        ),
       ),
       darkTheme:
-          ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
+          ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green)
+              .copyWith(
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: <TargetPlatform, PageTransitionsBuilder>{
+            TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          },
+        ),
+      ),
       home: WalksView(),
     );
   }
