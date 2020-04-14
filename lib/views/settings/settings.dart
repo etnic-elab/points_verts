@@ -63,9 +63,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = label;
     });
-    if (callback != null) {
-      callback();
-    }
+    callback(resetDate: false);
   }
 
   Future<void> _setTheme(String newTheme) async {
@@ -81,9 +79,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = null;
     });
-    if (callback != null) {
-      callback();
-    }
+    callback(resetDate: false);
   }
 
   Future<void> _setUseLocation(bool newValue) async {
@@ -98,9 +94,7 @@ class _SettingsState extends State<Settings> {
       setState(() {
         _useLocation = newValue;
       });
-      if (callback != null) {
-        callback();
-      }
+      callback(resetDate: false);
     }
   }
 

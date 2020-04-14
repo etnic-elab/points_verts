@@ -30,7 +30,7 @@ class WalksView extends StatefulWidget {
   _WalksViewState createState() => _WalksViewState();
 }
 
-class _WalksViewState extends State<WalksView> {
+class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
   Future<List<DateTime>> _dates;
@@ -45,10 +45,24 @@ class _WalksViewState extends State<WalksView> {
   void initState() {
     initializeDateFormatting("fr_BE");
     _retrieveData();
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
-  Future<void> _retrieveData() async {
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _retrieveData(resetDate: false);
+    }
+  }
+
+  Future<void> _retrieveData({bool resetDate = true}) async {
     setState(() {
       _currentWalks = null;
       _selectedWalk = null;
@@ -86,7 +100,7 @@ class _WalksViewState extends State<WalksView> {
             name: TAG);
       }
     }
-    _retrieveDates();
+    _retrieveDates(resetDate: resetDate);
   }
 
   _retrievePosition() async {
@@ -178,13 +192,15 @@ class _WalksViewState extends State<WalksView> {
     return Future.wait(weathers);
   }
 
-  void _retrieveDates() async {
+  void _retrieveDates({bool resetDate = true}) async {
     _dates = DBProvider.db.getWalkDates();
     await _retrievePosition();
     _dates.then((List<DateTime> items) {
-      setState(() {
-        _selectedDate = items.first;
-      });
+      if (resetDate || !items.contains(_selectedDate)) {
+        setState(() {
+          _selectedDate = items.first;
+        });
+      }
       _retrieveWalks();
     }).catchError((err) {
       print("Cannot retrieve dates: $err");
