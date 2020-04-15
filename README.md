@@ -2,7 +2,7 @@
 
 Small Flutter application displaying future Adeps' walks. Non official.
 
-Use the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de-ladeps/) to retrieve data.
+Uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de-ladeps/) to retrieve data.
 
 # Features
 
@@ -15,11 +15,12 @@ Use the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de-
 
 # Planned features
 
+- Open walk details directly from notification
 - Share walk infos button?
 
 # Releasing the application
 
-The Mapbox and OpenWeather API keyd should be defined in a `.env` file in root folder:
+The Mapbox and OpenWeather API keys should be defined in a `.env` file in root folder:
 
 ```properties
 MAPBOX_TOKEN=token
@@ -33,4 +34,10 @@ storePassword=<password>
 keyPassword=<password>
 keyAlias=key
 storeFile=<path>/key.jks
+```
+
+The release can then be build with the following command for android (use Xcode for iOS):
+
+```bash
+flutter build appbundle
 ```
