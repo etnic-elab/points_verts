@@ -19,6 +19,8 @@ jobs:
           channel: 'stable' # or: 'dev' or 'beta'
       - name: Install dependencies
         run: flutter pub get
+      - name: Touch .env file
+        run: touch .env
       - name: Run tests
         run: flutter test
       - name: Build APK
