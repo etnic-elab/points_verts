@@ -12,7 +12,7 @@ before_script:
 
 build:
   stage: build
-  script: 'flutter build aot'
+  script: 'flutter build apk --debug --split-per-abi'
 
 unit_test:
   stage: test
@@ -21,3 +21,4 @@ unit_test:
 analyze:
   stage: analyze
   script: 'flutter analyze'
+  allow_failure: true
