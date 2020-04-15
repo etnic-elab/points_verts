@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:points_verts/views/list_header.dart';
-import 'package:points_verts/views/settings/theme.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../services/prefs.dart';
@@ -23,7 +22,6 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   final Geolocator geoLocator = Geolocator()..forceAndroidLocationManager;
   String _home;
-  String _theme;
   bool _useLocation = false;
   bool _showNotification = false;
 
@@ -41,14 +39,12 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _retrievePrefs() async {
-    String theme = await PrefsProvider.prefs.getString("theme");
     String home = await PrefsProvider.prefs.getString("home_label");
     bool useLocation =
         await PrefsProvider.prefs.getBoolean(key: "use_location");
     bool showNotification = await PrefsProvider.prefs
         .getBoolean(key: "show_notification", defaultValue: true);
     setState(() {
-      _theme = theme;
       _home = home;
       _useLocation = useLocation;
       _showNotification = showNotification;
@@ -64,13 +60,6 @@ class _SettingsState extends State<Settings> {
       _home = label;
     });
     callback(resetDate: false);
-  }
-
-  Future<void> _setTheme(String newTheme) async {
-    String theme = await PrefsProvider.prefs.setString("theme", newTheme);
-    setState(() {
-      _theme = theme;
-    });
   }
 
   Future<void> _removeHome() async {
@@ -131,8 +120,6 @@ class _SettingsState extends State<Settings> {
       ),
       body: ListView(
         children: <Widget>[
-          ListHeader("Affichage"),
-          ThemeChoice(_theme, _setTheme),
           ListHeader("Tri des points selon leur emplacement"),
           ListTile(
               title: Text(

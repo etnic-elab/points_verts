@@ -44,55 +44,13 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.theme == "light") {
-      return _lightTheme();
-    } else if (widget.theme == "dark") {
-      return _darkTheme();
-    } else {
-      return _defaultTheme();
-    }
-  }
-
-  Widget _defaultTheme() {
     return MaterialApp(
       title: 'Points Verts',
       theme: ThemeData(
         primarySwatch: Colors.green,
-      ).copyWith(
-        pageTransitionsTheme: const PageTransitionsTheme(
-          builders: <TargetPlatform, PageTransitionsBuilder>{
-            TargetPlatform.android: ZoomPageTransitionsBuilder(),
-          },
-        ),
       ),
       darkTheme:
-          ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green)
-              .copyWith(
-        pageTransitionsTheme: const PageTransitionsTheme(
-          builders: <TargetPlatform, PageTransitionsBuilder>{
-            TargetPlatform.android: ZoomPageTransitionsBuilder(),
-          },
-        ),
-      ),
-      home: WalksView(),
-    );
-  }
-
-  Widget _lightTheme() {
-    return MaterialApp(
-      title: 'Points Verts',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: WalksView(),
-    );
-  }
-
-  Widget _darkTheme() {
-    return MaterialApp(
-      title: 'Points Verts',
-      theme:
-          ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
+      ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
       home: WalksView(),
     );
   }
