@@ -12,7 +12,7 @@ before_script:
 
 build:
   stage: build
-  script: 'flutter build apk --debug --split-per-abi'
+  script: 'flutter build aot'
 
 unit_test:
   stage: test
