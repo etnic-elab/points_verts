@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../tile_icon.dart';
+
 class About extends StatelessWidget {
   _launchURL(url) async {
     if (await canLaunch(url)) {
@@ -21,34 +23,45 @@ class About extends StatelessWidget {
               applicationVersion: "1.0",
               applicationLegalese: "GNU GPLv3",
               children: [
-                RaisedButton.icon(
-                    onPressed: () {
-                      _launchURL(
-                          "https://gitlab.com/thomas.borlee/points_verts");
-                    },
-                    icon: Icon(Icons.code),
-                    label: Text("Code source")),
-                RaisedButton.icon(
-                    onPressed: () {
-                      _launchURL(
-                          "mailto:android@alpagaga.dev?subject=Points Verts");
-                    },
-                    icon: Icon(Icons.email),
-                    label: Text("Contact")),
-                RaisedButton.icon(
-                    onPressed: () {
-                      _launchURL("http://www.sport-adeps.be/index.php?id=5945");
-                    },
-                    icon: Icon(Icons.directions_walk),
-                    label: Text("Portail Adeps")),
-                RaisedButton.icon(
-                    onPressed: () {
-                      _launchURL(
-                          "https://www.odwb.be/explore/dataset/points-verts-de-ladeps/");
-                    },
-                    icon: Icon(Icons.web),
-                    label: Text("ODWB API"))
+                _AboutRow("Code source", "Disponible sur GitLab.com",
+                    "https://gitlab.com/thomas.borlee/points_verts"),
+                _AboutRow("Adresse de contact", "android@alpagaga.dev",
+                    "mailto:android@alpagaga.dev?subject=Points Verts"),
+                _AboutRow(
+                    "Données des Points Verts",
+                    "Open Data Wallonie-Bruxelles",
+                    "https://www.odwb.be/explore/dataset/points-verts-de-ladeps/"),
+                _AboutRow("Données de navigation", "Mapbox",
+                    "https://www.mapbox.com/"),
+                _AboutRow("Données météorologiques", "OpenWeather",
+                    "https://openweathermap.org/")
               ]);
         });
+  }
+}
+
+class _AboutRow extends StatelessWidget {
+  _AboutRow(this.label, this.buttonLabel, this.url);
+
+  final String label;
+  final String buttonLabel;
+  final String url;
+
+  _launchURL(url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      title: Text(label),
+      subtitle: buttonLabel != null ? Text(buttonLabel) : null,
+      onTap: () {
+        _launchURL(url);
+      },
+    );
   }
 }
