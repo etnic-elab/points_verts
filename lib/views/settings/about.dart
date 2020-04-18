@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../tile_icon.dart';
-
 class About extends StatelessWidget {
-  _launchURL(url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return IconButton(
@@ -23,8 +15,8 @@ class About extends StatelessWidget {
               applicationVersion: "1.0",
               applicationLegalese: "GNU GPLv3",
               children: [
-                _AboutRow("Code source", "Disponible sur GitLab.com",
-                    "https://gitlab.com/thomas.borlee/points_verts"),
+                _AboutRow("Code source", "Disponible sur GitHub",
+                    "https://github.com/tborlee/points_verts"),
                 _AboutRow("Adresse de contact", "android@alpagaga.dev",
                     "mailto:android@alpagaga.dev?subject=Points Verts"),
                 _AboutRow(
