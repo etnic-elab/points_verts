@@ -5,7 +5,6 @@ import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../list_header.dart';
 import '../tile_icon.dart';
 import 'walk_utils.dart';
 
@@ -19,11 +18,7 @@ class WalkDetails extends StatelessWidget {
     return Expanded(
       child: ListView(
         children: <Widget>[
-          walk.weathers != null
-              ? ListHeader("Prévisions météo")
-              : SizedBox.shrink(),
           walk.weathers != null ? _WeatherSection(walk) : SizedBox.shrink(),
-          ListHeader("Autres informations"),
           _StatusTile(walk),
           ListTile(
             leading: Column(
@@ -56,9 +51,39 @@ class WalkDetails extends StatelessWidget {
                   ),
                   title: Text(walk.transport))
               : SizedBox.shrink(),
+          _infoRow(),
         ],
       ),
     );
+  }
+
+  Widget _infoRow() {
+    return Wrap(alignment: WrapAlignment.center, children: <Widget>[
+      _infoTile(Icons.directions_walk, walk.fifteenKm,
+          "Parcours suppl. de marche de 15 km"),
+      _infoTile(Icons.accessible_forward, walk.wheelchair,
+          "Parcours de 5 km accessible aux PMR"),
+      _infoTile(Icons.child_friendly, walk.stroller,
+          "Parcours de 5 km accessible aux landaus"),
+      _infoTile(Icons.map, walk.extraOrientation,
+          "Parcours suppl. d'orientation de +/- 8 km"),
+      _infoTile(Icons.directions_walk, walk.extraWalk,
+          "Parcours suppl. de marche de +/- 10 km"),
+      _infoTile(Icons.nature_people, walk.guided, "Balade guidée Nature"),
+      _infoTile(Icons.directions_bike, walk.bike,
+          "Parcours suppl. de vélo de +/- 20 km"),
+      _infoTile(Icons.directions_bike, walk.mountainBike,
+          "Parcours suppl. de VTT de +/- 20 km"),
+      _infoTile(Icons.local_drink, walk.waterSupply, "Ravitaillement"),
+    ]);
+  }
+
+  Widget _infoTile(IconData icon, bool value, String message) {
+    if (value) {
+    return ListTile(leading: TileIcon(Icon(icon)), title: Text(message));
+    } else {
+      return SizedBox.shrink();
+    }
   }
 
   Widget _getGeoText() {
@@ -128,8 +153,7 @@ class _StatusTile extends StatelessWidget {
     } else if (walk.isModified()) {
       return ListTile(
           leading: TileIcon(Icon(Icons.warning, color: Colors.orange)),
-          title: Text(
-              "Modifié par rapport au calendrier papier",
+          title: Text("Modifié par rapport au calendrier papier",
               style: TextStyle(color: Colors.orange)));
     } else {
       return SizedBox.shrink();
