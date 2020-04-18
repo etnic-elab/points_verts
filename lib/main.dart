@@ -2,7 +2,6 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:points_verts/services/notification.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'views/walks/walks_view.dart';
 
@@ -20,16 +19,11 @@ void backgroundFetchHeadlessTask(String taskId) async {
 void main() async {
   await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  runApp(new MyApp(theme: prefs.getString("theme")));
+  runApp(new MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({this.theme});
-
-  final String theme;
-
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -50,7 +44,7 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.green,
       ),
       darkTheme:
-      ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
+          ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
       home: WalksView(),
     );
   }
