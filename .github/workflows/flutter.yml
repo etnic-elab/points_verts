@@ -23,5 +23,8 @@ jobs:
         run: touch .env
       - name: Run tests
         run: flutter test
+      - name: Run code analysis
+        run: flutter analyze
+        continue-on-error: true
       - name: Build AOT
         run: flutter build aot
