@@ -15,7 +15,7 @@ class About extends StatelessWidget {
               applicationVersion: "1.0",
               applicationLegalese: "GNU GPLv3",
               children: [
-                _AboutRow("Code source", "Disponible sur GitHub",
+                _AboutRow("Dépôt du code source", "GitHub",
                     "https://github.com/tborlee/points_verts"),
                 _AboutRow("Adresse de contact", "android@alpagaga.dev",
                     "mailto:android@alpagaga.dev?subject=Points Verts"),
@@ -48,7 +48,6 @@ class _AboutRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      dense: true,
       title: Text(label),
       subtitle: buttonLabel != null ? Text(buttonLabel) : null,
       onTap: () {

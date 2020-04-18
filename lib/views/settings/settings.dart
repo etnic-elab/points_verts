@@ -99,7 +99,6 @@ class _SettingsState extends State<Settings> {
     PermissionHandler permissionHandler = PermissionHandler();
     PermissionStatus permission =
         await permissionHandler.checkPermissionStatus(group);
-    print("PermissionStatus is $permission");
     switch (permission) {
       case PermissionStatus.neverAskAgain:
         await permissionHandler.openAppSettings();
