@@ -7,15 +7,9 @@ import '../../models/walk.dart';
 void launchGeoApp(Walk walk) async {
   if (walk.lat != null && walk.long != null) {
     if (Platform.isIOS) {
-      String mapSchema = 'https://maps.apple.com/?q=${walk.lat},${walk.long}';
-      if (await canLaunch(mapSchema)) {
-        await launch(mapSchema);
-      }
+      launchURL('https://maps.apple.com/?q=${walk.lat},${walk.long}');
     } else {
-      String mapSchema = 'geo:${walk.lat},${walk.long}';
-      if (await canLaunch(mapSchema)) {
-        await launch(mapSchema);
-      }
+      launchURL('geo:${walk.lat},${walk.long}');
     }
   }
 }
@@ -33,5 +27,11 @@ int sortWalks(Walk a, Walk b) {
     return -1;
   } else {
     return 1;
+  }
+}
+
+launchURL(url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
   }
 }

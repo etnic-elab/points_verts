@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/openweather.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../tile_icon.dart';
 import 'walk_utils.dart';
@@ -39,7 +38,7 @@ class WalkDetails extends StatelessWidget {
                 "${walk.contactFirstName} ${walk.contactLastName} - ${walk.contactPhoneNumber != null ? walk.contactPhoneNumber : ''}"),
             onTap: () {
               if (walk.contactPhoneNumber != null) {
-                launch("tel:${walk.contactPhoneNumber}");
+                launchURL("tel:${walk.contactPhoneNumber}");
               }
             },
           ),
@@ -75,12 +74,22 @@ class WalkDetails extends StatelessWidget {
       _infoTile(Icons.directions_bike, walk.mountainBike,
           "Parcours suppl. de VTT de +/- 20 km"),
       _infoTile(Icons.local_drink, walk.waterSupply, "Ravitaillement"),
+      _infoTile(
+          Icons.delete, walk.beWapp, "Participe à \"Wallonie Plus Propre\"",
+          url: "https://www.walloniepluspropre.be/")
     ]);
   }
 
-  Widget _infoTile(IconData icon, bool value, String message) {
+  Widget _infoTile(IconData icon, bool value, String message, {String url}) {
     if (value) {
-    return ListTile(leading: TileIcon(Icon(icon)), title: Text(message));
+      return ListTile(
+          leading: TileIcon(Icon(icon)),
+          title: Text(message),
+          onTap: url != null
+              ? () {
+                  launchURL(url);
+                }
+              : null);
     } else {
       return SizedBox.shrink();
     }
