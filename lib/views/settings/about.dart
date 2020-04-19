@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:points_verts/views/walks/walk_utils.dart';
 
 class About extends StatelessWidget {
   @override
@@ -39,19 +39,13 @@ class _AboutRow extends StatelessWidget {
   final String buttonLabel;
   final String url;
 
-  _launchURL(url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(label),
       subtitle: buttonLabel != null ? Text(buttonLabel) : null,
       onTap: () {
-        _launchURL(url);
+        launchURL(url);
       },
     );
   }

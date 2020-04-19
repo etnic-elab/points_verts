@@ -23,20 +23,24 @@ class DBProvider {
         join(await getDatabasesPath(), 'points_verts_database.db'),
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
-        version: 2);
+        version: 3);
   }
 
   void _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, last_updated DATETIME)");
+        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
     await db.execute("CREATE INDEX walks_date_index on walks(date)");
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion == 1) {
       await db.execute(
-          "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, last_updated DATETIME)");
+          "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
       await db.execute("CREATE INDEX walks_date_index on walks(date)");
+    }
+    if (oldVersion == 2) {
+      await db.execute("ALTER TABLE walks ADD COLUMN be_wapp TINYINT default 0");
+      // might need in future versions a better way by deleting and retrieving again all data
     }
   }
 
@@ -107,6 +111,7 @@ class DBProvider {
           bike: maps[i]['bike'] == 1 ? true : false,
           mountainBike: maps[i]['mountain_bike'] == 1 ? true : false,
           waterSupply: maps[i]['water_supply'] == 1 ? true : false,
+          beWapp: maps[i]['be_wapp'] == 1 ? true : false,
           lastUpdated: DateTime.parse(maps[i]['last_updated']));
     });
   }

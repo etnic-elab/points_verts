@@ -30,6 +30,7 @@ class Walk {
       this.bike,
       this.mountainBike,
       this.waterSupply,
+      this.beWapp,
       this.lastUpdated});
 
   final int id;
@@ -55,6 +56,7 @@ class Walk {
   final bool bike;
   final bool mountainBike;
   final bool waterSupply;
+  final bool beWapp;
   final DateTime lastUpdated;
 
   double distance;
@@ -86,6 +88,7 @@ class Walk {
         bike: json['fields']['velo'] == "Oui" ? true : false,
         mountainBike: json['fields']['vtt'] == "Oui" ? true : false,
         waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
+        beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
         lastUpdated: DateTime.parse(json['record_timestamp']));
   }
 
@@ -114,6 +117,7 @@ class Walk {
       'bike': bike ? 1 : 0,
       'mountain_bike': mountainBike ? 1 : 0,
       'water_supply': waterSupply ? 1 : 0,
+      'be_wapp': beWapp ? 1 : 0,
       'last_updated': lastUpdated.toIso8601String()
     };
   }
