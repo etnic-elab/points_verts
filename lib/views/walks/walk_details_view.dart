@@ -7,7 +7,6 @@ import 'package:points_verts/services/mapbox.dart';
 import 'package:points_verts/views/walks/walk_details.dart';
 
 import '../../models/walk.dart';
-import 'walk_utils.dart';
 
 class WalkDetailsView extends StatelessWidget {
   WalkDetailsView(this.walk);
@@ -18,10 +17,6 @@ class WalkDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.directions), onPressed: () => launchGeoApp(walk))
-        ],
         title: FittedBox(
             fit: BoxFit.fitWidth, child: Text("${walk.type} à ${walk.city}")),
       ),
