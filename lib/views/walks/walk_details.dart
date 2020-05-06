@@ -20,19 +20,13 @@ class WalkDetails extends StatelessWidget {
           walk.weathers != null ? _WeatherSection(walk) : SizedBox.shrink(),
           _StatusTile(walk),
           ListTile(
-            leading: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[Icon(Icons.location_on)],
-            ),
+            leading: TileIcon(Icon(Icons.location_on)),
             title: Text(walk.meetingPoint),
             subtitle: _getGeoText(),
             onTap: () => launchGeoApp(walk),
           ),
           ListTile(
-            leading: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[Icon(Icons.group)],
-            ),
+            leading: TileIcon(Icon(Icons.group)),
             title: Text("${walk.organizer}"),
             subtitle: Text(
                 "${walk.contactFirstName} ${walk.contactLastName} - ${walk.contactPhoneNumber != null ? walk.contactPhoneNumber : ''}"),
@@ -44,10 +38,7 @@ class WalkDetails extends StatelessWidget {
           ),
           walk.transport != null
               ? ListTile(
-                  leading: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[Icon(Icons.train)],
-                  ),
+                  leading: TileIcon(Icon(Icons.train)),
                   title: Text(walk.transport))
               : SizedBox.shrink(),
           _infoRow(),

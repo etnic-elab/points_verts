@@ -14,7 +14,7 @@ class GeoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (walk.isCancelled()) {
-      return SizedBox.shrink();
+      return Text("Annulé", style: TextStyle(color: Colors.red));
     } else if (walk.trip != null &&
         walk.trip.distance != null &&
         walk.trip.duration != null) {
