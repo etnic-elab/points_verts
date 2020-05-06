@@ -5,7 +5,7 @@ import 'package:points_verts/models/walk.dart';
 import 'walk_utils.dart';
 
 class GeoButton extends StatelessWidget {
-  GeoButton({this.walk});
+  GeoButton(this.walk);
 
   final Walk walk;
   static final Icon carIcon = Icon(Icons.directions_car);
@@ -15,60 +15,18 @@ class GeoButton extends StatelessWidget {
   Widget build(BuildContext context) {
     if (walk.isCancelled()) {
       return Text("Annulé", style: TextStyle(color: Colors.red));
-    } else if (walk.trip != null &&
-        walk.trip.distance != null &&
-        walk.trip.duration != null) {
-      return _androidDuration();
-    } else if (walk.distance != null) {
-      return _androidDistance();
     } else {
-      return _androidNoLabel(context);
+      String label = walk.getNavigationLabel();
+      if (label != null) {
+        return OutlineButton.icon(
+            padding: EdgeInsets.all(0.0),
+            onPressed: () => launchGeoApp(walk),
+            icon: Icon(Icons.directions_car, size: 15.0),
+            label: Text(label));
+      } else {
+        return IconButton(
+            onPressed: () => launchGeoApp(walk), icon: Icon(Icons.directions));
+      }
     }
-  }
-
-  Widget _androidDuration() {
-    return RaisedButton.icon(
-        icon: carIcon,
-        onPressed: () {
-          launchGeoApp(walk);
-        },
-        label: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            Text(walk.getFormattedDistance()),
-            Text(
-                '${Duration(seconds: walk.trip.duration.round()).inMinutes} min')
-          ],
-        ));
-  }
-
-  Widget _androidDistance() {
-    return RaisedButton.icon(
-        icon: navIcon,
-        onPressed: () {
-          launchGeoApp(walk);
-        },
-        label: Text(walk.getFormattedDistance()));
-  }
-
-  Widget _androidNoLabel(BuildContext context) {
-    return Material(
-      child: Ink(
-        height: 40.0,
-        width: 40.0,
-        decoration: ShapeDecoration(
-          color: Theme.of(context).buttonColor,
-          shape: RoundedRectangleBorder(),
-        ),
-        child: IconButton(
-          tooltip: "Lancer la navigation vers ce point",
-          icon: carIcon,
-          onPressed: () {
-            launchGeoApp(walk);
-          },
-        ),
-      ),
-    );
   }
 }

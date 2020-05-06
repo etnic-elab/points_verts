@@ -142,6 +142,14 @@ class Walk {
     }
   }
 
+  String getNavigationLabel() {
+    if (trip != null && trip.duration != null) {
+      return '${Duration(seconds: trip.duration.round()).inMinutes} min';
+    } else {
+      return getFormattedDistance();
+    }
+  }
+
   bool isPositionable() {
     return long != null && lat != null && !isCancelled();
   }
