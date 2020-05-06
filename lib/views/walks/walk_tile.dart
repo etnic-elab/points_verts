@@ -5,7 +5,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../tile_icon.dart';
-import 'geo_button.dart';
 import '../../models/walk.dart';
 import 'walk_details_view.dart';
 import 'walk_icon.dart';
@@ -21,16 +20,17 @@ class WalkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      dense: smallScreen,
-      leading: _weatherIcon(),
-      title: Text(walk.city),
-      subtitle: Text("${walk.type} - ${walk.province}"),
-      onTap: () => Navigator.push(context, _pageRoute()),
-      trailing: walk.isCancelled()
-          ? Text("Annulé", style: TextStyle(color: Colors.red))
-          : GeoButton(walk: walk),
-    );
+    return Card(
+        elevation: 3.0,
+        margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+          leading: _weatherIcon(),
+          title: Text(walk.city, style: TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: Text("${walk.type} - ${walk.province}"),
+          onTap: () => Navigator.push(context, _pageRoute()),
+          trailing: Icon(Icons.keyboard_arrow_right),
+        ));
   }
 
   Widget _weatherIcon() {
