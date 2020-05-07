@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/openweather.dart';
+import 'package:points_verts/views/walks/outline_icon_button.dart';
 
 import '../tile_icon.dart';
 import 'walk_utils.dart';
@@ -23,18 +24,22 @@ class WalkDetails extends StatelessWidget {
             leading: TileIcon(Icon(Icons.location_on)),
             title: Text(walk.meetingPoint),
             subtitle: _getGeoText(),
-            onTap: () => launchGeoApp(walk),
+            trailing: OutlineIconButton(
+                onPressed: () => launchGeoApp(walk),
+                iconData: Icons.directions),
           ),
           ListTile(
             leading: TileIcon(Icon(Icons.group)),
             title: Text("${walk.organizer}"),
             subtitle: Text(
                 "${walk.contactFirstName} ${walk.contactLastName} - ${walk.contactPhoneNumber != null ? walk.contactPhoneNumber : ''}"),
-            onTap: () {
-              if (walk.contactPhoneNumber != null) {
-                launchURL("tel:${walk.contactPhoneNumber}");
-              }
-            },
+            trailing: OutlineIconButton(
+                onPressed: () {
+                  if (walk.contactPhoneNumber != null) {
+                    launchURL("tel:${walk.contactPhoneNumber}");
+                  }
+                },
+                iconData: Icons.call),
           ),
           walk.transport != null
               ? ListTile(
