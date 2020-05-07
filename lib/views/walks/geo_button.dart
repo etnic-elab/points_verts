@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:points_verts/models/walk.dart';
 
+import 'outline_icon_button.dart';
 import 'walk_utils.dart';
 
 class GeoButton extends StatelessWidget {
@@ -24,8 +25,8 @@ class GeoButton extends StatelessWidget {
             icon: Icon(Icons.directions_car, size: 15.0),
             label: Text(label));
       } else {
-        return IconButton(
-            onPressed: () => launchGeoApp(walk), icon: Icon(Icons.directions));
+        return OutlineIconButton(
+            onPressed: () => launchGeoApp(walk), iconData: Icons.directions);
       }
     }
   }
