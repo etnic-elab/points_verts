@@ -148,7 +148,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
     if (_selectedDate.difference(DateTime.now()).inDays < 5) {
       try {
-        await _retrieveWeathers(await newList);
+        _retrieveWeathers(await newList).then((_) {
+          setState(() {});
+        });
       } catch (err) {
         print("Cannot retrieve weather info: $err");
       }
@@ -172,12 +174,15 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
     walks.sort((a, b) => sortWalks(a, b));
     try {
-      await retrieveTrips(
-          selectedPosition.longitude, selectedPosition.latitude, walks);
+      retrieveTrips(
+              selectedPosition.longitude, selectedPosition.latitude, walks)
+          .then((_) {
+        walks.sort((a, b) => sortWalks(a, b));
+        setState(() {});
+      });
     } catch (err) {
       print("Cannot retrieve trips: $err");
     }
-    walks.sort((a, b) => sortWalks(a, b));
     return walks;
   }
 
@@ -221,7 +226,11 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
               IconButton(
                   icon: Icon(Icons.settings),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(callback: _retrieveData)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Settings(callback: _retrieveData)));
                   }),
             ],
             bottom: TabBar(
