@@ -238,6 +238,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
             ),
           ),
           body: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
               _buildListTab(),
               _buildMapTab(),
