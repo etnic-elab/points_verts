@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/services/database.dart';
@@ -36,6 +37,7 @@ class NotificationManager {
 
   scheduleNextNearestWalk(Walk walk, DateTime walkDate) async {
     try {
+      initializeDateFormatting("fr_BE");
       var androidPlatformChannelSpecifics = AndroidNotificationDetails(
           'NEXT_NEAREST_WALK',
           'Prochain point à proximité',
