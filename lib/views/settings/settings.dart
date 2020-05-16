@@ -144,6 +144,7 @@ class _SettingsState extends State<Settings> {
                       SettingsHomeSelect(_setHome, _removeHome)));
             },
           ),
+          Divider(height: 0.0),
           ListHeader("Notifications"),
           ListTile(
               title: Text(

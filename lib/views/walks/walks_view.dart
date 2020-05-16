@@ -261,6 +261,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return Column(
       children: <Widget>[
         _defineSearchPart(),
+        Divider(height: 0.0),
         Expanded(child: tabContent),
       ],
     );
