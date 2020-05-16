@@ -74,12 +74,12 @@ class WalkResultsMapView extends StatelessWidget {
     } else {
       return SafeArea(
           child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          child: WalkTile(walk),
-          padding: EdgeInsets.only(bottom: 15.0),
-        ),
-      ));
+              alignment: Alignment.bottomCenter,
+              child: Card(
+                child: Container(
+                  child: WalkTile(walk),
+                ),
+              )));
     }
   }
 

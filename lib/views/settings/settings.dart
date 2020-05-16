@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 
 import '../../models/address_suggestion.dart';
@@ -114,13 +115,6 @@ class _SettingsState extends State<Settings> {
     }
   }
 
-  Widget _header(String title) {
-    return Container(
-      child: Text(title, style: Theme.of(context).textTheme.subtitle1),
-      padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 5.0),
-    );
-  }
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -129,7 +123,7 @@ class _SettingsState extends State<Settings> {
       ),
       body: ListView(
         children: <Widget>[
-          _header("Tri des points selon leur emplacement"),
+          ListHeader("Tri des points selon leur emplacement"),
           ListTile(
               title: Text(
                   "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches.",
@@ -154,7 +148,7 @@ class _SettingsState extends State<Settings> {
                       SettingsHomeSelect(_setHome, _removeHome)));
             },
           ),
-          _header("Notifications"),
+          ListHeader("Notifications"),
           ListTile(
               title: Text(
                   "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
