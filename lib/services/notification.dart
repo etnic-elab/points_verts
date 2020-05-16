@@ -125,7 +125,7 @@ Future<void> scheduleNextNearestWalkNotification() async {
       print("Cannot retrieve trips: $err");
     }
     walks.sort((a, b) => sortWalks(a, b));
-    if (walks.length >= 1) {
+    if (walks.length >= 1 && !walks[0].isCancelled()) {
       await NotificationManager.instance
           .scheduleNextNearestWalk(walks[0], dates[0]);
     }
