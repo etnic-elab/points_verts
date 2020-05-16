@@ -77,7 +77,7 @@ class WalkResultsMapView extends StatelessWidget {
         alignment: Alignment.bottomCenter,
         child: Container(
           child: WalkTile(walk),
-          padding: EdgeInsets.only(bottom: 20.0),
+          padding: EdgeInsets.only(bottom: 15.0),
         ),
       ));
     }

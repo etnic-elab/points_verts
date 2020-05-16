@@ -72,7 +72,8 @@ class NotificationManager {
 }
 
 Future<void> scheduleNextNearestWalkNotification() async {
-  bool showNotification = await PrefsProvider.prefs.getBoolean(key: "show_notification", defaultValue: true);
+  bool showNotification = await PrefsProvider.prefs
+      .getBoolean(key: "show_notification", defaultValue: true);
   if (!showNotification) return;
   String homePos = await PrefsProvider.prefs.getString("home_coords");
   String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");

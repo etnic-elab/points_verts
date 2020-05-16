@@ -111,6 +111,13 @@ class _SettingsState extends State<Settings> {
     return permission;
   }
 
+  Widget _header(String title) {
+    return Container(
+      child: Text(title, style: Theme.of(context).textTheme.subtitle1),
+      padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 5.0),
+    );
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -119,7 +126,7 @@ class _SettingsState extends State<Settings> {
       ),
       body: ListView(
         children: <Widget>[
-          ListHeader("Tri des points selon leur emplacement"),
+          _header("Tri des points selon leur emplacement"),
           ListTile(
               title: Text(
                   "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches.",
@@ -144,8 +151,7 @@ class _SettingsState extends State<Settings> {
                       SettingsHomeSelect(_setHome, _removeHome)));
             },
           ),
-          Divider(height: 0.0),
-          ListHeader("Notifications"),
+          _header("Notifications"),
           ListTile(
               title: Text(
                   "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",

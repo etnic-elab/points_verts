@@ -43,6 +43,8 @@ class PrefsProvider {
   Future<bool> getBoolean({String key, bool defaultValue}) async {
     SharedPreferences prefs = await preferences;
     bool result = prefs.getBool(key);
-    return result != null ? result : defaultValue != null ? defaultValue : false;
+    return result != null
+        ? result
+        : defaultValue != null ? defaultValue : false;
   }
 }

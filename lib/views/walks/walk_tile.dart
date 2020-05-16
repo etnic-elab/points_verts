@@ -17,9 +17,8 @@ class WalkTile extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Card(
-        margin: new EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+        margin: new EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
         child: ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
           title: Text(walk.city, style: TextStyle(fontWeight: FontWeight.w500)),
           subtitle: Text("${walk.type} - ${walk.province}"),
           onTap: () => Navigator.push(context, _pageRoute()),

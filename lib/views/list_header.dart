@@ -9,9 +9,8 @@ class ListHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Text(title,
-          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
-      padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
+      child: Text(title, style: Theme.of(context).textTheme.headline6),
+      padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 5.0),
     );
   }
 }
