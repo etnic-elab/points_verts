@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +12,7 @@ import 'mapbox.dart';
 import 'prefs.dart';
 
 const int NEXT_NEAREST_WALK = 0;
+const String TAG = "dev.alpagaga.points_verts.NotificationManager";
 
 class NotificationManager {
   NotificationManager._();
@@ -20,7 +23,7 @@ class NotificationManager {
   Future<FlutterLocalNotificationsPlugin> get plugin async {
     if (_flutterLocalNotificationsPlugin != null)
       return _flutterLocalNotificationsPlugin;
-    print("creating a new plugin instance");
+    log("creating a new plugin instance", name: TAG);
     var initializationSettingsAndroid =
         AndroidInitializationSettings('ic_stat_name');
     var initializationSettingsIOS = IOSInitializationSettings();
@@ -43,10 +46,10 @@ class NotificationManager {
       var iOSPlatformChannelSpecifics = IOSNotificationDetails();
       var platformChannelSpecifics = NotificationDetails(
           androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-      FlutterLocalNotificationsPlugin instance = await plugin;
-      await _flutterLocalNotificationsPlugin.cancel(NEXT_NEAREST_WALK);
+      await cancelNextNearestWalkNotification();
       DateTime scheduledAt = walkDate.subtract(Duration(hours: 4));
       DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
+      FlutterLocalNotificationsPlugin instance = await plugin;
       if (walk.trip != null) {
         await instance.schedule(
             NEXT_NEAREST_WALK,
@@ -64,10 +67,16 @@ class NotificationManager {
             platformChannelSpecifics,
             payload: walk.id.toString());
       }
-      print('Notification scheduled for ${scheduledAt.toString()}');
+      log('Notification scheduled for ${scheduledAt.toString()}', name: TAG);
     } catch (err) {
       print("cannot display notification: $err");
     }
+  }
+
+  Future<void> cancelNextNearestWalkNotification() async {
+    FlutterLocalNotificationsPlugin instance = await plugin;
+    log('Cancelling next nearest walk notification', name: TAG);
+    await instance.cancel(NEXT_NEAREST_WALK);
   }
 }
 

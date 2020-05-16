@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:points_verts/services/notification.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../services/prefs.dart';
@@ -58,6 +59,8 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = label;
     });
+    // schedule/refresh the next notification with this new home location
+    scheduleNextNearestWalkNotification();
     callback(resetDate: false);
   }
 
@@ -67,6 +70,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = null;
     });
+    NotificationManager.instance.cancelNextNearestWalkNotification();
     callback(resetDate: false);
   }
 
@@ -88,6 +92,11 @@ class _SettingsState extends State<Settings> {
 
   Future<void> _setShowNotification(bool newValue) async {
     await PrefsProvider.prefs.setBoolean("show_notification", newValue);
+    if (newValue) {
+      scheduleNextNearestWalkNotification();
+    } else {
+      NotificationManager.instance.cancelNextNearestWalkNotification();
+    }
     setState(() {
       _showNotification = newValue;
     });
