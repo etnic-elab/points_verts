@@ -33,7 +33,7 @@ class WalkResultsListView extends StatelessWidget {
                       return ListHeader(_defineTopHeader());
                     }
                     if (i == 6) {
-                      return ListHeader("Autres points");
+                      return ListHeader("Autres Points");
                     }
                     if (i < 6) {
                       i = i - 1;

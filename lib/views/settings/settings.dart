@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:points_verts/views/list_header.dart';
+import 'package:points_verts/services/notification.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../services/prefs.dart';
@@ -59,6 +60,8 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = label;
     });
+    // schedule/refresh the next notification with this new home location
+    scheduleNextNearestWalkNotification();
     callback(resetDate: false);
   }
 
@@ -68,6 +71,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = null;
     });
+    NotificationManager.instance.cancelNextNearestWalkNotification();
     callback(resetDate: false);
   }
 
@@ -89,26 +93,26 @@ class _SettingsState extends State<Settings> {
 
   Future<void> _setShowNotification(bool newValue) async {
     await PrefsProvider.prefs.setBoolean("show_notification", newValue);
+    if (newValue) {
+      scheduleNextNearestWalkNotification();
+    } else {
+      NotificationManager.instance.cancelNextNearestWalkNotification();
+    }
     setState(() {
       _showNotification = newValue;
     });
   }
 
   Future<PermissionStatus> checkLocationPermission() async {
-    PermissionGroup group = PermissionGroup.locationWhenInUse;
-    PermissionHandler permissionHandler = PermissionHandler();
-    PermissionStatus permission =
-        await permissionHandler.checkPermissionStatus(group);
-    switch (permission) {
-      case PermissionStatus.neverAskAgain:
-        await permissionHandler.openAppSettings();
-        break;
-      case PermissionStatus.denied:
-        Map<PermissionGroup, PermissionStatus> results =
-            await permissionHandler.requestPermissions([group]);
-        return results[group];
+    PermissionStatus status = await Permission.locationWhenInUse.status;
+    if (status.isPermanentlyDenied) {
+      await openAppSettings();
+      return status;
+    } else if (status.isUndetermined || status.isDenied) {
+      return Permission.locationWhenInUse.request();
+    } else {
+      return status;
     }
-    return permission;
   }
 
   Widget build(BuildContext context) {

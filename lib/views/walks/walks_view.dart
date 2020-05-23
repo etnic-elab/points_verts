@@ -238,6 +238,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
             ),
           ),
           body: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
               _buildListTab(),
               _buildMapTab(),
@@ -261,6 +262,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return Column(
       children: <Widget>[
         _defineSearchPart(),
+        Divider(height: 0.0),
         Expanded(child: tabContent),
       ],
     );
