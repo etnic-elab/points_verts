@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class OutlineIconButton extends StatelessWidget {
   OutlineIconButton({this.onPressed, this.iconData});
 
-  @required final VoidCallback onPressed;
-  @required final IconData iconData;
+  @required
+  final VoidCallback onPressed;
+  @required
+  final IconData iconData;
 
   @override
   Widget build(BuildContext context) {

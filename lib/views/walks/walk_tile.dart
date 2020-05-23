@@ -22,7 +22,6 @@ class WalkTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
       leading: _weatherIcon(),
       title: Text(walk.city),
       subtitle: Text("${walk.type} - ${walk.province}"),
@@ -42,6 +41,7 @@ class WalkTile extends StatelessWidget {
             if (snapshot.hasData && snapshot.data.length > 0) {
               Weather weather = snapshot.data[0];
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   getWeatherIcon(weather, context),

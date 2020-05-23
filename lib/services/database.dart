@@ -39,7 +39,8 @@ class DBProvider {
       await db.execute("CREATE INDEX walks_date_index on walks(date)");
     }
     if (oldVersion == 2) {
-      await db.execute("ALTER TABLE walks ADD COLUMN be_wapp TINYINT default 0");
+      await db
+          .execute("ALTER TABLE walks ADD COLUMN be_wapp TINYINT default 0");
       // might need in future versions a better way by deleting and retrieving again all data
     }
   }
