@@ -1,5 +1,6 @@
 import 'package:path/path.dart';
 import 'package:points_verts/models/walk.dart';
+import 'package:points_verts/services/prefs.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:developer';
 
@@ -23,25 +24,24 @@ class DBProvider {
         join(await getDatabasesPath(), 'points_verts_database.db'),
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
-        version: 3);
+        version: 4);
   }
 
-  void _onCreate(Database db, int version) async {
+  Future<void> _createWalkTable(Database db) async {
+    await PrefsProvider.prefs.setString("last_walk_update", null);
+    await db.execute("DROP table IF EXISTS walks");
     await db.execute(
-        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
+        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, entity STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
     await db.execute("CREATE INDEX walks_date_index on walks(date)");
   }
 
+  void _onCreate(Database db, int version) async {
+   await  _createWalkTable(db);
+  }
+
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion == 1) {
-      await db.execute(
-          "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
-      await db.execute("CREATE INDEX walks_date_index on walks(date)");
-    }
-    if (oldVersion == 2) {
-      await db
-          .execute("ALTER TABLE walks ADD COLUMN be_wapp TINYINT default 0");
-      // might need in future versions a better way by deleting and retrieving again all data
+    if (oldVersion <= 3) {
+      await _createWalkTable(db);
     }
   }
 
@@ -89,6 +89,7 @@ class DBProvider {
       return Walk(
           id: maps[i]['id'],
           city: maps[i]['city'],
+          entity: maps[i]['entity'],
           type: maps[i]['type'],
           province: maps[i]['province'],
           date: DateTime.parse(maps[i]['date']),

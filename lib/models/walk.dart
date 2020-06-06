@@ -9,6 +9,7 @@ class Walk {
   Walk(
       {this.id,
       this.city,
+      this.entity,
       this.type,
       this.province,
       this.long,
@@ -35,6 +36,7 @@ class Walk {
 
   final int id;
   final String city;
+  final String entity;
   final String type;
   final String province;
   final DateTime date;
@@ -67,6 +69,7 @@ class Walk {
     return Walk(
         id: json['fields']['id'],
         city: json['fields']['localite'],
+        entity: json['fields']['entite'],
         type: json['fields']['activite'],
         province: json['fields']['province'],
         date: dateFormat.parse(json['fields']['date']),
@@ -96,6 +99,7 @@ class Walk {
     return {
       'id': id,
       'city': city,
+      'entity': entity,
       'type': type,
       'province': province,
       'date': date.toIso8601String(),

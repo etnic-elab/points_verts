@@ -18,7 +18,8 @@ class WalkDetailsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: FittedBox(
-            fit: BoxFit.fitWidth, child: Text("${walk.type} à ${walk.city}")),
+            fit: BoxFit.fitWidth,
+            child: Text("${walk.type} à ${walk.city} (${walk.entity})")),
       ),
       body: OrientationBuilder(
         builder: (context, orientation) {

@@ -63,6 +63,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   Future<void> _retrieveData({bool resetDate = true}) async {
+    // initialize database here in case of migrations
+    await DBProvider.db.database;
     setState(() {
       _currentWalks = null;
       _selectedWalk = null;
