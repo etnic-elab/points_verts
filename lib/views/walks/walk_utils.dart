@@ -9,7 +9,7 @@ void launchGeoApp(Walk walk) async {
     if (Platform.isIOS) {
       launchURL('https://maps.apple.com/?q=${walk.lat},${walk.long}');
     } else {
-      launchURL('geo:${walk.lat},${walk.long}');
+      launchURL('geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})');
     }
   }
 }
