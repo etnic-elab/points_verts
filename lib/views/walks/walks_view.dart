@@ -7,10 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/services/database.dart';
+import 'package:points_verts/views/app_drawer.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/settings/settings.dart';
 import 'package:points_verts/views/walks/place_select.dart';
 import 'package:points_verts/services/prefs.dart';
+import 'package:points_verts/views/directory/walk_directory_view.dart';
 
 import '../../services/adeps.dart';
 import 'dates_dropdown.dart';
@@ -222,19 +224,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return DefaultTabController(
         length: 2,
         child: Scaffold(
+          drawer: AppDrawer(),
           appBar: AppBar(
-            title: Text('Points Verts Adeps'),
-            actions: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Settings(callback: _retrieveData)));
-                  }),
-            ],
+            title: Text('Calendrier'),
             bottom: TabBar(
               tabs: <Widget>[Tab(text: "LISTE"), Tab(text: "CARTE")],
             ),

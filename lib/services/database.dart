@@ -36,7 +36,7 @@ class DBProvider {
   }
 
   void _onCreate(Database db, int version) async {
-   await  _createWalkTable(db);
+    await _createWalkTable(db);
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -78,6 +78,43 @@ class DBProvider {
     final Database db = await database;
     return await db.delete("walks",
         where: 'date < ?', whereArgs: [lastMidnight.toIso8601String()]);
+  }
+
+  Future<List<Walk>> getSortedWalks() async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps =
+        await db.query('walks', orderBy: "city ASC");
+    return List.generate(maps.length, (i) {
+      return Walk(
+          id: maps[i]['id'],
+          city: maps[i]['city'],
+          entity: maps[i]['entity'],
+          type: maps[i]['type'],
+          province: maps[i]['province'],
+          date: DateTime.parse(maps[i]['date']),
+          long: maps[i]['longitude'],
+          lat: maps[i]['latitude'],
+          status: maps[i]['status'],
+          meetingPoint: maps[i]['meeting_point'],
+          organizer: maps[i]['organizer'],
+          contactFirstName: maps[i]['contact_first_name'],
+          contactLastName: maps[i]['contact_last_name'],
+          contactPhoneNumber: maps[i]['contact_phone_number'] != null
+              ? maps[i]['contact_phone_number'].toString()
+              : null,
+          transport: maps[i]['transport'],
+          fifteenKm: maps[i]['fifteen_km'] == 1 ? true : false,
+          wheelchair: maps[i]['wheelchair'] == 1 ? true : false,
+          stroller: maps[i]['stroller'] == 1 ? true : false,
+          extraOrientation: maps[i]['extra_orientation'] == 1 ? true : false,
+          extraWalk: maps[i]['extra_walk'] == 1 ? true : false,
+          guided: maps[i]['guided'] == 1 ? true : false,
+          bike: maps[i]['bike'] == 1 ? true : false,
+          mountainBike: maps[i]['mountain_bike'] == 1 ? true : false,
+          waterSupply: maps[i]['water_supply'] == 1 ? true : false,
+          beWapp: maps[i]['be_wapp'] == 1 ? true : false,
+          lastUpdated: DateTime.parse(maps[i]['last_updated']));
+    });
   }
 
   Future<List<Walk>> getWalks(DateTime date) async {
