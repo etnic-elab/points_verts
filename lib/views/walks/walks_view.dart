@@ -9,10 +9,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/app_drawer.dart';
 import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/settings/settings.dart';
 import 'package:points_verts/views/walks/place_select.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/directory/walk_directory_view.dart';
 
 import '../../services/adeps.dart';
 import 'dates_dropdown.dart';
@@ -24,6 +22,7 @@ import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
 
 enum Places { home, current }
+enum ViewType { list, map }
 
 const String TAG = "dev.alpagaga.points_verts.WalkList";
 
@@ -42,6 +41,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Position _currentPosition;
   Position _homePosition;
   Places _selectedPlace;
+  ViewType _viewType = ViewType.list;
 
   @override
   void initState() {
@@ -221,27 +221,27 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          drawer: AppDrawer(),
-          appBar: AppBar(
-            title: Text('Calendrier'),
-            bottom: TabBar(
-              tabs: <Widget>[Tab(text: "LISTE"), Tab(text: "CARTE")],
-            ),
-          ),
-          body: TabBarView(
-            physics: NeverScrollableScrollPhysics(),
-            children: <Widget>[
-              _buildListTab(),
-              _buildMapTab(),
-            ],
-          ),
-        ));
+    return Scaffold(
+      drawer: AppDrawer(),
+      appBar: AppBar(
+        title: Text('Calendrier'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(_viewType == ViewType.list ? Icons.map : Icons.list),
+            onPressed: () {
+              setState(() {
+                _viewType =
+                    _viewType == ViewType.list ? ViewType.map : ViewType.list;
+              });
+            },
+          )
+        ],
+      ),
+      body: _buildTab(),
+    );
   }
 
-  Widget _buildTab(Widget tabContent) {
+  Widget _buildTab() {
     if (_dates == null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -256,24 +256,18 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return Column(
       children: <Widget>[
         _defineSearchPart(),
-        Divider(height: 0.0),
-        Expanded(child: tabContent),
+        Expanded(
+            child: _viewType == ViewType.list
+                ? WalkResultsListView(_currentWalks, selectedPosition,
+                    _selectedPlace, _retrieveData)
+                : WalkResultsMapView(_currentWalks, selectedPosition,
+                    _selectedPlace, _selectedWalk, (walk) {
+                    setState(() {
+                      _selectedWalk = walk;
+                    });
+                  }, _retrieveData)),
       ],
     );
-  }
-
-  Widget _buildListTab() {
-    return _buildTab(WalkResultsListView(
-        _currentWalks, selectedPosition, _selectedPlace, _retrieveData));
-  }
-
-  Widget _buildMapTab() {
-    return _buildTab(WalkResultsMapView(
-        _currentWalks, selectedPosition, _selectedPlace, _selectedWalk, (walk) {
-      setState(() {
-        _selectedWalk = walk;
-      });
-    }, _retrieveData));
   }
 
   Widget _defineSearchPart() {

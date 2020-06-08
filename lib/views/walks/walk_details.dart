@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/openweather.dart';
@@ -8,6 +9,7 @@ import 'package:points_verts/views/walks/outline_icon_button.dart';
 import '../tile_icon.dart';
 import 'walk_utils.dart';
 
+
 class WalkDetails extends StatelessWidget {
   WalkDetails(this.walk);
 
@@ -15,10 +17,15 @@ class WalkDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
     return Expanded(
       child: ListView(
         children: <Widget>[
           walk.weathers != null ? _WeatherSection(walk) : SizedBox.shrink(),
+          ListTile(
+              leading: TileIcon(Icon(Icons.calendar_today)),
+              title: Text(fullDate.format(walk.date))
+          ),
           _StatusTile(walk),
           ListTile(
             leading: TileIcon(Icon(Icons.location_on)),

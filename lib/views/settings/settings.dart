@@ -13,12 +13,9 @@ import 'about.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
-  Settings({this.callback});
-
-  final Function callback;
 
   @override
-  State<StatefulWidget> createState() => _SettingsState(callback: callback);
+  State<StatefulWidget> createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
@@ -27,9 +24,7 @@ class _SettingsState extends State<Settings> {
   bool _useLocation = false;
   bool _showNotification = false;
 
-  _SettingsState({this.callback});
-
-  Function callback;
+  _SettingsState();
 
   void initState() {
     super.initState();
@@ -63,7 +58,6 @@ class _SettingsState extends State<Settings> {
     });
     // schedule/refresh the next notification with this new home location
     scheduleNextNearestWalkNotification();
-    callback(resetDate: false);
   }
 
   Future<void> _removeHome() async {
@@ -73,7 +67,6 @@ class _SettingsState extends State<Settings> {
       _home = null;
     });
     NotificationManager.instance.cancelNextNearestWalkNotification();
-    callback(resetDate: false);
   }
 
   Future<void> _setUseLocation(bool newValue) async {
@@ -88,7 +81,6 @@ class _SettingsState extends State<Settings> {
       setState(() {
         _useLocation = newValue;
       });
-      callback(resetDate: false);
     }
   }
 

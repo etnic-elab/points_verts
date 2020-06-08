@@ -24,16 +24,11 @@ class AppDrawer extends StatelessWidget {
                       BoxDecoration(color: Theme.of(context).primaryColor),
                   child: Stack(children: <Widget>[
                     Positioned(
-                        bottom: 12.0,
-                        left: 16.0,
-                        child: Row(
-                          children: <Widget>[
-                            Icon(Icons.directions_walk),
-                            Text(" Points Verts Adeps",
-                                style:
-                                    Theme.of(context).primaryTextTheme.headline6),
-                          ],
-                        )),
+                      bottom: 12.0,
+                      left: 16.0,
+                      child: Text(" Points Verts Adeps",
+                          style: Theme.of(context).primaryTextTheme.headline6),
+                    ),
                   ])),
               ListTile(
                 leading: Icon(Icons.calendar_today),
