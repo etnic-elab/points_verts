@@ -76,13 +76,14 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
 Future<List<AddressSuggestion>> retrieveSuggestions(String search) async {
   if (search.isNotEmpty) {
     final String url =
-        "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token&country=BE&language=fr_BE&limit=10&types=address";
+        "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token&country=BE&language=fr_BE&limit=10&types=address,poi";
     final http.Response response = await http.get(url);
     var decoded = json.decode(response.body);
     List<AddressSuggestion> results = List<AddressSuggestion>();
     if (decoded['features'] != null) {
       for (var result in decoded['features']) {
         results.add(AddressSuggestion(
+          text: result['text'],
             address: result['place_name'],
             longitude: result['center'][0],
             latitude: result['center'][1]));
