@@ -85,35 +85,7 @@ class DBProvider {
     final List<Map<String, dynamic>> maps =
         await db.query('walks', orderBy: "city ASC");
     return List.generate(maps.length, (i) {
-      return Walk(
-          id: maps[i]['id'],
-          city: maps[i]['city'],
-          entity: maps[i]['entity'],
-          type: maps[i]['type'],
-          province: maps[i]['province'],
-          date: DateTime.parse(maps[i]['date']),
-          long: maps[i]['longitude'],
-          lat: maps[i]['latitude'],
-          status: maps[i]['status'],
-          meetingPoint: maps[i]['meeting_point'],
-          organizer: maps[i]['organizer'],
-          contactFirstName: maps[i]['contact_first_name'],
-          contactLastName: maps[i]['contact_last_name'],
-          contactPhoneNumber: maps[i]['contact_phone_number'] != null
-              ? maps[i]['contact_phone_number'].toString()
-              : null,
-          transport: maps[i]['transport'],
-          fifteenKm: maps[i]['fifteen_km'] == 1 ? true : false,
-          wheelchair: maps[i]['wheelchair'] == 1 ? true : false,
-          stroller: maps[i]['stroller'] == 1 ? true : false,
-          extraOrientation: maps[i]['extra_orientation'] == 1 ? true : false,
-          extraWalk: maps[i]['extra_walk'] == 1 ? true : false,
-          guided: maps[i]['guided'] == 1 ? true : false,
-          bike: maps[i]['bike'] == 1 ? true : false,
-          mountainBike: maps[i]['mountain_bike'] == 1 ? true : false,
-          waterSupply: maps[i]['water_supply'] == 1 ? true : false,
-          beWapp: maps[i]['be_wapp'] == 1 ? true : false,
-          lastUpdated: DateTime.parse(maps[i]['last_updated']));
+      return _fromDb(maps, i);
     });
   }
 
@@ -123,35 +95,39 @@ class DBProvider {
     final List<Map<String, dynamic>> maps = await db
         .query('walks', where: 'date = ?', whereArgs: [date.toIso8601String()]);
     return List.generate(maps.length, (i) {
-      return Walk(
-          id: maps[i]['id'],
-          city: maps[i]['city'],
-          entity: maps[i]['entity'],
-          type: maps[i]['type'],
-          province: maps[i]['province'],
-          date: DateTime.parse(maps[i]['date']),
-          long: maps[i]['longitude'],
-          lat: maps[i]['latitude'],
-          status: maps[i]['status'],
-          meetingPoint: maps[i]['meeting_point'],
-          organizer: maps[i]['organizer'],
-          contactFirstName: maps[i]['contact_first_name'],
-          contactLastName: maps[i]['contact_last_name'],
-          contactPhoneNumber: maps[i]['contact_phone_number'] != null
-              ? maps[i]['contact_phone_number'].toString()
-              : null,
-          transport: maps[i]['transport'],
-          fifteenKm: maps[i]['fifteen_km'] == 1 ? true : false,
-          wheelchair: maps[i]['wheelchair'] == 1 ? true : false,
-          stroller: maps[i]['stroller'] == 1 ? true : false,
-          extraOrientation: maps[i]['extra_orientation'] == 1 ? true : false,
-          extraWalk: maps[i]['extra_walk'] == 1 ? true : false,
-          guided: maps[i]['guided'] == 1 ? true : false,
-          bike: maps[i]['bike'] == 1 ? true : false,
-          mountainBike: maps[i]['mountain_bike'] == 1 ? true : false,
-          waterSupply: maps[i]['water_supply'] == 1 ? true : false,
-          beWapp: maps[i]['be_wapp'] == 1 ? true : false,
-          lastUpdated: DateTime.parse(maps[i]['last_updated']));
+      return _fromDb(maps, i);
     });
+  }
+
+  Walk _fromDb(List<Map<String, dynamic>> maps, int i) {
+    return Walk(
+        id: maps[i]['id'],
+        city: maps[i]['city'],
+        entity: maps[i]['entity'],
+        type: maps[i]['type'],
+        province: maps[i]['province'],
+        date: DateTime.parse(maps[i]['date']),
+        long: maps[i]['longitude'],
+        lat: maps[i]['latitude'],
+        status: maps[i]['status'],
+        meetingPoint: maps[i]['meeting_point'],
+        organizer: maps[i]['organizer'],
+        contactFirstName: maps[i]['contact_first_name'],
+        contactLastName: maps[i]['contact_last_name'],
+        contactPhoneNumber: maps[i]['contact_phone_number'] != null
+            ? maps[i]['contact_phone_number'].toString()
+            : null,
+        transport: maps[i]['transport'],
+        fifteenKm: maps[i]['fifteen_km'] == 1 ? true : false,
+        wheelchair: maps[i]['wheelchair'] == 1 ? true : false,
+        stroller: maps[i]['stroller'] == 1 ? true : false,
+        extraOrientation: maps[i]['extra_orientation'] == 1 ? true : false,
+        extraWalk: maps[i]['extra_walk'] == 1 ? true : false,
+        guided: maps[i]['guided'] == 1 ? true : false,
+        bike: maps[i]['bike'] == 1 ? true : false,
+        mountainBike: maps[i]['mountain_bike'] == 1 ? true : false,
+        waterSupply: maps[i]['water_supply'] == 1 ? true : false,
+        beWapp: maps[i]['be_wapp'] == 1 ? true : false,
+        lastUpdated: DateTime.parse(maps[i]['last_updated']));
   }
 }
