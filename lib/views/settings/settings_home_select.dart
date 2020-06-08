@@ -94,8 +94,8 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                   itemBuilder: (context, i) {
                     AddressSuggestion suggestion = suggestions[i];
                     return ListTile(
-                        title: Text(suggestion.address),
-                        dense: true,
+                        title: Text(suggestion.text),
+                        subtitle: Text(suggestion.address, overflow: TextOverflow.ellipsis),
                         onTap: () {
                           setHomeCallback(suggestion);
                           _homeSearchController
