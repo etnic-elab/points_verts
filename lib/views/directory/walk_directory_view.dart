@@ -3,10 +3,12 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/loading.dart';
+import 'package:points_verts/views/tile_icon.dart';
+import 'package:points_verts/views/walks/walk_icon.dart';
 import '../../models/walk.dart';
 import '../walks/walk_details_view.dart';
 
-DateFormat fullDate = DateFormat("dd/MM/yy", "fr_BE");
+DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
 class WalkDirectoryView extends StatefulWidget {
   @override
@@ -56,9 +58,8 @@ class _DirectoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
+    return ListView.builder(
       itemBuilder: (context, index) => _DirectoryTile(walks[index]),
-      separatorBuilder: (context, index) => Divider(),
       itemCount: walks.length,
     );
   }
@@ -74,9 +75,16 @@ class _DirectoryTile extends StatelessWidget {
     return ListTile(
         onTap: () => Navigator.push(context,
             MaterialPageRoute(builder: (context) => WalkDetailsView(walk))),
-        title: Text("${walk.city} (${walk.entity})"),
+        leading: TileIcon(WalkIcon(walk)),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(fullDate.format(walk.date)),
+          ],
+        ),
+        title: Text("${walk.city} (${walk.entity})", overflow: TextOverflow.ellipsis),
         subtitle: Text(
-            "${fullDate.format(walk.date)} ${walk.type} - ${walk.contactLastName} ${walk.contactFirstName} : ${walk.contactPhoneNumber}"));
+            "${walk.contactLastName} ${walk.contactFirstName} : ${walk.contactPhoneNumber}"));
   }
 }
 

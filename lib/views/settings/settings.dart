@@ -12,7 +12,6 @@ import 'about.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() => _SettingsState();
 }
@@ -118,7 +117,7 @@ class _SettingsState extends State<Settings> {
           ListHeader("Tri des points selon leur emplacement"),
           ListTile(
               title: Text(
-                  "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches.",
+                  "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",
                   style: Theme.of(context).textTheme.caption)),
           SwitchListTile(
             secondary: TileIcon(Icon(Icons.location_on)),
