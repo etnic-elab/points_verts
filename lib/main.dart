@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.calendar_today), title: Text("Calendrier")),
             BottomNavigationBarItem(
-                icon: Icon(Icons.format_list_bulleted),
+                icon: Icon(Icons.import_contacts),
                 title: Text("Annuaire")),
             BottomNavigationBarItem(
                 icon: Icon(Icons.settings), title: Text("Paramètres")),

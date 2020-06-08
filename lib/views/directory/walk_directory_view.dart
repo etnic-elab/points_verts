@@ -89,6 +89,9 @@ class _DataSearch extends SearchDelegate<String> {
   ThemeData appBarTheme(BuildContext context) => Theme.of(context);
 
   @override
+  String get searchFieldLabel => 'Rechercher';
+
+  @override
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
