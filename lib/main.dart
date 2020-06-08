@@ -2,7 +2,9 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:points_verts/services/notification.dart';
+import 'package:points_verts/views/directory/walk_directory_view.dart';
 
+import 'views/settings/settings.dart';
 import 'views/walks/walks_view.dart';
 
 void backgroundFetchHeadlessTask(String taskId) async {
@@ -29,11 +31,19 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  int _selectedIndex = 0;
+
   @override
   void initState() {
     print('Initializing MyApp');
     super.initState();
     initPlatformState();
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -45,8 +55,33 @@ class _MyAppState extends State<MyApp> {
       ),
       darkTheme:
           ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
-      home: WalksView(),
+      home: Scaffold(
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_today), title: Text("Calendrier")),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.format_list_bulleted),
+                title: Text("Annuaire")),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.settings), title: Text("Paramètres")),
+          ],
+        ),
+        body: _screen(),
+      ),
     );
+  }
+
+  Widget _screen() {
+    if (_selectedIndex == 0) {
+      return WalksView();
+    } else if (_selectedIndex == 1) {
+      return WalkDirectoryView();
+    } else {
+      return Settings();
+    }
   }
 
   Future<void> initPlatformState() async {

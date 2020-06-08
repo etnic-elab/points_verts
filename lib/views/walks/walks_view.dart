@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/views/app_drawer.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/place_select.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -222,7 +221,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: AppDrawer(),
       appBar: AppBar(
         title: Text('Calendrier'),
         actions: <Widget>[

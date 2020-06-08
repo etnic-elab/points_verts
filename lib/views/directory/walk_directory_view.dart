@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/views/app_drawer.dart';
 import 'package:points_verts/views/loading.dart';
 import '../../models/walk.dart';
 import '../walks/walk_details_view.dart';
@@ -24,7 +23,6 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Scaffold(
-              drawer: AppDrawer(),
               appBar: AppBar(
                 title: Text("Annuaire"),
                 actions: <Widget>[
@@ -42,7 +40,6 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
             );
           } else {
             return Scaffold(
-                drawer: AppDrawer(),
                 appBar: AppBar(
                   title: Text("Annuaire"),
                 ),
