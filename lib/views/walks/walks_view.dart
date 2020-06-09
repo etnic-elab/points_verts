@@ -11,7 +11,6 @@ import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/place_select.dart';
 import 'package:points_verts/services/prefs.dart';
 
-import '../../services/adeps.dart';
 import 'dates_dropdown.dart';
 import '../../services/mapbox.dart';
 import '../../services/openweather.dart';
@@ -64,7 +63,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
   }
 
-
   void _firstLaunch() async {
     bool firstLaunch = await PrefsProvider.prefs
         .getBoolean(key: 'first_launch', defaultValue: true);
@@ -95,37 +93,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       _currentPosition = null;
       _homePosition = null;
     });
-    String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
-    DateTime now = DateTime.now().toUtc();
-    if (lastUpdate == null) {
-      try {
-        List<Walk> newWalks = await fetchAllWalks();
-        if (newWalks.isNotEmpty) {
-          await DBProvider.db.insertWalks(newWalks);
-          PrefsProvider.prefs
-              .setString("last_walk_update", now.toIso8601String());
-        }
-      } catch (err) {
-        print("Cannot fetch walks list: $err");
-      }
-    } else {
-      DateTime lastUpdateDate = DateTime.parse(lastUpdate);
-      if (now.difference(lastUpdateDate) > Duration(hours: 1)) {
-        try {
-          List<Walk> updatedWalks = await refreshAllWalks(lastUpdate);
-          if (updatedWalks.isNotEmpty) {
-            await DBProvider.db.insertWalks(updatedWalks);
-          }
-          PrefsProvider.prefs
-              .setString("last_walk_update", now.toIso8601String());
-        } catch (err) {
-          print("Cannot refresh walks list: $err");
-        }
-      } else {
-        log("Not refreshing walks list since it has been done less than an hour ago",
-            name: TAG);
-      }
-    }
+    await updateWalks();
     _retrieveDates(resetDate: resetDate);
   }
 

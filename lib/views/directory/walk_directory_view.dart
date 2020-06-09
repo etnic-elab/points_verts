@@ -5,6 +5,7 @@ import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/tile_icon.dart';
 import 'package:points_verts/views/walks/walk_icon.dart';
+import 'package:points_verts/views/walks/walk_utils.dart';
 import '../../models/walk.dart';
 import '../walks/walk_details_view.dart';
 
@@ -16,7 +17,20 @@ class WalkDirectoryView extends StatefulWidget {
 }
 
 class _WalkDirectoryViewState extends State<WalkDirectoryView> {
-  final Future<List<Walk>> walks = DBProvider.db.getSortedWalks();
+  Future<List<Walk>> walks;
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
+
+  void init() async {
+    await updateWalks();
+    setState(() {
+      walks = DBProvider.db.getSortedWalks();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
