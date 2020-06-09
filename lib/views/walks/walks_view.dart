@@ -32,6 +32,7 @@ class WalksView extends StatefulWidget {
 
 class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   Future<List<DateTime>> _dates;
   Future<List<Walk>> _currentWalks;
@@ -60,6 +61,28 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _retrieveData(resetDate: false);
+    }
+  }
+
+
+  void _firstLaunch() async {
+    bool firstLaunch = await PrefsProvider.prefs
+        .getBoolean(key: 'first_launch', defaultValue: true);
+    if (firstLaunch) {
+      _scaffoldKey.currentState.removeCurrentSnackBar();
+      final snackBar = SnackBar(
+          duration: Duration(days: 1),
+          action: SnackBarAction(
+            onPressed: () {
+              PrefsProvider.prefs.setBoolean("first_launch", false);
+              _scaffoldKey.currentState.hideCurrentSnackBar();
+            },
+            label: "OK",
+          ),
+          content: const Text(
+              "Pour voir en un coup d'œil les marches les plus proches de chez vous, n'hésitez pas à indiquer votre adresse dans les Paramètres !",
+              textAlign: TextAlign.justify));
+      _scaffoldKey.currentState.showSnackBar(snackBar);
     }
   }
 
@@ -220,7 +243,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    _firstLaunch();
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Calendrier'),
         actions: <Widget>[
