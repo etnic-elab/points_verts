@@ -24,7 +24,7 @@ class WalkDetails extends StatelessWidget {
           walk.weathers != null ? _WeatherSection(walk) : SizedBox.shrink(),
           ListTile(
               leading: TileIcon(Icon(Icons.calendar_today)),
-              title: Text(fullDate.format(walk.date))
+              title: Text(toBeginningOfSentenceCase(fullDate.format(walk.date)))
           ),
           _StatusTile(walk),
           ListTile(
