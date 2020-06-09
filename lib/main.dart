@@ -2,6 +2,7 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:points_verts/services/notification.dart';
+import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/directory/walk_directory_view.dart';
 
 import 'views/settings/settings.dart';
@@ -31,6 +32,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   int _selectedIndex = 0;
 
   @override
@@ -46,6 +49,26 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void _firstLaunch() async {
+    bool firstLaunch = await PrefsProvider.prefs
+        .getBoolean(key: 'first_launch', defaultValue: true);
+    if (firstLaunch) {
+      PrefsProvider.prefs.setBoolean("first_launch", false);
+      final snackBar = SnackBar(
+          duration: Duration(days: 1),
+          action: SnackBarAction(
+            onPressed: () {
+              _scaffoldKey.currentState.hideCurrentSnackBar();
+            },
+            label: "OK",
+          ),
+          content: const Text(
+              "Pour voir en un coup d'oeil les marches les plus proches de chez vous, n'hésitez pas à indiquer votre adresse ou à partager votre position dans les Paramètres.",
+              textAlign: TextAlign.justify));
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -56,6 +79,7 @@ class _MyAppState extends State<MyApp> {
       darkTheme:
           ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
       home: Scaffold(
+        key: _scaffoldKey,
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
@@ -63,8 +87,7 @@ class _MyAppState extends State<MyApp> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.calendar_today), title: Text("Calendrier")),
             BottomNavigationBarItem(
-                icon: Icon(Icons.import_contacts),
-                title: Text("Annuaire")),
+                icon: Icon(Icons.import_contacts), title: Text("Annuaire")),
             BottomNavigationBarItem(
                 icon: Icon(Icons.settings), title: Text("Paramètres")),
           ],
@@ -75,6 +98,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _screen() {
+    _firstLaunch();
     if (_selectedIndex == 0) {
       return WalksView();
     } else if (_selectedIndex == 1) {
