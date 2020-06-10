@@ -24,14 +24,14 @@ class DBProvider {
         join(await getDatabasesPath(), 'points_verts_database.db'),
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
-        version: 4);
+        version: 5);
   }
 
   Future<void> _createWalkTable(Database db) async {
     await PrefsProvider.prefs.setString("last_walk_update", null);
     await db.execute("DROP table IF EXISTS walks");
     await db.execute(
-        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, entity STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
+        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, entity STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, meeting_point_info STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
     await db.execute("CREATE INDEX walks_date_index on walks(date)");
   }
 
@@ -40,7 +40,7 @@ class DBProvider {
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion <= 3) {
+    if (oldVersion <= 4) {
       await _createWalkTable(db);
     }
   }
@@ -111,6 +111,7 @@ class DBProvider {
         lat: maps[i]['latitude'],
         status: maps[i]['status'],
         meetingPoint: maps[i]['meeting_point'],
+        meetingPointInfo: maps[i]['meeting_point_info'],
         organizer: maps[i]['organizer'],
         contactFirstName: maps[i]['contact_first_name'],
         contactLastName: maps[i]['contact_last_name'],
