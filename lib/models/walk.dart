@@ -17,6 +17,7 @@ class Walk {
       this.date,
       this.status,
       this.meetingPoint,
+      this.meetingPointInfo,
       this.organizer,
       this.contactFirstName,
       this.contactLastName,
@@ -44,6 +45,7 @@ class Walk {
   final double lat;
   final String status;
   final String meetingPoint;
+  final String meetingPointInfo;
   final String organizer;
   final String contactFirstName;
   final String contactLastName;
@@ -77,6 +79,7 @@ class Walk {
         lat: json['fields']['geopoint'][0],
         status: json['fields']['statut'],
         meetingPoint: json['fields']['lieu_de_rendez_vous'],
+        meetingPointInfo: json['fields']['infos_rendez_vous'],
         organizer: json['fields']['groupement'],
         contactFirstName: json['fields']['prenom'],
         contactLastName: json['fields']['nom'],
@@ -107,6 +110,7 @@ class Walk {
       'latitude': lat,
       'status': status,
       'meeting_point': meetingPoint,
+      'meeting_point_info': meetingPointInfo,
       'organizer': organizer,
       'contact_first_name': contactFirstName,
       'contact_last_name': contactLastName,

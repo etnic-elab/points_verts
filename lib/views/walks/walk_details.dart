@@ -24,17 +24,23 @@ class WalkDetails extends StatelessWidget {
           walk.weathers != null ? _WeatherSection(walk) : SizedBox.shrink(),
           ListTile(
               leading: TileIcon(Icon(Icons.calendar_today)),
-              title: Text(toBeginningOfSentenceCase(fullDate.format(walk.date)))
-          ),
+              title:
+                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date)))),
           _StatusTile(walk),
           ListTile(
             leading: TileIcon(Icon(Icons.location_on)),
             title: Text(walk.meetingPoint),
+            isThreeLine: walk.meetingPointInfo != null && (walk.trip != null || walk.distance != null),
             subtitle: _getGeoText(),
             trailing: OutlineIconButton(
                 onPressed: () => launchGeoApp(walk),
                 iconData: Icons.directions),
           ),
+          walk.meetingPointInfo != null
+              ? ListTile(
+                  leading: TileIcon(Icon(Icons.info)),
+                  title: Text(walk.meetingPointInfo))
+              : SizedBox.shrink(),
           ListTile(
             leading: TileIcon(Icon(Icons.group)),
             title: Text("${walk.organizer}"),
@@ -99,13 +105,20 @@ class WalkDetails extends StatelessWidget {
   }
 
   Widget _getGeoText() {
+    String info = walk.meetingPointInfo;
+    String geo;
     if (walk.trip != null) {
-      return Text(
-          "À ${walk.getFormattedDistance()}, ~${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture");
+      geo =
+          "À ${walk.getFormattedDistance()}, ~${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture";
     } else if (walk.distance != null && walk.distance != double.maxFinite) {
-      return Text("À ${walk.getFormattedDistance()} (à vol d'oiseau)");
+      geo = "À ${walk.getFormattedDistance()} (à vol d'oiseau)";
+    }
+    if (geo != null && info != null) {
+      return Text("$info\n$geo");
+    } else if (geo != null) {
+      return Text(geo);
     } else {
-      return null;
+      return Text(info);
     }
   }
 }

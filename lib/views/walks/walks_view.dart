@@ -139,6 +139,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     Future<List<Walk>> newList = DBProvider.db.getWalks(_selectedDate);
     if (selectedPosition != null) {
       newList = _calculateDistances(await newList);
+    } else {
+      (await newList).sort((a, b) => sortWalks(a, b));
     }
     if (_selectedDate.difference(DateTime.now()).inDays < 5) {
       try {
