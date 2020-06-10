@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:points_verts/services/notification.dart';
 
-import 'views/walks/walks_view.dart';
+import 'package:points_verts/walks_home_screen.dart';
 
 void backgroundFetchHeadlessTask(String taskId) async {
   print('[BackgroundFetch] Headless event received.');
@@ -45,7 +45,7 @@ class _MyAppState extends State<MyApp> {
       ),
       darkTheme:
           ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
-      home: WalksView(),
+      home: WalksHomeScreen(),
     );
   }
 

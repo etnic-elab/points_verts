@@ -8,11 +8,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/settings/settings.dart';
 import 'package:points_verts/views/walks/place_select.dart';
 import 'package:points_verts/services/prefs.dart';
 
-import '../../services/adeps.dart';
 import 'dates_dropdown.dart';
 import '../../services/mapbox.dart';
 import '../../services/openweather.dart';
@@ -22,6 +20,7 @@ import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
 
 enum Places { home, current }
+enum ViewType { list, map }
 
 const String TAG = "dev.alpagaga.points_verts.WalkList";
 
@@ -32,6 +31,7 @@ class WalksView extends StatefulWidget {
 
 class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   Future<List<DateTime>> _dates;
   Future<List<Walk>> _currentWalks;
@@ -40,6 +40,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Position _currentPosition;
   Position _homePosition;
   Places _selectedPlace;
+  ViewType _viewType = ViewType.list;
 
   @override
   void initState() {
@@ -62,6 +63,27 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
   }
 
+  void _firstLaunch() async {
+    bool firstLaunch = await PrefsProvider.prefs
+        .getBoolean(key: 'first_launch', defaultValue: true);
+    if (firstLaunch) {
+      _scaffoldKey.currentState.removeCurrentSnackBar();
+      final snackBar = SnackBar(
+          duration: Duration(days: 1),
+          action: SnackBarAction(
+            onPressed: () {
+              PrefsProvider.prefs.setBoolean("first_launch", false);
+              _scaffoldKey.currentState.hideCurrentSnackBar();
+            },
+            label: "OK",
+          ),
+          content: const Text(
+              "Pour voir en un coup d'œil les marches les plus proches de chez vous, n'hésitez pas à indiquer votre adresse dans les Paramètres !",
+              textAlign: TextAlign.justify));
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    }
+  }
+
   Future<void> _retrieveData({bool resetDate = true}) async {
     // initialize database here in case of migrations
     await DBProvider.db.database;
@@ -71,37 +93,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       _currentPosition = null;
       _homePosition = null;
     });
-    String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
-    DateTime now = DateTime.now().toUtc();
-    if (lastUpdate == null) {
-      try {
-        List<Walk> newWalks = await fetchAllWalks();
-        if (newWalks.isNotEmpty) {
-          await DBProvider.db.insertWalks(newWalks);
-          PrefsProvider.prefs
-              .setString("last_walk_update", now.toIso8601String());
-        }
-      } catch (err) {
-        print("Cannot fetch walks list: $err");
-      }
-    } else {
-      DateTime lastUpdateDate = DateTime.parse(lastUpdate);
-      if (now.difference(lastUpdateDate) > Duration(hours: 1)) {
-        try {
-          List<Walk> updatedWalks = await refreshAllWalks(lastUpdate);
-          if (updatedWalks.isNotEmpty) {
-            await DBProvider.db.insertWalks(updatedWalks);
-          }
-          PrefsProvider.prefs
-              .setString("last_walk_update", now.toIso8601String());
-        } catch (err) {
-          print("Cannot refresh walks list: $err");
-        }
-      } else {
-        log("Not refreshing walks list since it has been done less than an hour ago",
-            name: TAG);
-      }
-    }
+    await updateWalks();
     _retrieveDates(resetDate: resetDate);
   }
 
@@ -219,37 +211,28 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Points Verts Adeps'),
-            actions: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Settings(callback: _retrieveData)));
-                  }),
-            ],
-            bottom: TabBar(
-              tabs: <Widget>[Tab(text: "LISTE"), Tab(text: "CARTE")],
-            ),
-          ),
-          body: TabBarView(
-            physics: NeverScrollableScrollPhysics(),
-            children: <Widget>[
-              _buildListTab(),
-              _buildMapTab(),
-            ],
-          ),
-        ));
+    _firstLaunch();
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text('Calendrier'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(_viewType == ViewType.list ? Icons.map : Icons.list),
+            onPressed: () {
+              setState(() {
+                _viewType =
+                    _viewType == ViewType.list ? ViewType.map : ViewType.list;
+              });
+            },
+          )
+        ],
+      ),
+      body: _buildTab(),
+    );
   }
 
-  Widget _buildTab(Widget tabContent) {
+  Widget _buildTab() {
     if (_dates == null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -264,24 +247,18 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return Column(
       children: <Widget>[
         _defineSearchPart(),
-        Divider(height: 0.0),
-        Expanded(child: tabContent),
+        Expanded(
+            child: _viewType == ViewType.list
+                ? WalkResultsListView(_currentWalks, selectedPosition,
+                    _selectedPlace, _retrieveData)
+                : WalkResultsMapView(_currentWalks, selectedPosition,
+                    _selectedPlace, _selectedWalk, (walk) {
+                    setState(() {
+                      _selectedWalk = walk;
+                    });
+                  }, _retrieveData)),
       ],
     );
-  }
-
-  Widget _buildListTab() {
-    return _buildTab(WalkResultsListView(
-        _currentWalks, selectedPosition, _selectedPlace, _retrieveData));
-  }
-
-  Widget _buildMapTab() {
-    return _buildTab(WalkResultsMapView(
-        _currentWalks, selectedPosition, _selectedPlace, _selectedWalk, (walk) {
-      setState(() {
-        _selectedWalk = walk;
-      });
-    }, _retrieveData));
   }
 
   Widget _defineSearchPart() {
