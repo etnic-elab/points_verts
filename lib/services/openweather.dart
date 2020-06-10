@@ -27,7 +27,7 @@ Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
         results.add(_createWeather(forecast));
       }
     }
-    return results;
+    return results.isNotEmpty ? results : null;
   }
 
   return null;
