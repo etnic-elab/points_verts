@@ -5,6 +5,7 @@ import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/tile_icon.dart';
 import 'package:points_verts/views/walks/walk_icon.dart';
+import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 import '../../models/walk.dart';
 import '../walks/walk_details_view.dart';
@@ -26,6 +27,9 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
   }
 
   void init() async {
+    setState(() {
+      walks = null;
+    });
     await updateWalks();
     setState(() {
       walks = DBProvider.db.getSortedWalks();
@@ -38,26 +42,27 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
         future: walks,
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
+            List<Walk> walks = snapshot.data;
             return Scaffold(
               appBar: AppBar(
-                title: Text("Annuaire"),
+                title: const Text("Annuaire"),
                 actions: <Widget>[
                   IconButton(
                     icon: Icon(Icons.search),
                     onPressed: () {
                       showSearch(
-                          context: context,
-                          delegate: _DataSearch(snapshot.data));
+                          context: context, delegate: _DataSearch(walks));
                     },
                   )
                 ],
               ),
-              body: _DirectoryList(snapshot.data),
+              body: walks.isNotEmpty ? _DirectoryList(walks) : WalkListError(
+                  init),
             );
           } else {
             return Scaffold(
                 appBar: AppBar(
-                  title: Text("Annuaire"),
+                  title: const Text("Annuaire"),
                 ),
                 body: Loading());
           }
@@ -96,7 +101,8 @@ class _DirectoryTile extends StatelessWidget {
             Text(fullDate.format(walk.date)),
           ],
         ),
-        title: Text("${walk.city} (${walk.entity})", overflow: TextOverflow.ellipsis),
+        title: Text("${walk.city} (${walk.entity})",
+            overflow: TextOverflow.ellipsis),
         subtitle: Text(
             "${walk.contactLastName} ${walk.contactFirstName} : ${walk.contactPhoneNumber}"));
   }
