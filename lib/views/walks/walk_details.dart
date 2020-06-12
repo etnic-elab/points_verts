@@ -117,8 +117,10 @@ class WalkDetails extends StatelessWidget {
       return Text("$info\n$geo");
     } else if (geo != null) {
       return Text(geo);
-    } else {
+    } else if (info != null) {
       return Text(info);
+    } else {
+      return null;
     }
   }
 }
