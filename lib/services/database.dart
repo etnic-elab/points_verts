@@ -31,8 +31,9 @@ class DBProvider {
     await PrefsProvider.prefs.setString("last_walk_update", null);
     await db.execute("DROP table IF EXISTS walks");
     await db.execute(
-        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city STRING, entity STRING, type STRING, province STRING, date DATE, longitude DOUBLE, latitude DOUBLE, status STRING, meeting_point STRING, meeting_point_info STRING, organizer STRING, contact_first_name STRING, contact_last_name STRING, contact_phone_number STRING, transport STRING, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
+        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city TEXT, entity TEXT, type TEXT, province TEXT, date DATE, longitude DOUBLE, latitude DOUBLE, status TEXT, meeting_point TEXT, meeting_point_info TEXT, organizer TEXT, contact_first_name TEXT, contact_last_name TEXT, contact_phone_number TEXT, transport TEXT, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
     await db.execute("CREATE INDEX walks_date_index on walks(date)");
+    await db.execute("CREATE INDEX walks_city_index on walks(city)");
   }
 
   void _onCreate(Database db, int version) async {
