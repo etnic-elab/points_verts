@@ -161,4 +161,8 @@ class Walk {
   bool isPositionable() {
     return long != null && lat != null && !isCancelled();
   }
+
+  String getContactLabel() {
+    return "$contactLastName $contactFirstName : $contactPhoneNumber";
+  }
 }

@@ -42,7 +42,7 @@ class WalkResultsListView extends StatelessWidget {
                     }
                   }
                   if (snapshot.data.length > i) {
-                    return WalkTile(snapshot.data[i]);
+                    return WalkTile(snapshot.data[i], TileType.calendar);
                   } else {
                     return SizedBox.shrink();
                   }

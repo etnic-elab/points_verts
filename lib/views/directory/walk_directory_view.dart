@@ -3,12 +3,10 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/tile_icon.dart';
-import 'package:points_verts/views/walks/walk_icon.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
+import 'package:points_verts/views/walks/walk_tile.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 import '../../models/walk.dart';
-import '../walks/walk_details_view.dart';
 
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
@@ -56,8 +54,9 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                   )
                 ],
               ),
-              body: walks.isNotEmpty ? _DirectoryList(walks) : WalkListError(
-                  init),
+              body: walks.isNotEmpty
+                  ? _DirectoryList(walks)
+                  : WalkListError(init),
             );
           } else {
             return Scaffold(
@@ -78,33 +77,10 @@ class _DirectoryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemBuilder: (context, index) => _DirectoryTile(walks[index]),
+      itemBuilder: (context, index) =>
+          WalkTile(walks[index], TileType.directory),
       itemCount: walks.length,
     );
-  }
-}
-
-class _DirectoryTile extends StatelessWidget {
-  final Walk walk;
-
-  _DirectoryTile(this.walk);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-        onTap: () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => WalkDetailsView(walk))),
-        leading: TileIcon(WalkIcon(walk)),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(fullDate.format(walk.date)),
-          ],
-        ),
-        title: Text("${walk.city} (${walk.entity})",
-            overflow: TextOverflow.ellipsis),
-        subtitle: Text(
-            "${walk.contactLastName} ${walk.contactFirstName} : ${walk.contactPhoneNumber}"));
   }
 }
 

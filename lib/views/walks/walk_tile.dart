@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 
 import '../tile_icon.dart';
 import '../../models/walk.dart';
@@ -13,20 +14,36 @@ import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
 bool smallScreen = window.physicalSize.width <= 640;
+DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
+
+enum TileType { calendar, directory }
 
 class WalkTile extends StatelessWidget {
-  WalkTile(this.walk);
+  WalkTile(this.walk, this.tileType);
 
   final Walk walk;
+  final TileType tileType;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: _weatherIcon(),
-      title: Text(walk.city),
-      subtitle: Text("${walk.type} - ${walk.province}"),
+      title: tileType == TileType.calendar
+          ? Text(walk.city)
+          : Text("${walk.city} (${walk.entity})",
+              overflow: TextOverflow.ellipsis),
+      subtitle: tileType == TileType.calendar
+          ? Text("${walk.type} - ${walk.province}")
+          : Text(walk.getContactLabel()),
       onTap: () => Navigator.push(context, _pageRoute()),
-      trailing: GeoButton(walk),
+      trailing: tileType == TileType.calendar
+          ? GeoButton(walk)
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(fullDate.format(walk.date)),
+              ],
+            ),
     );
   }
 
