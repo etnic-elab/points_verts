@@ -30,7 +30,6 @@ class WalkDetails extends StatelessWidget {
           ListTile(
             leading: TileIcon(Icon(Icons.location_on)),
             title: Text(walk.meetingPoint),
-            isThreeLine: walk.meetingPointInfo != null && (walk.trip != null || walk.distance != null),
             subtitle: _getGeoText(),
             trailing: OutlineIconButton(
                 onPressed: () => launchGeoApp(walk),
@@ -105,20 +104,10 @@ class WalkDetails extends StatelessWidget {
   }
 
   Widget _getGeoText() {
-    String info = walk.meetingPointInfo;
-    String geo;
     if (walk.trip != null) {
-      geo =
-          "À ${walk.getFormattedDistance()}, ~${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture";
+      return Text("À ${walk.getFormattedDistance()}, ~${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture");
     } else if (walk.distance != null && walk.distance != double.maxFinite) {
-      geo = "À ${walk.getFormattedDistance()} (à vol d'oiseau)";
-    }
-    if (geo != null && info != null) {
-      return Text("$info\n$geo");
-    } else if (geo != null) {
-      return Text(geo);
-    } else if (info != null) {
-      return Text(info);
+      return Text("À ${walk.getFormattedDistance()} (à vol d'oiseau)");
     } else {
       return null;
     }
