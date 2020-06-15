@@ -154,6 +154,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     setState(() {
       _currentWalks = newList;
     });
+    _firstLaunch();
   }
 
   Future<List<Walk>> _calculateDistances(List<Walk> walks) async {
@@ -213,7 +214,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    _firstLaunch();
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
