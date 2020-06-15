@@ -163,6 +163,10 @@ class Walk {
   }
 
   String getContactLabel() {
-    return "$contactLastName $contactFirstName : $contactPhoneNumber";
+    if(contactPhoneNumber != null) {
+      return "$contactLastName $contactFirstName : $contactPhoneNumber";
+    } else {
+      return "$contactLastName $contactFirstName";
+    }
   }
 }

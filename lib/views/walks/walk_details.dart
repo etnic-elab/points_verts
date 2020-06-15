@@ -43,8 +43,7 @@ class WalkDetails extends StatelessWidget {
           ListTile(
             leading: TileIcon(Icon(Icons.group)),
             title: Text("${walk.organizer}"),
-            subtitle: Text(
-                "${walk.contactFirstName} ${walk.contactLastName} - ${walk.contactPhoneNumber != null ? walk.contactPhoneNumber : ''}"),
+            subtitle: Text(walk.getContactLabel()),
             trailing: OutlineIconButton(
                 onPressed: () {
                   if (walk.contactPhoneNumber != null) {
