@@ -3,6 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
+import 'cache_http_file_service.dart';
+
+const Duration cacheDuration = Duration(days: 30);
+
 class TripCacheManager extends BaseCacheManager {
   static const key = "tripCache";
 
@@ -15,15 +19,18 @@ class TripCacheManager extends BaseCacheManager {
     return _instance;
   }
 
-  TripCacheManager._() : super(key, maxAgeCacheObject: Duration(days: 30));
+  TripCacheManager._()
+      : super(key,
+            maxAgeCacheObject: cacheDuration,
+            fileService: CacheHttpFileService(cacheDuration));
 
   Future<String> getFilePath() async {
     var directory = await getTemporaryDirectory();
     return path.join(directory.path, key);
   }
 
-  Future<http.Response> getData(String url, Map<String, String> headers) async {
-    var file = await _instance.getSingleFile(url, headers: headers);
+  Future<http.Response> getData(String url) async {
+    var file = await _instance.getSingleFile(url);
     if (file != null && await file.exists()) {
       var res = await file.readAsString();
       return http.Response(res, 200);

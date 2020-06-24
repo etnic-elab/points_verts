@@ -31,7 +31,7 @@ Future<void> retrieveTrips(
   }
   final String url =
       "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/$origin$destinations?sources=0&annotations=distance,duration&access_token=$_token";
-  final http.Response response = await TripCacheManager().getData(url, null);
+  final http.Response response = await TripCacheManager().getData(url);
   final decoded = json.decode(response.body);
   final distances =
       decoded['distances']?.length == 1 ? decoded['distances'][0] : null;
