@@ -13,7 +13,7 @@ String _token = DotEnv().env['OPENWEATHER_TOKEN'];
 Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
   String url =
       "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$long&lang=fr&units=metric&appid=$_token";
-  final http.Response response = await WeatherCacheManager().getData(url, null);
+  final http.Response response = await WeatherCacheManager().getData(url);
   final decoded = json.decode(response.body);
   final list = decoded['list'];
 
