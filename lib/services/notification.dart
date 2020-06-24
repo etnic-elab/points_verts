@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/main.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -31,7 +32,13 @@ class NotificationManager {
     var initializationSettings = InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
     _flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: (String payload) async {
+      int walkId = int.tryParse(payload);
+      if (walkId != null) {
+        MyApp.redirectToWalkDetails(walkId);
+      }
+    });
     return _flutterLocalNotificationsPlugin;
   }
 

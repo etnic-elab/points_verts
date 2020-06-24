@@ -100,6 +100,17 @@ class DBProvider {
     });
   }
 
+  Future<Walk> getWalk(int id) async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db
+        .query('walks', where: 'id = ?', whereArgs: [id]);
+    if (maps.length == 1) {
+      return _fromDb(maps, 0);
+    } else {
+      return null;
+    }
+  }
+
   Walk _fromDb(List<Map<String, dynamic>> maps, int i) {
     return Walk(
         id: maps[i]['id'],

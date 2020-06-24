@@ -1,10 +1,13 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
+import 'package:points_verts/views/walks/walk_details_view.dart';
 
 import 'package:points_verts/walks_home_screen.dart';
 
+import 'models/walk.dart';
 void backgroundFetchHeadlessTask(String taskId) async {
   print('[BackgroundFetch] Headless event received.');
   try {
@@ -19,26 +22,26 @@ void backgroundFetchHeadlessTask(String taskId) async {
 void main() async {
   await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationManager.instance.plugin;
   runApp(new MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
+class MyApp extends StatelessWidget {
+  static final navigatorKey = new GlobalKey<NavigatorState>();
 
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    print('Initializing MyApp');
-    super.initState();
-    initPlatformState();
+  static redirectToWalkDetails(int walkId) async {
+    Walk walk = await DBProvider.db.getWalk(walkId);
+    if (walk != null) {
+      MyApp.navigatorKey.currentState
+          .push(MaterialPageRoute(builder: (context) => WalkDetailsView(walk)));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Points Verts',
       theme: ThemeData(
         primarySwatch: Colors.green,
@@ -47,32 +50,5 @@ class _MyAppState extends State<MyApp> {
           ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
       home: WalksHomeScreen(),
     );
-  }
-
-  Future<void> initPlatformState() async {
-    BackgroundFetch.configure(
-        BackgroundFetchConfig(
-            minimumFetchInterval: 60 * 12,
-            // twice per day
-            stopOnTerminate: false,
-            enableHeadless: true,
-            requiredNetworkType: NetworkType.ANY,
-            startOnBoot: true), (String taskId) async {
-      try {
-        await scheduleNextNearestWalkNotification();
-      } catch (err) {
-        print("Cannot schedule next nearest walk notification: $err");
-      }
-      BackgroundFetch.finish(taskId);
-    }).then((int status) {
-      print('[BackgroundFetch] configure success: $status');
-    }).catchError((e) {
-      print('[BackgroundFetch] configure ERROR: $e');
-    });
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
   }
 }
