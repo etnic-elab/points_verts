@@ -29,7 +29,7 @@ class WalkDetails extends StatelessWidget {
           _StatusTile(walk),
           ListTile(
             leading: TileIcon(Icon(Icons.location_on)),
-            title: Text(walk.meetingPoint),
+            title: Text(walk.meetingPoint != null ? walk.meetingPoint : ""),
             subtitle: _getGeoText(),
             trailing: OutlineIconButton(
                 onPressed: () => launchGeoApp(walk),
