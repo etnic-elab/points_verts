@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:csv/csv.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
@@ -44,6 +45,22 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
   return walks;
 }
 
+Future<List<Walk>> retrieveWalksFromWebSite(DateTime date) async {
+  DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
+  List<Walk> newList = List<Walk>();
+  var response = await http.get(
+      "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O");
+  var fixed = _fixCsv(response.body);
+  List<List<dynamic>> rowsAsListOfValues =
+      const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
+  for (List<dynamic> walk in rowsAsListOfValues) {
+    newList.add(Walk(
+        id: walk[0],
+        status: _convertStatus(walk[9])));
+  }
+  return newList;
+}
+
 List<Walk> _convertWalks(var data) {
   List<Walk> newList = List<Walk>();
   List<dynamic> list = data['records'];
@@ -51,4 +68,34 @@ List<Walk> _convertWalks(var data) {
     newList.add(Walk.fromJson(walkJson));
   }
   return newList;
+}
+
+String _convertStatus(String webSiteStatus) {
+  if (webSiteStatus == "ptvert_annule") {
+    return "Annulé";
+  } else if (webSiteStatus == "ptvert_modifie") {
+    return "Modifié";
+  } else {
+    return "OK";
+  }
+}
+
+String _fixCsv(String csv) {
+  List<String> result = new List<String>();
+  List<String> splitted = csv.split(';');
+  String current = "";
+  int tokens = 0;
+  for (String token in splitted) {
+    if (tokens == 0) {
+      current = token;
+    } else {
+      current = current + ";" + token;
+    }
+    tokens++;
+    if (tokens == 10) {
+      result.add(current);
+      tokens = 0;
+    }
+  }
+  return result.join('\r\n');
 }
