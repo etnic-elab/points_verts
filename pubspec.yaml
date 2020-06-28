@@ -34,7 +34,7 @@ dependencies:
   shared_preferences: ^0.5.6
   flutter_dotenv: ^2.1.0
   weather_icons: ^2.0.0
-  background_fetch: ^0.5.4
+  background_fetch: ^0.6.0
   flutter_local_notifications: ^1.2.0+4
   permission_handler: ^5.0.0
 
