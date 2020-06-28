@@ -85,7 +85,7 @@ updateWalks() async {
 _fixNextWalks() async {
   List<DateTime> walkDates = await DBProvider.db.getWalkDates();
   if (walkDates.isEmpty) return;
-  DateTime nextWalkDate = walkDates[1];
+  DateTime nextWalkDate = walkDates.first;
   List<Walk> fromWebsite = await retrieveWalksFromWebSite(nextWalkDate);
   List<Walk> fromDbs = await DBProvider.db.getWalks(nextWalkDate);
   for (Walk walk in fromDbs) {
