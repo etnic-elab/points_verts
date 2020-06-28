@@ -43,6 +43,10 @@ class NotificationManager {
   }
 
   scheduleNextNearestWalk(Walk walk, DateTime walkDate) async {
+    DateTime scheduledAt = walkDate.subtract(Duration(hours: 4));
+    if (scheduledAt.isBefore(DateTime.now())) {
+      return;
+    }
     try {
       initializeDateFormatting("fr_BE");
       var androidPlatformChannelSpecifics = AndroidNotificationDetails(
@@ -56,7 +60,6 @@ class NotificationManager {
       var platformChannelSpecifics = NotificationDetails(
           androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
       await cancelNextNearestWalkNotification();
-      DateTime scheduledAt = walkDate.subtract(Duration(hours: 4));
       DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
       FlutterLocalNotificationsPlugin instance = await plugin;
       if (walk.trip != null) {
