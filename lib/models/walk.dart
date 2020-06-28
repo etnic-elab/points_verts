@@ -43,7 +43,7 @@ class Walk {
   final DateTime date;
   final double long;
   final double lat;
-  final String status;
+  String status;
   final String meetingPoint;
   final String meetingPointInfo;
   final String organizer;

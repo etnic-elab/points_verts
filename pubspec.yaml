@@ -37,6 +37,7 @@ dependencies:
   background_fetch: ^0.6.0
   flutter_local_notifications: ^1.2.0+4
   permission_handler: ^5.0.0
+  csv: ^4.0.3
 
 dev_dependencies:
   flutter_test:

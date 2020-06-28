@@ -53,6 +53,7 @@ updateWalks() async {
         await DBProvider.db.insertWalks(newWalks);
         PrefsProvider.prefs
             .setString("last_walk_update", now.toIso8601String());
+        await _fixNextWalks();
       }
     } catch (err) {
       print("Cannot fetch walks list: $err");
@@ -67,6 +68,7 @@ updateWalks() async {
         }
         PrefsProvider.prefs
             .setString("last_walk_update", now.toIso8601String());
+        await _fixNextWalks();
       } catch (err) {
         print("Cannot refresh walks list: $err");
       }
@@ -75,4 +77,21 @@ updateWalks() async {
           name: TAG);
     }
   }
+}
+
+// For some reasons, the API is not as up-to-date as the website.
+// To fix that until it is resolved, retrieve the statuses from the website
+// for the walks of the next walk date when we refresh data from the API.
+_fixNextWalks() async {
+  List<DateTime> walkDates = await DBProvider.db.getWalkDates();
+  if (walkDates.isEmpty) return;
+  DateTime nextWalkDate = walkDates[1];
+  List<Walk> fromWebsite = await retrieveWalksFromWebSite(nextWalkDate);
+  List<Walk> fromDbs = await DBProvider.db.getWalks(nextWalkDate);
+  for (Walk walk in fromDbs) {
+    Walk website = fromWebsite.singleWhere((element) => element.id == walk.id,
+        orElse: () => null);
+    walk.status = website == null ? "Annulé" : website.status;
+  }
+  await DBProvider.db.insertWalks(fromDbs);
 }
