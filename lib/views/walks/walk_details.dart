@@ -9,7 +9,6 @@ import 'package:points_verts/views/walks/outline_icon_button.dart';
 import '../tile_icon.dart';
 import 'walk_utils.dart';
 
-
 class WalkDetails extends StatelessWidget {
   WalkDetails(this.walk);
 
@@ -35,6 +34,11 @@ class WalkDetails extends StatelessWidget {
                 onPressed: () => launchGeoApp(walk),
                 iconData: Icons.directions),
           ),
+          walk.ign != null
+              ? ListTile(
+                  leading: TileIcon(Icon(Icons.map)),
+                  title: Text("IGN ${walk.ign}"))
+              : SizedBox.shrink(),
           walk.meetingPointInfo != null
               ? ListTile(
                   leading: TileIcon(Icon(Icons.info)),
@@ -104,7 +108,8 @@ class WalkDetails extends StatelessWidget {
 
   Widget _getGeoText() {
     if (walk.trip != null) {
-      return Text("À ${walk.getFormattedDistance()}, ~${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture");
+      return Text(
+          "À ${walk.getFormattedDistance()}, ~${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture");
     } else if (walk.distance != null && walk.distance != double.maxFinite) {
       return Text("À ${walk.getFormattedDistance()} (à vol d'oiseau)");
     } else {

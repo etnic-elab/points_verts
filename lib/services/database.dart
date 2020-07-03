@@ -24,14 +24,14 @@ class DBProvider {
         join(await getDatabasesPath(), 'points_verts_database.db'),
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
-        version: 5);
+        version: 6);
   }
 
   Future<void> _createWalkTable(Database db) async {
     await PrefsProvider.prefs.setString("last_walk_update", null);
     await db.execute("DROP table IF EXISTS walks");
     await db.execute(
-        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city TEXT, entity TEXT, type TEXT, province TEXT, date DATE, longitude DOUBLE, latitude DOUBLE, status TEXT, meeting_point TEXT, meeting_point_info TEXT, organizer TEXT, contact_first_name TEXT, contact_last_name TEXT, contact_phone_number TEXT, transport TEXT, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
+        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city TEXT, entity TEXT, type TEXT, province TEXT, date DATE, longitude DOUBLE, latitude DOUBLE, status TEXT, meeting_point TEXT, meeting_point_info TEXT, organizer TEXT, contact_first_name TEXT, contact_last_name TEXT, contact_phone_number TEXT, ign TEXT, transport TEXT, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");
     await db.execute("CREATE INDEX walks_date_index on walks(date)");
     await db.execute("CREATE INDEX walks_city_index on walks(city)");
   }
@@ -130,6 +130,7 @@ class DBProvider {
         contactPhoneNumber: maps[i]['contact_phone_number'] != null
             ? maps[i]['contact_phone_number'].toString()
             : null,
+        ign: maps[i]['ign'],
         transport: maps[i]['transport'],
         fifteenKm: maps[i]['fifteen_km'] == 1 ? true : false,
         wheelchair: maps[i]['wheelchair'] == 1 ? true : false,
