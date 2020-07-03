@@ -22,6 +22,7 @@ class Walk {
       this.contactFirstName,
       this.contactLastName,
       this.contactPhoneNumber,
+      this.ign,
       this.transport,
       this.fifteenKm,
       this.wheelchair,
@@ -50,6 +51,7 @@ class Walk {
   final String contactFirstName;
   final String contactLastName;
   final String contactPhoneNumber;
+  final String ign;
   final String transport;
   final bool fifteenKm;
   final bool wheelchair;
@@ -84,6 +86,7 @@ class Walk {
         contactFirstName: json['fields']['prenom'],
         contactLastName: json['fields']['nom'],
         contactPhoneNumber: json['fields']['gsm'],
+        ign: json['fields']['ign'],
         transport: json['fields']['gare'],
         fifteenKm: json['fields']['15km'] == "Oui" ? true : false,
         wheelchair: json['fields']['pmr'] == "Oui" ? true : false,
@@ -115,6 +118,7 @@ class Walk {
       'contact_first_name': contactFirstName,
       'contact_last_name': contactLastName,
       'contact_phone_number': contactPhoneNumber,
+      'ign': ign,
       'transport': transport,
       'fifteen_km': fifteenKm ? 1 : 0,
       'wheelchair': wheelchair ? 1 : 0,
@@ -163,7 +167,7 @@ class Walk {
   }
 
   String getContactLabel() {
-    if(contactPhoneNumber != null) {
+    if (contactPhoneNumber != null) {
       return "$contactLastName $contactFirstName : $contactPhoneNumber";
     } else {
       return "$contactLastName $contactFirstName";
