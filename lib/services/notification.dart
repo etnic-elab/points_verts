@@ -9,7 +9,6 @@ import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
-import 'adeps.dart';
 import 'mapbox.dart';
 import 'prefs.dart';
 
@@ -97,7 +96,6 @@ Future<void> scheduleNextNearestWalkNotification() async {
       .getBoolean(key: "show_notification", defaultValue: true);
   if (!showNotification) return;
   String homePos = await PrefsProvider.prefs.getString("home_coords");
-  String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
   if (homePos == null) return;
   List<String> split = homePos.split(",");
   Position home = Position(
@@ -110,16 +108,7 @@ Future<void> scheduleNextNearestWalkNotification() async {
       // already got the notification yesterday
       return;
     }
-    try {
-      List<Walk> updatedWalks = await refreshAllWalks(lastUpdate);
-      if (updatedWalks.isNotEmpty) {
-        await DBProvider.db.insertWalks(updatedWalks);
-        PrefsProvider.prefs
-            .setString("last_walk_update", DateTime.now().toIso8601String());
-      }
-    } catch (err) {
-      print("Cannot refresh walks list: $err");
-    }
+    await updateWalks();
     List<Walk> walks = await DBProvider.db.getWalks(dates[0]);
     final Geolocator geolocator = Geolocator();
     for (Walk walk in walks) {
