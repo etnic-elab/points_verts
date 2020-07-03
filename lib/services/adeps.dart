@@ -75,8 +75,10 @@ String _convertStatus(String webSiteStatus) {
     return "Annulé";
   } else if (webSiteStatus == "ptvert_modifie") {
     return "Modifié";
-  } else {
+  } else if (webSiteStatus == "ptvert") {
     return "OK";
+  } else {
+    return null;
   }
 }
 

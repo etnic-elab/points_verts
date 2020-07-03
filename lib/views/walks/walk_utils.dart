@@ -91,7 +91,11 @@ _fixNextWalks() async {
   for (Walk walk in fromDbs) {
     Walk website = fromWebsite.singleWhere((element) => element.id == walk.id,
         orElse: () => null);
-    walk.status = website == null ? "Annulé" : website.status;
+    if (website == null) {
+      walk.status = "Annulé";
+    } else if (website.status != null) {
+      walk.status = website.status;
+    }
   }
   await DBProvider.db.insertWalks(fromDbs);
 }
