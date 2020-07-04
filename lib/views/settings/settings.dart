@@ -55,6 +55,9 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = label;
     });
+    if (_showNotification == true) {
+      scheduleNextNearestWalkNotification();
+    }
   }
 
   Future<void> _removeHome() async {
@@ -63,7 +66,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = null;
     });
-    _setShowNotification(false);
+    NotificationManager.instance.cancelNextNearestWalkNotification();
   }
 
   Future<void> _setUseLocation(bool newValue) async {
