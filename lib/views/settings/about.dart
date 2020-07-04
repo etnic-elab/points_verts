@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 class About extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    String emailAddress = _getEmailAddress();
     return IconButton(
         icon: Icon(Icons.info),
         onPressed: () {
@@ -17,8 +20,8 @@ class About extends StatelessWidget {
               children: [
                 _AboutRow("Dépôt du code source", "GitHub",
                     "https://github.com/tborlee/points_verts"),
-                _AboutRow("Adresse de contact", "android@alpagaga.dev",
-                    "mailto:android@alpagaga.dev?subject=Points Verts"),
+                _AboutRow("Adresse de contact", emailAddress,
+                    "mailto:$emailAddress?subject=Points Verts"),
                 _AboutRow(
                     "Données des Points Verts",
                     "Open Data Wallonie-Bruxelles",
@@ -29,6 +32,14 @@ class About extends StatelessWidget {
                     "https://openweathermap.org/")
               ]);
         });
+  }
+
+  String _getEmailAddress() {
+    if (Platform.isIOS) {
+      return "ios@alpagaga.dev";
+    } else {
+      return "android@alpagaga.dev";
+    }
   }
 }
 
