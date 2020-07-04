@@ -29,6 +29,8 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Cette application nécessite l&apos;accès à votre position actuelle pour calculer les distances vers les points de départ des marches</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Cette application nécessite l&apos;accès à votre position actuelle pour calculer les distances vers les points de départ des marches</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
