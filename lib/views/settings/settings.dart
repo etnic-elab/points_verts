@@ -55,9 +55,6 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = label;
     });
-    bool allowed =
-        await NotificationManager.instance.requestNotificationPermissions();
-    _setShowNotification(allowed);
   }
 
   Future<void> _removeHome() async {
