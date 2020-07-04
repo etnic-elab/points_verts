@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
@@ -27,7 +28,11 @@ class NotificationManager {
     log("creating a new plugin instance", name: TAG);
     var initializationSettingsAndroid =
         AndroidInitializationSettings('ic_stat_name');
-    var initializationSettingsIOS = IOSInitializationSettings();
+    var initializationSettingsIOS = IOSInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+    );
     var initializationSettings = InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
     _flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
@@ -88,6 +93,20 @@ class NotificationManager {
     FlutterLocalNotificationsPlugin instance = await plugin;
     log('Cancelling next nearest walk notification', name: TAG);
     await instance.cancel(NEXT_NEAREST_WALK);
+  }
+
+  Future<bool> requestNotificationPermissions() async {
+    if (Platform.isIOS) {
+      FlutterLocalNotificationsPlugin instance = await plugin;
+      return await instance
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          .requestPermissions(
+            alert: true,
+          );
+    } else {
+      return true;
+    }
   }
 }
 
