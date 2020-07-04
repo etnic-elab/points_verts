@@ -6,6 +6,7 @@ import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 
 import '../../models/address_suggestion.dart';
+import '../../services/notification.dart';
 import '../../services/prefs.dart';
 import '../tile_icon.dart';
 import 'about.dart';
@@ -38,7 +39,7 @@ class _SettingsState extends State<Settings> {
     bool useLocation =
         await PrefsProvider.prefs.getBoolean(key: "use_location");
     bool showNotification = await PrefsProvider.prefs
-        .getBoolean(key: "show_notification", defaultValue: true);
+        .getBoolean(key: "show_notification", defaultValue: false);
     setState(() {
       _home = home;
       _useLocation = useLocation;
@@ -54,8 +55,9 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = label;
     });
-    // schedule/refresh the next notification with this new home location
-    scheduleNextNearestWalkNotification();
+    bool allowed =
+        await NotificationManager.instance.requestNotificationPermissions();
+    _setShowNotification(allowed);
   }
 
   Future<void> _removeHome() async {
@@ -64,7 +66,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = null;
     });
-    NotificationManager.instance.cancelNextNearestWalkNotification();
+    _setShowNotification(false);
   }
 
   Future<void> _setUseLocation(bool newValue) async {
@@ -84,8 +86,15 @@ class _SettingsState extends State<Settings> {
 
   Future<void> _setShowNotification(bool newValue) async {
     await PrefsProvider.prefs.setBoolean("show_notification", newValue);
-    if (newValue) {
-      scheduleNextNearestWalkNotification();
+    if (newValue == true) {
+      bool notificationsAllowed =
+          await NotificationManager.instance.requestNotificationPermissions();
+      if (notificationsAllowed) {
+        scheduleNextNearestWalkNotification();
+      } else {
+        _setShowNotification(false);
+        return;
+      }
     } else {
       NotificationManager.instance.cancelNextNearestWalkNotification();
     }
