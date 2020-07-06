@@ -108,6 +108,11 @@ class NotificationManager {
       return true;
     }
   }
+
+  Future<List<PendingNotificationRequest>> pendingNotifications() async {
+    FlutterLocalNotificationsPlugin instance = await plugin;
+    return instance.pendingNotificationRequests();
+  }
 }
 
 Future<void> scheduleNextNearestWalkNotification() async {
