@@ -10,6 +10,7 @@ import '../../services/notification.dart';
 import '../../services/prefs.dart';
 import '../tile_icon.dart';
 import 'about.dart';
+import 'debug.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
@@ -148,7 +149,10 @@ class _SettingsState extends State<Settings> {
                       SettingsHomeSelect(_setHome, _removeHome)));
             },
           ),
-          ListHeader("Notifications"),
+          GestureDetector(
+              child: ListHeader("Notifications"),
+              onLongPress: () => Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => Debug()))),
           ListTile(
               title: Text(
                   "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",

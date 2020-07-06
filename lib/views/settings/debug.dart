@@ -1,0 +1,86 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
+import 'package:points_verts/services/notification.dart';
+import 'package:points_verts/services/prefs.dart';
+
+class Debug extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Debug"),
+        ),
+        body: ListView(
+          children: <Widget>[
+            _LastWalkUpdateTile(),
+            _GeoPosTile(),
+            _PendingNotificationsTile()
+          ],
+        ));
+  }
+}
+
+class _LastWalkUpdateTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: PrefsProvider.prefs.getString("last_walk_update"),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          DateFormat dateFormat = new DateFormat.MMMMEEEEd("fr").add_Hms();
+          DateTime dateTime = DateTime.parse(snapshot.data).toLocal();
+          return ListTile(
+            title: Text("Dernière mise à jour de la liste des marches"),
+            subtitle: Text("${dateFormat.format(dateTime)} (heure locale)"),
+          );
+        } else {
+          return SizedBox.shrink();
+        }
+      },
+    );
+  }
+}
+
+class _GeoPosTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: PrefsProvider.prefs.getString("home_coords"),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.hasData) {
+          return ListTile(
+            title: Text("Coordonnées GPS de l'emplacement de référence"),
+            subtitle: Text(snapshot.data),
+          );
+        } else {
+          return SizedBox.shrink();
+        }
+      },
+    );
+  }
+}
+
+class _PendingNotificationsTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: NotificationManager.instance.pendingNotifications(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<PendingNotificationRequest>> snapshot) {
+          if (snapshot.hasData) {
+            List<PendingNotificationRequest> requests = snapshot.data;
+            if (requests.length > 0) {
+              return ListTile(
+                isThreeLine: true,
+                title: Text("Prochaine notification planifiée"),
+                subtitle: Text(requests[0].title + '\n' + requests[0].body),
+              );
+            }
+          }
+          ;
+          return SizedBox.shrink();
+        });
+  }
+}
