@@ -51,7 +51,7 @@ class WalkDetails extends StatelessWidget {
             trailing: OutlineIconButton(
                 onPressed: () {
                   if (walk.contactPhoneNumber != null) {
-                    launchURL("tel:${walk.contactPhoneNumber}");
+                    launchURL("tel:${walk.contactPhoneNumber.replaceAll(' ', '')}");
                   }
                 },
                 iconData: Icons.call),
