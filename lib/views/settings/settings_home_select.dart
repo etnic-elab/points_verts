@@ -42,6 +42,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
       setState(() {
         _suggestions = retrieveSuggestions(_homeSearchController.text);
       });
