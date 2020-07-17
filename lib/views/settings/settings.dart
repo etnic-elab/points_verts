@@ -140,14 +140,16 @@ class _SettingsState extends State<Settings> {
           ListTile(
             leading: TileIcon(Icon(Icons.home)),
             title: Text('Mon domicile'),
-            subtitle: Text(
-                _home != null ? _home : "Aucun - appuyez ici pour le définir",
-                overflow: TextOverflow.ellipsis),
+            subtitle: getHomeLabel(),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) =>
                       SettingsHomeSelect(_setHome, _removeHome)));
             },
+            trailing: _home != null
+                ? IconButton(
+                    icon: Icon(Icons.delete), onPressed: () => _removeHome())
+                : null,
           ),
           GestureDetector(
               child: ListHeader("Notifications"),
@@ -168,5 +170,13 @@ class _SettingsState extends State<Settings> {
         ],
       ),
     );
+  }
+
+  Widget getHomeLabel() {
+    if (_home == null) {
+      return Text("Aucun - appuyez ici pour le définir");
+    } else {
+      return Text(_home, style: TextStyle(fontSize: 12.0));
+    }
   }
 }
