@@ -10,16 +10,33 @@ class DatesDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
     return FutureBuilder<List<DateTime>>(
         future: dates,
         builder:
             (BuildContext context, AsyncSnapshot<List<DateTime>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData && snapshot.data.isNotEmpty) {
-              return DropdownButton(
-                  value: selectedDate,
-                  items: generateDropdownItems(snapshot.data),
-                  onChanged: onChanged);
+              List<DateTime> dates = snapshot.data;
+              return OutlineButton.icon(
+                  icon: Icon(Icons.calendar_today, size: 16.0),
+                  onPressed: () async {
+                    DateTime pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        selectableDayPredicate: (date) => dates.contains(date),
+                        fieldLabelText: "Choix de la date",
+                        helpText: "Choix de la date",
+                        fieldHintText: "dd/mm/aaaa",
+                        errorInvalidText: "Pas de marche à la date choisie.",
+                        errorFormatText: "Format invalide.",
+                        firstDate: dates.first,
+                        lastDate: dates.last);
+                    if (pickedDate != null) {
+                      onChanged(pickedDate);
+                    }
+                  },
+                  label: Text(fullDate.format(selectedDate)));
             } else {
               return SizedBox.shrink();
             }
