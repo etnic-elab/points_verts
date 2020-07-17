@@ -1,6 +1,7 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -45,6 +46,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('fr', 'BE'),
+        const Locale('fr', 'FR'),
+        const Locale('fr', 'LU'),
+      ],
       navigatorKey: navigatorKey,
       title: 'Points Verts',
       theme: ThemeData(
