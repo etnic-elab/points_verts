@@ -15,8 +15,12 @@ class Debug extends StatelessWidget {
         body: ListView(
           children: <Widget>[
             _LastWalkUpdateTile(),
+            Divider(height: 0.5),
             _GeoPosTile(),
-            _PendingNotificationsTile()
+            Divider(height: 0.5),
+            _PendingNotificationsTile(),
+            Divider(height: 0.5),
+            _LastBackgroundFetch()
           ],
         ));
   }
@@ -29,11 +33,9 @@ class _LastWalkUpdateTile extends StatelessWidget {
       future: PrefsProvider.prefs.getString("last_walk_update"),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
-          DateFormat dateFormat = new DateFormat.MMMMEEEEd("fr").add_Hms();
-          DateTime dateTime = DateTime.parse(snapshot.data).toLocal();
           return ListTile(
             title: Text("Dernière mise à jour de la liste des marches"),
-            subtitle: Text("${dateFormat.format(dateTime)} (heure locale)"),
+            subtitle: Text("${formatDate(snapshot.data)} (heure locale)"),
           );
         } else {
           return SizedBox.shrink();
@@ -75,12 +77,37 @@ class _PendingNotificationsTile extends StatelessWidget {
               return ListTile(
                 isThreeLine: true,
                 title: Text("Prochaine notification planifiée"),
-                subtitle: Text(requests[0].title + '\n' + requests[0].body),
+                subtitle: Text(
+                  requests[0].title + '\n' + requests[0].body,
+                  style: TextStyle(fontSize: 12.0),
+                ),
               );
             }
           }
-          ;
           return SizedBox.shrink();
         });
   }
+}
+
+class _LastBackgroundFetch extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: PrefsProvider.prefs.getString("last_background_fetch"),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            return ListTile(
+              title: Text("Dernière actualisation en arrière-plan"),
+              subtitle: Text("${formatDate(snapshot.data)} (heure locale)"),
+            );
+          }
+          return SizedBox.shrink();
+        });
+  }
+}
+
+String formatDate(String date) {
+  DateFormat dateFormat = new DateFormat.MMMMEEEEd("fr").add_Hms();
+  DateTime dateTime = DateTime.parse(date).toLocal();
+  return dateFormat.format(dateTime);
 }
