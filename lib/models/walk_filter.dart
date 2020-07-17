@@ -23,7 +23,7 @@ class WalkFilter {
     List<String> results = [];
     if (brabantWallon) results.add("Brabant Wallon");
     if (hainautEst) results.add("Hainaut Est");
-    if (hainautOuest) results.add("Hainau Ouest");
+    if (hainautOuest) results.add("Hainaut Ouest");
     if (liege) results.add("Liège");
     if (luxembourg) results.add("Luxembourg");
     if (namur) results.add("Namur");
