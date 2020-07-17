@@ -1,5 +1,6 @@
 import 'package:path/path.dart';
 import 'package:points_verts/models/walk.dart';
+import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:developer';
@@ -90,11 +91,27 @@ class DBProvider {
     });
   }
 
-  Future<List<Walk>> getWalks(DateTime date) async {
+  Future<List<Walk>> getWalks(DateTime date, {WalkFilter filter}) async {
     log("Retrieving walks from database for $date", name: TAG);
     final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db
-        .query('walks', where: 'date = ?', whereArgs: [date.toIso8601String()]);
+    List<Map<String, dynamic>> maps;
+    if (filter != null) {
+      String where = "date = ?";
+      List<dynamic> args = [date.toIso8601String()];
+      if (filter.filterByProvince()) {
+        List<String> provinces = filter.provinceFilter();
+        where = where + " and province in ${provinces.map((e) => "?")}";
+        args.addAll(provinces);
+      }
+      if (!filter.cancelledWalks) {
+        where = where + " and status != ?";
+        args.add("Annulé");
+      }
+      maps = await db.query('walks', where: where, whereArgs: args);
+    } else {
+      maps = await db.query('walks',
+          where: 'date = ?', whereArgs: [date.toIso8601String()]);
+    }
     return List.generate(maps.length, (i) {
       return _fromDb(maps, i);
     });
@@ -102,8 +119,8 @@ class DBProvider {
 
   Future<Walk> getWalk(int id) async {
     final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db
-        .query('walks', where: 'id = ?', whereArgs: [id]);
+    final List<Map<String, dynamic>> maps =
+        await db.query('walks', where: 'id = ?', whereArgs: [id]);
     if (maps.length == 1) {
       return _fromDb(maps, 0);
     } else {

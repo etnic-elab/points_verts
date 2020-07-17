@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -6,7 +7,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/database.dart';
+import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/place_select.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -41,6 +44,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Position _homePosition;
   Places _selectedPlace;
   ViewType _viewType = ViewType.list;
+  WalkFilter _filter;
 
   @override
   void initState() {
@@ -87,11 +91,19 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Future<void> _retrieveData({bool resetDate = true}) async {
     // initialize database here in case of migrations
     await DBProvider.db.database;
+    String filterString = await PrefsProvider.prefs.getString("walk_filter");
+    WalkFilter filter;
+    if (filterString != null) {
+      filter = WalkFilter.fromJson(jsonDecode(filterString));
+    } else {
+      filter = WalkFilter();
+    }
     setState(() {
       _currentWalks = null;
       _selectedWalk = null;
       _currentPosition = null;
       _homePosition = null;
+      _filter = filter;
     });
     await updateWalks();
     _retrieveDates(resetDate: resetDate);
@@ -136,7 +148,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   _retrieveWalksHelper() async {
-    Future<List<Walk>> newList = DBProvider.db.getWalks(_selectedDate);
+    Future<List<Walk>> newList =
+        DBProvider.db.getWalks(_selectedDate, filter: _filter);
     if (selectedPosition != null) {
       newList = _calculateDistances(await newList);
     } else {
@@ -278,6 +291,126 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                       _retrieveWalks();
                     });
                   }),
+              ActionChip(
+                label: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4.0),
+                      child: Icon(Icons.tune, size: 16.0),
+                    ),
+                    Text("Filtres")
+                  ],
+                ),
+                onPressed: () async {
+                  await showDialog<void>(
+                    context: context,
+                    barrierDismissible: false, // user must tap button!
+                    builder: (BuildContext context) {
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          return AlertDialog(
+                            title: Text('Filtres'),
+                            content: SingleChildScrollView(
+                              child: ListBody(
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.cancelledWalks = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.cancelledWalks),
+                                      Text("Marches annulées")
+                                    ],
+                                  ),
+                                  ListHeader("Provinces"),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.brabantWallon = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.brabantWallon),
+                                      Text("Brabant Wallon")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.hainautEst = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.hainautEst),
+                                      Text("Hainaut Est")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.hainautOuest = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.hainautOuest),
+                                      Text("Hainaut Ouest")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.liege = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.liege),
+                                      Text("Liège")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.luxembourg = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.luxembourg),
+                                      Text("Luxembourg")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.namur = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.namur),
+                                      Text("Namur")
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('Fermer'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  );
+                  await PrefsProvider.prefs.setString("walk_filter", jsonEncode(_filter));
+                  _retrieveWalks();
+                },
+              ),
               _homePosition != null && _currentPosition != null
                   ? PlaceSelect(
                       currentPlace: _selectedPlace,
@@ -287,7 +420,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                         });
                         _retrieveWalks();
                       })
-                  : Expanded(child: _resultNumber())
+                  : _resultNumber()
             ]));
   }
 

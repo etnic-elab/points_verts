@@ -18,8 +18,7 @@ class DatesDropdown extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData && snapshot.data.isNotEmpty) {
               List<DateTime> dates = snapshot.data;
-              return OutlineButton.icon(
-                  icon: Icon(Icons.calendar_today, size: 16.0),
+              return ActionChip(
                   onPressed: () async {
                     DateTime pickedDate = await showDatePicker(
                         context: context,
@@ -36,7 +35,15 @@ class DatesDropdown extends StatelessWidget {
                       onChanged(pickedDate);
                     }
                   },
-                  label: Text(fullDate.format(selectedDate)));
+                  label: Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Icon(Icons.calendar_today, size: 16.0),
+                      ),
+                      Text(fullDate.format(selectedDate))
+                    ],
+                  ));
             } else {
               return SizedBox.shrink();
             }
