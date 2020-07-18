@@ -9,9 +9,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/walks/place_select.dart';
+import 'package:points_verts/views/walks/filter_dialog.dart';
 import 'package:points_verts/services/prefs.dart';
 
 import 'dates_dropdown.dart';
@@ -42,7 +41,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   DateTime _selectedDate;
   Position _currentPosition;
   Position _homePosition;
-  Places _selectedPlace;
   ViewType _viewType = ViewType.list;
   WalkFilter _filter;
 
@@ -117,11 +115,11 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         _homePosition = Position(
             latitude: double.parse(split[0]),
             longitude: double.parse(split[1]));
-        _selectedPlace = Places.home;
+        _filter.selectedPlace = Places.home;
       });
     } else {
       setState(() {
-        _selectedPlace = Places.current;
+        _filter.selectedPlace = Places.current;
       });
     }
     if (await PrefsProvider.prefs.getBoolean(key: "use_location") == true) {
@@ -130,9 +128,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   Position get selectedPosition {
-    if (_selectedPlace == Places.current) {
+    if (_filter.selectedPlace == Places.current) {
       return _currentPosition;
-    } else if (_selectedPlace == Places.home) {
+    } else if (_filter.selectedPlace == Places.home) {
       return _homePosition;
     } else {
       return null;
@@ -265,9 +263,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         Expanded(
             child: _viewType == ViewType.list
                 ? WalkResultsListView(_currentWalks, selectedPosition,
-                    _selectedPlace, _retrieveData)
+                    _filter.selectedPlace, _retrieveData)
                 : WalkResultsMapView(_currentWalks, selectedPosition,
-                    _selectedPlace, _selectedWalk, (walk) {
+                    _filter.selectedPlace, _selectedWalk, (walk) {
                     setState(() {
                       _selectedWalk = walk;
                     });
@@ -302,255 +300,16 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                   ],
                 ),
                 onPressed: () async {
-                  await showDialog<void>(
-                    context: context,
-                    barrierDismissible: false, // user must tap button!
-                    builder: (BuildContext context) {
-                      return StatefulBuilder(
-                        builder: (context, setState) {
-                          return AlertDialog(
-                            title: Text('Filtres'),
-                            content: SingleChildScrollView(
-                              child: ListBody(
-                                children: <Widget>[
-                                  _homePosition != null &&
-                                          _currentPosition != null
-                                      ? PlaceSelect(
-                                          currentPlace: _selectedPlace,
-                                          onChanged: (Places place) {
-                                            setState(() {
-                                              _selectedPlace = place;
-                                            });
-                                          })
-                                      : SizedBox.shrink(),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.cancelledWalks = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.cancelledWalks),
-                                      Text("Marches annulées")
-                                    ],
-                                  ),
-                                  ListHeader("Restrictions"),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.fifteenKm = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.fifteenKm),
-                                      Text("Parcours suppl. de 15 km")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.wheelchair = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.wheelchair),
-                                      Text("Accessible PMR")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.stroller = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.stroller),
-                                      Text("Poussettes")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.extraOrientation = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.extraOrientation),
-                                      Text("Orientation")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.guided = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.guided),
-                                      Text("Balade guidée")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.extraWalk = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.extraWalk),
-                                      Text("Parcours suppl. de 10 km")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.bike = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.bike),
-                                      Text("Vélo")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.mountainBike = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.mountainBike),
-                                      Text("VTT")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.waterSupply = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.waterSupply),
-                                      Text("Ravitaillement")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.beWapp = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.beWapp),
-                                      Text("BeWaPP")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.transport = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.transport),
-                                      Text("Transports en commun")
-                                    ],
-                                  ),
-                                  ListHeader("Provinces"),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.brabantWallon = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.brabantWallon),
-                                      Text("Brabant Wallon")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.hainautEst = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.hainautEst),
-                                      Text("Hainaut Est")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.hainautOuest = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.hainautOuest),
-                                      Text("Hainaut Ouest")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.liege = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.liege),
-                                      Text("Liège")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.luxembourg = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.luxembourg),
-                                      Text("Luxembourg")
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Checkbox(
-                                          onChanged: (bool) {
-                                            _filter.namur = bool;
-                                            setState(() {});
-                                          },
-                                          value: _filter.namur),
-                                      Text("Namur")
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            actions: <Widget>[
-                              FlatButton(
-                                child: const Text('Réinitialiser'),
-                                onPressed: () {
-                                  setState(() {
-                                    _filter = WalkFilter();
-                                  });
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              FlatButton(
-                                child: const Text('Filtrer'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  );
-                  await PrefsProvider.prefs
-                      .setString("walk_filter", jsonEncode(_filter));
-                  _retrieveWalks();
+                  WalkFilter newFilter = await filterDialog(context, _filter,
+                      _homePosition != null && _currentPosition != null);
+                  if (newFilter != null) {
+                    setState(() {
+                      _filter = newFilter;
+                    });
+                    await PrefsProvider.prefs
+                        .setString("walk_filter", jsonEncode(newFilter));
+                    _retrieveWalks();
+                  }
                 },
               ),
             ]));
@@ -568,7 +327,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         setState(() {
           _currentPosition = position;
         });
-        if (_selectedPlace == Places.current && _selectedDate != null) {
+        if (_filter.selectedPlace == Places.current && _selectedDate != null) {
           _retrieveWalks();
         }
       }

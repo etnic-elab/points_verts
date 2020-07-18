@@ -1,6 +1,9 @@
+import 'package:points_verts/views/walks/walks_view.dart';
+
 class WalkFilter {
   WalkFilter();
 
+  Places selectedPlace;
   bool cancelledWalks = true;
   bool brabantWallon = true;
   bool hainautEst = true;
@@ -41,7 +44,7 @@ class WalkFilter {
   }
 
   WalkFilter.fromJson(Map<String, dynamic> json)
-      : cancelledWalks = json['cancelledWalks'],
+      : cancelledWalks = json['cancelled_walks'],
         brabantWallon = json['brabantWallon'],
         hainautEst = json['hainautEst'],
         hainautOuest = json['hainautOuest'],
@@ -61,7 +64,7 @@ class WalkFilter {
         transport = json['transport'];
 
   Map<String, dynamic> toJson() => {
-        'cancelledWalks': cancelledWalks,
+        'cancelled_walks': cancelledWalks,
         'brabantWallon': brabantWallon,
         'hainautEst': hainautEst,
         'hainautOuest': hainautOuest,
