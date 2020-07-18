@@ -313,6 +313,16 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                             content: SingleChildScrollView(
                               child: ListBody(
                                 children: <Widget>[
+                                  _homePosition != null &&
+                                          _currentPosition != null
+                                      ? PlaceSelect(
+                                          currentPlace: _selectedPlace,
+                                          onChanged: (Places place) {
+                                            setState(() {
+                                              _selectedPlace = place;
+                                            });
+                                          })
+                                      : SizedBox.shrink(),
                                   Row(
                                     children: <Widget>[
                                       Checkbox(
@@ -396,7 +406,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                             ),
                             actions: <Widget>[
                               FlatButton(
-                                child: Text('Fermer'),
+                                child: Text('Filtrer'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
@@ -407,37 +417,12 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                       );
                     },
                   );
-                  await PrefsProvider.prefs.setString("walk_filter", jsonEncode(_filter));
+                  await PrefsProvider.prefs
+                      .setString("walk_filter", jsonEncode(_filter));
                   _retrieveWalks();
                 },
               ),
-              _homePosition != null && _currentPosition != null
-                  ? PlaceSelect(
-                      currentPlace: _selectedPlace,
-                      onChanged: (Places place) {
-                        setState(() {
-                          _selectedPlace = place;
-                        });
-                        _retrieveWalks();
-                      })
-                  : _resultNumber()
             ]));
-  }
-
-  Widget _resultNumber() {
-    return FutureBuilder(
-      future: _currentWalks,
-      builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData) {
-            return Align(
-                alignment: Alignment.centerRight,
-                child: Text("${snapshot.data.length.toString()} résultat(s)"));
-          }
-        }
-        return SizedBox.shrink();
-      },
-    );
   }
 
   _getCurrentLocation() {
