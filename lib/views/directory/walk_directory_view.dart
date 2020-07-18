@@ -128,11 +128,16 @@ class _DirectoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemBuilder: (context, index) =>
-          WalkTile(walks[index], TileType.directory),
-      itemCount: walks.length,
-    );
+    if (walks.length == 0) {
+      return Center(
+          child: Text("Aucune marche ne correspond aux critères."));
+    } else {
+      return ListView.builder(
+        itemBuilder: (context, index) =>
+            WalkTile(walks[index], TileType.directory),
+        itemCount: walks.length,
+      );
+    }
   }
 }
 
