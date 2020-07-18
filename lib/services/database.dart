@@ -1,5 +1,6 @@
 import 'package:path/path.dart';
 import 'package:points_verts/models/walk.dart';
+import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:developer';
@@ -81,20 +82,70 @@ class DBProvider {
         where: 'date < ?', whereArgs: [lastMidnight.toIso8601String()]);
   }
 
-  Future<List<Walk>> getSortedWalks() async {
+  Future<List<Walk>> getSortedWalks({WalkFilter filter}) async {
     final Database db = await database;
-    final List<Map<String, dynamic>> maps =
-        await db.query('walks', orderBy: "city ASC");
+    List<Map<String, dynamic>> maps;
+    if (filter != null) {
+      maps = await db.query('walks',
+          where: _generateWhereFromFilter(filter),
+          whereArgs: _generateArgsFromFilter(filter),
+          orderBy: "city ASC");
+    } else {
+      maps = await db.query('walks', orderBy: "city ASC");
+    }
     return List.generate(maps.length, (i) {
       return _fromDb(maps, i);
     });
   }
 
-  Future<List<Walk>> getWalks(DateTime date) async {
+  String _generateWhereFromFilter(WalkFilter filter) {
+    String where = "1=1";
+    if (filter.filterByProvince()) {
+      List<String> provinces = filter.provinceFilter();
+      where = where + " and province in ${provinces.map((e) => "?")}";
+    }
+    if (!filter.cancelledWalks) {
+      where = where + " and status != ?";
+    }
+    if (filter.fifteenKm) where = where + " and fifteen_km = 1";
+    if (filter.wheelchair) where = where + " and wheelchair = 1";
+    if (filter.stroller) where = where + " and stroller = 1";
+    if (filter.extraOrientation) where = where + " and extra_orientation = 1";
+    if (filter.extraWalk) where = where + " and extra_walk = 1";
+    if (filter.guided) where = where + " and guided = 1";
+    if (filter.bike) where = where + " and bike = 1";
+    if (filter.mountainBike) where = where + " and mountain_bike = 1";
+    if (filter.waterSupply) where = where + " and water_supply = 1";
+    if (filter.beWapp) where = where + " and be_wapp = 1";
+    if (filter.transport) where = where + " and transport is not null";
+    return where;
+  }
+
+  List<dynamic> _generateArgsFromFilter(WalkFilter filter) {
+    List<dynamic> args = [];
+    if (filter.filterByProvince()) {
+      List<String> provinces = filter.provinceFilter();
+      args.addAll(provinces);
+    }
+    if (!filter.cancelledWalks) {
+      args.add("Annulé");
+    }
+    return args;
+  }
+
+  Future<List<Walk>> getWalks(DateTime date, {WalkFilter filter}) async {
     log("Retrieving walks from database for $date", name: TAG);
     final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db
-        .query('walks', where: 'date = ?', whereArgs: [date.toIso8601String()]);
+    List<Map<String, dynamic>> maps;
+    if (filter != null) {
+      String where = "date = ?" + _generateWhereFromFilter(filter);
+      List<dynamic> args = [date.toIso8601String()];
+      args.addAll(_generateArgsFromFilter(filter));
+      maps = await db.query('walks', where: where, whereArgs: args);
+    } else {
+      maps = await db.query('walks',
+          where: 'date = ?', whereArgs: [date.toIso8601String()]);
+    }
     return List.generate(maps.length, (i) {
       return _fromDb(maps, i);
     });
@@ -102,8 +153,8 @@ class DBProvider {
 
   Future<Walk> getWalk(int id) async {
     final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db
-        .query('walks', where: 'id = ?', whereArgs: [id]);
+    final List<Map<String, dynamic>> maps =
+        await db.query('walks', where: 'id = ?', whereArgs: [id]);
     if (maps.length == 1) {
       return _fromDb(maps, 0);
     } else {

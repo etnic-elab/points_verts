@@ -162,7 +162,10 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
           onPressed: () {
             Navigator.pop(context, i);
           },
-          child: Text(countryLabels[i])));
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(countryLabels[i]),
+          )));
     }
     return results;
   }

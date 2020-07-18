@@ -13,8 +13,10 @@ class PlaceSelect extends StatelessWidget {
       value: currentPlace,
       onChanged: onChanged,
       items: [
-        DropdownMenuItem(child: Text("De mon domicile"), value: Places.home),
-        DropdownMenuItem(child: Text("De ma position"), value: Places.current),
+        DropdownMenuItem(
+            child: Text("Distances du domicile"), value: Places.home),
+        DropdownMenuItem(
+            child: Text("Distances de la position"), value: Places.current),
       ],
     );
   }
