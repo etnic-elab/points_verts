@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/database.dart';
+import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
+import 'package:points_verts/views/walks/filter_dialog.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_tile.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -16,7 +21,8 @@ class WalkDirectoryView extends StatefulWidget {
 }
 
 class _WalkDirectoryViewState extends State<WalkDirectoryView> {
-  Future<List<Walk>> walks;
+  Future<List<Walk>> _walks;
+  WalkFilter _filter = WalkFilter();
 
   @override
   void initState() {
@@ -25,19 +31,28 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
   }
 
   void init() async {
+    String filterString =
+        await PrefsProvider.prefs.getString("directory_walk_filter");
+    WalkFilter filter;
+    if (filterString != null) {
+      filter = WalkFilter.fromJson(jsonDecode(filterString));
+    } else {
+      filter = WalkFilter();
+    }
     setState(() {
-      walks = null;
+      _walks = null;
+      _filter = filter;
     });
     await updateWalks();
     setState(() {
-      walks = DBProvider.db.getSortedWalks();
+      _walks = DBProvider.db.getSortedWalks(filter: _filter);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: walks,
+        future: _walks,
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             List<Walk> walks = snapshot.data;
@@ -54,8 +69,45 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                   )
                 ],
               ),
-              body: walks.isNotEmpty
-                  ? _DirectoryList(walks)
+              body: walks != null
+                  ? Column(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10.0),
+                            child: ActionChip(
+                              label: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 4.0),
+                                    child: Icon(Icons.tune, size: 16.0),
+                                  ),
+                                  Text("Filtres")
+                                ],
+                              ),
+                              onPressed: () async {
+                                WalkFilter newFilter =
+                                    await filterDialog(context, _filter, false);
+                                if (newFilter != null) {
+                                  await PrefsProvider.prefs.setString(
+                                      "directory_walk_filter",
+                                      jsonEncode(newFilter));
+                                  setState(() {
+                                    _filter = newFilter;
+                                    _walks = DBProvider.db
+                                        .getSortedWalks(filter: newFilter);
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        Divider(height: 0.0),
+                        Expanded(child: _DirectoryList(walks)),
+                      ],
+                    )
                   : WalkListError(init),
             );
           } else {

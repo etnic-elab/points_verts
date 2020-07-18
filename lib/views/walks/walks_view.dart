@@ -89,7 +89,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Future<void> _retrieveData({bool resetDate = true}) async {
     // initialize database here in case of migrations
     await DBProvider.db.database;
-    String filterString = await PrefsProvider.prefs.getString("walk_filter");
+    String filterString = await PrefsProvider.prefs.getString("calendar_walk_filter");
     WalkFilter filter;
     if (filterString != null) {
       filter = WalkFilter.fromJson(jsonDecode(filterString));
@@ -260,6 +260,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return Column(
       children: <Widget>[
         _defineSearchPart(),
+        Divider(height: 0.0),
         Expanded(
             child: _viewType == ViewType.list
                 ? WalkResultsListView(_currentWalks, selectedPosition,
@@ -307,7 +308,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                       _filter = newFilter;
                     });
                     await PrefsProvider.prefs
-                        .setString("walk_filter", jsonEncode(newFilter));
+                        .setString("calendar_walk_filter", jsonEncode(newFilter));
                     _retrieveWalks();
                   }
                 },

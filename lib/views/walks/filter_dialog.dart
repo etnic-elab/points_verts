@@ -81,7 +81,7 @@ Future<WalkFilter> filterDialog(
                             setState(() {});
                           },
                           value: editedFilter.extraOrientation),
-                      Text("Orientation")
+                      Text("+ Orientation")
                     ],
                   ),
                   Row(
@@ -103,7 +103,7 @@ Future<WalkFilter> filterDialog(
                             setState(() {});
                           },
                           value: editedFilter.extraWalk),
-                      Text("Parcours suppl. de 10 km")
+                      Text("+ Marche")
                     ],
                   ),
                   Row(
@@ -159,73 +159,6 @@ Future<WalkFilter> filterDialog(
                           },
                           value: editedFilter.transport),
                       Text("Transports en commun")
-                    ],
-                  ),
-                  ListHeader("Provinces"),
-                  Row(
-                    children: <Widget>[
-                      Checkbox(
-                          onChanged: (bool) {
-                            editedFilter.brabantWallon = bool;
-                            setState(() {});
-                          },
-                          value: editedFilter.brabantWallon),
-                      Text("Brabant Wallon")
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Checkbox(
-                          onChanged: (bool) {
-                            editedFilter.hainautEst = bool;
-                            setState(() {});
-                          },
-                          value: editedFilter.hainautEst),
-                      Text("Hainaut Est")
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Checkbox(
-                          onChanged: (bool) {
-                            editedFilter.hainautOuest = bool;
-                            setState(() {});
-                          },
-                          value: editedFilter.hainautOuest),
-                      Text("Hainaut Ouest")
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Checkbox(
-                          onChanged: (bool) {
-                            editedFilter.liege = bool;
-                            setState(() {});
-                          },
-                          value: editedFilter.liege),
-                      Text("Liège")
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Checkbox(
-                          onChanged: (bool) {
-                            editedFilter.luxembourg = bool;
-                            setState(() {});
-                          },
-                          value: editedFilter.luxembourg),
-                      Text("Luxembourg")
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Checkbox(
-                          onChanged: (bool) {
-                            editedFilter.namur = bool;
-                            setState(() {});
-                          },
-                          value: editedFilter.namur),
-                      Text("Namur")
                     ],
                   ),
                 ],

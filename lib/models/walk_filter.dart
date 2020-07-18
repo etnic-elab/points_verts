@@ -83,4 +83,21 @@ class WalkFilter {
         'be_wapp': beWapp,
         'transport': transport
       };
+  
+  String getLabel() {
+    List<String> result = [];
+    if (!cancelledWalks) result.add("pas annulé");
+    if (fifteenKm) result.add("15km");
+    if (wheelchair) result.add("PMR");
+    if (stroller) result.add("poussettes");
+    if (extraOrientation) result.add("+ orientation");
+    if (extraWalk) result.add("+ marche");
+    if (guided) result.add("balade guidée");
+    if (bike) result.add("vélo");
+    if (mountainBike) result.add("VTT");
+    if (waterSupply) result.add("ravitaillement");
+    if (beWapp) result.add("BeWaPP");
+    if (transport) result.add("transports en commun");
+    return result.length == 0 ? "aucun" : result.join(", ");
+  }
 }
