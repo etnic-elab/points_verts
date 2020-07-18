@@ -48,7 +48,7 @@ class WalkFilter {
         liege = json['liege'],
         luxembourg = json['luxembourg'],
         namur = json['namur'],
-        fifteenKm = json['fifteenKm'],
+        fifteenKm = json['fifteen_km'],
         wheelchair = json['wheelchair'],
         stroller = json['stroller'],
         extraOrientation = json['extra_orientation'],
