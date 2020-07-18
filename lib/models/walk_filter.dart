@@ -1,5 +1,4 @@
 class WalkFilter {
-
   WalkFilter();
 
   bool cancelledWalks = true;
@@ -9,6 +8,17 @@ class WalkFilter {
   bool liege = true;
   bool luxembourg = true;
   bool namur = true;
+  bool fifteenKm = false;
+  bool wheelchair = false;
+  bool stroller = false;
+  bool extraOrientation = false;
+  bool extraWalk = false;
+  bool guided = false;
+  bool bike = false;
+  bool mountainBike = false;
+  bool waterSupply = false;
+  bool beWapp = false;
+  bool transport = false;
 
   bool filterByProvince() {
     return !brabantWallon ||
@@ -37,7 +47,18 @@ class WalkFilter {
         hainautOuest = json['hainautOuest'],
         liege = json['liege'],
         luxembourg = json['luxembourg'],
-        namur = json['namur'];
+        namur = json['namur'],
+        fifteenKm = json['fifteenKm'],
+        wheelchair = json['wheelchair'],
+        stroller = json['stroller'],
+        extraOrientation = json['extra_orientation'],
+        extraWalk = json['extra_walk'],
+        guided = json['guided'],
+        bike = json['bike'],
+        mountainBike = json['mountain_bike'],
+        waterSupply = json['water_supply'],
+        beWapp = json['be_wapp'],
+        transport = json['transport'];
 
   Map<String, dynamic> toJson() => {
         'cancelledWalks': cancelledWalks,
@@ -47,5 +68,16 @@ class WalkFilter {
         'liege': liege,
         'luxembourg': luxembourg,
         'namur': namur,
+        'fifteen_km': fifteenKm,
+        'wheelchair': wheelchair,
+        'stroller': stroller,
+        'extra_orientation': extraOrientation,
+        'extra_walk': extraWalk,
+        'guided': guided,
+        'bike': bike,
+        'mountain_bike': mountainBike,
+        'water_supply': waterSupply,
+        'be_wapp': beWapp,
+        'transport': transport
       };
 }

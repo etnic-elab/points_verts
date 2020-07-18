@@ -334,6 +334,128 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                                       Text("Marches annulées")
                                     ],
                                   ),
+                                  ListHeader("Restrictions"),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.fifteenKm = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.fifteenKm),
+                                      Text("Parcours suppl. de 15 km")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.wheelchair = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.wheelchair),
+                                      Text("Accessible PMR")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.stroller = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.stroller),
+                                      Text("Poussettes")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.extraOrientation = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.extraOrientation),
+                                      Text("Orientation")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.guided = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.guided),
+                                      Text("Balade guidée")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.extraWalk = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.extraWalk),
+                                      Text("Parcours suppl. de 10 km")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.bike = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.bike),
+                                      Text("Vélo")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.mountainBike = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.mountainBike),
+                                      Text("VTT")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.waterSupply = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.waterSupply),
+                                      Text("Ravitaillement")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.beWapp = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.beWapp),
+                                      Text("BeWaPP")
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Checkbox(
+                                          onChanged: (bool) {
+                                            _filter.transport = bool;
+                                            setState(() {});
+                                          },
+                                          value: _filter.transport),
+                                      Text("Transports en commun")
+                                    ],
+                                  ),
                                   ListHeader("Provinces"),
                                   Row(
                                     children: <Widget>[
@@ -406,7 +528,16 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                             ),
                             actions: <Widget>[
                               FlatButton(
-                                child: Text('Filtrer'),
+                                child: const Text('Réinitialiser'),
+                                onPressed: () {
+                                  setState(() {
+                                    _filter = WalkFilter();
+                                  });
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              FlatButton(
+                                child: const Text('Filtrer'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },

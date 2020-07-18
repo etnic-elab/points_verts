@@ -107,6 +107,17 @@ class DBProvider {
         where = where + " and status != ?";
         args.add("Annulé");
       }
+      if (filter.fifteenKm) where = where + " and fifteen_km = 1";
+      if (filter.wheelchair) where = where + " and wheelchair = 1";
+      if (filter.stroller) where = where + " and stroller = 1";
+      if (filter.extraOrientation) where = where + " and extra_orientation = 1";
+      if (filter.extraWalk) where = where + " and extra_walk = 1";
+      if (filter.guided) where = where + " and guided = 1";
+      if (filter.bike) where = where + " and bike = 1";
+      if (filter.mountainBike) where = where + " and mountain_bike = 1";
+      if (filter.waterSupply) where = where + " and water_supply = 1";
+      if (filter.beWapp) where = where + " and be_wapp = 1";
+      if (filter.transport) where = where + " and transport is not null";
       maps = await db.query('walks', where: where, whereArgs: args);
     } else {
       maps = await db.query('walks',
