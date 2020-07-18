@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -6,9 +7,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/walks/place_select.dart';
+import 'package:points_verts/views/walks/filter_dialog.dart';
 import 'package:points_verts/services/prefs.dart';
 
 import 'dates_dropdown.dart';
@@ -39,8 +41,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   DateTime _selectedDate;
   Position _currentPosition;
   Position _homePosition;
-  Places _selectedPlace;
   ViewType _viewType = ViewType.list;
+  WalkFilter _filter;
 
   @override
   void initState() {
@@ -87,11 +89,19 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Future<void> _retrieveData({bool resetDate = true}) async {
     // initialize database here in case of migrations
     await DBProvider.db.database;
+    String filterString = await PrefsProvider.prefs.getString("calendar_walk_filter");
+    WalkFilter filter;
+    if (filterString != null) {
+      filter = WalkFilter.fromJson(jsonDecode(filterString));
+    } else {
+      filter = WalkFilter();
+    }
     setState(() {
       _currentWalks = null;
       _selectedWalk = null;
       _currentPosition = null;
       _homePosition = null;
+      _filter = filter;
     });
     await updateWalks();
     _retrieveDates(resetDate: resetDate);
@@ -105,11 +115,11 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         _homePosition = Position(
             latitude: double.parse(split[0]),
             longitude: double.parse(split[1]));
-        _selectedPlace = Places.home;
+        _filter.selectedPlace = Places.home;
       });
     } else {
       setState(() {
-        _selectedPlace = Places.current;
+        _filter.selectedPlace = Places.current;
       });
     }
     if (await PrefsProvider.prefs.getBoolean(key: "use_location") == true) {
@@ -118,9 +128,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   Position get selectedPosition {
-    if (_selectedPlace == Places.current) {
+    if (_filter.selectedPlace == Places.current) {
       return _currentPosition;
-    } else if (_selectedPlace == Places.home) {
+    } else if (_filter.selectedPlace == Places.home) {
       return _homePosition;
     } else {
       return null;
@@ -136,7 +146,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   _retrieveWalksHelper() async {
-    Future<List<Walk>> newList = DBProvider.db.getWalks(_selectedDate);
+    Future<List<Walk>> newList =
+        DBProvider.db.getWalks(_selectedDate, filter: _filter);
     if (selectedPosition != null) {
       newList = _calculateDistances(await newList);
     } else {
@@ -249,12 +260,13 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return Column(
       children: <Widget>[
         _defineSearchPart(),
+        Divider(height: 0.0),
         Expanded(
             child: _viewType == ViewType.list
                 ? WalkResultsListView(_currentWalks, selectedPosition,
-                    _selectedPlace, _retrieveData)
+                    _filter.selectedPlace, _retrieveData)
                 : WalkResultsMapView(_currentWalks, selectedPosition,
-                    _selectedPlace, _selectedWalk, (walk) {
+                    _filter.selectedPlace, _selectedWalk, (walk) {
                     setState(() {
                       _selectedWalk = walk;
                     });
@@ -278,33 +290,30 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                       _retrieveWalks();
                     });
                   }),
-              _homePosition != null && _currentPosition != null
-                  ? PlaceSelect(
-                      currentPlace: _selectedPlace,
-                      onChanged: (Places place) {
-                        setState(() {
-                          _selectedPlace = place;
-                        });
-                        _retrieveWalks();
-                      })
-                  : Expanded(child: _resultNumber())
+              ActionChip(
+                label: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4.0),
+                      child: Icon(Icons.tune, size: 16.0),
+                    ),
+                    Text("Filtres")
+                  ],
+                ),
+                onPressed: () async {
+                  WalkFilter newFilter = await filterDialog(context, _filter,
+                      _homePosition != null && _currentPosition != null);
+                  if (newFilter != null) {
+                    setState(() {
+                      _filter = newFilter;
+                    });
+                    await PrefsProvider.prefs
+                        .setString("calendar_walk_filter", jsonEncode(newFilter));
+                    _retrieveWalks();
+                  }
+                },
+              ),
             ]));
-  }
-
-  Widget _resultNumber() {
-    return FutureBuilder(
-      future: _currentWalks,
-      builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData) {
-            return Align(
-                alignment: Alignment.centerRight,
-                child: Text("${snapshot.data.length.toString()} résultat(s)"));
-          }
-        }
-        return SizedBox.shrink();
-      },
-    );
   }
 
   _getCurrentLocation() {
@@ -319,7 +328,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         setState(() {
           _currentPosition = position;
         });
-        if (_selectedPlace == Places.current && _selectedDate != null) {
+        if (_filter.selectedPlace == Places.current && _selectedDate != null) {
           _retrieveWalks();
         }
       }
