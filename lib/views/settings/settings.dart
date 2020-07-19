@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
+import 'package:points_verts/views/walks/walk_utils.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../services/notification.dart';
@@ -167,6 +168,15 @@ class _SettingsState extends State<Settings> {
               _setShowNotification(value);
             },
           ),
+          Divider(),
+          ListTile(
+            title: Text("Assistance"),
+            onTap: () => launchURL("https://tborlee.github.io/points_verts/assistance.html"),
+          ),
+          ListTile(
+            title: Text("Charte de la vie privée"),
+            onTap: () => launchURL("https://tborlee.github.io/points_verts/privacy.html"),
+          )
         ],
       ),
     );
