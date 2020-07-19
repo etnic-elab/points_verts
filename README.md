@@ -7,6 +7,7 @@ Uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de
 # Features
 
 - Display walks list by date, either in list form or on a map
+- Display walks list alphabetically, in directory-style
 - Calculate distance between your position and the walks (requires to allow the app to use your position)
 - Calculate distance and time between your home and the walks (requires to set home address in settings)
 - Display forecast weathers 5 days before the walks
@@ -15,7 +16,6 @@ Uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de
 
 # Planned features
 
-- Open walk details directly from notification
 - Share walk infos button?
 
 # Releasing the application
