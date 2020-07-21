@@ -171,11 +171,11 @@ class _SettingsState extends State<Settings> {
           Divider(),
           ListTile(
             title: Text("Assistance"),
-            onTap: () => launchURL("https://tborlee.github.io/points_verts/assistance.html"),
+            onTap: () => launchURL("https://pointsverts.alpagaga.dev/assistance.html"),
           ),
           ListTile(
             title: Text("Charte de la vie privée"),
-            onTap: () => launchURL("https://tborlee.github.io/points_verts/privacy.html"),
+            onTap: () => launchURL("https://pointsverts.alpagaga.dev/privacy.html"),
           )
         ],
       ),
