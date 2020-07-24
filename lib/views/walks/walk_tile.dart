@@ -26,24 +26,27 @@ class WalkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: _weatherIcon(),
-      title: tileType == TileType.calendar
-          ? Text(walk.city)
-          : Text("${walk.city} (${walk.entity})",
-              overflow: TextOverflow.ellipsis),
-      subtitle: tileType == TileType.calendar
-          ? Text("${walk.type} - ${walk.province}")
-          : Text(walk.getContactLabel()),
-      onTap: () => Navigator.push(context, _pageRoute()),
-      trailing: tileType == TileType.calendar
-          ? GeoButton(walk)
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(fullDate.format(walk.date)),
-              ],
-            ),
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      child: ListTile(
+        leading: _weatherIcon(),
+        title: tileType == TileType.calendar
+            ? Text(walk.city)
+            : Text("${walk.city} (${walk.entity})",
+                overflow: TextOverflow.ellipsis),
+        subtitle: tileType == TileType.calendar
+            ? Text("${walk.type} - ${walk.province}")
+            : Text(walk.getContactLabel()),
+        onTap: () => Navigator.push(context, _pageRoute()),
+        trailing: tileType == TileType.calendar
+            ? GeoButton(walk)
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(fullDate.format(walk.date)),
+                ],
+              ),
+      ),
     );
   }
 
