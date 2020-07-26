@@ -43,8 +43,8 @@ class WalkDetailsView extends StatelessWidget {
     return Container(
       height: height,
       width: width,
-      child: retrieveStaticImage(walk.long, walk.lat, (width * 1.5).round(),
-          (height * 1.5).round(), Theme.of(context).brightness),
+      child: retrieveStaticImage(walk.long, walk.lat, width.round(),
+          height.round(), Theme.of(context).brightness),
     );
   }
 }
