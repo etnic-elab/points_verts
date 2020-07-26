@@ -73,7 +73,8 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
   );
 }
 
-Future<List<AddressSuggestion>> retrieveSuggestions(String country, String search) async {
+Future<List<AddressSuggestion>> retrieveSuggestions(
+    String country, String search) async {
   if (search.isNotEmpty) {
     final String url =
         "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token&country=$country&language=fr_BE&limit=10&types=address,poi";
@@ -83,7 +84,7 @@ Future<List<AddressSuggestion>> retrieveSuggestions(String country, String searc
     if (decoded['features'] != null) {
       for (var result in decoded['features']) {
         results.add(AddressSuggestion(
-          text: result['text'],
+            text: result['text'],
             address: result['place_name'],
             longitude: result['center'][0],
             latitude: result['center'][1]));
@@ -105,4 +106,13 @@ Future<String> retrieveAddress(double long, double lat) async {
   } else {
     return null;
   }
+}
+
+Image retrieveStaticImage(
+    double long, double lat, int width, int height, Brightness brightness,
+    {double zoom = 16.0}) {
+  final String style = brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
+  final String url =
+      "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l($long,$lat)/$long,$lat,$zoom,0,0/${width}x$height?access_token=$_token";
+  return Image.network(url);
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
 import 'package:points_verts/services/mapbox.dart';
 import 'package:points_verts/views/walks/walk_details.dart';
 
@@ -18,8 +16,7 @@ class WalkDetailsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: FittedBox(
-            fit: BoxFit.fitWidth,
-            child: Text("${walk.type} à ${walk.city}")),
+            fit: BoxFit.fitWidth, child: Text("${walk.type} à ${walk.city}")),
       ),
       body: OrientationBuilder(
         builder: (context, orientation) {
@@ -40,19 +37,14 @@ class WalkDetailsView extends StatelessWidget {
   }
 
   Widget _buildMap(BuildContext context, bool landscape) {
-    final Marker marker = Marker(
-      point: new LatLng(walk.lat, walk.long),
-      builder: (ctx) => new Container(child: Icon(Icons.location_on)),
-    );
     Size size = MediaQuery.of(context).size;
+    double height = landscape ? size.height : 200.0;
+    double width = landscape ? size.width / 2 : size.width;
     return Container(
-      height: landscape ? size.height : 200.0,
-      width: landscape ? size.width / 2 : size.width,
-      child: retrieveMap([marker], Theme.of(context).brightness,
-          centerLat: walk.lat,
-          centerLong: walk.long,
-          zoom: 16.0,
-          interactive: false),
+      height: height,
+      width: width,
+      child: retrieveStaticImage(walk.long, walk.lat, (width * 1.5).round(),
+          (height * 1.5).round(), Theme.of(context).brightness),
     );
   }
 }
