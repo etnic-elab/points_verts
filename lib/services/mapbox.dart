@@ -113,6 +113,6 @@ Image retrieveStaticImage(
     {double zoom = 16.0}) {
   final String style = brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
   final String url =
-      "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l($long,$lat)/$long,$lat,$zoom,0,0/${width}x$height?access_token=$_token";
+      "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l($long,$lat)/$long,$lat,$zoom,0,0/${width}x$height@2x?access_token=$_token";
   return Image.network(url);
 }
