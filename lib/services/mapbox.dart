@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -108,11 +110,16 @@ Future<String> retrieveAddress(double long, double lat) async {
   }
 }
 
-Image retrieveStaticImage(
+Widget retrieveStaticImage(
     double long, double lat, int width, int height, Brightness brightness,
     {double zoom = 16.0}) {
   final String style = brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
   final String url =
       "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l($long,$lat)/$long,$lat,$zoom,0,0/${width}x$height@2x?access_token=$_token";
-  return Image.network(url);
+  return CachedNetworkImage(
+    imageUrl: url,
+    progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+        child: CircularProgressIndicator(value: downloadProgress.progress)),
+    errorWidget: (context, url, error) => Icon(Icons.error),
+  );
 }
