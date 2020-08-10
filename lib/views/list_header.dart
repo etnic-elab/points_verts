@@ -13,7 +13,7 @@ class ListHeader extends StatelessWidget {
           style: TextStyle(
               color: Theme.of(context).accentColor,
               fontWeight: FontWeight.bold)),
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
     );
   }
 }

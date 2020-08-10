@@ -121,7 +121,6 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Paramètres"),
-        actions: <Widget>[About()],
       ),
       body: ListView(
         children: <Widget>[
@@ -152,6 +151,7 @@ class _SettingsState extends State<Settings> {
                     icon: Icon(Icons.delete), onPressed: () => _removeHome())
                 : null,
           ),
+          Divider(),
           GestureDetector(
               child: ListHeader("Notifications"),
               onLongPress: () => Navigator.of(context)
@@ -170,13 +170,16 @@ class _SettingsState extends State<Settings> {
           ),
           Divider(),
           ListTile(
+            leading: Icon(Icons.help),
             title: Text("Assistance"),
             onTap: () => launchURL("https://pointsverts.alpagaga.dev/assistance.html"),
           ),
           ListTile(
+            leading: Icon(Icons.security),
             title: Text("Charte de la vie privée"),
             onTap: () => launchURL("https://pointsverts.alpagaga.dev/privacy.html"),
-          )
+          ),
+          About()
         ],
       ),
     );

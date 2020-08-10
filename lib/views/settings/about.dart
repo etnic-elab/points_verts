@@ -7,9 +7,10 @@ class About extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String emailAddress = _getEmailAddress();
-    return IconButton(
-        icon: Icon(Icons.info),
-        onPressed: () {
+    return ListTile(
+        leading: Icon(Icons.info),
+        title: Text("À propos"),
+        onTap: () {
           showAboutDialog(
               context: context,
               applicationIcon:
