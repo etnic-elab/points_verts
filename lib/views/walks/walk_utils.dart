@@ -69,6 +69,7 @@ updateWalks() async {
         PrefsProvider.prefs
             .setString("last_walk_update", now.toIso8601String());
         await _fixNextWalks();
+        await DBProvider.db.deleteOldWalks();
       } catch (err) {
         print("Cannot refresh walks list: $err");
       }

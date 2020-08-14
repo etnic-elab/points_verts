@@ -46,8 +46,8 @@ class NotificationManager {
     return _flutterLocalNotificationsPlugin;
   }
 
-  scheduleNextNearestWalk(Walk walk, DateTime walkDate) async {
-    DateTime scheduledAt = walkDate.subtract(Duration(hours: 4));
+  scheduleNextNearestWalk(Walk walk) async {
+    DateTime scheduledAt = walk.date.subtract(Duration(hours: 4));
     if (scheduledAt.isBefore(DateTime.now())) {
       return;
     }
@@ -69,7 +69,7 @@ class NotificationManager {
       if (walk.trip != null) {
         await instance.schedule(
             NEXT_NEAREST_WALK,
-            'Point le plus proche le ${fullDate.format(walkDate)}',
+            'Point le plus proche le ${fullDate.format(walk.date)}',
             "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture",
             scheduledAt,
             platformChannelSpecifics,
@@ -77,7 +77,7 @@ class NotificationManager {
       } else {
         await instance.schedule(
             NEXT_NEAREST_WALK,
-            'Point le plus proche le ${fullDate.format(walkDate)}',
+            'Point le plus proche le ${fullDate.format(walk.date)}',
             "${walk.city} - ${walk.province}",
             scheduledAt,
             platformChannelSpecifics,
@@ -124,7 +124,6 @@ Future<void> scheduleNextNearestWalkNotification() async {
   List<String> split = homePos.split(",");
   Position home = Position(
       latitude: double.parse(split[0]), longitude: double.parse(split[1]));
-  DBProvider.db.deleteOldWalks();
   List<DateTime> dates = await DBProvider.db.getWalkDates();
   if (dates.length >= 1) {
     if (dates[0].isBefore(DateTime.now())) {
@@ -150,7 +149,7 @@ Future<void> scheduleNextNearestWalkNotification() async {
     walks.sort((a, b) => sortWalks(a, b));
     if (walks.length >= 1 && !walks[0].isCancelled()) {
       await NotificationManager.instance
-          .scheduleNextNearestWalk(walks[0], dates[0]);
+          .scheduleNextNearestWalk(walks[0]);
     }
   }
 }
