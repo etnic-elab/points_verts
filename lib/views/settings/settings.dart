@@ -120,7 +120,10 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Paramètres"),
+        title: GestureDetector(
+            child: Text("Paramètres"),
+            onLongPress: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => Debug()))),
       ),
       body: ListView(
         children: <Widget>[
@@ -152,10 +155,7 @@ class _SettingsState extends State<Settings> {
                 : null,
           ),
           Divider(),
-          GestureDetector(
-              child: ListHeader("Notifications"),
-              onLongPress: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => Debug()))),
+          ListHeader("Notifications"),
           ListTile(
               title: Text(
                   "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
@@ -172,12 +172,14 @@ class _SettingsState extends State<Settings> {
           ListTile(
             leading: Icon(Icons.help),
             title: Text("Assistance"),
-            onTap: () => launchURL("https://pointsverts.alpagaga.dev/assistance.html"),
+            onTap: () =>
+                launchURL("https://pointsverts.alpagaga.dev/assistance.html"),
           ),
           ListTile(
             leading: Icon(Icons.security),
             title: Text("Charte de la vie privée"),
-            onTap: () => launchURL("https://pointsverts.alpagaga.dev/privacy.html"),
+            onTap: () =>
+                launchURL("https://pointsverts.alpagaga.dev/privacy.html"),
           ),
           About()
         ],
