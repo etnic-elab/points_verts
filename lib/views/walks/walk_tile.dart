@@ -30,10 +30,7 @@ class WalkTile extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
       child: ListTile(
         leading: _weatherIcon(),
-        title: tileType == TileType.calendar
-            ? Text(walk.city)
-            : Text("${walk.city} (${walk.entity})",
-                overflow: TextOverflow.ellipsis),
+        title: _title(),
         subtitle: tileType == TileType.calendar
             ? Text("${walk.type} - ${walk.province}")
             : Text(walk.getContactLabel()),
@@ -48,6 +45,16 @@ class WalkTile extends StatelessWidget {
               ),
       ),
     );
+  }
+
+  Widget _title() {
+    if (tileType == TileType.directory) {
+      return Text("${walk.city} (${walk.entity})",
+          style: TextStyle(fontWeight: FontWeight.bold),
+          overflow: TextOverflow.ellipsis);
+    } else {
+      return Text(walk.city, style: TextStyle(fontWeight: FontWeight.bold));
+    }
   }
 
   Widget _weatherIcon() {
