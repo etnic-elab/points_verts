@@ -14,7 +14,6 @@ import 'package:points_verts/views/walks/filter_dialog.dart';
 import 'package:points_verts/services/prefs.dart';
 
 import 'dates_dropdown.dart';
-import '../../services/mapbox.dart';
 import '../../services/openweather.dart';
 import '../../models/walk.dart';
 import 'walk_results_list_view.dart';
@@ -89,7 +88,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Future<void> _retrieveData({bool resetDate = true}) async {
     // initialize database here in case of migrations
     await DBProvider.db.database;
-    String filterString = await PrefsProvider.prefs.getString("calendar_walk_filter");
+    String filterString =
+        await PrefsProvider.prefs.getString("calendar_walk_filter");
     WalkFilter filter;
     if (filterString != null) {
       filter = WalkFilter.fromJson(jsonDecode(filterString));
@@ -108,13 +108,10 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   _retrievePosition() async {
-    String homePos = await PrefsProvider.prefs.getString("home_coords");
-    if (homePos != null) {
-      List<String> split = homePos.split(",");
+    Position home = await retrieveHomePosition();
+    if (home != null) {
       setState(() {
-        _homePosition = Position(
-            latitude: double.parse(split[0]),
-            longitude: double.parse(split[1]));
+        _homePosition = home;
         _filter.selectedPlace = Places.home;
       });
     } else {
@@ -146,13 +143,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   _retrieveWalksHelper() async {
-    Future<List<Walk>> newList =
-        DBProvider.db.getWalks(_selectedDate, filter: _filter);
-    if (selectedPosition != null) {
-      newList = _calculateDistances(await newList);
-    } else {
-      (await newList).sort((a, b) => sortWalks(a, b));
-    }
+    Future<List<Walk>> newList = retrieveSortedWalks(_selectedDate,
+        filter: _filter, position: selectedPosition);
     if (_selectedDate.difference(DateTime.now()).inDays < 5) {
       try {
         _retrieveWeathers(await newList).then((_) {
@@ -166,32 +158,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       _currentWalks = newList;
     });
     _firstLaunch();
-  }
-
-  Future<List<Walk>> _calculateDistances(List<Walk> walks) async {
-    for (Walk walk in walks) {
-      if (walk.lat != null && walk.long != null) {
-        double distance = await geolocator.distanceBetween(
-            selectedPosition.latitude,
-            selectedPosition.longitude,
-            walk.lat,
-            walk.long);
-        walk.distance = distance;
-        walk.trip = null;
-      }
-    }
-    walks.sort((a, b) => sortWalks(a, b));
-    try {
-      retrieveTrips(
-              selectedPosition.longitude, selectedPosition.latitude, walks)
-          .then((_) {
-        walks.sort((a, b) => sortWalks(a, b));
-        setState(() {});
-      });
-    } catch (err) {
-      print("Cannot retrieve trips: $err");
-    }
-    return walks;
   }
 
   Future _retrieveWeathers(List<Walk> walks) async {
@@ -307,8 +273,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                     setState(() {
                       _filter = newFilter;
                     });
-                    await PrefsProvider.prefs
-                        .setString("calendar_walk_filter", jsonEncode(newFilter));
+                    await PrefsProvider.prefs.setString(
+                        "calendar_walk_filter", jsonEncode(newFilter));
                     _retrieveWalks();
                   }
                 },

@@ -7,10 +7,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/main.dart';
 import 'package:points_verts/models/walk.dart';
-import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
-import 'mapbox.dart';
 import 'prefs.dart';
 
 const int NEXT_NEAREST_WALK = 0;
@@ -119,37 +117,14 @@ Future<void> scheduleNextNearestWalkNotification() async {
   bool showNotification = await PrefsProvider.prefs
       .getBoolean(key: "show_notification", defaultValue: false);
   if (!showNotification) return;
-  String homePos = await PrefsProvider.prefs.getString("home_coords");
-  if (homePos == null) return;
-  List<String> split = homePos.split(",");
-  Position home = Position(
-      latitude: double.parse(split[0]), longitude: double.parse(split[1]));
-  List<DateTime> dates = await DBProvider.db.getWalkDates();
-  if (dates.length >= 1) {
-    if (dates[0].isBefore(DateTime.now())) {
-      // don't say that the next walk is tomorrow if it's today, user normally
-      // already got the notification yesterday
-      return;
-    }
+  Position home = await retrieveHomePosition();
+  if (home == null) return;
+  List<DateTime> dates = await retrieveNearestDates();
+  if (dates.isNotEmpty) {
     await updateWalks();
-    List<Walk> walks = await DBProvider.db.getWalks(dates[0]);
-    final Geolocator geolocator = Geolocator();
-    for (Walk walk in walks) {
-      if (walk.isPositionable()) {
-        walk.distance = await geolocator.distanceBetween(
-            home.latitude, home.longitude, walk.lat, walk.long);
-      }
-    }
-    walks.sort((a, b) => sortWalks(a, b));
-    try {
-      await retrieveTrips(home.longitude, home.latitude, walks);
-    } catch (err) {
-      print("Cannot retrieve trips: $err");
-    }
-    walks.sort((a, b) => sortWalks(a, b));
+    List<Walk> walks = await retrieveSortedWalks(dates[0], position: home);
     if (walks.length >= 1 && !walks[0].isCancelled()) {
-      await NotificationManager.instance
-          .scheduleNextNearestWalk(walks[0]);
+      await NotificationManager.instance.scheduleNextNearestWalk(walks[0]);
     }
   }
 }
