@@ -26,8 +26,8 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
   Future<void> _initPlatformState() async {
     BackgroundFetch.configure(
         BackgroundFetchConfig(
-            minimumFetchInterval: 60 * 12,
-            // twice per day
+            minimumFetchInterval: 60 * 6,
+            // four times per day
             stopOnTerminate: false,
             enableHeadless: true,
             requiredNetworkType: NetworkType.ANY,
