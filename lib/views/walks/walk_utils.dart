@@ -1,8 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
+import 'package:points_verts/services/mapbox.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -35,6 +38,33 @@ int sortWalks(Walk a, Walk b) {
   } else {
     return 1;
   }
+}
+
+Future<List<Walk>> retrieveSortedWalks(DateTime date,
+    {Position position, WalkFilter filter}) async {
+  List<Walk> walks = await DBProvider.db.getWalks(date, filter: filter);
+  if (position == null) {
+    walks.sort((a, b) => sortWalks(a, b));
+    return walks;
+  }
+  Geolocator geolocator = Geolocator();
+  for (Walk walk in walks) {
+    if (walk.isPositionable()) {
+      double distance = await geolocator.distanceBetween(
+          position.latitude, position.longitude, walk.lat, walk.long);
+      walk.distance = distance;
+      walk.trip = null;
+    }
+  }
+  walks.sort((a, b) => sortWalks(a, b));
+  try {
+    retrieveTrips(position.longitude, position.latitude, walks).then((_) {
+      walks.sort((a, b) => sortWalks(a, b));
+    });
+  } catch (err) {
+    print("Cannot retrieve trips: $err");
+  }
+  return walks;
 }
 
 launchURL(url) async {
@@ -80,23 +110,40 @@ updateWalks() async {
   }
 }
 
+Future<List<DateTime>> retrieveNearestDates() async {
+  List<DateTime> walkDates = await DBProvider.db.getWalkDates();
+  DateTime now = DateTime.now();
+  DateTime inAWeek = now.add(Duration(days: 10));
+  walkDates.retainWhere(
+      (element) => element.isAfter(now) && element.isBefore(inAWeek));
+  return walkDates;
+}
+
+Future<Position> retrieveHomePosition() async {
+  String homePos = await PrefsProvider.prefs.getString("home_coords");
+  if (homePos == null) return null;
+  List<String> split = homePos.split(",");
+  return Position(
+      latitude: double.parse(split[0]), longitude: double.parse(split[1]));
+}
+
 // For some reasons, the API is not as up-to-date as the website.
 // To fix that until it is resolved, retrieve the statuses from the website
 // for the walks of the next walk date when we refresh data from the API.
 _fixNextWalks() async {
-  List<DateTime> walkDates = await DBProvider.db.getWalkDates();
-  if (walkDates.isEmpty) return;
-  DateTime nextWalkDate = walkDates.first;
-  List<Walk> fromWebsite = await retrieveWalksFromWebSite(nextWalkDate);
-  List<Walk> fromDbs = await DBProvider.db.getWalks(nextWalkDate);
-  for (Walk walk in fromDbs) {
-    Walk website = fromWebsite.singleWhere((element) => element.id == walk.id,
-        orElse: () => null);
-    if (website == null) {
-      walk.status = "Annulé";
-    } else if (website.status != null) {
-      walk.status = website.status;
+  List<DateTime> nextDates = await retrieveNearestDates();
+  for (DateTime walkDate in nextDates) {
+    List<Walk> fromWebsite = await retrieveWalksFromWebSite(walkDate);
+    List<Walk> fromDbs = await DBProvider.db.getWalks(walkDate);
+    for (Walk walk in fromDbs) {
+      Walk website = fromWebsite.singleWhere((element) => element.id == walk.id,
+          orElse: () => null);
+      if (website == null) {
+        walk.status = "Annulé";
+      } else if (website.status != null) {
+        walk.status = website.status;
+      }
     }
+    await DBProvider.db.insertWalks(fromDbs);
   }
-  await DBProvider.db.insertWalks(fromDbs);
 }
