@@ -48,7 +48,7 @@ Future<WalkFilter> filterDialog(
                             setState(() {});
                           },
                           value: editedFilter.fifteenKm),
-                      Text("Parcours suppl. de 15 km")
+                      Text("Parcours de 15 km")
                     ],
                   ),
                   Row(
@@ -158,7 +158,7 @@ Future<WalkFilter> filterDialog(
                             setState(() {});
                           },
                           value: editedFilter.transport),
-                      Text("Transports en commun")
+                      Text("Train/Bus")
                     ],
                   ),
                 ],
