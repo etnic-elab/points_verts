@@ -31,7 +31,9 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
     DateTime lastFetchDate = DateTime.parse(lastFetch);
     // temp fix (I hope) since iOS task scheduling is not friendly
     if (DateTime.now().difference(lastFetchDate) > Duration(days: 1)) {
-      scheduleNextNearestWalkNotification();
+      await scheduleNextNearestWalkNotification();
+      await PrefsProvider.prefs.setString(
+          "last_background_fetch", DateTime.now().toUtc().toIso8601String());
     }
   }
 
