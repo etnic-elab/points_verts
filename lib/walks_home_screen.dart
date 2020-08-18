@@ -20,7 +20,19 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
   @override
   void initState() {
     _initPlatformState();
+    _checkLastBackgroundTask();
     super.initState();
+  }
+
+  void _checkLastBackgroundTask() async {
+    String lastFetch =
+    await PrefsProvider.prefs.getString("last_background_fetch");
+    if (lastFetch == null) return;
+    DateTime lastFetchDate = DateTime.parse(lastFetch);
+    // temp fix (I hope) since iOS task scheduling is not friendly
+    if (DateTime.now().difference(lastFetchDate) > Duration(days: 1)) {
+      scheduleNextNearestWalkNotification();
+    }
   }
 
   Future<void> _initPlatformState() async {

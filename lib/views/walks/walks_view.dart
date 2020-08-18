@@ -47,9 +47,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   @override
   void initState() {
     initializeDateFormatting("fr_BE");
-    _retrieveData().then((_) {
-      _checkLastBackgroundTask();
-    });
+    _retrieveData();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
@@ -64,17 +62,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _retrieveData(resetDate: false);
-    }
-  }
-
-  void _checkLastBackgroundTask() async {
-    String lastFetch =
-        await PrefsProvider.prefs.getString("last_background_fetch");
-    if (lastFetch == null) return;
-    DateTime lastFetchDate = DateTime.parse(lastFetch);
-    // temp fix (I hope) since iOS task scheduling is not friendly
-    if (DateTime.now().difference(lastFetchDate) > Duration(days: 1)) {
-      scheduleNextNearestWalkNotification();
     }
   }
 
