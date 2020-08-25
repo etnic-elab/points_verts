@@ -159,6 +159,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       _currentWalks = newList;
     });
     _firstLaunch();
+    newList.then((_) {
+      setState(() {});
+    });
   }
 
   Future _retrieveWeathers(List<Walk> walks) async {
