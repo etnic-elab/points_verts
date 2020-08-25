@@ -58,7 +58,7 @@ Future<List<Walk>> retrieveSortedWalks(DateTime date,
   }
   walks.sort((a, b) => sortWalks(a, b));
   try {
-    retrieveTrips(position.longitude, position.latitude, walks).then((_) {
+    await retrieveTrips(position.longitude, position.latitude, walks).then((_) {
       walks.sort((a, b) => sortWalks(a, b));
     });
   } catch (err) {
