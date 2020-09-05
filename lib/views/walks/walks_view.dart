@@ -9,7 +9,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/filter_dialog.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -32,7 +31,6 @@ class WalksView extends StatefulWidget {
 }
 
 class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
-  final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   Future<List<DateTime>> _dates;
@@ -288,10 +286,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   _getCurrentLocation() {
     log("Retrieving current user location", name: TAG);
-    geolocator
-        .getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.medium,
-            locationPermissionLevel: GeolocationPermission.locationWhenInUse)
+    getCurrentPosition(desiredAccuracy: LocationAccuracy.medium)
         .then((Position position) {
       log("Current user location is $position", name: TAG);
       if (this.mounted) {
