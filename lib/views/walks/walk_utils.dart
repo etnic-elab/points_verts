@@ -47,10 +47,9 @@ Future<List<Walk>> retrieveSortedWalks(DateTime date,
     walks.sort((a, b) => sortWalks(a, b));
     return walks;
   }
-  Geolocator geolocator = Geolocator();
   for (Walk walk in walks) {
     if (walk.isPositionable()) {
-      double distance = await geolocator.distanceBetween(
+      double distance = distanceBetween(
           position.latitude, position.longitude, walk.lat, walk.long);
       walk.distance = distance;
       walk.trip = null;
