@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -20,7 +19,6 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  final Geolocator geoLocator = Geolocator()..forceAndroidLocationManager;
   String _home;
   bool _useLocation = false;
   bool _showNotification = false;
@@ -74,7 +72,7 @@ class _SettingsState extends State<Settings> {
   Future<void> _setUseLocation(bool newValue) async {
     bool validated = false;
     if (newValue == true) {
-      validated = await checkLocationPermission() == PermissionStatus.granted;
+      validated = await checkLocationPermission() == LocationPermission.whileInUse;
     } else {
       validated = true;
     }
@@ -105,15 +103,15 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  Future<PermissionStatus> checkLocationPermission() async {
-    PermissionStatus status = await Permission.locationWhenInUse.status;
-    if (status.isPermanentlyDenied) {
+  Future<LocationPermission> checkLocationPermission() async {
+    LocationPermission permission = await checkPermission();
+    if (permission == LocationPermission.deniedForever) {
       await openAppSettings();
-      return status;
-    } else if (status.isUndetermined || status.isDenied) {
-      return Permission.locationWhenInUse.request();
+      return permission;
+    } else if (permission == LocationPermission.denied) {
+      return requestPermission();
     } else {
-      return status;
+      return permission;
     }
   }
 
