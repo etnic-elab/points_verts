@@ -7,7 +7,7 @@ import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/walks/filter_dialog.dart';
+import 'package:points_verts/views/walks/filter_page.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_tile.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -89,7 +89,10 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                               ),
                               onPressed: () async {
                                 WalkFilter newFilter =
-                                    await filterDialog(context, _filter, false);
+                                    await Navigator.of(context)
+                                        .push<WalkFilter>(MaterialPageRoute(
+                                            builder: (context) =>
+                                                FilterPage(_filter, false)));
                                 if (newFilter != null) {
                                   await PrefsProvider.prefs.setString(
                                       "directory_walk_filter",
@@ -129,8 +132,7 @@ class _DirectoryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (walks.length == 0) {
-      return Center(
-          child: Text("Aucune marche ne correspond aux critères."));
+      return Center(child: Text("Aucune marche ne correspond aux critères."));
     } else {
       return ListView.builder(
         itemBuilder: (context, index) =>

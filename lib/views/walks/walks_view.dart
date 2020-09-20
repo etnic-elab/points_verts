@@ -10,8 +10,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/walks/filter_dialog.dart';
 import 'package:points_verts/services/prefs.dart';
+import 'package:points_verts/views/walks/filter_page.dart';
 
 import 'dates_dropdown.dart';
 import '../../services/openweather.dart';
@@ -269,8 +269,12 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                   ],
                 ),
                 onPressed: () async {
-                  WalkFilter newFilter = await filterDialog(context, _filter,
-                      _homePosition != null && _currentPosition != null);
+                  WalkFilter newFilter = await Navigator.of(context)
+                      .push<WalkFilter>(MaterialPageRoute(
+                          builder: (context) => FilterPage(
+                              _filter,
+                              _homePosition != null &&
+                                  _currentPosition != null)));
                   if (newFilter != null) {
                     setState(() {
                       _filter = newFilter;
