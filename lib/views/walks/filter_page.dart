@@ -76,6 +76,11 @@ class _FilterPageState extends State<FilterPage> {
                       editedFilter.brabantWallon = bool;
                       setState(() {});
                     }),
+                    _PaddedChip(editedFilter.bruxelles, "Bruxelles",
+                            (bool) {
+                          editedFilter.bruxelles = bool;
+                          setState(() {});
+                        }),
                     _PaddedChip(editedFilter.hainautEst, "Hainaut Est", (bool) {
                       editedFilter.hainautEst = bool;
                       setState(() {});
