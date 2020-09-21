@@ -6,6 +6,7 @@ class WalkFilter {
   Places selectedPlace;
   bool cancelledWalks = true;
   bool brabantWallon = true;
+  bool bruxelles = true;
   bool hainautEst = true;
   bool hainautOuest = true;
   bool liege = true;
@@ -25,6 +26,7 @@ class WalkFilter {
 
   bool filterByProvince() {
     return !brabantWallon ||
+        !bruxelles ||
         !hainautEst ||
         !hainautOuest ||
         !liege ||
@@ -35,6 +37,7 @@ class WalkFilter {
   List<String> provinceFilter() {
     List<String> results = [];
     if (brabantWallon) results.add("Brabant Wallon");
+    if (bruxelles) results.add("Bruxelles");
     if (hainautEst) results.add("Hainaut Est");
     if (hainautOuest) results.add("Hainaut Ouest");
     if (liege) results.add("Liège");
@@ -46,6 +49,7 @@ class WalkFilter {
   WalkFilter.fromJson(Map<String, dynamic> json)
       : cancelledWalks = json['cancelled_walks'],
         brabantWallon = json['brabantWallon'],
+        bruxelles = json['bruxelles'],
         hainautEst = json['hainautEst'],
         hainautOuest = json['hainautOuest'],
         liege = json['liege'],
@@ -66,6 +70,7 @@ class WalkFilter {
   Map<String, dynamic> toJson() => {
         'cancelled_walks': cancelledWalks,
         'brabantWallon': brabantWallon,
+        'bruxelles': bruxelles,
         'hainautEst': hainautEst,
         'hainautOuest': hainautOuest,
         'liege': liege,
@@ -83,7 +88,7 @@ class WalkFilter {
         'be_wapp': beWapp,
         'transport': transport
       };
-  
+
   String getLabel() {
     List<String> result = [];
     if (!cancelledWalks) result.add("pas annulé");
