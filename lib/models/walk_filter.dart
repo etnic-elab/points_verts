@@ -49,7 +49,7 @@ class WalkFilter {
   WalkFilter.fromJson(Map<String, dynamic> json)
       : cancelledWalks = json['cancelled_walks'],
         brabantWallon = json['brabantWallon'],
-        bruxelles = json['bruxelles'],
+        bruxelles = json['bruxelles'] != null ? json['bruxelles'] : true,
         hainautEst = json['hainautEst'],
         hainautOuest = json['hainautOuest'],
         liege = json['liege'],
