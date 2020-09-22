@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -164,7 +165,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   Future _retrieveWeathers(List<Walk> walks) async {
     List<Future> weathers = List<Future>();
-    for (Walk walk in walks) {
+    for (int i = 0; i < math.min(walks.length, 5); i++) {
+      Walk walk = walks[i];
       if (walk.weathers == null && !walk.isCancelled()) {
         walk.weathers = getWeather(walk.long, walk.lat, _selectedDate);
         weathers.add(walk.weathers);
