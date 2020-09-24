@@ -16,7 +16,7 @@ class About extends StatelessWidget {
               applicationIcon:
                   Image(image: AssetImage('assets/logo.png'), height: 50),
               applicationName: "Points Verts",
-              applicationVersion: "1.3.4",
+              applicationVersion: "1.3.5",
               applicationLegalese: "GNU GPLv3",
               children: [
                 _AboutRow("Dépôt du code source", "GitHub",
