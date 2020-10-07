@@ -63,7 +63,10 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
     layers: [
       new TileLayerOptions(
         urlTemplate:
-            "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}",
+            "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}@2x?access_token={accessToken}",
+        tileSize: 512,
+        maxZoom: 18,
+        zoomOffset: -1,
         additionalOptions: {
           'accessToken': _token,
           'id': brightness == Brightness.dark ? 'dark-v10' : 'light-v10',
