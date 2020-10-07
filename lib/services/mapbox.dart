@@ -62,12 +62,11 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
         interactive: interactive),
     layers: [
       new TileLayerOptions(
-        urlTemplate: "https://api.tiles.mapbox.com/v4/"
-            "{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}",
+        urlTemplate:
+            "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}",
         additionalOptions: {
           'accessToken': _token,
-          'id':
-              brightness == Brightness.dark ? 'mapbox.dark' : 'mapbox.streets',
+          'id': brightness == Brightness.dark ? 'dark-v10' : 'light-v10',
         },
       ),
       new MarkerLayerOptions(markers: markers),
