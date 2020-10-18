@@ -37,7 +37,7 @@ dependencies:
   flutter_dotenv: ^2.1.0
   weather_icons: ^2.0.0
   background_fetch: ^0.6.0
-  flutter_local_notifications: ^1.2.0+4
+  flutter_local_notifications: ^2.0.0
   csv: ^4.0.3
 
 dev_dependencies:

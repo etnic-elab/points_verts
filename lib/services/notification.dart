@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:points_verts/main.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 import 'prefs.dart';
 
@@ -32,7 +34,7 @@ class NotificationManager {
       requestAlertPermission: false,
     );
     var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     _flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (String payload) async {
@@ -41,11 +43,13 @@ class NotificationManager {
         MyApp.redirectToWalkDetails(walkId);
       }
     });
+    tz.initializeTimeZones();
     return _flutterLocalNotificationsPlugin;
   }
 
   scheduleNextNearestWalk(Walk walk) async {
-    DateTime scheduledAt = walk.date.subtract(Duration(hours: 4));
+    tz.TZDateTime scheduledAt =
+        tz.TZDateTime.from(walk.date, tz.local).subtract(Duration(hours: 4));
     if (scheduledAt.isBefore(DateTime.now())) {
       return;
     }
@@ -55,32 +59,35 @@ class NotificationManager {
           'NEXT_NEAREST_WALK',
           'Prochain point à proximité',
           'Indique la veille le prochain point vert Adeps le plus proche de votre domicile',
-          importance: Importance.Max,
-          priority: Priority.High,
+          importance: Importance.max,
+          priority: Priority.high,
           ticker: 'ticker');
       var iOSPlatformChannelSpecifics = IOSNotificationDetails();
       var platformChannelSpecifics = NotificationDetails(
-          androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+          android: androidPlatformChannelSpecifics,
+          iOS: iOSPlatformChannelSpecifics);
       await cancelNextNearestWalkNotification();
       DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
       FlutterLocalNotificationsPlugin instance = await plugin;
+
+      var title;
+      var description;
+
       if (walk.trip != null) {
-        await instance.schedule(
-            NEXT_NEAREST_WALK,
-            'Point le plus proche le ${fullDate.format(walk.date)}',
-            "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture",
-            scheduledAt,
-            platformChannelSpecifics,
-            payload: walk.id.toString());
+        title = 'Point le plus proche le ${fullDate.format(walk.date)}';
+        description =
+            "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture";
       } else {
-        await instance.schedule(
-            NEXT_NEAREST_WALK,
-            'Point le plus proche le ${fullDate.format(walk.date)}',
-            "${walk.city} - ${walk.province}",
-            scheduledAt,
-            platformChannelSpecifics,
-            payload: walk.id.toString());
+        title = 'Point le plus proche le ${fullDate.format(walk.date)}';
+        description = "${walk.city} - ${walk.province}";
       }
+
+      await instance.zonedSchedule(NEXT_NEAREST_WALK, title, description,
+          scheduledAt, platformChannelSpecifics,
+          payload: walk.id.toString(),
+          androidAllowWhileIdle: true,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime);
       log('Notification scheduled for ${scheduledAt.toString()}', name: TAG);
     } catch (err) {
       print("cannot display notification: $err");
