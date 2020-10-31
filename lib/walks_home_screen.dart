@@ -74,11 +74,11 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
         onTap: _onItemTapped,
         items: <BottomNavigationBarItem>[
           const BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), title: Text("Calendrier")),
+              icon: Icon(Icons.calendar_today), label: "Calendrier"),
           const BottomNavigationBarItem(
-              icon: Icon(Icons.import_contacts), title: Text("Annuaire")),
+              icon: Icon(Icons.import_contacts), label: "Annuaire"),
           const BottomNavigationBarItem(
-              icon: Icon(Icons.settings), title: Text("Paramètres")),
+              icon: Icon(Icons.settings), label: "Paramètres"),
         ],
       ),
       body: _pages[_selectedIndex],
