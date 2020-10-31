@@ -104,12 +104,12 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<LocationPermission> checkLocationPermission() async {
-    LocationPermission permission = await checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.deniedForever) {
-      await openAppSettings();
+      await Geolocator.openAppSettings();
       return permission;
     } else if (permission == LocationPermission.denied) {
-      return requestPermission();
+      return Geolocator.requestPermission();
     } else {
       return permission;
     }
