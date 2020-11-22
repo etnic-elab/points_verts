@@ -72,7 +72,9 @@ class _SettingsState extends State<Settings> {
   Future<void> _setUseLocation(bool newValue) async {
     bool validated = false;
     if (newValue == true) {
-      validated = await checkLocationPermission() == LocationPermission.whileInUse;
+      LocationPermission permission = await checkLocationPermission();
+      validated = permission == LocationPermission.whileInUse ||
+          permission == LocationPermission.always;
     } else {
       validated = true;
     }
