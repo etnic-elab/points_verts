@@ -49,7 +49,7 @@ Future<List<Walk>> retrieveSortedWalks(DateTime date,
   }
   for (Walk walk in walks) {
     if (walk.isPositionable()) {
-      double distance = distanceBetween(
+      double distance = Geolocator.distanceBetween(
           position.latitude, position.longitude, walk.lat, walk.long);
       walk.distance = distance;
       walk.trip = null;
