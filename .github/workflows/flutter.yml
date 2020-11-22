@@ -21,5 +21,5 @@ jobs:
     - run: touch .env
     - run: flutter test
     - run: flutter analyze
-    - run: flutter build apk
-    - run: flutter build ios --release --no-codesign
+    - run: flutter build apk --debug --target-platform android-arm,android-arm64,android-x64 --split-per-abi
+    - run: flutter build ios --debug
