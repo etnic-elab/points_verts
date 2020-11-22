@@ -292,7 +292,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   _getCurrentLocation() {
     log("Retrieving current user location", name: TAG);
-    getCurrentPosition(desiredAccuracy: LocationAccuracy.medium)
+    Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium)
         .then((Position position) {
       log("Current user location is $position", name: TAG);
       if (this.mounted) {
