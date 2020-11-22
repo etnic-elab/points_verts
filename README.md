@@ -23,6 +23,9 @@ Uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de
 The Mapbox and OpenWeather API keys should be defined in a `.env` file in root folder:
 
 ```properties
+# if you use a proxy, set its hostname here (e.g. my.proxy.com)
+MAPBOX_PROXY_URL=proxy
+# if you don't use a proxy, set the Mapbox access token
 MAPBOX_TOKEN=token
 OPENWEATHER_TOKEN=token
 ```
