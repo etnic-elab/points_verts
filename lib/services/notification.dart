@@ -128,7 +128,6 @@ Future<void> scheduleNextNearestWalkNotification() async {
   if (home == null) return;
   List<DateTime> dates = await retrieveNearestDates();
   if (dates.isNotEmpty) {
-    await updateWalks();
     List<Walk> walks = await retrieveSortedWalks(dates[0], position: home);
     if (walks.length >= 1 && !walks[0].isCancelled()) {
       await NotificationManager.instance.scheduleNextNearestWalk(walks[0]);

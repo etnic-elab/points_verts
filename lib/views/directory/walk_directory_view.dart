@@ -43,7 +43,6 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
       _walks = null;
       _filter = filter;
     });
-    await updateWalks();
     setState(() {
       _walks = DBProvider.db.getSortedWalks(filter: _filter);
     });
