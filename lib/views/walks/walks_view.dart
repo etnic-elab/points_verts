@@ -103,7 +103,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       _homePosition = null;
       _filter = filter;
     });
-    await updateWalks();
     _retrieveDates(resetDate: resetDate);
   }
 

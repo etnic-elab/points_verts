@@ -73,6 +73,7 @@ launchURL(url) async {
 }
 
 updateWalks() async {
+  log("Updating walks", name: TAG);
   String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
   DateTime now = DateTime.now().toUtc();
   if (lastUpdate == null) {

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
+import 'package:points_verts/views/loading.dart';
+import 'package:points_verts/views/walks/walk_utils.dart';
 
 import 'views/directory/walk_directory_view.dart';
 import 'views/settings/settings.dart';
@@ -13,27 +15,41 @@ class WalksHomeScreen extends StatefulWidget {
   _WalksHomeScreenState createState() => _WalksHomeScreenState();
 }
 
-class _WalksHomeScreenState extends State<WalksHomeScreen> {
+class _WalksHomeScreenState extends State<WalksHomeScreen>
+    with WidgetsBindingObserver {
   List<Widget> _pages = [WalksView(), WalkDirectoryView(), Settings()];
   int _selectedIndex = 0;
+  bool _loading = true;
 
   @override
   void initState() {
-    _initPlatformState();
-    _checkLastBackgroundTask();
+    updateWalks().then((_) {
+      setState(() {
+        _loading = false;
+      });
+      _initPlatformState();
+    });
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
-  void _checkLastBackgroundTask() async {
-    String lastFetch =
-    await PrefsProvider.prefs.getString("last_background_fetch");
-    if (lastFetch == null) return;
-    DateTime lastFetchDate = DateTime.parse(lastFetch);
-    // temp fix (I hope) since iOS task scheduling is not friendly
-    if (DateTime.now().difference(lastFetchDate) > Duration(days: 1)) {
-      await scheduleNextNearestWalkNotification();
-      await PrefsProvider.prefs.setString(
-          "last_background_fetch", DateTime.now().toUtc().toIso8601String());
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setState(() {
+        _loading = true;
+      });
+      updateWalks().then((_) {
+        setState(() {
+          _loading = false;
+        });
+      });
     }
   }
 
@@ -81,7 +97,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
               icon: Icon(Icons.settings), label: "Paramètres"),
         ],
       ),
-      body: _pages[_selectedIndex],
+      body: _loading ? Loading() : _pages[_selectedIndex],
     );
   }
 

@@ -6,6 +6,7 @@ import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/walk_details_view.dart';
+import 'package:points_verts/views/walks/walk_utils.dart';
 
 import 'package:points_verts/walks_home_screen.dart';
 
@@ -15,6 +16,7 @@ void backgroundFetchHeadlessTask(String taskId) async {
   print('[BackgroundFetch] Headless event received.');
   try {
     await DotEnv().load('.env');
+    await updateWalks();
     await scheduleNextNearestWalkNotification();
     await PrefsProvider.prefs.setString(
         "last_background_fetch", DateTime.now().toUtc().toIso8601String());
