@@ -144,7 +144,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   _retrieveWalksHelper() async {
     Future<List<Walk>> newList = retrieveSortedWalks(_selectedDate,
         filter: _filter, position: selectedPosition);
-    if (_selectedDate.difference(DateTime.now()).inDays < 5) {
+    if (_selectedDate != null &&
+        _selectedDate.difference(DateTime.now()).inDays < 5) {
       try {
         _retrieveWeathers(await newList).then((_) {
           setState(() {});
@@ -178,7 +179,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     _dates = DBProvider.db.getWalkDates();
     await _retrievePosition();
     _dates.then((List<DateTime> items) {
-      if (resetDate || !items.contains(_selectedDate)) {
+      if (items.isNotEmpty && (resetDate || !items.contains(_selectedDate))) {
         setState(() {
           _selectedDate = items.first;
         });

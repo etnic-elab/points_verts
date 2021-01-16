@@ -135,6 +135,7 @@ class DBProvider {
 
   Future<List<Walk>> getWalks(DateTime date, {WalkFilter filter}) async {
     log("Retrieving walks from database for $date", name: TAG);
+    if (date == null) return [];
     final Database db = await database;
     List<Map<String, dynamic>> maps;
     if (filter != null) {
