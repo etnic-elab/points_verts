@@ -16,8 +16,8 @@ import 'dart:convert';
 import '../models/walk.dart';
 import 'trip_cache_manager.dart';
 
-String _token = DotEnv().env['MAPBOX_TOKEN'];
-String _proxy = DotEnv().env['MAPBOX_PROXY_URL'];
+String _token = env['MAPBOX_TOKEN'];
+String _proxy = env['MAPBOX_PROXY_URL'];
 
 Future<void> retrieveTrips(
     double fromLong, double fromLat, List<Walk> walks) async {

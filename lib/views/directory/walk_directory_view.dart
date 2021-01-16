@@ -10,7 +10,6 @@ import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/filter_page.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_tile.dart';
-import 'package:points_verts/views/walks/walk_utils.dart';
 import '../../models/walk.dart';
 
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");

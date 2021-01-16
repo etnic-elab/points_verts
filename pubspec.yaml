@@ -33,7 +33,7 @@ dependencies:
   url_launcher: ^5.4.0
   flutter_map: ^0.10.0
   shared_preferences: ^0.5.6
-  flutter_dotenv: ^2.1.0
+  flutter_dotenv: ^3.0.0
   weather_icons: ^2.0.0
   background_fetch: ^0.6.0
   flutter_local_notifications: ^3.0.0
