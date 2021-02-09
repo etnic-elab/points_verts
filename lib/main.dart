@@ -29,7 +29,9 @@ void backgroundFetchHeadlessTask(String taskId) async {
 void main() async {
   await DotEnv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
+  //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
+  await DBProvider.db.database;
   runApp(new MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }

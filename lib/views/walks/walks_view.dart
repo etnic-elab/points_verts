@@ -86,8 +86,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   Future<void> _retrieveData({bool resetDate = true}) async {
-    // initialize database here in case of migrations
-    await DBProvider.db.database;
     String filterString =
         await PrefsProvider.prefs.getString("calendar_walk_filter");
     WalkFilter filter;
