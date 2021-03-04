@@ -8,15 +8,15 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
         with:
           java-version: '12.x'
       - uses: subosito/flutter-action@v1
         with:
-          channel: 'stable' # or: 'dev' or 'beta'
+          channel: 'stable'
       - name: Install dependencies
         run: flutter pub get
       - name: Touch .env file
@@ -26,5 +26,7 @@ jobs:
       - name: Run code analysis
         run: flutter analyze
         continue-on-error: true
-      - name: Build AOT
-        run: flutter build aot
+      - name: Build APKs
+        run: flutter build apk --debug --target-platform android-arm,android-arm64,android-x64 --split-per-abi
+      - name: Build IPA
+        run: flutter build ios --debug
