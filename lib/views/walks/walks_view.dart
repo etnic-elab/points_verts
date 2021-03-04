@@ -32,8 +32,6 @@ class WalksView extends StatefulWidget {
 }
 
 class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
   Future<List<DateTime>> _dates;
   Future<List<Walk>> _currentWalks;
   Walk _selectedWalk;
@@ -68,20 +66,20 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     bool firstLaunch = await PrefsProvider.prefs
         .getBoolean(key: 'first_launch', defaultValue: true);
     if (firstLaunch) {
-      _scaffoldKey.currentState.removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
       final snackBar = SnackBar(
           duration: Duration(days: 1),
           action: SnackBarAction(
             onPressed: () {
               PrefsProvider.prefs.setBoolean("first_launch", false);
-              _scaffoldKey.currentState.hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
             },
             label: "OK",
           ),
           content: const Text(
               "Pour voir en un coup d'œil les marches les plus proches de chez vous, n'hésitez pas à indiquer votre adresse dans les Paramètres !",
               textAlign: TextAlign.justify));
-      _scaffoldKey.currentState.showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
@@ -162,7 +160,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   Future _retrieveWeathers(List<Walk> walks) async {
-    List<Future> weathers = List<Future>();
+    List<Future> weathers = [];
     for (int i = 0; i < math.min(walks.length, 5); i++) {
       Walk walk = walks[i];
       if (walk.weathers == null && !walk.isCancelled()) {
@@ -194,7 +192,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Calendrier'),
         actions: <Widget>[

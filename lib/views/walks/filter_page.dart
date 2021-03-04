@@ -162,7 +162,7 @@ class _FilterPageState extends State<FilterPage> {
           ),
           ButtonBar(
             children: [
-              FlatButton(
+              TextButton(
                 child: const Text('Réinitialiser'),
                 onPressed: () {
                   WalkFilter resetFilter = WalkFilter();
@@ -171,7 +171,7 @@ class _FilterPageState extends State<FilterPage> {
                   Navigator.of(context).pop(resetFilter);
                 },
               ),
-              FlatButton(
+              TextButton(
                 child: const Text('Filtrer'),
                 onPressed: () {
                   Navigator.of(context).pop(editedFilter);
