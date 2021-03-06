@@ -27,12 +27,12 @@ Future<List<Walk>> refreshAllWalks(String lastUpdate) async {
 }
 
 Future<List<Walk>> _retrieveWalks(String baseUrl) async {
-  List<Walk> walks = List<Walk>();
+  List<Walk> walks = [];
   bool finished = false;
   int start = 0;
   while (!finished) {
     String url = "$baseUrl&rows=$PAGE_SIZE&start=$start";
-    var response = await http.get(url);
+    var response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       walks.addAll(_convertWalks(data));
@@ -47,22 +47,20 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
 
 Future<List<Walk>> retrieveWalksFromWebSite(DateTime date) async {
   DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
-  List<Walk> newList = List<Walk>();
-  var response = await http.get(
-      "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O");
+  List<Walk> newList = [];
+  var response = await http.get(Uri.parse(
+      "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O"));
   var fixed = _fixCsv(response.body);
   List<List<dynamic>> rowsAsListOfValues =
       const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
   for (List<dynamic> walk in rowsAsListOfValues) {
-    newList.add(Walk(
-        id: walk[0],
-        status: _convertStatus(walk[9])));
+    newList.add(Walk(id: walk[0], status: _convertStatus(walk[9])));
   }
   return newList;
 }
 
 List<Walk> _convertWalks(var data) {
-  List<Walk> newList = List<Walk>();
+  List<Walk> newList = [];
   List<dynamic> list = data['records'];
   for (Map<String, dynamic> walkJson in list) {
     newList.add(Walk.fromJson(walkJson));
@@ -83,7 +81,7 @@ String _convertStatus(String webSiteStatus) {
 }
 
 String _fixCsv(String csv) {
-  List<String> result = new List<String>();
+  List<String> result = [];
   List<String> splitted = csv.split(';');
   String current = "";
   int tokens = 0;

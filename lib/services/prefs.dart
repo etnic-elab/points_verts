@@ -12,6 +12,11 @@ class PrefsProvider {
     return _sharedPreferences;
   }
 
+  Future<bool> remove(String key) async {
+    SharedPreferences prefs = await preferences;
+    return prefs.remove(key);
+  }
+
   Future<String> setString(String key, String value) async {
     SharedPreferences prefs = await preferences;
     await prefs.setString(key, value);

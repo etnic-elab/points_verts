@@ -18,7 +18,7 @@ Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
   final list = decoded['list'];
 
   if (list != null) {
-    List<Weather> results = List<Weather>();
+    List<Weather> results = [];
     int from = date.add(Duration(hours: 6)).millisecondsSinceEpoch;
     int to = date.add(Duration(hours: 18)).millisecondsSinceEpoch;
     for (var forecast in list) {

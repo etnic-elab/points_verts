@@ -29,7 +29,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   Timer _debounce;
   int _countryIndex = 0;
   Future<List<AddressSuggestion>> _suggestions =
-      Future.value(List<AddressSuggestion>());
+      Future.value([]);
 
   @override
   void initState() {

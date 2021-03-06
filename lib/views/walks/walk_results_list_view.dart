@@ -22,7 +22,7 @@ class WalkResultsListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder<List<Walk>>(
       future: walks,
-      initialData: List<Walk>(),
+      initialData: [],
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {

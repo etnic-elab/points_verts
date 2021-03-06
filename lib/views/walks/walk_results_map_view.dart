@@ -22,7 +22,7 @@ class WalkResultsMapView extends StatelessWidget {
   final Walk selectedWalk;
   final Function(Walk) onWalkSelect;
   final Function refreshWalks;
-  final List<Marker> markers = List<Marker>();
+  final List<Marker> markers = [];
 
   @override
   Widget build(BuildContext context) {
