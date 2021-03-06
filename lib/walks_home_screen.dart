@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
+import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 import 'views/directory/walk_directory_view.dart';
@@ -20,14 +21,14 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
   List<Widget> _pages = [WalksView(), WalkDirectoryView(), Settings()];
   int _selectedIndex = 0;
   bool _loading = true;
+  bool _error = false;
 
   @override
   void initState() {
-    updateWalks().then((_) {
-      setState(() {
-        _loading = false;
-      });
+    fetchData().then((_) {
       _initPlatformState();
+    }).catchError((err) {
+      print("error init state");
     });
     WidgetsBinding.instance.addObserver(this);
     super.initState();
@@ -39,17 +40,28 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
     super.dispose();
   }
 
+  Future<void> fetchData() async {
+    setState(() {
+      _error = false;
+      _loading = true;
+    });
+    updateWalks().then((_) {
+      setState(() {
+        _loading = false;
+      });
+    }).catchError((err) {
+      print("error fetch data");
+      setState(() {
+        _loading = false;
+        _error = true;
+      });
+    });
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      setState(() {
-        _loading = true;
-      });
-      updateWalks().then((_) {
-        setState(() {
-          _loading = false;
-        });
-      });
+      fetchData();
     }
   }
 
@@ -97,7 +109,11 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
               icon: Icon(Icons.settings), label: "Paramètres"),
         ],
       ),
-      body: _loading ? Loading() : _pages[_selectedIndex],
+      body: _error
+          ? WalkListError(fetchData)
+          : _loading
+              ? Loading()
+              : _pages[_selectedIndex],
     );
   }
 

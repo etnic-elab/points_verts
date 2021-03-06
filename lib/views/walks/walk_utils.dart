@@ -77,16 +77,11 @@ updateWalks() async {
   String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
   DateTime now = DateTime.now().toUtc();
   if (lastUpdate == null) {
-    try {
-      List<Walk> newWalks = await fetchAllWalks();
-      if (newWalks.isNotEmpty) {
-        await DBProvider.db.insertWalks(newWalks);
-        PrefsProvider.prefs
-            .setString("last_walk_update", now.toIso8601String());
-        await _fixNextWalks();
-      }
-    } catch (err) {
-      print("Cannot fetch walks list: $err");
+    List<Walk> newWalks = await fetchAllWalks();
+    if (newWalks.isNotEmpty) {
+      await DBProvider.db.insertWalks(newWalks);
+      PrefsProvider.prefs.setString("last_walk_update", now.toIso8601String());
+      await _fixNextWalks();
     }
   } else {
     DateTime lastUpdateDate = DateTime.parse(lastUpdate);
