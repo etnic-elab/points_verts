@@ -83,9 +83,9 @@ Future<List<AddressSuggestion>> retrieveSuggestions(
   if (search.isNotEmpty) {
     final String url =
         "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token&country=$country&language=fr_BE&limit=10&types=address,poi";
-    final http.Response response = await http.get(url);
+    final http.Response response = await http.get(Uri.parse(url));
     var decoded = json.decode(response.body);
-    List<AddressSuggestion> results = List<AddressSuggestion>();
+    List<AddressSuggestion> results = [];
     if (decoded['features'] != null) {
       for (var result in decoded['features']) {
         results.add(AddressSuggestion(
@@ -97,14 +97,14 @@ Future<List<AddressSuggestion>> retrieveSuggestions(
     }
     return results;
   } else {
-    return List<AddressSuggestion>();
+    return [];
   }
 }
 
 Future<String> retrieveAddress(double long, double lat) async {
   final String url =
       "https://api.mapbox.com/geocoding/v5/mapbox.places/$long,$lat.json?access_token=$_token";
-  final http.Response response = await http.get(url);
+  final http.Response response = await http.get(Uri.parse(url));
   var decoded = json.decode(response.body);
   if (decoded['features'].length > 0) {
     return decoded['features'][0]['place_name'];

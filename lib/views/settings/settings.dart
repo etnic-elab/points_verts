@@ -61,8 +61,8 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _removeHome() async {
-    await PrefsProvider.prefs.setString("home_coords", null);
-    await PrefsProvider.prefs.setString("home_label", null);
+    await PrefsProvider.prefs.remove("home_coords");
+    await PrefsProvider.prefs.remove("home_label");
     setState(() {
       _home = null;
     });

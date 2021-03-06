@@ -29,7 +29,7 @@ class DBProvider {
   }
 
   Future<void> _createWalkTable(Database db) async {
-    await PrefsProvider.prefs.setString("last_walk_update", null);
+    await PrefsProvider.prefs.remove("last_walk_update");
     await db.execute("DROP table IF EXISTS walks");
     await db.execute(
         "CREATE TABLE walks(id INTEGER PRIMARY KEY, city TEXT, entity TEXT, type TEXT, province TEXT, date DATE, longitude DOUBLE, latitude DOUBLE, status TEXT, meeting_point TEXT, meeting_point_info TEXT, organizer TEXT, contact_first_name TEXT, contact_last_name TEXT, contact_phone_number TEXT, ign TEXT, transport TEXT, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME)");

@@ -131,7 +131,7 @@ class _WeatherSection extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               List<Weather> weathers = snapshot.data;
-              List<Widget> widgets = List<Widget>();
+              List<Widget> widgets = [];
               for (Weather weather in weathers) {
                 widgets.add(Column(
                   mainAxisAlignment: MainAxisAlignment.center,

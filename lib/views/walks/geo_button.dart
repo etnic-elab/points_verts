@@ -19,9 +19,10 @@ class GeoButton extends StatelessWidget {
     } else {
       String label = walk.getNavigationLabel();
       if (label != null) {
-        return OutlineButton.icon(
-            padding: EdgeInsets.all(0.0),
+        return OutlinedButton.icon(
             onPressed: () => launchGeoApp(walk),
+            style: OutlinedButton.styleFrom(
+                primary: Theme.of(context).textTheme.bodyText1.color),
             icon: Icon(Icons.directions_car, size: 15.0),
             label: Text(label));
       } else {
