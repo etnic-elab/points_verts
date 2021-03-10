@@ -58,7 +58,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _retrieveData(resetDate: false);
+      _retrieveData();
     }
   }
 
@@ -83,7 +83,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _retrieveData({bool resetDate = true}) async {
+  Future<void> _retrieveData() async {
     String filterString =
         await PrefsProvider.prefs.getString("calendar_walk_filter");
     WalkFilter filter;
@@ -99,7 +99,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       _homePosition = null;
       _filter = filter;
     });
-    _retrieveDates(resetDate: resetDate);
+    _retrieveDates();
   }
 
   _retrievePosition() async {
@@ -171,14 +171,24 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return Future.wait(weathers);
   }
 
-  void _retrieveDates({bool resetDate = true}) async {
+  void _retrieveDates() async {
     _dates = DBProvider.db.getWalkDates();
     await _retrievePosition();
-    _dates.then((List<DateTime> items) {
-      if (items.isNotEmpty && (resetDate || !items.contains(_selectedDate))) {
+    _dates.then((List<DateTime> items) async {
+      String lastSelectedDateString =
+          await PrefsProvider.prefs.getString("last_selected_date");
+      print(lastSelectedDateString);
+      if (lastSelectedDateString != null) {
+        setState(() {
+          _selectedDate = DateTime.parse(lastSelectedDateString);
+        });
+      }
+      if (items.isNotEmpty && !items.contains(_selectedDate)) {
         setState(() {
           _selectedDate = items.first;
         });
+        PrefsProvider.prefs
+            .setString("last_selected_date", items.first.toIso8601String());
       }
       _retrieveWalks();
     }).catchError((err) {
@@ -254,6 +264,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                       _selectedDate = date;
                       _retrieveWalks();
                     });
+                    PrefsProvider.prefs.setString(
+                        "last_selected_date", date.toIso8601String());
                   }),
               ActionChip(
                 label: Row(

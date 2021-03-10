@@ -30,6 +30,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
     }).catchError((err) {
       print("error init state");
     });
+    PrefsProvider.prefs.remove("last_selected_date");
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
