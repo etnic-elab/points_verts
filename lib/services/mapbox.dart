@@ -17,7 +17,6 @@ import '../models/walk.dart';
 import 'trip_cache_manager.dart';
 
 String _token = env['MAPBOX_TOKEN'];
-String _proxy = env['MAPBOX_PROXY_URL'];
 
 Future<void> retrieveTrips(
     double fromLong, double fromLat, List<Walk> walks) async {
@@ -119,21 +118,10 @@ Widget retrieveStaticImage(
   final String style = brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
   Uri url = Uri.parse(
       "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l($long,$lat)/$long,$lat,$zoom,0,0/${width}x$height@2x?access_token=$_token");
-  url = _proxyHost(url);
   return CachedNetworkImage(
     imageUrl: url.toString(),
     progressIndicatorBuilder: (context, url, downloadProgress) => Center(
         child: CircularProgressIndicator(value: downloadProgress.progress)),
     errorWidget: (context, url, error) => Icon(Icons.error),
   );
-}
-
-Uri _proxyHost(Uri request) {
-  if (_proxy != null) {
-    Map<String, String> newMap =
-        new Map<String, String>.from(request.queryParameters);
-    newMap.remove("access_token");
-    return request.replace(host: _proxy, queryParameters: newMap);
-  }
-  return request;
 }
