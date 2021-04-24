@@ -50,6 +50,8 @@ class PrefsProvider {
     bool result = prefs.getBool(key);
     return result != null
         ? result
-        : defaultValue != null ? defaultValue : false;
+        : defaultValue != null
+            ? defaultValue
+            : false;
   }
 }

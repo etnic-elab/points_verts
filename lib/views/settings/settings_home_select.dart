@@ -28,8 +28,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   final _homeSearchController = TextEditingController();
   Timer _debounce;
   int _countryIndex = 0;
-  Future<List<AddressSuggestion>> _suggestions =
-      Future.value([]);
+  Future<List<AddressSuggestion>> _suggestions = Future.value([]);
 
   @override
   void initState() {
