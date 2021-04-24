@@ -10,6 +10,7 @@ import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/walk.dart';
+import '../../models/coordinates.dart';
 
 const String TAG = "dev.alpagaga.points_verts.WalksUtils";
 
@@ -41,7 +42,7 @@ int sortWalks(Walk a, Walk b) {
 }
 
 Future<List<Walk>> retrieveSortedWalks(DateTime date,
-    {Position position, WalkFilter filter}) async {
+    {Coordinates position, WalkFilter filter}) async {
   List<Walk> walks = await DBProvider.db.getWalks(date, filter: filter);
   if (position == null) {
     walks.sort((a, b) => sortWalks(a, b));
@@ -114,11 +115,11 @@ Future<List<DateTime>> retrieveNearestDates() async {
   return walkDates;
 }
 
-Future<Position> retrieveHomePosition() async {
+Future<Coordinates> retrieveHomePosition() async {
   String homePos = await PrefsProvider.prefs.getString("home_coords");
   if (homePos == null) return null;
   List<String> split = homePos.split(",");
-  return Position(
+  return Coordinates(
       latitude: double.parse(split[0]), longitude: double.parse(split[1]));
 }
 

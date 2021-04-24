@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong/latlong.dart';
 
 import '../loading.dart';
 import '../../services/mapbox.dart';
 import '../../models/walk.dart';
+import '../../models/coordinates.dart';
 import 'walk_icon.dart';
 import 'walks_view.dart';
 import 'walk_list_error.dart';
@@ -17,7 +17,7 @@ class WalkResultsMapView extends StatelessWidget {
       this.selectedWalk, this.onWalkSelect, this.refreshWalks);
 
   final Future<List<Walk>> walks;
-  final Position position;
+  final Coordinates position;
   final Places currentPlace;
   final Walk selectedWalk;
   final Function(Walk) onWalkSelect;
