@@ -26,14 +26,12 @@ class WalkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 5.0),
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
       child: ListTile(
         leading: _weatherIcon(),
         title: _title(),
-        subtitle: tileType == TileType.calendar
-            ? Text("${walk.type} - ${walk.province}")
-            : Text(walk.getContactLabel()),
+        subtitle: _subtitle(),
         onTap: () => Navigator.push(context, _pageRoute()),
         trailing: tileType == TileType.calendar
             ? GeoButton(walk)
@@ -54,6 +52,14 @@ class WalkTile extends StatelessWidget {
           overflow: TextOverflow.ellipsis);
     } else {
       return Text(walk.city, style: TextStyle(fontWeight: FontWeight.bold));
+    }
+  }
+
+  Widget _subtitle() {
+    if (tileType == TileType.directory) {
+      return Text(walk.getContactLabel());
+    } else {
+      return Text("${walk.type} - ${walk.province}");
     }
   }
 
