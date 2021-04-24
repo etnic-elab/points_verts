@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:points_verts/services/mapbox.dart';
 import 'package:points_verts/views/walks/walk_details.dart';
 
@@ -13,10 +14,19 @@ class WalkDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
     return Scaffold(
       appBar: AppBar(
         title: FittedBox(
-            fit: BoxFit.fitWidth, child: Text("${walk.type} à ${walk.city}")),
+            fit: BoxFit.fitWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("${walk.city}"),
+                Text("${walk.type} du ${fullDate.format(walk.date)}",
+                    style: TextStyle(fontSize: 14))
+              ],
+            )),
       ),
       body: OrientationBuilder(
         builder: (context, orientation) {
