@@ -17,6 +17,7 @@ import 'package:points_verts/views/walks/filter_page.dart';
 import 'dates_dropdown.dart';
 import '../../services/openweather.dart';
 import '../../models/walk.dart';
+import '../../models/coordinates.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
@@ -36,8 +37,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Future<List<Walk>> _currentWalks;
   Walk _selectedWalk;
   DateTime _selectedDate;
-  Position _currentPosition;
-  Position _homePosition;
+  Coordinates _currentPosition;
+  Coordinates _homePosition;
   ViewType _viewType = ViewType.list;
   WalkFilter _filter;
 
@@ -103,7 +104,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   _retrievePosition() async {
-    Position home = await retrieveHomePosition();
+    Coordinates home = await retrieveHomePosition();
     if (home != null) {
       setState(() {
         _homePosition = home;
@@ -119,7 +120,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
   }
 
-  Position get selectedPosition {
+  Coordinates get selectedPosition {
     if (_filter.selectedPlace == Places.current) {
       return _currentPosition;
     } else if (_filter.selectedPlace == Places.home) {
@@ -304,7 +305,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       log("Current user location is $position", name: TAG);
       if (this.mounted) {
         setState(() {
-          _currentPosition = position;
+          _currentPosition = Coordinates(
+              latitude: position.latitude, longitude: position.longitude);
         });
         if (_filter.selectedPlace == Places.current && _selectedDate != null) {
           _retrieveWalks();

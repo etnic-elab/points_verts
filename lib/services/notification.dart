@@ -2,11 +2,11 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/main.dart';
 import 'package:points_verts/models/walk.dart';
+import 'package:points_verts/models/coordinates.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -124,7 +124,7 @@ Future<void> scheduleNextNearestWalkNotification() async {
   bool showNotification = await PrefsProvider.prefs
       .getBoolean(key: "show_notification", defaultValue: false);
   if (!showNotification) return;
-  Position home = await retrieveHomePosition();
+  Coordinates home = await retrieveHomePosition();
   if (home == null) return;
   List<DateTime> dates = await retrieveNearestDates();
   if (dates.isNotEmpty) {
