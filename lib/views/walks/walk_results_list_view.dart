@@ -27,7 +27,9 @@ class WalkResultsListView extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
             if (snapshot.data.length == 0) {
-              return Center(child: Text("Aucune marche ne correspond aux critères ce jour-là."));
+              return Center(
+                  child: Text(
+                      "Aucune marche ne correspond aux critères ce jour-là."));
             }
             return ListView.builder(
                 itemBuilder: (context, i) {
