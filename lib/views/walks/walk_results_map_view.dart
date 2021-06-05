@@ -16,10 +16,10 @@ class WalkResultsMapView extends StatelessWidget {
   WalkResultsMapView(this.walks, this.position, this.currentPlace,
       this.selectedWalk, this.onWalkSelect, this.refreshWalks);
 
-  final Future<List<Walk>> walks;
-  final Coordinates position;
-  final Places currentPlace;
-  final Walk selectedWalk;
+  final Future<List<Walk>>? walks;
+  final Coordinates? position;
+  final Places? currentPlace;
+  final Walk? selectedWalk;
   final Function(Walk) onWalkSelect;
   final Function refreshWalks;
   final List<Marker> markers = [];
@@ -32,14 +32,14 @@ class WalkResultsMapView extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
             markers.clear();
-            for (Walk walk in snapshot.data) {
+            for (Walk walk in snapshot.data!) {
               if (walk.lat != null && walk.long != null) {
                 markers.add(_buildMarker(walk, context));
               }
             }
             if (position != null) {
               markers.add(Marker(
-                point: new LatLng(position.latitude, position.longitude),
+                point: new LatLng(position!.latitude, position!.longitude),
                 builder: (ctx) => new Container(
                     child: Icon(currentPlace == Places.current
                         ? Icons.location_on
@@ -68,7 +68,7 @@ class WalkResultsMapView extends StatelessWidget {
     );
   }
 
-  static Widget _buildWalkInfo(Walk walk) {
+  static Widget _buildWalkInfo(Walk? walk) {
     if (walk == null) {
       return SizedBox.shrink();
     } else {
@@ -87,7 +87,7 @@ class WalkResultsMapView extends StatelessWidget {
     return Marker(
       width: 25,
       height: 25,
-      point: new LatLng(walk.lat, walk.long),
+      point: new LatLng(walk.lat!, walk.long!),
       builder: (ctx) => RawMaterialButton(
         child: WalkIcon(walk, color: Colors.white, size: 20),
         shape: new CircleBorder(),

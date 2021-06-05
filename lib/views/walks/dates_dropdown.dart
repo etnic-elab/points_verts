@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DatesDropdown extends StatelessWidget {
-  DatesDropdown({this.dates, this.selectedDate, this.onChanged});
+  DatesDropdown({required this.dates, required this.selectedDate, required this.onChanged});
 
   final Future<List<DateTime>> dates;
   final DateTime selectedDate;
@@ -16,11 +16,11 @@ class DatesDropdown extends StatelessWidget {
         builder:
             (BuildContext context, AsyncSnapshot<List<DateTime>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData && snapshot.data.isNotEmpty) {
-              List<DateTime> dates = snapshot.data;
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              List<DateTime> dates = snapshot.data as List<DateTime>;
               return ActionChip(
                   onPressed: () async {
-                    DateTime pickedDate = await showDatePicker(
+                    DateTime? pickedDate = await showDatePicker(
                         context: context,
                         initialDate: selectedDate,
                         selectableDayPredicate: (date) => dates.contains(date),

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:csv/csv.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
@@ -34,7 +33,7 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
     String url = "$baseUrl&rows=$PAGE_SIZE&start=$start";
     var response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
-      var data = json.decode(response.body);
+      Map<String, dynamic> data = json.decode(response.body);
       walks.addAll(_convertWalks(data));
       start = start + PAGE_SIZE;
       finished = data['nhits'] <= start;
@@ -45,57 +44,11 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
   return walks;
 }
 
-Future<List<Walk>> retrieveWalksFromWebSite(DateTime date) async {
-  DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
-  List<Walk> newList = [];
-  var response = await http.get(Uri.parse(
-      "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O"));
-  var fixed = _fixCsv(response.body);
-  List<List<dynamic>> rowsAsListOfValues =
-      const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-  for (List<dynamic> walk in rowsAsListOfValues) {
-    newList.add(Walk(id: walk[0], status: _convertStatus(walk[9])));
-  }
-  return newList;
-}
-
-List<Walk> _convertWalks(var data) {
+List<Walk> _convertWalks(Map<String, dynamic> data) {
   List<Walk> newList = [];
   List<dynamic> list = data['records'];
   for (Map<String, dynamic> walkJson in list) {
     newList.add(Walk.fromJson(walkJson));
   }
   return newList;
-}
-
-String _convertStatus(String webSiteStatus) {
-  if (webSiteStatus == "ptvert_annule") {
-    return "Annulé";
-  } else if (webSiteStatus == "ptvert_modifie") {
-    return "Modifié";
-  } else if (webSiteStatus == "ptvert") {
-    return "OK";
-  } else {
-    return null;
-  }
-}
-
-String _fixCsv(String csv) {
-  List<String> result = [];
-  List<String> splitted = csv.split(';');
-  String current = "";
-  int tokens = 0;
-  for (String token in splitted) {
-    if (tokens == 0) {
-      current = token;
-    } else {
-      current = current + ";" + token;
-    }
-    tokens++;
-    if (tokens == 10) {
-      result.add(current);
-      tokens = 0;
-    }
-  }
-  return result.join('\r\n');
 }

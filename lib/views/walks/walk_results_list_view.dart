@@ -13,9 +13,9 @@ class WalkResultsListView extends StatelessWidget {
   WalkResultsListView(
       this.walks, this.position, this.currentPlace, this.refreshWalks);
 
-  final Future<List<Walk>> walks;
-  final Coordinates position;
-  final Places currentPlace;
+  final Future<List<Walk>>? walks;
+  final Coordinates? position;
+  final Places? currentPlace;
   final Function refreshWalks;
 
   @override
@@ -26,7 +26,7 @@ class WalkResultsListView extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
-            if (snapshot.data.length == 0) {
+            if (snapshot.data!.length == 0) {
               return Center(
                   child: Text(
                       "Aucune marche ne correspond aux critères ce jour-là."));
@@ -46,8 +46,8 @@ class WalkResultsListView extends StatelessWidget {
                       i = i - 2;
                     }
                   }
-                  if (snapshot.data.length > i) {
-                    return WalkTile(snapshot.data[i], TileType.calendar);
+                  if (snapshot.data!.length > i) {
+                    return WalkTile(snapshot.data![i], TileType.calendar);
                   } else {
                     return SizedBox.shrink();
                   }
@@ -83,9 +83,9 @@ class WalkResultsListView extends StatelessWidget {
     }
   }
 
-  int _defineItemCount(List<Walk> walks) {
+  int _defineItemCount(List<Walk>? walks) {
     if (position != null) {
-      if (walks.length == 0) {
+      if (walks!.length == 0) {
         return walks.length;
       } else if (walks.length > 5) {
         return walks.length + 2;
@@ -93,7 +93,7 @@ class WalkResultsListView extends StatelessWidget {
         return walks.length + 1;
       }
     } else {
-      return walks.length;
+      return walks!.length;
     }
   }
 }

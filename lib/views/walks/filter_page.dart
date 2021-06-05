@@ -60,7 +60,7 @@ class _FilterPageState extends State<FilterPage> {
                   children: <Widget>[
                     Checkbox(
                         onChanged: (bool) {
-                          editedFilter.cancelledWalks = bool;
+                          editedFilter.cancelledWalks = bool!;
                           setState(() {});
                         },
                         value: editedFilter.cancelledWalks),

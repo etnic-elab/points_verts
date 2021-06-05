@@ -21,7 +21,7 @@ packages:
       name: background_fetch
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.2"
+    version: "1.0.0-nullsafety.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -58,7 +58,7 @@ packages:
     source: hosted
     version: "1.1.0"
   collection:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: collection
       url: "https://pub.dartlang.org"
@@ -578,7 +578,7 @@ packages:
       name: weather_icons
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "3.0.0-nullsafety.0"
   win32:
     dependency: transitive
     description:

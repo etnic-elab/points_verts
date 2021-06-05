@@ -19,7 +19,7 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  String _home;
+  String? _home;
   bool _useLocation = false;
   bool _showNotification = false;
 
@@ -35,7 +35,7 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _retrievePrefs() async {
-    String home = await PrefsProvider.prefs.getString("home_label");
+    String? home = await PrefsProvider.prefs.getString("home_label");
     bool useLocation =
         await PrefsProvider.prefs.getBoolean(key: "use_location");
     bool showNotification = await PrefsProvider.prefs
@@ -50,7 +50,7 @@ class _SettingsState extends State<Settings> {
   Future<void> _setHome(AddressSuggestion suggestion) async {
     await PrefsProvider.prefs.setString(
         "home_coords", "${suggestion.latitude},${suggestion.longitude}");
-    String label =
+    String? label =
         await PrefsProvider.prefs.setString("home_label", suggestion.address);
     setState(() {
       _home = label;
@@ -89,9 +89,9 @@ class _SettingsState extends State<Settings> {
   Future<void> _setShowNotification(bool newValue) async {
     await PrefsProvider.prefs.setBoolean("show_notification", newValue);
     if (newValue == true) {
-      bool notificationsAllowed =
+      bool? notificationsAllowed =
           await NotificationManager.instance.requestNotificationPermissions();
-      if (notificationsAllowed) {
+      if (notificationsAllowed == true) {
         scheduleNextNearestWalkNotification();
       } else {
         _setShowNotification(false);
@@ -191,7 +191,7 @@ class _SettingsState extends State<Settings> {
     if (_home == null) {
       return Text("Aucun - appuyez ici pour le définir");
     } else {
-      return Text(_home, style: TextStyle(fontSize: 12.0));
+      return Text(_home!, style: TextStyle(fontSize: 12.0));
     }
   }
 }

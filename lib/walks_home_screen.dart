@@ -31,13 +31,13 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
       print("error init state");
     });
     PrefsProvider.prefs.remove("last_selected_date");
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 

@@ -40,9 +40,9 @@ class MyApp extends StatelessWidget {
   static final navigatorKey = new GlobalKey<NavigatorState>();
 
   static redirectToWalkDetails(int walkId) async {
-    Walk walk = await DBProvider.db.getWalk(walkId);
+    Walk? walk = await DBProvider.db.getWalk(walkId);
     if (walk != null) {
-      MyApp.navigatorKey.currentState
+      MyApp.navigatorKey.currentState!
           .push(MaterialPageRoute(builder: (context) => WalkDetailsView(walk)));
     }
   }

@@ -1,8 +1,8 @@
 class Trip {
-  Trip({this.distance, this.duration});
+  Trip({required this.distance, required this.duration});
 
-  double distance;
-  double duration;
+  double? distance;
+  double? duration;
 
   @override
   String toString() {

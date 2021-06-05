@@ -16,7 +16,7 @@ import 'dart:convert';
 import '../models/walk.dart';
 import 'trip_cache_manager.dart';
 
-String _token = dotenv.env['MAPBOX_TOKEN'];
+String? _token = dotenv.env['MAPBOX_TOKEN'];
 
 Future<void> retrieveTrips(
     double fromLong, double fromLat, List<Walk> walks) async {
@@ -68,7 +68,7 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
         maxZoom: 18,
         zoomOffset: -1,
         additionalOptions: {
-          'accessToken': _token,
+          'accessToken': _token!,
           'id': brightness == Brightness.dark ? 'dark-v10' : 'light-v10',
         },
       ),
@@ -100,7 +100,7 @@ Future<List<AddressSuggestion>> retrieveSuggestions(
   }
 }
 
-Future<String> retrieveAddress(double long, double lat) async {
+Future<String?> retrieveAddress(double long, double lat) async {
   final String url =
       "https://api.mapbox.com/geocoding/v5/mapbox.places/$long,$lat.json?access_token=$_token";
   final http.Response response = await http.get(Uri.parse(url));
@@ -113,7 +113,7 @@ Future<String> retrieveAddress(double long, double lat) async {
 }
 
 Widget retrieveStaticImage(
-    double long, double lat, int width, int height, Brightness brightness,
+    double? long, double? lat, int width, int height, Brightness brightness,
     {double zoom = 16.0}) {
   final String style = brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
   Uri url = Uri.parse(
