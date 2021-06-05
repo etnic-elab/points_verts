@@ -74,7 +74,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
           action: SnackBarAction(
             onPressed: () {
               PrefsProvider.prefs.setBoolean("first_launch", false);
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
             },
             label: "OK",
           ),
