@@ -260,51 +260,44 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     );
   }
 
+  void onDateChanged(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+      _retrieveWalks();
+    });
+    PrefsProvider.prefs.setString("last_selected_date", date.toIso8601String());
+  }
+
+  void onFilterPressed() async {
+    WalkFilter? newFilter = await Navigator.of(context).push<WalkFilter>(
+        MaterialPageRoute(
+            builder: (context) => FilterPage(
+                _filter!, _homePosition != null && _currentPosition != null)));
+    if (newFilter != null) {
+      setState(() {
+        _filter = newFilter;
+      });
+      await PrefsProvider.prefs
+          .setString("calendar_walk_filter", jsonEncode(newFilter));
+      _retrieveWalks();
+    }
+  }
+
   Widget _defineSearchPart(Future<List<DateTime>> dates) {
-    return Container(
-        margin: const EdgeInsets.only(left: 10, right: 10),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              DatesDropdown(
-                  dates: dates,
-                  selectedDate: _selectedDate!,
-                  onChanged: (DateTime date) {
-                    setState(() {
-                      _selectedDate = date;
-                      _retrieveWalks();
-                    });
-                    PrefsProvider.prefs.setString(
-                        "last_selected_date", date.toIso8601String());
-                  }),
-              ActionChip(
-                label: Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(right: 4.0),
-                      child: Icon(Icons.tune, size: 16.0),
-                    ),
-                    Text("Filtres")
-                  ],
-                ),
-                onPressed: () async {
-                  WalkFilter? newFilter = await Navigator.of(context)
-                      .push<WalkFilter>(MaterialPageRoute(
-                          builder: (context) => FilterPage(
-                              _filter!,
-                              _homePosition != null &&
-                                  _currentPosition != null)));
-                  if (newFilter != null) {
-                    setState(() {
-                      _filter = newFilter;
-                    });
-                    await PrefsProvider.prefs.setString(
-                        "calendar_walk_filter", jsonEncode(newFilter));
-                    _retrieveWalks();
-                  }
-                },
-              ),
-            ]));
+    return FutureBuilder(
+        future: dates,
+        builder:
+            (BuildContext context, AsyncSnapshot<List<DateTime>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            return _SearchPanel(
+                dates: snapshot.data!,
+                selectedDate: _selectedDate!,
+                onDateChanged: onDateChanged,
+                onFilterPressed: onFilterPressed);
+          }
+          return SizedBox();
+        });
   }
 
   _getCurrentLocation() {
@@ -330,5 +323,44 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       }
       print("Cannot retrieve current position: $e");
     });
+  }
+}
+
+class _SearchPanel extends StatelessWidget {
+  _SearchPanel(
+      {required this.dates,
+      required this.selectedDate,
+      required this.onDateChanged,
+      required this.onFilterPressed});
+
+  final List<DateTime> dates;
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onDateChanged;
+  final VoidCallback onFilterPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        margin: const EdgeInsets.only(left: 10, right: 10),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              DatesDropdown(
+                  dates: dates,
+                  selectedDate: selectedDate,
+                  onChanged: onDateChanged),
+              ActionChip(
+                label: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4.0),
+                      child: Icon(Icons.tune, size: 16.0),
+                    ),
+                    Text("Filtres")
+                  ],
+                ),
+                onPressed: onFilterPressed,
+              ),
+            ]));
   }
 }
