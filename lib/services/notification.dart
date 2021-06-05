@@ -25,7 +25,8 @@ class NotificationManager {
 
   Future<FlutterLocalNotificationsPlugin> get plugin async {
     if (_flutterLocalNotificationsPlugin != null)
-      return _flutterLocalNotificationsPlugin as FlutterLocalNotificationsPlugin;
+      return _flutterLocalNotificationsPlugin
+          as FlutterLocalNotificationsPlugin;
     log("creating a new plugin instance", name: TAG);
     var initializationSettingsAndroid =
         AndroidInitializationSettings('ic_stat_name');

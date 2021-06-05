@@ -53,7 +53,7 @@ Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
       "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O"));
   var fixed = _fixCsv(response.body);
   List<List<dynamic>> rowsAsListOfValues =
-  const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
+      const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
   for (List<dynamic> walk in rowsAsListOfValues) {
     newList.add(WebsiteWalk(id: walk[0], status: _convertStatus(walk[9])));
   }
