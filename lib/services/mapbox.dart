@@ -54,7 +54,7 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
     {double centerLat = 50.3155646,
     double centerLong = 5.009682,
     double zoom = 7.5,
-    interactive = InteractiveFlag.all}) {
+    interactive = InteractiveFlag.none}) {
   return FlutterMap(
     options: new MapOptions(
         center: LatLng(centerLat, centerLong),
