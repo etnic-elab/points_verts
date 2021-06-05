@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/walk_filter.dart';
+import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/mapbox.dart';
@@ -82,6 +83,7 @@ updateWalks() async {
     if (newWalks.isNotEmpty) {
       await DBProvider.db.insertWalks(newWalks);
       PrefsProvider.prefs.setString("last_walk_update", now.toIso8601String());
+      await _fixNextWalks();
     }
   } else {
     DateTime lastUpdateDate = DateTime.parse(lastUpdate);
@@ -93,6 +95,7 @@ updateWalks() async {
         }
         PrefsProvider.prefs
             .setString("last_walk_update", now.toIso8601String());
+        await _fixNextWalks();
         await DBProvider.db.deleteOldWalks();
       } catch (err) {
         print("Cannot refresh walks list: $err");
@@ -119,4 +122,33 @@ Future<Coordinates?> retrieveHomePosition() async {
   List<String> split = homePos.split(",");
   return Coordinates(
       latitude: double.parse(split[0]), longitude: double.parse(split[1]));
+}
+
+// For some reasons, the API is not as up-to-date as the website.
+// To fix that until it is resolved, retrieve the statuses from the website
+// for the walks of the next walk date when we refresh data from the API.
+_fixNextWalks() async {
+  List<DateTime> nextDates = await retrieveNearestDates();
+  for (DateTime walkDate in nextDates) {
+    List<WebsiteWalk> fromWebsite = await retrieveWalksFromWebSite(walkDate);
+    List<Walk> fromDb = await DBProvider.db.getWalks(walkDate);
+    List<Walk> fromDbUpdated = [];
+    for (Walk walk in fromDb) {
+      WebsiteWalk? website;
+      for (WebsiteWalk websiteWalk in fromWebsite) {
+        if (walk.id == websiteWalk.id) {
+          website = websiteWalk;
+          break;
+        }
+      }
+      if (website == null) {
+        walk.status = "Annulé";
+        fromDbUpdated.add(walk);
+      } else if (website.status != null && website.status != walk.status) {
+        walk.status = website.status!;
+        fromDbUpdated.add(walk);
+      }
+    }
+    await DBProvider.db.insertWalks(fromDbUpdated);
+  }
 }
