@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../models/address_suggestion.dart';
 import '../models/trip.dart';
@@ -16,7 +16,7 @@ import 'dart:convert';
 import '../models/walk.dart';
 import 'trip_cache_manager.dart';
 
-String _token = env['MAPBOX_TOKEN'];
+String _token = dotenv.env['MAPBOX_TOKEN'];
 
 Future<void> retrieveTrips(
     double fromLong, double fromLat, List<Walk> walks) async {
@@ -54,12 +54,12 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
     {double centerLat = 50.3155646,
     double centerLong = 5.009682,
     double zoom = 7.5,
-    bool interactive = true}) {
+    interactive = InteractiveFlag.all}) {
   return FlutterMap(
     options: new MapOptions(
         center: LatLng(centerLat, centerLong),
         zoom: zoom,
-        interactive: interactive),
+        interactiveFlags: interactive),
     layers: [
       new TileLayerOptions(
         urlTemplate:

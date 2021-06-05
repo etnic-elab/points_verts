@@ -8,7 +8,7 @@ import 'dart:convert';
 import '../models/weather.dart';
 import 'weather_cache_manager.dart';
 
-String _token = env['OPENWEATHER_TOKEN'];
+String _token = dotenv.env['OPENWEATHER_TOKEN'];
 
 Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
   String url =
