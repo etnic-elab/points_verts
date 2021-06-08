@@ -16,10 +16,10 @@ class WeatherCacheManager {
 
   static Future<http.Response> getData(String url) async {
     var file = await instance.getSingleFile(url);
-    if (file != null && await file.exists()) {
+    if (await file.exists()) {
       var res = await file.readAsString();
       return http.Response(res, 200);
     }
-    return http.Response(null, 404);
+    return http.Response("not found", 404);
   }
 }

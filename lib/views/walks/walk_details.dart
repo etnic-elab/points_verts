@@ -20,15 +20,15 @@ class WalkDetails extends StatelessWidget {
     return Expanded(
       child: ListView(
         children: <Widget>[
-          walk.weathers != null ? _WeatherSection(walk) : SizedBox.shrink(),
+          walk.weathers.isNotEmpty ? _WeatherSection(walk) : SizedBox.shrink(),
           ListTile(
               leading: TileIcon(Icon(Icons.calendar_today)),
               title:
-                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date)))),
+                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!)),
           _StatusTile(walk),
           ListTile(
             leading: TileIcon(Icon(Icons.location_on)),
-            title: Text(walk.meetingPoint != null ? walk.meetingPoint : ""),
+            title: Text(walk.meetingPoint != null ? walk.meetingPoint! : ""),
             subtitle: _getGeoText(),
             trailing: OutlineIconButton(
                 onPressed: () => launchGeoApp(walk),
@@ -42,7 +42,7 @@ class WalkDetails extends StatelessWidget {
           walk.meetingPointInfo != null
               ? ListTile(
                   leading: TileIcon(Icon(Icons.info)),
-                  title: Text(walk.meetingPointInfo))
+                  title: Text(walk.meetingPointInfo!))
               : SizedBox.shrink(),
           ListTile(
             leading: TileIcon(Icon(Icons.group)),
@@ -52,7 +52,7 @@ class WalkDetails extends StatelessWidget {
                 onPressed: () {
                   if (walk.contactPhoneNumber != null) {
                     launchURL(
-                        "tel:${walk.contactPhoneNumber.replaceAll(' ', '')}");
+                        "tel:${walk.contactPhoneNumber!.replaceAll(' ', '')}");
                   }
                 },
                 iconData: Icons.call),
@@ -60,7 +60,7 @@ class WalkDetails extends StatelessWidget {
           walk.transport != null
               ? ListTile(
                   leading: TileIcon(Icon(Icons.train)),
-                  title: Text(walk.transport))
+                  title: Text(walk.transport!))
               : SizedBox.shrink(),
           _infoRow(),
         ],
@@ -92,7 +92,7 @@ class WalkDetails extends StatelessWidget {
     ]);
   }
 
-  Widget _infoTile(IconData icon, bool value, String message, {String url}) {
+  Widget _infoTile(IconData icon, bool value, String message, {String? url}) {
     if (value) {
       return ListTile(
           leading: TileIcon(Icon(icon)),
@@ -107,10 +107,10 @@ class WalkDetails extends StatelessWidget {
     }
   }
 
-  Widget _getGeoText() {
+  Widget? _getGeoText() {
     if (walk.trip != null) {
       return Text(
-          "À ${walk.getFormattedDistance()}, ~${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture");
+          "À ${walk.getFormattedDistance()}, ~${Duration(seconds: walk.trip!.duration!.round()).inMinutes} min. en voiture");
     } else if (walk.distance != null && walk.distance != double.maxFinite) {
       return Text("À ${walk.getFormattedDistance()} (à vol d'oiseau)");
     } else {
@@ -126,34 +126,26 @@ class _WeatherSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: walk.weathers,
-        builder: (BuildContext context, AsyncSnapshot<List<Weather>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              List<Weather> weathers = snapshot.data;
-              List<Widget> widgets = [];
-              for (Weather weather in weathers) {
-                widgets.add(Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("${weather.timestamp.hour}h", textScaleFactor: 0.8),
-                    getWeatherIcon(weather, context),
-                    Text("${weather.temperature.round()}°",
-                        textScaleFactor: 0.8),
-                    Text("${weather.windSpeed.round()} km/h",
-                        textScaleFactor: 0.8)
-                  ],
-                ));
-              }
-              return ListTile(
-                  title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: widgets));
-            }
-          }
-          return SizedBox();
-        });
+    if (walk.weathers.isEmpty) {
+      return SizedBox();
+    } else {
+      List<Widget> widgets = [];
+      for (Weather weather in walk.weathers) {
+        widgets.add(Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text("${weather.timestamp.hour}h", textScaleFactor: 0.8),
+            getWeatherIcon(weather, context),
+            Text("${weather.temperature.round()}°", textScaleFactor: 0.8),
+            Text("${weather.windSpeed.round()} km/h", textScaleFactor: 0.8)
+          ],
+        ));
+      }
+      return ListTile(
+          title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: widgets));
+    }
   }
 }
 

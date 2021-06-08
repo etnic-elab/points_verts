@@ -3,7 +3,7 @@ import 'package:points_verts/views/walks/walks_view.dart';
 class WalkFilter {
   WalkFilter();
 
-  Places selectedPlace;
+  Places? selectedPlace;
   bool cancelledWalks = true;
   bool brabantWallon = true;
   bool bruxelles = true;

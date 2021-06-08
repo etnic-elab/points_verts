@@ -5,8 +5,8 @@ class WalkIcon extends StatelessWidget {
   WalkIcon(this.walk, {this.color, this.size});
 
   final Walk walk;
-  final Color color;
-  final double size;
+  final Color? color;
+  final double? size;
 
   @override
   Widget build(BuildContext context) {

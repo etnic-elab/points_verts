@@ -20,7 +20,7 @@ class WalkDirectoryView extends StatefulWidget {
 }
 
 class _WalkDirectoryViewState extends State<WalkDirectoryView> {
-  Future<List<Walk>> _walks;
+  Future<List<Walk>>? _walks;
   WalkFilter _filter = WalkFilter();
 
   @override
@@ -30,7 +30,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
   }
 
   void init() async {
-    String filterString =
+    String? filterString =
         await PrefsProvider.prefs.getString("directory_walk_filter");
     WalkFilter filter;
     if (filterString != null) {
@@ -53,18 +53,20 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
         future: _walks,
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            List<Walk> walks = snapshot.data;
+            List<Walk>? walks = snapshot.data;
             return Scaffold(
               appBar: AppBar(
                 title: const Text("Annuaire"),
                 actions: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.search),
-                    onPressed: () {
-                      showSearch(
-                          context: context, delegate: _DataSearch(walks));
-                    },
-                  )
+                  walks != null
+                      ? IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: () {
+                            showSearch(
+                                context: context, delegate: _DataSearch(walks));
+                          },
+                        )
+                      : SizedBox()
                 ],
               ),
               body: walks != null
@@ -86,7 +88,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                                 ],
                               ),
                               onPressed: () async {
-                                WalkFilter newFilter =
+                                WalkFilter? newFilter =
                                     await Navigator.of(context)
                                         .push<WalkFilter>(MaterialPageRoute(
                                             builder: (context) =>
@@ -141,7 +143,7 @@ class _DirectoryList extends StatelessWidget {
   }
 }
 
-class _DataSearch extends SearchDelegate<String> {
+class _DataSearch extends SearchDelegate<String?> {
   final List<Walk> walks;
 
   _DataSearch(this.walks);

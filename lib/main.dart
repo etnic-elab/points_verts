@@ -1,6 +1,6 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart' as DotEnv;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
@@ -15,7 +15,7 @@ import 'models/walk.dart';
 void backgroundFetchHeadlessTask(String taskId) async {
   print('[BackgroundFetch] Headless event received.');
   try {
-    await DotEnv.load(fileName: '.env');
+    await dotenv.load(fileName: '.env');
     await updateWalks();
     await scheduleNextNearestWalkNotification();
     await PrefsProvider.prefs.setString(
@@ -27,7 +27,7 @@ void backgroundFetchHeadlessTask(String taskId) async {
 }
 
 void main() async {
-  await DotEnv.load(fileName: '.env');
+  await dotenv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
@@ -40,9 +40,9 @@ class MyApp extends StatelessWidget {
   static final navigatorKey = new GlobalKey<NavigatorState>();
 
   static redirectToWalkDetails(int walkId) async {
-    Walk walk = await DBProvider.db.getWalk(walkId);
+    Walk? walk = await DBProvider.db.getWalk(walkId);
     if (walk != null) {
-      MyApp.navigatorKey.currentState
+      MyApp.navigatorKey.currentState!
           .push(MaterialPageRoute(builder: (context) => WalkDetailsView(walk)));
     }
   }

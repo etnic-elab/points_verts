@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/walk_filter.dart';
+import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -33,26 +34,26 @@ class WalksView extends StatefulWidget {
 }
 
 class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
-  Future<List<DateTime>> _dates;
-  Future<List<Walk>> _currentWalks;
-  Walk _selectedWalk;
-  DateTime _selectedDate;
-  Coordinates _currentPosition;
-  Coordinates _homePosition;
+  Future<List<DateTime>>? _dates;
+  Future<List<Walk>>? _currentWalks;
+  Walk? _selectedWalk;
+  DateTime? _selectedDate;
+  Coordinates? _currentPosition;
+  Coordinates? _homePosition;
   ViewType _viewType = ViewType.list;
-  WalkFilter _filter;
+  WalkFilter? _filter;
 
   @override
   void initState() {
     initializeDateFormatting("fr_BE");
     _retrieveData();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
@@ -73,7 +74,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
           action: SnackBarAction(
             onPressed: () {
               PrefsProvider.prefs.setBoolean("first_launch", false);
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
             },
             label: "OK",
           ),
@@ -85,7 +85,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   Future<void> _retrieveData() async {
-    String filterString =
+    String? filterString =
         await PrefsProvider.prefs.getString("calendar_walk_filter");
     WalkFilter filter;
     if (filterString != null) {
@@ -104,15 +104,15 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   _retrievePosition() async {
-    Coordinates home = await retrieveHomePosition();
+    Coordinates? home = await retrieveHomePosition();
     if (home != null) {
       setState(() {
         _homePosition = home;
-        _filter.selectedPlace = Places.home;
+        _filter!.selectedPlace = Places.home;
       });
     } else {
       setState(() {
-        _filter.selectedPlace = Places.current;
+        _filter!.selectedPlace = Places.current;
       });
     }
     if (await PrefsProvider.prefs.getBoolean(key: "use_location") == true) {
@@ -120,10 +120,10 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
   }
 
-  Coordinates get selectedPosition {
-    if (_filter.selectedPlace == Places.current) {
+  Coordinates? get selectedPosition {
+    if (_filter!.selectedPlace == Places.current) {
       return _currentPosition;
-    } else if (_filter.selectedPlace == Places.home) {
+    } else if (_filter!.selectedPlace == Places.home) {
       return _homePosition;
     } else {
       return null;
@@ -142,7 +142,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     Future<List<Walk>> newList = retrieveSortedWalks(_selectedDate,
         filter: _filter, position: selectedPosition);
     if (_selectedDate != null &&
-        _selectedDate.difference(DateTime.now()).inDays < 5) {
+        _selectedDate!.difference(DateTime.now()).inDays < 5) {
       try {
         _retrieveWeathers(await newList).then((_) {
           setState(() {});
@@ -161,12 +161,20 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   Future _retrieveWeathers(List<Walk> walks) async {
-    List<Future> weathers = [];
+    List<Future<List<Weather>>> weathers = [];
     for (int i = 0; i < math.min(walks.length, 5); i++) {
       Walk walk = walks[i];
-      if (walk.weathers == null && !walk.isCancelled()) {
-        walk.weathers = getWeather(walk.long, walk.lat, _selectedDate);
-        weathers.add(walk.weathers);
+      if (_selectedDate != null &&
+          walk.weathers.isEmpty &&
+          walk.long != null &&
+          walk.lat != null &&
+          !walk.isCancelled()) {
+        Future<List<Weather>> future =
+            getWeather(walk.long!, walk.lat!, _selectedDate!);
+        future.then((weathers) {
+          walk.weathers = weathers;
+        });
+        weathers.add(future);
       }
     }
     return Future.wait(weathers);
@@ -175,10 +183,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   void _retrieveDates() async {
     _dates = DBProvider.db.getWalkDates();
     await _retrievePosition();
-    _dates.then((List<DateTime> items) async {
-      String lastSelectedDateString =
+    _dates!.then((List<DateTime> items) async {
+      String? lastSelectedDateString =
           await PrefsProvider.prefs.getString("last_selected_date");
-      print(lastSelectedDateString);
       if (lastSelectedDateString != null) {
         setState(() {
           _selectedDate = DateTime.parse(lastSelectedDateString);
@@ -222,7 +229,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   Widget _buildTab() {
-    if (_dates == null) {
+    Future<List<DateTime>>? dates = _dates;
+    if (dates == null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -235,14 +243,14 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
     return Column(
       children: <Widget>[
-        _defineSearchPart(),
+        _defineSearchPart(dates),
         Divider(height: 0.0),
         Expanded(
             child: _viewType == ViewType.list
                 ? WalkResultsListView(_currentWalks, selectedPosition,
-                    _filter.selectedPlace, _retrieveData)
+                    _filter!.selectedPlace, _retrieveData)
                 : WalkResultsMapView(_currentWalks, selectedPosition,
-                    _filter.selectedPlace, _selectedWalk, (walk) {
+                    _filter!.selectedPlace, _selectedWalk, (walk) {
                     setState(() {
                       _selectedWalk = walk;
                     });
@@ -251,51 +259,44 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     );
   }
 
-  Widget _defineSearchPart() {
-    return Container(
-        margin: const EdgeInsets.only(left: 10, right: 10),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              DatesDropdown(
-                  dates: _dates,
-                  selectedDate: _selectedDate,
-                  onChanged: (DateTime date) {
-                    setState(() {
-                      _selectedDate = date;
-                      _retrieveWalks();
-                    });
-                    PrefsProvider.prefs.setString(
-                        "last_selected_date", date.toIso8601String());
-                  }),
-              ActionChip(
-                label: Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(right: 4.0),
-                      child: Icon(Icons.tune, size: 16.0),
-                    ),
-                    Text("Filtres")
-                  ],
-                ),
-                onPressed: () async {
-                  WalkFilter newFilter = await Navigator.of(context)
-                      .push<WalkFilter>(MaterialPageRoute(
-                          builder: (context) => FilterPage(
-                              _filter,
-                              _homePosition != null &&
-                                  _currentPosition != null)));
-                  if (newFilter != null) {
-                    setState(() {
-                      _filter = newFilter;
-                    });
-                    await PrefsProvider.prefs.setString(
-                        "calendar_walk_filter", jsonEncode(newFilter));
-                    _retrieveWalks();
-                  }
-                },
-              ),
-            ]));
+  void onDateChanged(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+      _retrieveWalks();
+    });
+    PrefsProvider.prefs.setString("last_selected_date", date.toIso8601String());
+  }
+
+  void onFilterPressed() async {
+    WalkFilter? newFilter = await Navigator.of(context).push<WalkFilter>(
+        MaterialPageRoute(
+            builder: (context) => FilterPage(
+                _filter!, _homePosition != null && _currentPosition != null)));
+    if (newFilter != null) {
+      setState(() {
+        _filter = newFilter;
+      });
+      await PrefsProvider.prefs
+          .setString("calendar_walk_filter", jsonEncode(newFilter));
+      _retrieveWalks();
+    }
+  }
+
+  Widget _defineSearchPart(Future<List<DateTime>> dates) {
+    return FutureBuilder(
+        future: dates,
+        builder:
+            (BuildContext context, AsyncSnapshot<List<DateTime>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            return _SearchPanel(
+                dates: snapshot.data!,
+                selectedDate: _selectedDate!,
+                onDateChanged: onDateChanged,
+                onFilterPressed: onFilterPressed);
+          }
+          return SizedBox();
+        });
   }
 
   _getCurrentLocation() {
@@ -308,7 +309,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
           _currentPosition = Coordinates(
               latitude: position.latitude, longitude: position.longitude);
         });
-        if (_filter.selectedPlace == Places.current && _selectedDate != null) {
+        if (_filter!.selectedPlace == Places.current && _selectedDate != null) {
           _retrieveWalks();
         }
       }
@@ -321,5 +322,44 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       }
       print("Cannot retrieve current position: $e");
     });
+  }
+}
+
+class _SearchPanel extends StatelessWidget {
+  _SearchPanel(
+      {required this.dates,
+      required this.selectedDate,
+      required this.onDateChanged,
+      required this.onFilterPressed});
+
+  final List<DateTime> dates;
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onDateChanged;
+  final VoidCallback onFilterPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        margin: const EdgeInsets.only(left: 10, right: 10),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              DatesDropdown(
+                  dates: dates,
+                  selectedDate: selectedDate,
+                  onChanged: onDateChanged),
+              ActionChip(
+                label: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4.0),
+                      child: Icon(Icons.tune, size: 16.0),
+                    ),
+                    Text("Filtres")
+                  ],
+                ),
+                onPressed: onFilterPressed,
+              ),
+            ]));
   }
 }

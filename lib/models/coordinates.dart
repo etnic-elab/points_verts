@@ -1,5 +1,5 @@
 class Coordinates {
-  Coordinates({this.latitude, this.longitude});
+  Coordinates({required this.latitude, required this.longitude});
 
   double latitude;
   double longitude;
