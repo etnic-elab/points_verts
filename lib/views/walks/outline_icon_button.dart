@@ -4,9 +4,9 @@ class OutlineIconButton extends StatelessWidget {
   OutlineIconButton({this.onPressed, this.iconData});
 
   @required
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   @required
-  final IconData iconData;
+  final IconData? iconData;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class OutlineIconButton extends StatelessWidget {
             onPressed: onPressed,
             style: OutlinedButton.styleFrom(
                 padding: EdgeInsets.all(0.0),
-                primary: Theme.of(context).textTheme.bodyText1.color),
+                primary: Theme.of(context).textTheme.bodyText1!.color),
             child: Icon(iconData)));
   }
 }

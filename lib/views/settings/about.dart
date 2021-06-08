@@ -22,7 +22,7 @@ class About extends StatelessWidget {
                       applicationIcon: Image(
                           image: AssetImage('assets/logo.png'), height: 50),
                       applicationName: "Points Verts",
-                      applicationVersion: snapshot.data.version,
+                      applicationVersion: snapshot.data!.version,
                       applicationLegalese: "GNU GPLv3",
                       children: [
                         _AboutRow("Dépôt du code source", "GitHub",
@@ -65,7 +65,7 @@ class _AboutRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(label),
-      subtitle: buttonLabel != null ? Text(buttonLabel) : null,
+      subtitle: Text(buttonLabel),
       onTap: () {
         launchURL(url);
       },

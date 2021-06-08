@@ -1,11 +1,11 @@
 class Weather {
   Weather({
-    this.timestamp,
-    this.temperature,
-    this.weatherId,
-    this.weather,
-    this.weatherIcon,
-    this.windSpeed,
+    required this.timestamp,
+    required this.temperature,
+    required this.weatherId,
+    required this.weather,
+    required this.weatherIcon,
+    required this.windSpeed,
   });
 
   final DateTime timestamp;

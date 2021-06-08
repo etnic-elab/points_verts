@@ -64,30 +64,32 @@ class WalkTile extends StatelessWidget {
   }
 
   Widget _weatherIcon() {
-    if (walk.isCancelled()) {
+    if (walk.isCancelled() || walk.weathers.isEmpty) {
       return TileIcon(WalkIcon(walk));
+    } else {
+      return WeatherIcon(walk.weathers[0]);
     }
-    return FutureBuilder(
-        future: walk.weathers,
-        builder: (BuildContext context, AsyncSnapshot<List<Weather>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData && snapshot.data.length > 0) {
-              Weather weather = snapshot.data[0];
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  getWeatherIcon(weather, context),
-                  Text("${weather.temperature.round()}°"),
-                ],
-              );
-            }
-          }
-          return TileIcon(WalkIcon(walk));
-        });
   }
 
   PageRoute _pageRoute() {
     return MaterialPageRoute(builder: (context) => WalkDetailsView(walk));
+  }
+}
+
+class WeatherIcon extends StatelessWidget {
+  WeatherIcon(this.weather);
+
+  final Weather weather;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        getWeatherIcon(weather, context),
+        Text("${weather.temperature.round()}°"),
+      ],
+    );
   }
 }

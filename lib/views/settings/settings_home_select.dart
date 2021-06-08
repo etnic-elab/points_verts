@@ -26,7 +26,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   final Function(AddressSuggestion) setHomeCallback;
   final Function removeHomeCallback;
   final _homeSearchController = TextEditingController();
-  Timer _debounce;
+  Timer? _debounce;
   int _countryIndex = 0;
   Future<List<AddressSuggestion>> _suggestions = Future.value([]);
 
@@ -43,7 +43,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   }
 
   _onSearchChanged() {
-    if (_debounce?.isActive ?? false) _debounce.cancel();
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       if (!mounted) return;
       setState(() {
@@ -97,7 +97,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
             AsyncSnapshot<List<AddressSuggestion>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              List<AddressSuggestion> suggestions = snapshot.data;
+              List<AddressSuggestion> suggestions = snapshot.data!;
               return ListView.separated(
                   itemCount: suggestions.length,
                   separatorBuilder: (context, i) => Divider(height: 0.5),
@@ -140,7 +140,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   }
 
   Future<void> _countrySelection(BuildContext context) async {
-    int index = await showDialog<int>(
+    int? index = await showDialog<int>(
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(

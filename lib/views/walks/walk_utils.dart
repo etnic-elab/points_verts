@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/walk_filter.dart';
+import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/mapbox.dart';
@@ -27,13 +28,13 @@ void launchGeoApp(Walk walk) async {
 
 int sortWalks(Walk a, Walk b) {
   if (a.trip != null && b.trip != null) {
-    return a.trip.duration.compareTo(b.trip.duration);
+    return a.trip!.duration!.compareTo(b.trip!.duration!);
   } else if (!a.isCancelled() && b.isCancelled()) {
     return -1;
   } else if (a.isCancelled() && !b.isCancelled()) {
     return 1;
   } else if (a.distance != null && b.distance != null) {
-    return a.distance.compareTo(b.distance);
+    return a.distance!.compareTo(b.distance!);
   } else if (a.distance != null) {
     return -1;
   } else {
@@ -41,8 +42,8 @@ int sortWalks(Walk a, Walk b) {
   }
 }
 
-Future<List<Walk>> retrieveSortedWalks(DateTime date,
-    {Coordinates position, WalkFilter filter}) async {
+Future<List<Walk>> retrieveSortedWalks(DateTime? date,
+    {Coordinates? position, WalkFilter? filter}) async {
   List<Walk> walks = await DBProvider.db.getWalks(date, filter: filter);
   if (position == null) {
     walks.sort((a, b) => sortWalks(a, b));
@@ -51,7 +52,7 @@ Future<List<Walk>> retrieveSortedWalks(DateTime date,
   for (Walk walk in walks) {
     if (walk.isPositionable()) {
       double distance = Geolocator.distanceBetween(
-          position.latitude, position.longitude, walk.lat, walk.long);
+          position.latitude, position.longitude, walk.lat!, walk.long!);
       walk.distance = distance;
       walk.trip = null;
     }
@@ -75,7 +76,7 @@ launchURL(url) async {
 
 updateWalks() async {
   log("Updating walks", name: TAG);
-  String lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
+  String? lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
   DateTime now = DateTime.now().toUtc();
   if (lastUpdate == null) {
     List<Walk> newWalks = await fetchAllWalks();
@@ -115,8 +116,8 @@ Future<List<DateTime>> retrieveNearestDates() async {
   return walkDates;
 }
 
-Future<Coordinates> retrieveHomePosition() async {
-  String homePos = await PrefsProvider.prefs.getString("home_coords");
+Future<Coordinates?> retrieveHomePosition() async {
+  String? homePos = await PrefsProvider.prefs.getString("home_coords");
   if (homePos == null) return null;
   List<String> split = homePos.split(",");
   return Coordinates(
@@ -129,17 +130,25 @@ Future<Coordinates> retrieveHomePosition() async {
 _fixNextWalks() async {
   List<DateTime> nextDates = await retrieveNearestDates();
   for (DateTime walkDate in nextDates) {
-    List<Walk> fromWebsite = await retrieveWalksFromWebSite(walkDate);
-    List<Walk> fromDbs = await DBProvider.db.getWalks(walkDate);
-    for (Walk walk in fromDbs) {
-      Walk website = fromWebsite.singleWhere((element) => element.id == walk.id,
-          orElse: () => null);
+    List<WebsiteWalk> fromWebsite = await retrieveWalksFromWebSite(walkDate);
+    List<Walk> fromDb = await DBProvider.db.getWalks(walkDate);
+    List<Walk> fromDbUpdated = [];
+    for (Walk walk in fromDb) {
+      WebsiteWalk? website;
+      for (WebsiteWalk websiteWalk in fromWebsite) {
+        if (walk.id == websiteWalk.id) {
+          website = websiteWalk;
+          break;
+        }
+      }
       if (website == null) {
         walk.status = "Annulé";
-      } else if (website.status != null) {
-        walk.status = website.status;
+        fromDbUpdated.add(walk);
+      } else if (website.status != null && website.status != walk.status) {
+        walk.status = website.status!;
+        fromDbUpdated.add(walk);
       }
     }
-    await DBProvider.db.insertWalks(fromDbs);
+    await DBProvider.db.insertWalks(fromDbUpdated);
   }
 }

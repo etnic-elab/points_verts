@@ -17,12 +17,12 @@ class GeoButton extends StatelessWidget {
     if (walk.isCancelled()) {
       return Text("Annulé", style: TextStyle(color: Colors.red));
     } else {
-      String label = walk.getNavigationLabel();
+      String? label = walk.getNavigationLabel();
       if (label != null) {
         return OutlinedButton.icon(
             onPressed: () => launchGeoApp(walk),
             style: OutlinedButton.styleFrom(
-                primary: Theme.of(context).textTheme.bodyText1.color),
+                primary: Theme.of(context).textTheme.bodyText1!.color),
             icon: Icon(Icons.directions_car, size: 15.0),
             label: Text(label));
       } else {

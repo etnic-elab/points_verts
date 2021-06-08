@@ -11,12 +11,12 @@ class DBProvider {
   DBProvider._();
 
   static final DBProvider db = DBProvider._();
-  Database _database;
+  Database? _database;
 
   Future<Database> get database async {
-    if (_database != null) return _database;
+    if (_database != null) return _database as Database;
     _database = await getDatabaseInstance();
-    return _database;
+    return _database as Database;
   }
 
   Future<Database> getDatabaseInstance() async {
@@ -82,7 +82,7 @@ class DBProvider {
         where: 'date < ?', whereArgs: [lastMidnight.toIso8601String()]);
   }
 
-  Future<List<Walk>> getSortedWalks({WalkFilter filter}) async {
+  Future<List<Walk>> getSortedWalks({WalkFilter? filter}) async {
     final Database db = await database;
     List<Map<String, dynamic>> maps;
     if (filter != null) {
@@ -133,18 +133,18 @@ class DBProvider {
     return args;
   }
 
-  Future<List<Walk>> getWalks(DateTime date, {WalkFilter filter}) async {
+  Future<List<Walk>> getWalks(DateTime? date, {WalkFilter? filter}) async {
     log("Retrieving walks from database for $date", name: TAG);
     if (date == null) return [];
-    final Database db = await database;
+    final Database? db = await database;
     List<Map<String, dynamic>> maps;
     if (filter != null) {
       String where = "date = ?" + _generateWhereFromFilter(filter);
       List<dynamic> args = [date.toIso8601String()];
       args.addAll(_generateArgsFromFilter(filter));
-      maps = await db.query('walks', where: where, whereArgs: args);
+      maps = await db!.query('walks', where: where, whereArgs: args);
     } else {
-      maps = await db.query('walks',
+      maps = await db!.query('walks',
           where: 'date = ?', whereArgs: [date.toIso8601String()]);
     }
     return List.generate(maps.length, (i) {
@@ -152,7 +152,7 @@ class DBProvider {
     });
   }
 
-  Future<Walk> getWalk(int id) async {
+  Future<Walk?> getWalk(int id) async {
     final Database db = await database;
     final List<Map<String, dynamic>> maps =
         await db.query('walks', where: 'id = ?', whereArgs: [id]);

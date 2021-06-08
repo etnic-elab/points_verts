@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -20,11 +21,12 @@ class NotificationManager {
   NotificationManager._();
 
   static final NotificationManager instance = NotificationManager._();
-  FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+  FlutterLocalNotificationsPlugin? _flutterLocalNotificationsPlugin;
 
   Future<FlutterLocalNotificationsPlugin> get plugin async {
     if (_flutterLocalNotificationsPlugin != null)
-      return _flutterLocalNotificationsPlugin;
+      return _flutterLocalNotificationsPlugin
+          as FlutterLocalNotificationsPlugin;
     log("creating a new plugin instance", name: TAG);
     var initializationSettingsAndroid =
         AndroidInitializationSettings('ic_stat_name');
@@ -36,15 +38,15 @@ class NotificationManager {
     var initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     _flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: (String payload) async {
-      int walkId = int.tryParse(payload);
+    await _flutterLocalNotificationsPlugin!.initialize(initializationSettings,
+        onSelectNotification: (String? payload) async {
+      int? walkId = int.tryParse(payload!);
       if (walkId != null) {
         MyApp.redirectToWalkDetails(walkId);
       }
     });
     tz.initializeTimeZones();
-    return _flutterLocalNotificationsPlugin;
+    return _flutterLocalNotificationsPlugin as FlutterLocalNotificationsPlugin;
   }
 
   scheduleNextNearestWalk(Walk walk) async {
@@ -76,7 +78,7 @@ class NotificationManager {
       if (walk.trip != null) {
         title = 'Point le plus proche le ${fullDate.format(walk.date)}';
         description =
-            "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip.duration.round()).inMinutes} min. en voiture";
+            "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip!.duration!.round()).inMinutes} min. en voiture";
       } else {
         title = 'Point le plus proche le ${fullDate.format(walk.date)}';
         description = "${walk.city} - ${walk.province}";
@@ -100,12 +102,12 @@ class NotificationManager {
     await instance.cancel(NEXT_NEAREST_WALK);
   }
 
-  Future<bool> requestNotificationPermissions() async {
+  Future<bool?> requestNotificationPermissions() async {
     if (Platform.isIOS) {
       FlutterLocalNotificationsPlugin instance = await plugin;
       return await instance
           .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
+              IOSFlutterLocalNotificationsPlugin>()!
           .requestPermissions(
             alert: true,
           );
@@ -124,7 +126,7 @@ Future<void> scheduleNextNearestWalkNotification() async {
   bool showNotification = await PrefsProvider.prefs
       .getBoolean(key: "show_notification", defaultValue: false);
   if (!showNotification) return;
-  Coordinates home = await retrieveHomePosition();
+  Coordinates? home = await retrieveHomePosition();
   if (home == null) return;
   List<DateTime> dates = await retrieveNearestDates();
   if (dates.isNotEmpty) {

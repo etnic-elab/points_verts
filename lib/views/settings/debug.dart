@@ -31,11 +31,11 @@ class _LastWalkUpdateTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: PrefsProvider.prefs.getString("last_walk_update"),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           return ListTile(
             title: Text("Dernière mise à jour de la liste des marches"),
-            subtitle: Text("${formatDate(snapshot.data)} (heure locale)"),
+            subtitle: Text("${formatDate(snapshot.data!)} (heure locale)"),
           );
         } else {
           return SizedBox.shrink();
@@ -50,11 +50,11 @@ class _GeoPosTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: PrefsProvider.prefs.getString("home_coords"),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData) {
           return ListTile(
             title: Text("Coordonnées GPS de l'emplacement de référence"),
-            subtitle: Text(snapshot.data),
+            subtitle: Text(snapshot.data!),
           );
         } else {
           return SizedBox.shrink();
@@ -72,13 +72,13 @@ class _PendingNotificationsTile extends StatelessWidget {
         builder: (BuildContext context,
             AsyncSnapshot<List<PendingNotificationRequest>> snapshot) {
           if (snapshot.hasData) {
-            List<PendingNotificationRequest> requests = snapshot.data;
+            List<PendingNotificationRequest> requests = snapshot.data!;
             if (requests.length > 0) {
               return ListTile(
                 isThreeLine: true,
                 title: Text("Prochaine notification planifiée"),
                 subtitle: Text(
-                  requests[0].title + '\n' + requests[0].body,
+                  requests[0].title! + '\n' + requests[0].body!,
                   style: TextStyle(fontSize: 12.0),
                 ),
               );
@@ -94,11 +94,11 @@ class _LastBackgroundFetch extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: PrefsProvider.prefs.getString("last_background_fetch"),
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
             return ListTile(
               title: Text("Dernière actualisation en arrière-plan"),
-              subtitle: Text("${formatDate(snapshot.data)} (heure locale)"),
+              subtitle: Text("${formatDate(snapshot.data!)} (heure locale)"),
             );
           }
           return SizedBox.shrink();

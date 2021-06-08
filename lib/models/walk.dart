@@ -7,34 +7,34 @@ final dateFormat = new DateFormat("yyyy-MM-dd");
 
 class Walk {
   Walk(
-      {this.id,
-      this.city,
-      this.entity,
-      this.type,
-      this.province,
-      this.long,
-      this.lat,
-      this.date,
-      this.status,
-      this.meetingPoint,
-      this.meetingPointInfo,
-      this.organizer,
-      this.contactFirstName,
-      this.contactLastName,
-      this.contactPhoneNumber,
-      this.ign,
-      this.transport,
-      this.fifteenKm,
-      this.wheelchair,
-      this.stroller,
-      this.extraOrientation,
-      this.extraWalk,
-      this.guided,
-      this.bike,
-      this.mountainBike,
-      this.waterSupply,
-      this.beWapp,
-      this.lastUpdated});
+      {required this.id,
+      required this.city,
+      required this.entity,
+      required this.type,
+      required this.province,
+      required this.long,
+      required this.lat,
+      required this.date,
+      required this.status,
+      required this.meetingPoint,
+      required this.meetingPointInfo,
+      required this.organizer,
+      required this.contactFirstName,
+      required this.contactLastName,
+      required this.contactPhoneNumber,
+      required this.ign,
+      required this.transport,
+      required this.fifteenKm,
+      required this.wheelchair,
+      required this.stroller,
+      required this.extraOrientation,
+      required this.extraWalk,
+      required this.guided,
+      required this.bike,
+      required this.mountainBike,
+      required this.waterSupply,
+      required this.beWapp,
+      required this.lastUpdated});
 
   final int id;
   final String city;
@@ -42,17 +42,17 @@ class Walk {
   final String type;
   final String province;
   final DateTime date;
-  final double long;
-  final double lat;
+  final double? long;
+  final double? lat;
   String status;
-  final String meetingPoint;
-  final String meetingPointInfo;
+  final String? meetingPoint;
+  final String? meetingPointInfo;
   final String organizer;
   final String contactFirstName;
   final String contactLastName;
-  final String contactPhoneNumber;
-  final String ign;
-  final String transport;
+  final String? contactPhoneNumber;
+  final String? ign;
+  final String? transport;
   final bool fifteenKm;
   final bool wheelchair;
   final bool stroller;
@@ -65,9 +65,9 @@ class Walk {
   final bool beWapp;
   final DateTime lastUpdated;
 
-  double distance;
-  Trip trip;
-  Future<List<Weather>> weathers;
+  double? distance;
+  Trip? trip;
+  List<Weather> weathers = [];
 
   factory Walk.fromJson(Map<String, dynamic> json) {
     return Walk(
@@ -142,9 +142,9 @@ class Walk {
     return status == "Modifié";
   }
 
-  String getFormattedDistance() {
-    double dist =
-        trip != null && trip.distance != null ? trip.distance : distance;
+  String? getFormattedDistance() {
+    double? dist =
+        trip != null && trip!.distance != null ? trip!.distance : distance;
     if (dist == null) {
       return null;
     } else if (dist < 1000) {
@@ -154,9 +154,9 @@ class Walk {
     }
   }
 
-  String getNavigationLabel() {
-    if (trip != null && trip.duration != null) {
-      return '${Duration(seconds: trip.duration.round()).inMinutes} min';
+  String? getNavigationLabel() {
+    if (trip != null && trip!.duration != null) {
+      return '${Duration(seconds: trip!.duration!.round()).inMinutes} min';
     } else {
       return getFormattedDistance();
     }
