@@ -12,9 +12,16 @@ import 'package:points_verts/walks_home_screen.dart';
 
 import 'models/walk.dart';
 
-void backgroundFetchHeadlessTask(String taskId) async {
-  print('[BackgroundFetch] Headless event received.');
+void backgroundFetchHeadlessTask(HeadlessTask task) async {
+  String taskId = task.taskId;
+  bool isTimeout = task.timeout;
+  if (isTimeout) {
+    print("[BackgroundFetch] Headless TIMEOUT: $taskId");
+    BackgroundFetch.finish(taskId);
+    return;
+  }
   try {
+    print("[BackgroundFetch] Headless task: $taskId");
     await dotenv.load(fileName: '.env');
     await updateWalks();
     await scheduleNextNearestWalkNotification();
@@ -22,8 +29,9 @@ void backgroundFetchHeadlessTask(String taskId) async {
         "last_background_fetch", DateTime.now().toUtc().toIso8601String());
   } catch (err) {
     print("Cannot schedule next nearest walk notification: $err");
+  } finally {
+    BackgroundFetch.finish(taskId);
   }
-  BackgroundFetch.finish(taskId);
 }
 
 void main() async {
