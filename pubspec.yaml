@@ -28,14 +28,14 @@ dependencies:
 
   sqflite: ^2.0.0
   http: ^0.13.0
-  geolocator: ^7.0.0
+  geolocator: ^7.1.0
   intl: ^0.17.0
   url_launcher: ^6.0.0
   flutter_map: ^0.13.0
   shared_preferences: ^2.0.0
   flutter_dotenv: ^5.0.0
   weather_icons: ^3.0.0-nullsafety.0
-  background_fetch: ^1.0.0-nullsafety.2
+  background_fetch: ^1.0.0
   flutter_local_notifications: ^6.0.0
   csv: ^5.0.0
   package_info: ^2.0.0
