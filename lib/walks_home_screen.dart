@@ -75,6 +75,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
             enableHeadless: true,
             requiredNetworkType: NetworkType.ANY,
             startOnBoot: true), (String taskId) async {
+      print("[BackgroundFetch] taskId: $taskId");
       try {
         await scheduleNextNearestWalkNotification();
         await PrefsProvider.prefs.setString(
@@ -82,6 +83,9 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
       } catch (err) {
         print("Cannot schedule next nearest walk notification: $err");
       }
+      BackgroundFetch.finish(taskId);
+    }, (String taskId) async {
+      print("[BackgroundFetch] TIMEOUT taskId: $taskId");
       BackgroundFetch.finish(taskId);
     }).then((int status) {
       print('[BackgroundFetch] configure success: $status');

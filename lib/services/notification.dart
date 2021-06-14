@@ -50,6 +50,7 @@ class NotificationManager {
   }
 
   scheduleNextNearestWalk(Walk walk) async {
+    tz.initializeTimeZones();
     tz.TZDateTime scheduledAt =
         tz.TZDateTime.from(walk.date, tz.local).subtract(Duration(hours: 4));
     if (scheduledAt.isBefore(DateTime.now())) {
