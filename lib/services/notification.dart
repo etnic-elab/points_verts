@@ -29,7 +29,7 @@ class NotificationManager {
           as FlutterLocalNotificationsPlugin;
     log("creating a new plugin instance", name: TAG);
     var initializationSettingsAndroid =
-        AndroidInitializationSettings('ic_stat_name');
+        AndroidInitializationSettings('ic_notification');
     var initializationSettingsIOS = IOSInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,

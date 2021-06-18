@@ -4,6 +4,6 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/walk" />
+            android:src="@drawable/ic_splashscreen" />
     </item>
 </layer-list>

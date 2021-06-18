@@ -1,13 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
+import 'package:points_verts/company_data.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 class About extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    String emailAddress = _getEmailAddress();
     return FutureBuilder(
         future: PackageInfo.fromPlatform(),
         builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
@@ -21,14 +19,14 @@ class About extends StatelessWidget {
                       context: context,
                       applicationIcon: Image(
                           image: AssetImage('assets/logo.png'), height: 50),
-                      applicationName: "Points Verts",
+                      applicationName: APPLICATION_NAME,
                       applicationVersion: snapshot.data!.version,
                       applicationLegalese: "GNU GPLv3",
                       children: [
                         _AboutRow("Dépôt du code source", "GitHub",
-                            "https://github.com/tborlee/points_verts"),
-                        _AboutRow("Adresse de contact", emailAddress,
-                            "mailto:$emailAddress?subject=Points Verts"),
+                            "https://github.com/etnic-elab/points_verts"),
+                        _AboutRow("Adresse de contact", COMPANY_MAIL,
+                            "mailto:$COMPANY_MAIL?subject=Points Verts"),
                         _AboutRow(
                             "Données des Points Verts",
                             "Open Data Wallonie-Bruxelles",
@@ -43,14 +41,6 @@ class About extends StatelessWidget {
             return SizedBox.shrink();
           }
         });
-  }
-
-  String _getEmailAddress() {
-    if (Platform.isIOS) {
-      return "ios@alpagaga.dev";
-    } else {
-      return "android@alpagaga.dev";
-    }
   }
 }
 

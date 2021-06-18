@@ -1,6 +1,6 @@
-# Points Verts
+# ADEPS - Points Verts
 
-Small Flutter application displaying future Adeps' walks. Non official.
+Small Flutter application displaying future ADEPS' walks.
 
 Uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de-ladeps/) to retrieve data.
 

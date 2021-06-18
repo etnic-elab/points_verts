@@ -12,8 +12,9 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         tools:replace="android:label"
-        android:label="Points Verts"
-        android:icon="@mipmap/ic_launcher">
+        android:label="ADEPS\nPoints Verts"
+        android:icon="@mipmap/ic_launcher"
+        >
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

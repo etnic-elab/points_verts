@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:points_verts/company_data.dart';
 import 'package:points_verts/models/walk.dart';
 
 import 'outline_icon_button.dart';
@@ -15,7 +16,8 @@ class GeoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (walk.isCancelled()) {
-      return Text("Annulé", style: TextStyle(color: Colors.red));
+      return Text("Annulé",
+          style: TextStyle(color: CompanyColors.contextualRed(context)));
     } else {
       String? label = walk.getNavigationLabel();
       if (label != null) {

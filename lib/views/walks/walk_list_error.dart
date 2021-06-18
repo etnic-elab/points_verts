@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:points_verts/company_data.dart';
 
 class WalkListError extends StatelessWidget {
   WalkListError(this.refreshWalks);
@@ -11,7 +12,10 @@ class WalkListError extends StatelessWidget {
         child: Column(
       children: <Widget>[
         Spacer(),
-        Icon(Icons.warning),
+        Icon(
+          Icons.warning,
+          color: CompanyColors.red,
+        ),
         Container(
             padding: EdgeInsets.all(5.0),
             child: Row(children: [

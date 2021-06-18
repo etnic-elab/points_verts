@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:points_verts/company_data.dart';
 
 import '../loading.dart';
 import '../../services/mapbox.dart';
@@ -73,13 +74,11 @@ class WalkResultsMapView extends StatelessWidget {
       return SizedBox.shrink();
     } else {
       return SafeArea(
-          child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Card(
-                child: Container(
-                  child: WalkTile(walk, TileType.calendar),
-                ),
-              )));
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: WalkTile(walk, TileType.calendar),
+        ),
+      );
     }
   }
 
@@ -89,11 +88,13 @@ class WalkResultsMapView extends StatelessWidget {
       height: 25,
       point: new LatLng(walk.lat!, walk.long!),
       builder: (ctx) => RawMaterialButton(
-        child: WalkIcon(walk, color: Colors.white, size: 20),
+        child: WalkIcon(walk, size: 21),
         shape: new CircleBorder(),
         elevation: selectedWalk == walk ? 5.0 : 2.0,
         // TODO: find a way to not hardcode the colors here
-        fillColor: selectedWalk == walk ? Colors.greenAccent : Colors.green,
+        fillColor: selectedWalk == walk
+            ? CompanyColors.lightestGreen
+            : CompanyColors.darkGreen,
         onPressed: () {
           onWalkSelect(walk);
         },
