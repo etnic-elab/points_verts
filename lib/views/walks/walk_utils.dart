@@ -69,10 +69,12 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
 }
 
 launchURL(url) async {
-  try {
-    await launch(url);
-  } catch(err) {
-    print("Cannot launch URL: $err");
+  if (await canLaunch(url)) {
+    try {
+      await launch(url);
+    } catch (err) {
+      print("Cannot launch URL: $err");
+    }
   }
 }
 
