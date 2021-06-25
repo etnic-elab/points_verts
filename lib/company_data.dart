@@ -7,9 +7,9 @@ const String GITHUB_URL = "https://github.com/etnic-elab/points_verts";
 const String OPENDATA_URL =
     "https://www.odwb.be/explore/dataset/points-verts-de-ladeps";
 const String ASSISTANCE_URL =
-    "https://www.adeps-points-verts.innovation-etnic.be/assistance.html";
+    "https://adeps-points-verts.innovation-etnic.be/assistance.html";
 const String PRIVACY_URL =
-    "https://www.adpes-points-verts.innovation-etnic.be/privacy.html";
+    "https://adeps-points-verts.innovation-etnic.be/privacy.html";
 
 class CompanyColors {
   static const greenPrimary = Color(0xFF6CB233);

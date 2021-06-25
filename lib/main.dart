@@ -73,6 +73,7 @@ class MyApp extends StatelessWidget {
       theme: companyTheme,
       darkTheme: companyDarkTheme,
       home: WalksHomeScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
