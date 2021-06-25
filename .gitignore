@@ -39,4 +39,6 @@ lib/generated_plugin_registrant.dart
 
 /android/key.properties
 key.jks
+upload-keystore.jks
+upload_certificate.pem
 .env

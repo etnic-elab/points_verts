@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 
 const String APPLICATION_NAME = "ADEPS - Points Verts";
 const String COMPANY_MAIL = "innovation@etnic.be";
+const String GITHUB_URL = "https://github.com/etnic-elab/points_verts";
+const String OPENDATA_URL =
+    "https://www.odwb.be/explore/dataset/points-verts-de-ladeps";
+const String ASSISTANCE_URL =
+    "https://www.adeps-points-verts.innovation-etnic.be/assistance.html";
+const String PRIVACY_URL =
+    "https://www.adpes-points-verts.innovation-etnic.be/privacy.html";
 
 class CompanyColors {
   static const greenPrimary = Color(0xFF6CB233);
@@ -29,13 +36,18 @@ class CompanyColors {
   }
 }
 
-final ThemeData companyTheme = ThemeData(
-  primarySwatch: _createMaterialColor(CompanyColors.greenPrimary),
-);
+final greenPrimaryMatCol = _createMaterialColor(CompanyColors.greenPrimary);
+
+final ThemeData companyTheme =
+    ThemeData(primarySwatch: _createMaterialColor(greenPrimaryMatCol));
 
 final ThemeData companyDarkTheme = ThemeData(
   brightness: Brightness.dark,
-  primarySwatch: _createMaterialColor(CompanyColors.greenPrimary),
+  primarySwatch: _createMaterialColor(greenPrimaryMatCol),
+  accentColor: greenPrimaryMatCol[400],
+  toggleableActiveColor: greenPrimaryMatCol[400],
+  textSelectionTheme:
+      TextSelectionThemeData(selectionHandleColor: greenPrimaryMatCol[400]),
 );
 
 MaterialColor _createMaterialColor(Color color) {

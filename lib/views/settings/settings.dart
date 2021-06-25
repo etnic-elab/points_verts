@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/company_data.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -172,14 +173,12 @@ class _SettingsState extends State<Settings> {
           ListTile(
             leading: Icon(Icons.help),
             title: Text("Assistance"),
-            onTap: () =>
-                launchURL("https://pointsverts.alpagaga.dev/assistance.html"),
+            onTap: () => launchURL(ASSISTANCE_URL),
           ),
           ListTile(
             leading: Icon(Icons.security),
             title: Text("Charte de la vie privée"),
-            onTap: () =>
-                launchURL("https://pointsverts.alpagaga.dev/privacy.html"),
+            onTap: () => launchURL(PRIVACY_URL),
           ),
           About()
         ],

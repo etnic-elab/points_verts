@@ -23,18 +23,15 @@ class About extends StatelessWidget {
                       applicationVersion: snapshot.data!.version,
                       applicationLegalese: "GNU GPLv3",
                       children: [
-                        _AboutRow("Dépôt du code source", "GitHub",
-                            "https://github.com/etnic-elab/points_verts"),
+                        _AboutRow("Dépôt du code source", "GitHub", GITHUB_URL),
                         _AboutRow("Adresse de contact", COMPANY_MAIL,
                             "mailto:$COMPANY_MAIL?subject=Points Verts"),
-                        _AboutRow(
-                            "Données des Points Verts",
-                            "Open Data Wallonie-Bruxelles",
-                            "https://www.odwb.be/explore/dataset/points-verts-de-ladeps/"),
+                        _AboutRow("Données des Points Verts",
+                            "Open Data Wallonie-Bruxelles", OPENDATA_URL),
                         _AboutRow("Données de navigation", "Mapbox",
-                            "https://www.mapbox.com/"),
+                            "https://www.mapbox.com"),
                         _AboutRow("Données météorologiques", "OpenWeather",
-                            "https://openweathermap.org/")
+                            "https://openweathermap.org")
                       ]);
                 });
           } else {
