@@ -41,7 +41,7 @@ class WalkResultsMapView extends StatelessWidget {
             if (position != null) {
               markers.add(Marker(
                 point: new LatLng(position!.latitude, position!.longitude),
-                builder: (ctx) => new Container(
+                builder: (ctx) => new IgnorePointer(
                     child: Icon(currentPlace == Places.current
                         ? Icons.location_on
                         : Icons.home)),

@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
         const Locale('fr', 'LU'),
       ],
       navigatorKey: navigatorKey,
-      title: APPLICATION_NAME,
+      title: applicationName,
       theme: companyTheme,
       darkTheme: companyDarkTheme,
       home: WalksHomeScreen(),

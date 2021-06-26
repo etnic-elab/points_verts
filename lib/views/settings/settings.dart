@@ -173,12 +173,12 @@ class _SettingsState extends State<Settings> {
           ListTile(
             leading: Icon(Icons.help),
             title: Text("Assistance"),
-            onTap: () => launchURL(ASSISTANCE_URL),
+            onTap: () => launchURL(assistanceUrl),
           ),
           ListTile(
             leading: Icon(Icons.security),
             title: Text("Charte de la vie privée"),
-            onTap: () => launchURL(PRIVACY_URL),
+            onTap: () => launchURL(privacyUrl),
           ),
           About()
         ],

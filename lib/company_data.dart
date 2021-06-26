@@ -1,14 +1,14 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-const String APPLICATION_NAME = "ADEPS - Points Verts";
-const String COMPANY_MAIL = "innovation@etnic.be";
-const String GITHUB_URL = "https://github.com/etnic-elab/points_verts";
-const String OPENDATA_URL =
+const String applicationName = "ADEPS - Points Verts";
+const String companyMail = "innovation@etnic.be";
+const String githubUrl = "https://github.com/etnic-elab/points_verts";
+const String opendataUrl =
     "https://www.odwb.be/explore/dataset/points-verts-de-ladeps";
-const String ASSISTANCE_URL =
+const String assistanceUrl =
     "https://adeps-points-verts.innovation-etnic.be/assistance.html";
-const String PRIVACY_URL =
+const String privacyUrl =
     "https://adeps-points-verts.innovation-etnic.be/privacy.html";
 
 class CompanyColors {

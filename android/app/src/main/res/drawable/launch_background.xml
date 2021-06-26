@@ -3,7 +3,7 @@
     <item android:drawable="@color/background" />
     <item>
         <bitmap
-            android:gravity="fill_horizontal"
-            android:src="@drawable/ic_splashscreen" />
+            android:gravity="center"
+            android:src="@drawable/walk" />
     </item>
 </layer-list>
