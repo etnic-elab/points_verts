@@ -42,9 +42,8 @@ The release can then be build with the following command for android (use Xcode 
 flutter build appbundle
 ```
 
-# App Icons and images
-Due to copyright issues:
-Below assets, files and folders are not the official assets, files and folders being used in production and only function as placeholders
+# App assets and icons
+Due to copyright issues => below assets, files and folders are not the official assets, files and folders being used in production and these only function as placeholders
 
 Android:
 ```
@@ -58,8 +57,7 @@ ios/Runner/Assets.xcassets
 ios/Runner/Base.Iproj
 ```
 
-Please do not change below asset file names
-Assets:
+Please do not change below asset file names:
 ```
 assets/logo_light.png
 assets/logo_dark.png
