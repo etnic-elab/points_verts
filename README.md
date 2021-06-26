@@ -59,9 +59,8 @@ ios/Runner/Base.Iproj
 
 Please do not change below asset file names:
 ```
-assets/logo_light.png
-assets/logo_dark.png
-asset/logo-annule_light.png
-assets/logo-annule_dark.png
-
+assets/dark/logo.png
+assets/dark/logo-annule.png
+assets/light/logo.png
+assets/light/logo-annule.png
 ```
