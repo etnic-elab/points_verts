@@ -1,6 +1,6 @@
-# Points Verts
+# ADEPS - Points Verts
 
-Small Flutter application displaying future Adeps' walks. Non official.
+Small Flutter application displaying future ADEPS' walks.
 
 Uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de-ladeps/) to retrieve data.
 
@@ -40,4 +40,27 @@ The release can then be build with the following command for android (use Xcode 
 
 ```bash
 flutter build appbundle
+```
+
+# App assets and icons
+Due to copyright issues => below assets, files and folders are not the official assets, files and folders being used in production and these only function as placeholders
+
+Android:
+```
+android/app/src/main/res
+android/app/src/main/ic_launcher-playstore.png
+```
+
+iOS:
+```
+ios/Runner/Assets.xcassets
+ios/Runner/Base.Iproj
+```
+
+Please do not change below asset file names:
+```
+assets/dark/logo.png
+assets/dark/logo-annule.png
+assets/light/logo.png
+assets/light/logo-annule.png
 ```
