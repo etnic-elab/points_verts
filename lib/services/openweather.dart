@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:points_verts/company_data.dart';
 import 'package:weather_icons/weather_icons.dart';
 import 'dart:convert';
 
@@ -43,8 +44,7 @@ Weather _createWeather(var forecast) {
       timestamp: DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000));
 }
 
-Widget getWeatherIcon(Weather weather, BuildContext context) {
-  Brightness brightness = Theme.of(context).brightness;
+Widget getWeatherIcon(Weather weather) {
   IconData icon;
   switch (weather.weatherId) {
     case 200:
@@ -155,8 +155,7 @@ Widget getWeatherIcon(Weather weather, BuildContext context) {
       icon = WeatherIcons.strong_wind;
       break;
     default:
-      return Icon(Icons.cancel);
+      return Icon(Icons.cancel, color: CompanyColors.red);
   }
-  return BoxedIcon(icon,
-      color: brightness == Brightness.dark ? Colors.white : Colors.black);
+  return BoxedIcon(icon, color: CompanyColors.blue);
 }

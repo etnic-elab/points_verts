@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/company_data.dart';
 import 'package:points_verts/main.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/coordinates.dart';
@@ -29,7 +30,7 @@ class NotificationManager {
           as FlutterLocalNotificationsPlugin;
     log("creating a new plugin instance", name: TAG);
     var initializationSettingsAndroid =
-        AndroidInitializationSettings('ic_stat_name');
+        AndroidInitializationSettings('ic_notification');
     var initializationSettingsIOS = IOSInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
@@ -64,6 +65,7 @@ class NotificationManager {
           'Indique la veille le prochain point vert Adeps le plus proche de votre domicile',
           importance: Importance.max,
           priority: Priority.high,
+          color: CompanyColors.greenPrimary,
           ticker: 'ticker');
       var iOSPlatformChannelSpecifics = IOSNotificationDetails();
       var platformChannelSpecifics = NotificationDetails(

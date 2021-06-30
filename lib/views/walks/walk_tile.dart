@@ -87,7 +87,7 @@ class WeatherIcon extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        getWeatherIcon(weather, context),
+        getWeatherIcon(weather),
         Text("${weather.temperature.round()}°"),
       ],
     );

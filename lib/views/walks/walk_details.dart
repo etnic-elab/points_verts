@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/company_data.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/openweather.dart';
@@ -135,7 +136,7 @@ class _WeatherSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text("${weather.timestamp.hour}h", textScaleFactor: 0.8),
-            getWeatherIcon(weather, context),
+            getWeatherIcon(weather),
             Text("${weather.temperature.round()}°", textScaleFactor: 0.8),
             Text("${weather.windSpeed.round()} km/h", textScaleFactor: 0.8)
           ],
@@ -158,16 +159,12 @@ class _StatusTile extends StatelessWidget {
   Widget build(BuildContext context) {
     if (walk.isCancelled()) {
       return ListTile(
-          leading: TileIcon(Icon(Icons.cancel, color: Colors.red)),
+          leading: TileIcon(
+              Icon(Icons.cancel, color: CompanyColors.contextualRed(context))),
           title: Text(
             "Ce Point Vert est annulé",
-            style: TextStyle(color: Colors.red),
+            style: TextStyle(color: CompanyColors.contextualRed(context)),
           ));
-    } else if (walk.isModified()) {
-      return ListTile(
-          leading: TileIcon(Icon(Icons.warning, color: Colors.orange)),
-          title: Text("Modifié par rapport au calendrier papier",
-              style: TextStyle(color: Colors.orange)));
     } else {
       return SizedBox.shrink();
     }

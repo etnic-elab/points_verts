@@ -9,6 +9,7 @@ import 'package:points_verts/views/walks/walk_details_view.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 import 'package:points_verts/walks_home_screen.dart';
+import 'package:points_verts/company_data.dart';
 
 import 'models/walk.dart';
 
@@ -68,13 +69,11 @@ class MyApp extends StatelessWidget {
         const Locale('fr', 'LU'),
       ],
       navigatorKey: navigatorKey,
-      title: 'Points Verts',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      darkTheme:
-          ThemeData(brightness: Brightness.dark, primarySwatch: Colors.green),
+      title: applicationName,
+      theme: companyTheme,
+      darkTheme: companyDarkTheme,
       home: WalksHomeScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
