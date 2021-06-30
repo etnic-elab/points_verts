@@ -43,3 +43,7 @@ upload-keystore.jks
 upload_certificate.pem
 .env
 /app_icons/
+
+# assets
+assets/**/*.png
+ios/Runner/Assets.xcassets/**/*.png
