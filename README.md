@@ -43,21 +43,24 @@ flutter build appbundle
 ```
 
 # App assets and icons
-Due to copyright issues => below assets, files and folders are not the official assets, files and folders being used in production and these only function as placeholders
+Due to copyright issues => below assets, files and folders are not included:
 
 Android:
 ```
-android/app/src/main/res
+android/app/src/main/res/drawable*/ic_notification.png
+android/app/src/main/res/drawable*/ic_splashscreen.png
+android/app/src/main/res/drawable*/ic_splashscreen_dark.png
+android/app/src/main/res/mimap*/ic_launcher_foreground.png
 android/app/src/main/ic_launcher-playstore.png
 ```
 
 iOS:
 ```
-ios/Runner/Assets.xcassets
-ios/Runner/Base.Iproj
+ios/Runner/Assets.xcassets/AppIcon.appiconset
+ios/Runner/Assets.xcassets/LaunchImage.imageset
 ```
 
-Please do not change below asset file names:
+Flutter:
 ```
 assets/dark/logo.png
 assets/dark/logo-annule.png

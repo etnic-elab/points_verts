@@ -47,3 +47,5 @@ upload_certificate.pem
 # assets
 assets/**/*.png
 ios/Runner/Assets.xcassets/**/*.png
+android/app/src/main/res/**/*.png
+android/app/src/main/ic_launcher-playstore.png

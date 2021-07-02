@@ -4,6 +4,6 @@
     <item>
         <bitmap
             android:gravity="fill_horizontal"
-            android:src="@drawable/ic_splashscreen" />
+            android:src="@drawable/ic_splashscreen_dark" />
     </item>
 </layer-list>
