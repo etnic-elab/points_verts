@@ -19,8 +19,13 @@ jobs:
           channel: 'stable'
       - name: Install dependencies
         run: flutter pub get
-      - name: Touch .env file
-        run: touch .env
+      - name: Touch placeholder files
+        run: |
+          touch .env
+          touch android/app/src/main/res/drawable/ic_notification.png
+          touch android/app/src/main/res/drawable/ic_splashscreen.png
+          touch android/app/src/main/res/drawable/ic_splashscreen_dark.png
+          touch android/app/src/main/res/mipmap/ic_launcher_foreground.png
       - name: Run tests
         run: flutter test
       - name: Run code analysis
