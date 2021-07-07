@@ -12,12 +12,9 @@ const String TAG = "dev.alpagaga.points_verts.Crashlytics";
 
 class Crashlytics {
   static Future<void> initialize() async {
-    if (kDebugMode) {
-      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-    } else {
       toggle(await PrefsProvider.prefs
           .getBoolean(key: "crashlytics_enabled", defaultValue: false));
-    }
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   }
 
   static Future<bool?> crashlyticsPrompt(BuildContext context) async {
@@ -50,7 +47,11 @@ class Crashlytics {
 
   static Future<void> toggle(bool value) async {
     await PrefsProvider.prefs.setBoolean("crashlytics_enabled", value);
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(value);
+    if (kDebugMode) {
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+    } else {
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(value);
+    }
     log("Crashlytics is now " + (value ? "enabled" : "disabled"), name: TAG);
   }
 }

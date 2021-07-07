@@ -39,6 +39,7 @@ lib/generated_plugin_registrant.dart
 
 /android/key*.properties
 /android/app/google-services.json
+/ios/GoogleService-Info.plist
 key.jks
 upload-keystore.jks
 upload_certificate.pem

@@ -39,7 +39,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
 Future<void> initializeFirebase() async {
   await Firebase.initializeApp();
-  Crashlytics.initialize();
+  await Crashlytics.initialize();
 }
 
 void main() async {
