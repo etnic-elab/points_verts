@@ -13,7 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../models/walk.dart';
 import '../../models/coordinates.dart';
 
-const String TAG = "dev.alpagaga.points_verts.WalksUtils";
+const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
 void launchGeoApp(Walk walk) async {
   if (walk.lat != null && walk.long != null) {
@@ -79,7 +79,7 @@ launchURL(url) async {
 }
 
 updateWalks() async {
-  log("Updating walks", name: TAG);
+  log("Updating walks", name: tag);
   String? lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
   DateTime now = DateTime.now().toUtc();
   if (lastUpdate == null) {
@@ -91,7 +91,7 @@ updateWalks() async {
     }
   } else {
     DateTime lastUpdateDate = DateTime.parse(lastUpdate);
-    if (now.difference(lastUpdateDate) > Duration(hours: 1)) {
+    if (now.difference(lastUpdateDate) > const Duration(hours: 1)) {
       try {
         List<Walk> updatedWalks = await refreshAllWalks(lastUpdate);
         if (updatedWalks.isNotEmpty) {
@@ -106,7 +106,7 @@ updateWalks() async {
       }
     } else {
       log("Not refreshing walks list since it has been done less than an hour ago",
-          name: TAG);
+          name: tag);
     }
   }
 }
@@ -114,7 +114,7 @@ updateWalks() async {
 Future<List<DateTime>> retrieveNearestDates() async {
   List<DateTime> walkDates = await DBProvider.db.getWalkDates();
   DateTime now = DateTime.now();
-  DateTime inAWeek = now.add(Duration(days: 10));
+  DateTime inAWeek = now.add(const Duration(days: 10));
   walkDates.retainWhere(
       (element) => element.isAfter(now) && element.isBefore(inAWeek));
   return walkDates;

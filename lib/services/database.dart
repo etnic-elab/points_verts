@@ -5,7 +5,7 @@ import 'package:points_verts/services/prefs.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:developer';
 
-const String TAG = "dev.alpagaga.points_verts.DBProvider";
+const String tag = "dev.alpagaga.points_verts.DBProvider";
 
 class DBProvider {
   DBProvider._();
@@ -20,7 +20,7 @@ class DBProvider {
   }
 
   Future<Database> getDatabaseInstance() async {
-    log("Creating new database client", name: TAG);
+    log("Creating new database client", name: tag);
     return openDatabase(
         join(await getDatabasesPath(), 'points_verts_database.db'),
         onCreate: _onCreate,
@@ -50,7 +50,7 @@ class DBProvider {
   Future<List<DateTime>> getWalkDates() async {
     final Database db = await database;
     final now = DateTime.now();
-    final lastMidnight = new DateTime(now.year, now.month, now.day);
+    final lastMidnight = DateTime(now.year, now.month, now.day);
     final List<Map<String, dynamic>> maps = await db.query('walks',
         columns: ['date'],
         groupBy: "date",
@@ -63,7 +63,7 @@ class DBProvider {
   }
 
   Future<void> insertWalks(List<Walk> walks) async {
-    log("Inserting ${walks.length} walks in database", name: TAG);
+    log("Inserting ${walks.length} walks in database", name: tag);
     final Database db = await database;
     final Batch batch = db.batch();
     for (Walk walk in walks) {
@@ -75,8 +75,8 @@ class DBProvider {
 
   Future<int> deleteOldWalks() async {
     final now = DateTime.now();
-    final lastMidnight = new DateTime(now.year, now.month, now.day);
-    log("Deleting old walks before $lastMidnight", name: TAG);
+    final lastMidnight = DateTime(now.year, now.month, now.day);
+    log("Deleting old walks before $lastMidnight", name: tag);
     final Database db = await database;
     return await db.delete("walks",
         where: 'date < ?', whereArgs: [lastMidnight.toIso8601String()]);
@@ -134,7 +134,7 @@ class DBProvider {
   }
 
   Future<List<Walk>> getWalks(DateTime? date, {WalkFilter? filter}) async {
-    log("Retrieving walks from database for $date", name: TAG);
+    log("Retrieving walks from database for $date", name: tag);
     if (date == null) return [];
     final Database? db = await database;
     List<Map<String, dynamic>> maps;
@@ -179,9 +179,7 @@ class DBProvider {
         organizer: maps[i]['organizer'],
         contactFirstName: maps[i]['contact_first_name'],
         contactLastName: maps[i]['contact_last_name'],
-        contactPhoneNumber: maps[i]['contact_phone_number'] != null
-            ? maps[i]['contact_phone_number'].toString()
-            : null,
+        contactPhoneNumber: maps[i]['contact_phone_number']?.toString(),
         ign: maps[i]['ign'],
         transport: maps[i]['transport'],
         fifteenKm: maps[i]['fifteen_km'] == 1 ? true : false,

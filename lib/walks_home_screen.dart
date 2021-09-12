@@ -12,13 +12,19 @@ import 'views/settings/settings.dart';
 import 'views/walks/walks_view.dart';
 
 class WalksHomeScreen extends StatefulWidget {
+  const WalksHomeScreen({Key? key}) : super(key: key);
+
   @override
   _WalksHomeScreenState createState() => _WalksHomeScreenState();
 }
 
 class _WalksHomeScreenState extends State<WalksHomeScreen>
     with WidgetsBindingObserver {
-  List<Widget> _pages = [WalksView(), WalkDirectoryView(), Settings()];
+  final List<Widget> _pages = [
+    const WalksView(),
+    const WalkDirectoryView(),
+    const Settings()
+  ];
   int _selectedIndex = 0;
   bool _loading = true;
   bool _error = false;
@@ -105,19 +111,19 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: <BottomNavigationBarItem>[
-          const BottomNavigationBarItem(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today), label: "Calendrier"),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
               icon: Icon(Icons.import_contacts), label: "Annuaire"),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
               icon: Icon(Icons.settings), label: "Paramètres"),
         ],
       ),
       body: _error
           ? WalkListError(fetchData)
           : _loading
-              ? Loading()
+              ? const Loading()
               : _pages[_selectedIndex],
     );
   }

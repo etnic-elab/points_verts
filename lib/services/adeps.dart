@@ -8,23 +8,23 @@ import 'package:points_verts/models/website_walk.dart';
 
 import '../models/walk.dart';
 
-const String TAG = "dev.alpagaga.points_verts.Adeps";
-const String BASE_URL =
+const String tag = "dev.alpagaga.points_verts.Adeps";
+const String baseUrl =
     "https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps";
-const int PAGE_SIZE = 500;
+const int pageSize = 500;
 
 Future<List<Walk>> fetchAllWalks() async {
-  log("Fetching all future walks", name: TAG);
-  DateFormat dateFormat = new DateFormat("yyyy/MM/dd");
+  log("Fetching all future walks", name: tag);
+  DateFormat dateFormat = DateFormat("yyyy/MM/dd");
   return _retrieveWalks(
-      "$BASE_URL&q=date+>%3D+${dateFormat.format(DateTime.now())}");
+      "$baseUrl&q=date+>%3D+${dateFormat.format(DateTime.now())}");
 }
 
 Future<List<Walk>> refreshAllWalks(String lastUpdate) async {
-  log("Refreshing future walks list since $lastUpdate", name: TAG);
-  DateFormat dateFormat = new DateFormat("yyyy/MM/dd");
+  log("Refreshing future walks list since $lastUpdate", name: tag);
+  DateFormat dateFormat = DateFormat("yyyy/MM/dd");
   return _retrieveWalks(
-      "$BASE_URL&q=(date+>%3D+${dateFormat.format(DateTime.now())}+AND+record_timestamp+>$lastUpdate)");
+      "$baseUrl&q=(date+>%3D+${dateFormat.format(DateTime.now())}+AND+record_timestamp+>$lastUpdate)");
 }
 
 Future<List<Walk>> _retrieveWalks(String baseUrl) async {
@@ -32,12 +32,12 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
   bool finished = false;
   int start = 0;
   while (!finished) {
-    String url = "$baseUrl&rows=$PAGE_SIZE&start=$start";
+    String url = "$baseUrl&rows=$pageSize&start=$start";
     var response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       Map<String, dynamic> data = json.decode(response.body);
       walks.addAll(_convertWalks(data));
-      start = start + PAGE_SIZE;
+      start = start + pageSize;
       finished = data['nhits'] <= start;
     } else {
       throw Exception('Failed to load walks');
@@ -47,7 +47,7 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
 }
 
 Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
-  DateFormat dateFormat = new DateFormat("dd-MM-yyyy");
+  DateFormat dateFormat = DateFormat("dd-MM-yyyy");
   List<WebsiteWalk> newList = [];
   var response = await http.get(Uri.parse(
       "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O"));
