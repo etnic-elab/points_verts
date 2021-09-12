@@ -22,10 +22,10 @@ jobs:
       - name: Touch placeholder files
         run: |
           touch .env
-          touch android/app/src/main/res/drawable/ic_notification.png
-          touch android/app/src/main/res/drawable/ic_splashscreen.png
-          touch android/app/src/main/res/drawable/ic_splashscreen_dark.png
-          touch android/app/src/main/res/mipmap/ic_launcher_foreground.png
+          touch assets/light/splash.png
+          touch assets/dark/splash.png
+      - name: Generate splash screens
+        run: flutter pub run flutter_native_splash:create
       - name: Run tests
         run: flutter test
       - name: Run code analysis
