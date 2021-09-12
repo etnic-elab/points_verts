@@ -62,7 +62,7 @@ class NotificationManager {
       var androidPlatformChannelSpecifics = AndroidNotificationDetails(
           'NEXT_NEAREST_WALK',
           'Prochain point à proximité',
-          'Indique la veille le prochain point vert Adeps le plus proche de votre domicile',
+          channelDescription: 'Indique la veille le prochain point vert Adeps le plus proche de votre domicile',
           importance: Importance.max,
           priority: Priority.high,
           color: CompanyColors.greenPrimary,
