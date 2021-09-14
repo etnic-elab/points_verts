@@ -22,8 +22,8 @@ jobs:
       - name: Touch placeholder files
         run: |
           touch .env
-          touch assets/light/splash.png
-          touch assets/dark/splash.png
+          cp assets/dummy.png assets/light/splash.png
+          cp assets/dummy.png assets/dark/splash.png
       - name: Generate splash screens
         run: flutter pub run flutter_native_splash:create
       - name: Run tests
