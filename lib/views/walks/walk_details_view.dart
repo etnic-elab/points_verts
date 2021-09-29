@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
-import 'package:points_verts/services/mapbox.dart';
+import 'package:points_verts/services/map/map_interface.dart';
+import 'package:points_verts/services/map/mapbox.dart';
 import 'package:points_verts/views/walks/walk_details.dart';
 
 import '../../models/walk.dart';
 
 class WalkDetailsView extends StatelessWidget {
   WalkDetailsView(this.walk);
+
+  final MapInterface map = new MapBox();
 
   final Walk walk;
 
@@ -53,7 +56,7 @@ class WalkDetailsView extends StatelessWidget {
     return Container(
       height: height,
       width: width,
-      child: retrieveStaticImage(walk.long, walk.lat, width.round(),
+      child: map.retrieveStaticImage(walk.long, walk.lat, width.round(),
           height.round(), Theme.of(context).brightness),
     );
   }

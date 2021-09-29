@@ -3,9 +3,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/services/map/map_interface.dart';
 
 import '../loading.dart';
-import '../../services/mapbox.dart';
+import '../../services/map/mapbox.dart';
 import '../../models/walk.dart';
 import '../../models/coordinates.dart';
 import 'walk_icon.dart';
@@ -24,6 +25,7 @@ class WalkResultsMapView extends StatelessWidget {
   final Function(Walk) onWalkSelect;
   final Function refreshWalks;
   final List<Marker> markers = [];
+  final MapInterface map = new MapBox();
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +52,7 @@ class WalkResultsMapView extends StatelessWidget {
 
             return Stack(
               children: <Widget>[
-                retrieveMap(markers, Theme.of(context).brightness),
+                map.retrieveMap(markers, Theme.of(context).brightness),
                 _buildWalkInfo(selectedWalk),
               ],
             );
@@ -60,7 +62,7 @@ class WalkResultsMapView extends StatelessWidget {
         }
         return Stack(
           children: <Widget>[
-            retrieveMap(markers, Theme.of(context).brightness),
+            map.retrieveMap(markers, Theme.of(context).brightness),
             Loading(),
             _buildWalkInfo(selectedWalk),
           ],

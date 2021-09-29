@@ -6,12 +6,15 @@ import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/services/mapbox.dart';
+import 'package:points_verts/services/map/map_interface.dart';
+import 'package:points_verts/services/map/mapbox.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/walk.dart';
 import '../../models/coordinates.dart';
+
+final MapInterface map = new MapBox();
 
 const String TAG = "dev.alpagaga.points_verts.WalksUtils";
 
@@ -59,7 +62,9 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
   }
   walks.sort((a, b) => sortWalks(a, b));
   try {
-    await retrieveTrips(position.longitude, position.latitude, walks).then((_) {
+    await map
+        .retrieveTrips(position.longitude, position.latitude, walks)
+        .then((_) {
       walks.sort((a, b) => sortWalks(a, b));
     });
   } catch (err) {
