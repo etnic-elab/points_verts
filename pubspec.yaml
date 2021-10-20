@@ -44,6 +44,7 @@ dependencies:
   collection: ^1.15.0-nullsafety.4
 
 dev_dependencies:
+  flutter_native_splash: ^1.2.3
   flutter_test:
     sdk: flutter
 

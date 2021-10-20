@@ -36,6 +36,12 @@ keyAlias=key
 storeFile=<path>/key.jks
 ```
 
+To generate the splash screen before release, use the following command:
+
+```bash
+flutter pub run flutter_native_splash:create
+```
+
 The release can then be build with the following command for android (use Xcode for iOS):
 
 ```bash
@@ -48,8 +54,6 @@ Due to copyright issues => below assets, files and folders are not included:
 Android:
 ```
 android/app/src/main/res/drawable*/ic_notification.png
-android/app/src/main/res/drawable*/ic_splashscreen.png
-android/app/src/main/res/drawable*/ic_splashscreen_dark.png
 android/app/src/main/res/mimap*/ic_launcher_foreground.png
 android/app/src/main/ic_launcher-playstore.png
 ```
@@ -57,13 +61,14 @@ android/app/src/main/ic_launcher-playstore.png
 iOS:
 ```
 ios/Runner/Assets.xcassets/AppIcon.appiconset
-ios/Runner/Assets.xcassets/LaunchImage.imageset
 ```
 
 Flutter:
 ```
 assets/dark/logo.png
 assets/dark/logo-annule.png
+assets/dark/splash.png
 assets/light/logo.png
 assets/light/logo-annule.png
+assets/light/splash.png
 ```
