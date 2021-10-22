@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:points_verts/services/map/map_interface.dart';
+import 'package:points_verts/services/map/googlemapwidget.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -17,6 +17,10 @@ import 'dart:convert';
 import '../../models/walk.dart';
 
 class GoogleMaps implements MapInterface {
+  //this api key is used to make all googlemaps API calls
+  //to use the googlemaps ANDROID/IOS library, the API key is specified in
+  //android/app/src/main/AndroidManifest.xml for Android
+  //ios/Runner/AppDelegate.swift for IOS
   String? _apiKey = dotenv.env['GOOGLEMAPS_API_KEY'];
 
   @override
@@ -39,33 +43,18 @@ class GoogleMaps implements MapInterface {
   }
 
   @override
-  Widget retrieveMap(List<Marker> markers, Brightness brightness,
+  Widget retrieveMap(
+      List<Marker> markers, List<Map> rawMarkers, Brightness brightness,
       {double centerLat = 50.3155646,
       double centerLong = 5.009682,
       double zoom = 7.5,
       interactive = InteractiveFlag.all}) {
-    return FlutterMap(
-      options: new MapOptions(
-          center: LatLng(centerLat, centerLong),
-          zoom: zoom,
-          interactiveFlags: interactive),
-      layers: [
-        new TileLayerOptions(
-          //urlTemplate: "https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&key=$_apiKey",
-          //urlTemplate: "https://maps.googleapis.com/maps/api/staticmap?key=$_apiKey&zoom={z}&format=png&center={x},{y}",
-          urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          tileSize: 512,
-          maxZoom: 18,
-          zoomOffset: -1,
-          //subdomains: ['0', '1', '2', '3'],
-          subdomains: ['a', 'b', 'c'],
-          additionalOptions: {
-            'id': brightness == Brightness.dark ? 'dark-v10' : 'light-v10',
-          },
-        ),
-        new MarkerLayerOptions(markers: markers),
-      ],
-    );
+    return GoogleMapWidget(
+        centerLat: centerLat,
+        centerLong: centerLong,
+        zoom: zoom,
+        rawMarkers: rawMarkers,
+        brightness: brightness);
   }
 
   @override

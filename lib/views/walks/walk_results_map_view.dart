@@ -3,10 +3,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/services/map/googlemaps.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 
 import '../loading.dart';
-import '../../services/map/mapbox.dart';
 import '../../models/walk.dart';
 import '../../models/coordinates.dart';
 import 'walk_icon.dart';
@@ -25,7 +25,8 @@ class WalkResultsMapView extends StatelessWidget {
   final Function(Walk) onWalkSelect;
   final Function refreshWalks;
   final List<Marker> markers = [];
-  final MapInterface map = new MapBox();
+  final List<Map> rawMarkers = [];
+  final MapInterface map = new GoogleMaps();
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +36,11 @@ class WalkResultsMapView extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
             markers.clear();
+            rawMarkers.clear();
             for (Walk walk in snapshot.data!) {
               if (walk.lat != null && walk.long != null) {
                 markers.add(_buildMarker(walk, context));
+                rawMarkers.add({"walk": walk, "context": context});
               }
             }
             if (position != null) {
@@ -48,11 +51,20 @@ class WalkResultsMapView extends StatelessWidget {
                         ? Icons.location_on
                         : Icons.home)),
               ));
+              rawMarkers.add({
+                "latitude": position!.latitude,
+                "longitude": position!.longitude,
+                "context": context,
+                "icon": Icon(currentPlace == Places.current
+                    ? Icons.location_on
+                    : Icons.home)
+              });
             }
 
             return Stack(
               children: <Widget>[
-                map.retrieveMap(markers, Theme.of(context).brightness),
+                map.retrieveMap(
+                    markers, rawMarkers, Theme.of(context).brightness),
                 _buildWalkInfo(selectedWalk),
               ],
             );
@@ -62,7 +74,7 @@ class WalkResultsMapView extends StatelessWidget {
         }
         return Stack(
           children: <Widget>[
-            map.retrieveMap(markers, Theme.of(context).brightness),
+            map.retrieveMap(markers, rawMarkers, Theme.of(context).brightness),
             Loading(),
             _buildWalkInfo(selectedWalk),
           ],

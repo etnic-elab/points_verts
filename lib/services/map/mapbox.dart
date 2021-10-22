@@ -52,7 +52,8 @@ class MapBox implements MapInterface {
     }
   }
 
-  Widget retrieveMap(List<Marker> markers, Brightness brightness,
+  Widget retrieveMap(
+      List<Marker> markers, List<Map> rawMarkers, Brightness brightness,
       {double centerLat = 50.3155646,
       double centerLong = 5.009682,
       double zoom = 7.5,

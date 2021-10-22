@@ -6,6 +6,7 @@ import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
+import 'package:points_verts/services/map/googlemaps.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/mapbox.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -14,7 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../models/walk.dart';
 import '../../models/coordinates.dart';
 
-final MapInterface map = new MapBox();
+final MapInterface map = new GoogleMaps();
 
 const String TAG = "dev.alpagaga.points_verts.WalksUtils";
 

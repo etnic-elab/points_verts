@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/services/map/googlemaps.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/mapbox.dart';
 import 'package:points_verts/views/walks/walk_details.dart';
@@ -11,7 +12,7 @@ import '../../models/walk.dart';
 class WalkDetailsView extends StatelessWidget {
   WalkDetailsView(this.walk);
 
-  final MapInterface map = new MapBox();
+  final MapInterface map = new GoogleMaps();
 
   final Walk walk;
 
