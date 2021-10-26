@@ -4,6 +4,6 @@ import 'package:points_verts/main.dart';
 
 void main() {
   testWidgets('placeholder', (WidgetTester tester) async {
-    await tester.pumpWidget(MyApp());
+    await tester.pumpWidget(const MyApp());
   });
 }

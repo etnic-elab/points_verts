@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DatesDropdown extends StatelessWidget {
-  DatesDropdown(
+  const DatesDropdown(
       {required this.dates,
       required this.selectedDate,
-      required this.onChanged});
+      required this.onChanged,
+      Key? key})
+      : super(key: key);
 
   final List<DateTime> dates;
   final DateTime selectedDate;
@@ -33,8 +35,8 @@ class DatesDropdown extends StatelessWidget {
         },
         label: Row(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+            const Padding(
+              padding: EdgeInsets.only(right: 8.0),
               child: Icon(Icons.calendar_today, size: 16.0),
             ),
             Text(fullDate.format(selectedDate))
@@ -47,7 +49,7 @@ class DatesDropdown extends StatelessWidget {
     DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
     return dates.map((DateTime walkDate) {
       return DropdownMenuItem<DateTime>(
-          value: walkDate, child: new Text(fullDate.format(walkDate)));
+          value: walkDate, child: Text(fullDate.format(walkDate)));
     }).toList();
   }
 }

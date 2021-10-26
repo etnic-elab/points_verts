@@ -3,7 +3,7 @@ import 'package:points_verts/asset.dart';
 import 'package:points_verts/models/walk.dart';
 
 class WalkIcon extends StatelessWidget {
-  WalkIcon(this.walk, {this.size});
+  const WalkIcon(this.walk, {this.size, Key? key}) : super(key: key);
 
   final Walk walk;
   final double? size;
@@ -21,7 +21,7 @@ class WalkIcon extends StatelessWidget {
           height: size ?? 30,
           semanticLabel: "Marche/Orientation");
     } else {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
   }
 }

@@ -56,12 +56,12 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
     double zoom = 7.5,
     interactive = InteractiveFlag.all}) {
   return FlutterMap(
-    options: new MapOptions(
+    options: MapOptions(
         center: LatLng(centerLat, centerLong),
         zoom: zoom,
         interactiveFlags: interactive),
     layers: [
-      new TileLayerOptions(
+      TileLayerOptions(
         urlTemplate:
             "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}@2x?access_token={accessToken}",
         tileSize: 512,
@@ -72,7 +72,7 @@ Widget retrieveMap(List<Marker> markers, Brightness brightness,
           'id': brightness == Brightness.dark ? 'dark-v10' : 'light-v10',
         },
       ),
-      new MarkerLayerOptions(markers: markers),
+      MarkerLayerOptions(markers: markers),
     ],
   );
 }
@@ -122,6 +122,6 @@ Widget retrieveStaticImage(
     imageUrl: url.toString(),
     progressIndicatorBuilder: (context, url, downloadProgress) => Center(
         child: CircularProgressIndicator(value: downloadProgress.progress)),
-    errorWidget: (context, url, error) => Icon(Icons.error),
+    errorWidget: (context, url, error) => const Icon(Icons.error),
   );
 }

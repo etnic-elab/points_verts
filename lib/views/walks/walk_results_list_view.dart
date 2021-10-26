@@ -9,8 +9,10 @@ import '../../models/coordinates.dart';
 import 'walks_view.dart';
 
 class WalkResultsListView extends StatelessWidget {
-  WalkResultsListView(
-      this.walks, this.position, this.currentPlace, this.refreshWalks);
+  const WalkResultsListView(
+      this.walks, this.position, this.currentPlace, this.refreshWalks,
+      {Key? key})
+      : super(key: key);
 
   final Future<List<Walk>>? walks;
   final Coordinates? position;
@@ -21,7 +23,7 @@ class WalkResultsListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder<List<Walk>>(
       future: walks,
-      initialData: [],
+      initialData: const [],
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
@@ -29,16 +31,16 @@ class WalkResultsListView extends StatelessWidget {
           } else if (snapshot.hasError) {
             return WalkListError(refreshWalks);
           } else {
-            return Loading();
+            return const Loading();
           }
         } else {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Loading(),
+              const Loading(),
               Container(
-                  padding: EdgeInsets.all(10),
-                  child: Text("Chargement des points..."))
+                  padding: const EdgeInsets.all(10),
+                  child: const Text("Chargement des points..."))
             ],
           );
         }
