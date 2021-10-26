@@ -7,11 +7,11 @@ import 'outline_icon_button.dart';
 import 'walk_utils.dart';
 
 class GeoButton extends StatelessWidget {
-  GeoButton(this.walk);
+  const GeoButton(this.walk, {Key? key}) : super(key: key);
 
   final Walk walk;
-  static final Icon carIcon = Icon(Icons.directions_car);
-  static final Icon navIcon = Icon(Icons.near_me);
+  static const Icon carIcon = Icon(Icons.directions_car);
+  static const Icon navIcon = Icon(Icons.near_me);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class GeoButton extends StatelessWidget {
             onPressed: () => launchGeoApp(walk),
             style: OutlinedButton.styleFrom(
                 primary: Theme.of(context).textTheme.bodyText1!.color),
-            icon: Icon(Icons.directions_car, size: 15.0),
+            icon: const Icon(Icons.directions_car, size: 15.0),
             label: Text(label));
       } else {
         return OutlineIconButton(

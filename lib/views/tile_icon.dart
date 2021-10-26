@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 class TileIcon extends StatelessWidget {
-  TileIcon(this.icon);
+  const TileIcon(this.icon, {Key? key}) : super(key: key);
 
   final Widget icon;
 

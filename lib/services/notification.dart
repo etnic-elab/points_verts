@@ -15,8 +15,8 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'prefs.dart';
 
-const int NEXT_NEAREST_WALK = 0;
-const String TAG = "dev.alpagaga.points_verts.NotificationManager";
+const int nextNearestWalk = 0;
+const String tag = "dev.alpagaga.points_verts.NotificationManager";
 
 class NotificationManager {
   NotificationManager._();
@@ -25,20 +25,21 @@ class NotificationManager {
   FlutterLocalNotificationsPlugin? _flutterLocalNotificationsPlugin;
 
   Future<FlutterLocalNotificationsPlugin> get plugin async {
-    if (_flutterLocalNotificationsPlugin != null)
+    if (_flutterLocalNotificationsPlugin != null) {
       return _flutterLocalNotificationsPlugin
           as FlutterLocalNotificationsPlugin;
-    log("creating a new plugin instance", name: TAG);
+    }
+    log("creating a new plugin instance", name: tag);
     var initializationSettingsAndroid =
-        AndroidInitializationSettings('ic_notification');
-    var initializationSettingsIOS = IOSInitializationSettings(
+        const AndroidInitializationSettings('ic_notification');
+    var initializationSettingsIOS = const IOSInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: false,
     );
     var initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-    _flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+    _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     await _flutterLocalNotificationsPlugin!.initialize(initializationSettings,
         onSelectNotification: (String? payload) async {
       int? walkId = int.tryParse(payload!);
@@ -52,14 +53,14 @@ class NotificationManager {
 
   scheduleNextNearestWalk(Walk walk) async {
     tz.initializeTimeZones();
-    tz.TZDateTime scheduledAt =
-        tz.TZDateTime.from(walk.date, tz.local).subtract(Duration(hours: 4));
+    tz.TZDateTime scheduledAt = tz.TZDateTime.from(walk.date, tz.local)
+        .subtract(const Duration(hours: 4));
     if (scheduledAt.isBefore(DateTime.now())) {
       return;
     }
     try {
       initializeDateFormatting("fr_BE");
-      var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
           'NEXT_NEAREST_WALK',
           'Prochain point à proximité',
           'Indique la veille le prochain point vert Adeps le plus proche de votre domicile',
@@ -67,7 +68,7 @@ class NotificationManager {
           priority: Priority.high,
           color: CompanyColors.greenPrimary,
           ticker: 'ticker');
-      var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+      var iOSPlatformChannelSpecifics = const IOSNotificationDetails();
       var platformChannelSpecifics = NotificationDetails(
           android: androidPlatformChannelSpecifics,
           iOS: iOSPlatformChannelSpecifics);
@@ -75,8 +76,8 @@ class NotificationManager {
       DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
       FlutterLocalNotificationsPlugin instance = await plugin;
 
-      var title;
-      var description;
+      String title;
+      String description;
 
       if (walk.trip != null) {
         title = 'Point le plus proche le ${fullDate.format(walk.date)}';
@@ -87,13 +88,13 @@ class NotificationManager {
         description = "${walk.city} - ${walk.province}";
       }
 
-      await instance.zonedSchedule(NEXT_NEAREST_WALK, title, description,
+      await instance.zonedSchedule(nextNearestWalk, title, description,
           scheduledAt, platformChannelSpecifics,
           payload: walk.id.toString(),
           androidAllowWhileIdle: true,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime);
-      log('Notification scheduled for ${scheduledAt.toString()}', name: TAG);
+      log('Notification scheduled for ${scheduledAt.toString()}', name: tag);
     } catch (err) {
       print("cannot display notification: $err");
     }
@@ -101,8 +102,8 @@ class NotificationManager {
 
   Future<void> cancelNextNearestWalkNotification() async {
     FlutterLocalNotificationsPlugin instance = await plugin;
-    log('Cancelling next nearest walk notification', name: TAG);
-    await instance.cancel(NEXT_NEAREST_WALK);
+    log('Cancelling next nearest walk notification', name: tag);
+    await instance.cancel(nextNearestWalk);
   }
 
   Future<bool?> requestNotificationPermissions() async {
@@ -134,7 +135,7 @@ Future<void> scheduleNextNearestWalkNotification() async {
   List<DateTime> dates = await retrieveNearestDates();
   if (dates.isNotEmpty) {
     List<Walk> walks = await retrieveSortedWalks(dates[0], position: home);
-    if (walks.length >= 1 && !walks[0].isCancelled()) {
+    if (walks.isNotEmpty && !walks[0].isCancelled()) {
       await NotificationManager.instance.scheduleNextNearestWalk(walks[0]);
     } else {
       // in case all walks are now cancelled and one notification was scheduled.
