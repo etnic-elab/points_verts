@@ -78,9 +78,9 @@ class _PendingNotificationsTile extends StatelessWidget {
             if (requests.isNotEmpty) {
               return ListTile(
                 isThreeLine: true,
-                title: const Text("Prochaine notification planifiée"),
+                title: const Text("Prochaines notifications planifiées"),
                 subtitle: Text(
-                  requests[0].title! + '\n' + requests[0].body!,
+                  generatePendingNotificationsSubtitle(requests),
                   style: const TextStyle(fontSize: 12.0),
                 ),
               );
@@ -89,6 +89,18 @@ class _PendingNotificationsTile extends StatelessWidget {
           return const SizedBox.shrink();
         });
   }
+}
+
+String generatePendingNotificationsSubtitle(List<PendingNotificationRequest> requests) {
+  String result = "";
+  for (int i = 0; i < requests.length; i++) {
+    PendingNotificationRequest request = requests[i];
+    result = result + request.title! + '\n' + request.body!;
+    if (i != requests.length - 1) {
+      result = result + "\n\n";
+    }
+  }
+  return result;
 }
 
 class _LastBackgroundFetch extends StatelessWidget {
