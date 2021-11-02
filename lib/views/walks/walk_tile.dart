@@ -19,7 +19,7 @@ DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 enum TileType { calendar, directory }
 
 class WalkTile extends StatelessWidget {
-  WalkTile(this.walk, this.tileType);
+  const WalkTile(this.walk, this.tileType, {Key? key}) : super(key: key);
 
   final Walk walk;
   final TileType tileType;
@@ -27,7 +27,7 @@ class WalkTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
       child: ListTile(
         leading: _weatherIcon(),
         title: _title(),
@@ -48,10 +48,11 @@ class WalkTile extends StatelessWidget {
   Widget _title() {
     if (tileType == TileType.directory) {
       return Text("${walk.city} (${walk.entity})",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
           overflow: TextOverflow.ellipsis);
     } else {
-      return Text(walk.city, style: TextStyle(fontWeight: FontWeight.bold));
+      return Text(walk.city,
+          style: const TextStyle(fontWeight: FontWeight.bold));
     }
   }
 
@@ -77,7 +78,7 @@ class WalkTile extends StatelessWidget {
 }
 
 class WeatherIcon extends StatelessWidget {
-  WeatherIcon(this.weather);
+  const WeatherIcon(this.weather, {Key? key}) : super(key: key);
 
   final Weather weather;
 

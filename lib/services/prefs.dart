@@ -7,8 +7,9 @@ class PrefsProvider {
   SharedPreferences? _sharedPreferences;
 
   Future<SharedPreferences> get preferences async {
-    if (_sharedPreferences != null)
+    if (_sharedPreferences != null) {
       return _sharedPreferences as SharedPreferences;
+    }
     _sharedPreferences = await SharedPreferences.getInstance();
     return _sharedPreferences as SharedPreferences;
   }
@@ -49,10 +50,6 @@ class PrefsProvider {
   Future<bool> getBoolean({required String key, bool? defaultValue}) async {
     SharedPreferences prefs = await preferences;
     bool? result = prefs.getBool(key);
-    return result != null
-        ? result
-        : defaultValue != null
-            ? defaultValue
-            : false;
+    return result ?? defaultValue ?? false;
   }
 }

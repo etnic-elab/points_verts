@@ -41,12 +41,14 @@ void main() async {
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
   await DBProvider.db.database;
-  runApp(new MyApp());
+  runApp(const MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
 class MyApp extends StatelessWidget {
-  static final navigatorKey = new GlobalKey<NavigatorState>();
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
+  const MyApp({Key? key}) : super(key: key);
 
   static redirectToWalkDetails(int walkId) async {
     Walk? walk = await DBProvider.db.getWalk(walkId);
@@ -59,20 +61,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: [
+      localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: [
-        const Locale('fr', 'BE'),
-        const Locale('fr', 'FR'),
-        const Locale('fr', 'LU'),
+      supportedLocales: const [
+        Locale('fr', 'BE'),
+        Locale('fr', 'FR'),
+        Locale('fr', 'LU'),
       ],
       navigatorKey: navigatorKey,
       title: applicationName,
       theme: companyTheme,
       darkTheme: companyDarkTheme,
-      home: WalksHomeScreen(),
+      home: const WalksHomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -11,7 +11,7 @@ import '../tile_icon.dart';
 import 'walk_utils.dart';
 
 class WalkDetails extends StatelessWidget {
-  WalkDetails(this.walk);
+  const WalkDetails(this.walk, {Key? key}) : super(key: key);
 
   final Walk walk;
 
@@ -21,14 +21,16 @@ class WalkDetails extends StatelessWidget {
     return Expanded(
       child: ListView(
         children: <Widget>[
-          walk.weathers.isNotEmpty ? _WeatherSection(walk) : SizedBox.shrink(),
+          walk.weathers.isNotEmpty
+              ? _WeatherSection(walk)
+              : const SizedBox.shrink(),
           ListTile(
-              leading: TileIcon(Icon(Icons.calendar_today)),
+              leading: const TileIcon(Icon(Icons.calendar_today)),
               title:
                   Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!)),
           _StatusTile(walk),
           ListTile(
-            leading: TileIcon(Icon(Icons.location_on)),
+            leading: const TileIcon(Icon(Icons.location_on)),
             title: Text(walk.meetingPoint != null ? walk.meetingPoint! : ""),
             subtitle: _getGeoText(),
             trailing: OutlineIconButton(
@@ -37,17 +39,17 @@ class WalkDetails extends StatelessWidget {
           ),
           walk.ign != null
               ? ListTile(
-                  leading: TileIcon(Icon(Icons.map)),
+                  leading: const TileIcon(Icon(Icons.map)),
                   title: Text("IGN ${walk.ign}"))
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           walk.meetingPointInfo != null
               ? ListTile(
-                  leading: TileIcon(Icon(Icons.info)),
+                  leading: const TileIcon(Icon(Icons.info)),
                   title: Text(walk.meetingPointInfo!))
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           ListTile(
-            leading: TileIcon(Icon(Icons.group)),
-            title: Text("${walk.organizer}"),
+            leading: const TileIcon(Icon(Icons.group)),
+            title: Text(walk.organizer),
             subtitle: Text(walk.getContactLabel()),
             trailing: OutlineIconButton(
                 onPressed: () {
@@ -60,9 +62,9 @@ class WalkDetails extends StatelessWidget {
           ),
           walk.transport != null
               ? ListTile(
-                  leading: TileIcon(Icon(Icons.train)),
+                  leading: const TileIcon(Icon(Icons.train)),
                   title: Text(walk.transport!))
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           _infoRow(),
         ],
       ),
@@ -104,7 +106,7 @@ class WalkDetails extends StatelessWidget {
                 }
               : null);
     } else {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
   }
 
@@ -121,14 +123,14 @@ class WalkDetails extends StatelessWidget {
 }
 
 class _WeatherSection extends StatelessWidget {
-  _WeatherSection(this.walk);
+  const _WeatherSection(this.walk);
 
   final Walk walk;
 
   @override
   Widget build(BuildContext context) {
     if (walk.weathers.isEmpty) {
-      return SizedBox();
+      return const SizedBox();
     } else {
       List<Widget> widgets = [];
       for (Weather weather in walk.weathers) {
@@ -151,7 +153,7 @@ class _WeatherSection extends StatelessWidget {
 }
 
 class _StatusTile extends StatelessWidget {
-  _StatusTile(this.walk);
+  const _StatusTile(this.walk);
 
   final Walk walk;
 
@@ -166,7 +168,7 @@ class _StatusTile extends StatelessWidget {
             style: TextStyle(color: CompanyColors.contextualRed(context)),
           ));
     } else {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
   }
 }

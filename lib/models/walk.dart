@@ -3,7 +3,7 @@ import 'package:points_verts/models/weather.dart';
 
 import 'trip.dart';
 
-final dateFormat = new DateFormat("yyyy-MM-dd");
+final dateFormat = DateFormat("yyyy-MM-dd");
 
 class Walk {
   Walk(

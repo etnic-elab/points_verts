@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class ListHeader extends StatelessWidget {
-  ListHeader(this.title);
+  const ListHeader(this.title, {Key? key}) : super(key: key);
 
   final String title;
 
@@ -11,9 +11,9 @@ class ListHeader extends StatelessWidget {
     return Container(
       child: Text(title,
           style: TextStyle(
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).colorScheme.secondary,
               fontWeight: FontWeight.bold)),
-      padding: EdgeInsets.all(15.0),
+      padding: const EdgeInsets.all(15.0),
     );
   }
 }

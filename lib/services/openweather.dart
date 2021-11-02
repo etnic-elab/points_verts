@@ -20,8 +20,8 @@ Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
 
   if (list != null) {
     List<Weather> results = [];
-    int from = date.add(Duration(hours: 6)).millisecondsSinceEpoch;
-    int to = date.add(Duration(hours: 18)).millisecondsSinceEpoch;
+    int from = date.add(const Duration(hours: 6)).millisecondsSinceEpoch;
+    int to = date.add(const Duration(hours: 18)).millisecondsSinceEpoch;
     for (var forecast in list) {
       int time = forecast['dt'] * 1000;
       if (time > from && time < to) {
@@ -155,7 +155,7 @@ Widget getWeatherIcon(Weather weather) {
       icon = WeatherIcons.strong_wind;
       break;
     default:
-      return Icon(Icons.cancel, color: CompanyColors.red);
+      return const Icon(Icons.cancel, color: CompanyColors.red);
   }
   return BoxedIcon(icon, color: CompanyColors.blue);
 }

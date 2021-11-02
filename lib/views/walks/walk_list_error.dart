@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:points_verts/company_data.dart';
 
 class WalkListError extends StatelessWidget {
-  WalkListError(this.refreshWalks);
+  const WalkListError(this.refreshWalks, {Key? key}) : super(key: key);
 
   final Function refreshWalks;
 
@@ -11,23 +11,23 @@ class WalkListError extends StatelessWidget {
     return Card(
         child: Column(
       children: <Widget>[
-        Spacer(),
-        Icon(
+        const Spacer(),
+        const Icon(
           Icons.warning,
           color: CompanyColors.red,
         ),
         Container(
-            padding: EdgeInsets.all(5.0),
-            child: Row(children: [
+            padding: const EdgeInsets.all(5.0),
+            child: Row(children: const [
               Expanded(
                   child: Center(
-                      child: const Text(
+                      child: Text(
                           "Une erreur est survenue lors de la récupération des données. Merci de réessayer plus tard.\n\nSi vous venez d'installer l'application ou qu'elle vient de se mettre à jour, assurez-vous d'être connecté à internet afin de récupérer le jeu de données initial.",
                           textAlign: TextAlign.center)))
             ])),
         ElevatedButton(
             child: const Text("Réessayer"), onPressed: () => refreshWalks()),
-        Spacer()
+        const Spacer()
       ],
     ));
   }

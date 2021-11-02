@@ -49,7 +49,7 @@ class WalkFilter {
   WalkFilter.fromJson(Map<String, dynamic> json)
       : cancelledWalks = json['cancelled_walks'],
         brabantWallon = json['brabantWallon'],
-        bruxelles = json['bruxelles'] != null ? json['bruxelles'] : true,
+        bruxelles = json['bruxelles'] ?? true,
         hainautEst = json['hainautEst'],
         hainautOuest = json['hainautOuest'],
         liege = json['liege'],
@@ -103,6 +103,6 @@ class WalkFilter {
     if (waterSupply) result.add("ravitaillement");
     if (beWapp) result.add("BeWaPP");
     if (transport) result.add("transports en commun");
-    return result.length == 0 ? "aucun" : result.join(", ");
+    return result.isEmpty ? "aucun" : result.join(", ");
   }
 }
