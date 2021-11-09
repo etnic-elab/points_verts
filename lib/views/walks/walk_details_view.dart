@@ -10,9 +10,9 @@ import 'package:points_verts/views/walks/walk_details.dart';
 import '../../models/walk.dart';
 
 class WalkDetailsView extends StatelessWidget {
-  const WalkDetailsView(this.walk, {Key? key}) : super(key: key);
+  WalkDetailsView(this.walk, {Key? key}) : super(key: key);
 
-  final MapInterface map = new GoogleMaps();
+  final MapInterface map = GoogleMaps();
 
   final Walk walk;
 
