@@ -7,7 +7,9 @@ import 'walk_tile.dart';
 import 'walks_view.dart';
 
 class WalkResultsList extends StatelessWidget {
-  WalkResultsList(this.walks, this.position, this.currentPlace);
+  const WalkResultsList(this.walks, this.position, this.currentPlace,
+      {Key? key})
+      : super(key: key);
 
   final List<Walk> walks;
   final Coordinates? position;
@@ -15,8 +17,8 @@ class WalkResultsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (walks.length == 0) {
-      return Center(
+    if (walks.isEmpty) {
+      return const Center(
           child: Text("Aucune marche ne correspond aux critères ce jour-là."));
     }
     return ListView.builder(
@@ -26,7 +28,7 @@ class WalkResultsList extends StatelessWidget {
               return ListHeader(_defineTopHeader());
             }
             if (i == 6) {
-              return ListHeader("Autres Points");
+              return const ListHeader("Autres Points");
             }
             if (i < 6) {
               i = i - 1;
@@ -37,7 +39,7 @@ class WalkResultsList extends StatelessWidget {
           if (walks.length > i) {
             return WalkTile(walks[i], TileType.calendar);
           } else {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
         },
         itemCount: _defineItemCount(walks));
@@ -55,7 +57,7 @@ class WalkResultsList extends StatelessWidget {
 
   int _defineItemCount(List<Walk>? walks) {
     if (position != null) {
-      if (walks!.length == 0) {
+      if (walks!.isEmpty) {
         return walks.length;
       } else if (walks.length > 5) {
         return walks.length + 2;

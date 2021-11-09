@@ -10,7 +10,7 @@ import 'package:points_verts/views/walks/walk_details.dart';
 import '../../models/walk.dart';
 
 class WalkDetailsView extends StatelessWidget {
-  WalkDetailsView(this.walk);
+  const WalkDetailsView(this.walk, {Key? key}) : super(key: key);
 
   final MapInterface map = new GoogleMaps();
 
@@ -26,9 +26,9 @@ class WalkDetailsView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("${walk.city}"),
+                Text(walk.city),
                 Text("${walk.type} du ${fullDate.format(walk.date)}",
-                    style: TextStyle(fontSize: 14))
+                    style: const TextStyle(fontSize: 14))
               ],
             )),
       ),
@@ -54,7 +54,7 @@ class WalkDetailsView extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     double height = landscape ? size.height : 200.0;
     double width = landscape ? size.width / 2 : size.width;
-    return Container(
+    return SizedBox(
       height: height,
       width: width,
       child: map.retrieveStaticImage(walk.long, walk.lat, width.round(),

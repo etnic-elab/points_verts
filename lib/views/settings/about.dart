@@ -5,6 +5,8 @@ import 'package:points_verts/asset.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 class About extends StatelessWidget {
+  const About({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -13,8 +15,8 @@ class About extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
             return ListTile(
-                leading: Icon(Icons.info),
-                title: Text("À propos"),
+                leading: const Icon(Icons.info),
+                title: const Text("À propos"),
                 onTap: () {
                   showAboutDialog(
                       context: context,
@@ -25,26 +27,27 @@ class About extends StatelessWidget {
                       applicationVersion: snapshot.data!.version,
                       applicationLegalese: "GNU GPLv3",
                       children: [
-                        _AboutRow("Dépôt du code source", "GitHub", githubUrl),
-                        _AboutRow("Adresse de contact", companyMail,
+                        const _AboutRow(
+                            "Dépôt du code source", "GitHub", githubUrl),
+                        const _AboutRow("Adresse de contact", companyMail,
                             "mailto:$companyMail?subject=Points Verts"),
-                        _AboutRow("Données des Points Verts",
+                        const _AboutRow("Données des Points Verts",
                             "Open Data Wallonie-Bruxelles", opendataUrl),
-                        _AboutRow("Données de navigation", "Mapbox",
+                        const _AboutRow("Données de navigation", "Mapbox",
                             "https://www.mapbox.com"),
-                        _AboutRow("Données météorologiques", "OpenWeather",
-                            "https://openweathermap.org")
+                        const _AboutRow("Données météorologiques",
+                            "OpenWeather", "https://openweathermap.org")
                       ]);
                 });
           } else {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
         });
   }
 }
 
 class _AboutRow extends StatelessWidget {
-  _AboutRow(this.label, this.buttonLabel, this.url);
+  const _AboutRow(this.label, this.buttonLabel, this.url);
 
   final String label;
   final String buttonLabel;

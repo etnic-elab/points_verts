@@ -16,7 +16,9 @@ import 'walk_tile.dart';
 
 class WalkResultsMapView extends StatelessWidget {
   WalkResultsMapView(this.walks, this.position, this.currentPlace,
-      this.selectedWalk, this.onWalkSelect, this.refreshWalks);
+      this.selectedWalk, this.onWalkSelect, this.refreshWalks,
+      {Key? key})
+      : super(key: key);
 
   final Future<List<Walk>>? walks;
   final Coordinates? position;
@@ -45,8 +47,8 @@ class WalkResultsMapView extends StatelessWidget {
             }
             if (position != null) {
               markers.add(Marker(
-                point: new LatLng(position!.latitude, position!.longitude),
-                builder: (ctx) => new IgnorePointer(
+                point: LatLng(position!.latitude, position!.longitude),
+                builder: (ctx) => IgnorePointer(
                     child: Icon(currentPlace == Places.current
                         ? Icons.location_on
                         : Icons.home)),
@@ -75,7 +77,7 @@ class WalkResultsMapView extends StatelessWidget {
         return Stack(
           children: <Widget>[
             map.retrieveMap(markers, rawMarkers, Theme.of(context).brightness),
-            Loading(),
+            const Loading(),
             _buildWalkInfo(selectedWalk),
           ],
         );
@@ -85,7 +87,7 @@ class WalkResultsMapView extends StatelessWidget {
 
   static Widget _buildWalkInfo(Walk? walk) {
     if (walk == null) {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     } else {
       return SafeArea(
         child: Align(
@@ -100,10 +102,10 @@ class WalkResultsMapView extends StatelessWidget {
     return Marker(
       width: 25,
       height: 25,
-      point: new LatLng(walk.lat!, walk.long!),
+      point: LatLng(walk.lat!, walk.long!),
       builder: (ctx) => RawMaterialButton(
         child: WalkIcon(walk, size: 21),
-        shape: new CircleBorder(),
+        shape: const CircleBorder(),
         elevation: selectedWalk == walk ? 5.0 : 2.0,
         // TODO: find a way to not hardcode the colors here
         fillColor: selectedWalk == walk

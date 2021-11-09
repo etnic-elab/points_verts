@@ -12,14 +12,16 @@ const countryCodes = ['BE', 'FR', 'LU'];
 const countryLabels = ['Belgique', 'France', 'Luxembourg'];
 
 class SettingsHomeSelect extends StatefulWidget {
-  SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback);
+  const SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback,
+      {Key? key})
+      : super(key: key);
 
   final Function(AddressSuggestion) setHomeCallback;
   final Function removeHomeCallback;
 
   @override
   _SettingsHomeSelectState createState() =>
-      _SettingsHomeSelectState(setHomeCallback, removeHomeCallback);
+      _SettingsHomeSelectState(this.setHomeCallback, this.removeHomeCallback);
 }
 
 class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
@@ -29,6 +31,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
 
   final Function(AddressSuggestion) setHomeCallback;
   final Function removeHomeCallback;
+
   final _homeSearchController = TextEditingController();
   Timer? _debounce;
   int _countryIndex = 0;
@@ -63,14 +66,14 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
         appBar: AppBar(
           actions: <Widget>[
             IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () {
-                  removeHomeCallback();
+                  widget.removeHomeCallback();
                   _homeSearchController.removeListener(_onSearchChanged);
                   Navigator.of(context).pop();
                 })
           ],
-          title: Text("Recherche du domicile"),
+          title: const Text("Recherche du domicile"),
         ),
         body: _pageContent(context));
   }
@@ -78,7 +81,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   Widget _pageContent(BuildContext context) {
     return Column(children: <Widget>[
       ListTile(
-        title: Text("Pays"),
+        title: const Text("Pays"),
         subtitle: Text(countryLabels[_countryIndex]),
         onTap: () => _countrySelection(context),
       ),
@@ -104,7 +107,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
               List<AddressSuggestion> suggestions = snapshot.data!;
               return ListView.separated(
                   itemCount: suggestions.length,
-                  separatorBuilder: (context, i) => Divider(height: 0.5),
+                  separatorBuilder: (context, i) => const Divider(height: 0.5),
                   itemBuilder: (context, i) {
                     AddressSuggestion suggestion = suggestions[i];
                     return ListTile(
@@ -112,7 +115,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                         subtitle: Text(suggestion.address,
                             overflow: TextOverflow.ellipsis),
                         onTap: () {
-                          setHomeCallback(suggestion);
+                          widget.setHomeCallback(suggestion);
                           _homeSearchController
                               .removeListener(_onSearchChanged);
                           Navigator.of(context).pop();
@@ -122,10 +125,10 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(Icons.warning),
+                  const Icon(Icons.warning),
                   Container(
-                      padding: EdgeInsets.all(5.0),
-                      child: Row(children: [
+                      padding: const EdgeInsets.all(5.0),
+                      child: Row(children: const [
                         Expanded(
                             child: Center(
                                 child: Text(
@@ -135,10 +138,10 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                 ],
               );
             } else {
-              return Loading();
+              return const Loading();
             }
           } else {
-            return Loading();
+            return const Loading();
           }
         });
   }
