@@ -83,7 +83,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
             startOnBoot: true), (String taskId) async {
       print("[BackgroundFetch] taskId: $taskId");
       try {
-        await scheduleNextNearestWalkNotification();
+        await scheduleNextNearestWalkNotifications();
         await PrefsProvider.prefs.setString(
             "last_background_fetch", DateTime.now().toUtc().toIso8601String());
       } catch (err) {

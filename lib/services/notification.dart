@@ -15,8 +15,8 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'prefs.dart';
 
-const int nextNearestWalk = 0;
 const String tag = "dev.alpagaga.points_verts.NotificationManager";
+final DateFormat formatter = DateFormat('yyyyMMdd');
 
 class NotificationManager {
   NotificationManager._();
@@ -72,7 +72,6 @@ class NotificationManager {
       var platformChannelSpecifics = NotificationDetails(
           android: androidPlatformChannelSpecifics,
           iOS: iOSPlatformChannelSpecifics);
-      await cancelNextNearestWalkNotification();
       DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
       FlutterLocalNotificationsPlugin instance = await plugin;
 
@@ -88,8 +87,10 @@ class NotificationManager {
         description = "${walk.city} - ${walk.province}";
       }
 
-      await instance.zonedSchedule(nextNearestWalk, title, description,
-          scheduledAt, platformChannelSpecifics,
+      int id = int.parse(formatter.format(scheduledAt));
+
+      await instance.zonedSchedule(
+          id, title, description, scheduledAt, platformChannelSpecifics,
           payload: walk.id.toString(),
           androidAllowWhileIdle: true,
           uiLocalNotificationDateInterpretation:
@@ -100,10 +101,10 @@ class NotificationManager {
     }
   }
 
-  Future<void> cancelNextNearestWalkNotification() async {
+  Future<void> cancelNextNearestWalkNotifications() async {
     FlutterLocalNotificationsPlugin instance = await plugin;
-    log('Cancelling next nearest walk notification', name: tag);
-    await instance.cancel(nextNearestWalk);
+    log('Cancelling all next nearest walk notifications', name: tag);
+    await instance.cancelAll();
   }
 
   Future<bool?> requestNotificationPermissions() async {
@@ -126,20 +127,18 @@ class NotificationManager {
   }
 }
 
-Future<void> scheduleNextNearestWalkNotification() async {
+Future<void> scheduleNextNearestWalkNotifications() async {
   bool showNotification = await PrefsProvider.prefs
       .getBoolean(key: "show_notification", defaultValue: false);
   if (!showNotification) return;
   Coordinates? home = await retrieveHomePosition();
   if (home == null) return;
   List<DateTime> dates = await retrieveNearestDates();
-  if (dates.isNotEmpty) {
-    List<Walk> walks = await retrieveSortedWalks(dates[0], position: home);
+  NotificationManager.instance.cancelNextNearestWalkNotifications();
+  for (DateTime date in dates) {
+    List<Walk> walks = await retrieveSortedWalks(date, position: home);
     if (walks.isNotEmpty && !walks[0].isCancelled()) {
       await NotificationManager.instance.scheduleNextNearestWalk(walks[0]);
-    } else {
-      // in case all walks are now cancelled and one notification was scheduled.
-      NotificationManager.instance.cancelNextNearestWalkNotification();
     }
   }
 }
