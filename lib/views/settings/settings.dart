@@ -61,7 +61,7 @@ class _SettingsState extends State<Settings> {
       _home = label;
     });
     if (_showNotification == true) {
-      scheduleNextNearestWalkNotification();
+      scheduleNextNearestWalkNotifications();
     }
   }
 
@@ -71,7 +71,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = null;
     });
-    NotificationManager.instance.cancelNextNearestWalkNotification();
+    NotificationManager.instance.cancelNextNearestWalkNotifications();
   }
 
   Future<void> _setUseLocation(bool newValue) async {
@@ -97,13 +97,13 @@ class _SettingsState extends State<Settings> {
       bool? notificationsAllowed =
           await NotificationManager.instance.requestNotificationPermissions();
       if (notificationsAllowed == true) {
-        scheduleNextNearestWalkNotification();
+        scheduleNextNearestWalkNotifications();
       } else {
         _setShowNotification(false);
         return;
       }
     } else {
-      NotificationManager.instance.cancelNextNearestWalkNotification();
+      NotificationManager.instance.cancelNextNearestWalkNotifications();
     }
     setState(() {
       _showNotification = newValue;
