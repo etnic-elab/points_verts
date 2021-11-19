@@ -24,6 +24,27 @@ import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
 
 enum Places { home, current }
+
+extension PlacesExtension on Places {
+  IconData get icon {
+    switch (this) {
+      case Places.current:
+        return Icons.location_on;
+      case Places.home:
+        return Icons.home;
+    }
+  }
+
+  String get text {
+    switch (this) {
+      case Places.current:
+        return "localisation";
+      case Places.home:
+        return "domicile";
+    }
+  }
+}
+
 enum ViewType { list, map }
 
 const String tag = "dev.alpagaga.points_verts.WalkList";
@@ -251,12 +272,23 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
             child: _viewType == ViewType.list
                 ? WalkResultsListView(_currentWalks, selectedPosition,
                     _filter!.selectedPlace, _retrieveData)
-                : WalkResultsMapView(_currentWalks, selectedPosition,
-                    _filter!.selectedPlace, _selectedWalk, (walk) {
-                    setState(() {
-                      _selectedWalk = walk;
-                    });
-                  }, _retrieveData)),
+                : WalkResultsMapView(
+                    _currentWalks,
+                    selectedPosition,
+                    _filter!.selectedPlace,
+                    _selectedWalk,
+                    (walk) {
+                      setState(() {
+                        _selectedWalk = walk;
+                      });
+                    },
+                    () {
+                      setState(() {
+                        _selectedWalk = null;
+                      });
+                    },
+                    _retrieveData,
+                  )),
       ],
     );
   }

@@ -39,9 +39,8 @@ class _LastWalkUpdateTile extends StatelessWidget {
             title: const Text("Dernière mise à jour de la liste des marches"),
             subtitle: Text("${formatDate(snapshot.data!)} (heure locale)"),
           );
-        } else {
-          return const SizedBox.shrink();
         }
+        return const SizedBox.shrink();
       },
     );
   }
@@ -58,9 +57,8 @@ class _GeoPosTile extends StatelessWidget {
             title: const Text("Coordonnées GPS de l'emplacement de référence"),
             subtitle: Text(snapshot.data!),
           );
-        } else {
-          return const SizedBox.shrink();
         }
+        return const SizedBox.shrink();
       },
     );
   }
@@ -91,7 +89,8 @@ class _PendingNotificationsTile extends StatelessWidget {
   }
 }
 
-String generatePendingNotificationsSubtitle(List<PendingNotificationRequest> requests) {
+String generatePendingNotificationsSubtitle(
+    List<PendingNotificationRequest> requests) {
   String result = "";
   for (int i = 0; i < requests.length; i++) {
     PendingNotificationRequest request = requests[i];

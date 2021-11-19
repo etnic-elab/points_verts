@@ -4,10 +4,11 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/map/map_interface.dart';
+import 'package:points_verts/services/map/markers/marker_interface.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -15,11 +16,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../../models/walk.dart';
-import '../trip_cache_manager.dart';
+import '../cache_managers/trip_cache_manager.dart';
 
 class MapBox implements MapInterface {
-  String? _token = dotenv.env['MAPBOX_TOKEN'];
+  final String? _token = Environment.mapApiKey;
 
+  @override
   Future<void> retrieveTrips(
       double fromLong, double fromLat, List<Walk> walks) async {
     String origin = "$fromLong,$fromLat";
@@ -35,7 +37,7 @@ class MapBox implements MapInterface {
     }
     final String url =
         "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/$origin$destinations?sources=0&annotations=distance,duration&access_token=$_token";
-    final http.Response response = await TripCacheManager.getData(url);
+    final http.Response response = await TripCacheManager.trip.getData(url);
     final decoded = json.decode(response.body);
     final distances =
         decoded['distances']?.length == 1 ? decoded['distances'][0] : null;
@@ -52,19 +54,20 @@ class MapBox implements MapInterface {
     }
   }
 
+  @override
   Widget retrieveMap(
-      List<Marker> markers, List<Map> rawMarkers, Brightness brightness,
+      List<MarkerInterface> markers, Brightness brightness, Function onMapTap,
       {double centerLat = 50.3155646,
       double centerLong = 5.009682,
-      double zoom = 7.5,
-      interactive = InteractiveFlag.all}) {
+      double zoom = 7.5}) {
+    final List<Marker> _flutterMarkers = [];
+    for (MarkerInterface marker in markers) {
+      _flutterMarkers.add(marker.buildFlutterMarker());
+    }
     return FlutterMap(
-      options: new MapOptions(
-          center: LatLng(centerLat, centerLong),
-          zoom: zoom,
-          interactiveFlags: interactive),
+      options: MapOptions(center: LatLng(centerLat, centerLong), zoom: zoom),
       layers: [
-        new TileLayerOptions(
+        TileLayerOptions(
           urlTemplate:
               "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}@2x?access_token={accessToken}",
           tileSize: 512,
@@ -75,11 +78,12 @@ class MapBox implements MapInterface {
             'id': brightness == Brightness.dark ? 'dark-v10' : 'light-v10',
           },
         ),
-        new MarkerLayerOptions(markers: markers),
+        MarkerLayerOptions(markers: _flutterMarkers),
       ],
     );
   }
 
+  @override
   Future<List<AddressSuggestion>> retrieveSuggestions(
       String country, String search) async {
     if (search.isNotEmpty) {
@@ -103,6 +107,7 @@ class MapBox implements MapInterface {
     }
   }
 
+  @override
   Future<String?> retrieveAddress(double long, double lat) async {
     final String url =
         "https://api.mapbox.com/geocoding/v5/mapbox.places/$long,$lat.json?access_token=$_token";
@@ -115,6 +120,7 @@ class MapBox implements MapInterface {
     }
   }
 
+  @override
   Widget retrieveStaticImage(
       double? long, double? lat, int width, int height, Brightness brightness,
       {double zoom = 16.0}) {
@@ -126,7 +132,7 @@ class MapBox implements MapInterface {
       imageUrl: url.toString(),
       progressIndicatorBuilder: (context, url, downloadProgress) => Center(
           child: CircularProgressIndicator(value: downloadProgress.progress)),
-      errorWidget: (context, url, error) => Icon(Icons.error),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
     );
   }
 }

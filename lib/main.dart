@@ -23,7 +23,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   }
   try {
     print("[BackgroundFetch] Headless task: $taskId");
-    await dotenv.load(fileName: '.env');
+    await dotenv.load();
     await updateWalks();
     await scheduleNextNearestWalkNotifications();
     await PrefsProvider.prefs.setString(
@@ -36,7 +36,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 }
 
 void main() async {
-  await dotenv.load(fileName: '.env');
+  await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
@@ -72,8 +72,8 @@ class MyApp extends StatelessWidget {
       ],
       navigatorKey: navigatorKey,
       title: applicationName,
-      theme: companyTheme,
-      darkTheme: companyDarkTheme,
+      theme: CompanyTheme.companyLightTheme(),
+      darkTheme: CompanyTheme.companyDarkTheme(),
       home: const WalksHomeScreen(),
       debugShowCheckedModeBanner: false,
     );

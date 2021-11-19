@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:points_verts/services/map/googlemaps.dart';
+import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/services/map/mapbox.dart';
 import 'package:points_verts/models/address_suggestion.dart';
 
 import '../loading.dart';
@@ -20,17 +19,11 @@ class SettingsHomeSelect extends StatefulWidget {
   final Function removeHomeCallback;
 
   @override
-  _SettingsHomeSelectState createState() =>
-      _SettingsHomeSelectState(this.setHomeCallback, this.removeHomeCallback);
+  _SettingsHomeSelectState createState() => _SettingsHomeSelectState();
 }
 
 class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
-  _SettingsHomeSelectState(this.setHomeCallback, this.removeHomeCallback);
-
-  final MapInterface map = new GoogleMaps();
-
-  final Function(AddressSuggestion) setHomeCallback;
-  final Function removeHomeCallback;
+  final MapInterface map = Environment.mapInterface;
 
   final _homeSearchController = TextEditingController();
   Timer? _debounce;

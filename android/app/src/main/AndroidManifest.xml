@@ -72,8 +72,10 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyCK_m1EShFIBtGwWLB5j1LhNVZKsh9grwI"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${mapApiKey}" />
+
 
         <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
             <intent-filter>

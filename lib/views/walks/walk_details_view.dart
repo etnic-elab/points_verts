@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
-import 'package:points_verts/services/map/googlemaps.dart';
+import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/services/map/mapbox.dart';
 import 'package:points_verts/views/walks/walk_details.dart';
 
 import '../../models/walk.dart';
@@ -12,7 +11,7 @@ import '../../models/walk.dart';
 class WalkDetailsView extends StatelessWidget {
   WalkDetailsView(this.walk, {Key? key}) : super(key: key);
 
-  final MapInterface map = GoogleMaps();
+  final MapInterface map = Environment.mapInterface;
 
   final Walk walk;
 

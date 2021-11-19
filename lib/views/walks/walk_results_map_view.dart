@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:points_verts/company_data.dart';
-import 'package:points_verts/services/map/googlemaps.dart';
+import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/map/map_interface.dart';
+import 'package:points_verts/services/map/markers/marker_interface.dart';
 
-import '../loading.dart';
-import '../../models/walk.dart';
-import '../../models/coordinates.dart';
-import 'walk_icon.dart';
+import 'package:points_verts/views/loading.dart';
+import 'package:points_verts/models/walk.dart';
+import 'package:points_verts/models/coordinates.dart';
+import 'package:points_verts/services/map/markers/walk_marker.dart';
+import 'package:points_verts/services/map/markers/position_marker.dart';
 import 'walks_view.dart';
 import 'walk_list_error.dart';
 import 'walk_tile.dart';
 
 class WalkResultsMapView extends StatelessWidget {
   WalkResultsMapView(this.walks, this.position, this.currentPlace,
-      this.selectedWalk, this.onWalkSelect, this.refreshWalks,
+      this.selectedWalk, this.onWalkSelect, this.onMapTap, this.refreshWalks,
       {Key? key})
       : super(key: key);
 
@@ -25,10 +24,11 @@ class WalkResultsMapView extends StatelessWidget {
   final Places? currentPlace;
   final Walk? selectedWalk;
   final Function(Walk) onWalkSelect;
+  final Function onMapTap;
   final Function refreshWalks;
-  final List<Marker> markers = [];
+  final List<MarkerInterface> markers = [];
   final List<Map> rawMarkers = [];
-  final MapInterface map = new GoogleMaps();
+  final MapInterface map = Environment.mapInterface;
 
   @override
   Widget build(BuildContext context) {
@@ -38,35 +38,20 @@ class WalkResultsMapView extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
             markers.clear();
-            rawMarkers.clear();
             for (Walk walk in snapshot.data!) {
               if (walk.lat != null && walk.long != null) {
-                markers.add(_buildMarker(walk, context));
-                rawMarkers.add({"walk": walk, "context": context});
+                markers.add(WalkMarker(walk, selectedWalk, onWalkSelect));
               }
             }
             if (position != null) {
-              markers.add(Marker(
-                point: LatLng(position!.latitude, position!.longitude),
-                builder: (ctx) => IgnorePointer(
-                    child: Icon(currentPlace == Places.current
-                        ? Icons.location_on
-                        : Icons.home)),
-              ));
-              rawMarkers.add({
-                "latitude": position!.latitude,
-                "longitude": position!.longitude,
-                "context": context,
-                "icon": Icon(currentPlace == Places.current
-                    ? Icons.location_on
-                    : Icons.home)
-              });
+              markers.add(PositionMarker(
+                  position!.latitude, position!.longitude, currentPlace!));
             }
 
             return Stack(
               children: <Widget>[
                 map.retrieveMap(
-                    markers, rawMarkers, Theme.of(context).brightness),
+                    markers, Theme.of(context).brightness, onMapTap),
                 _buildWalkInfo(selectedWalk),
               ],
             );
@@ -76,7 +61,7 @@ class WalkResultsMapView extends StatelessWidget {
         }
         return Stack(
           children: <Widget>[
-            map.retrieveMap(markers, rawMarkers, Theme.of(context).brightness),
+            map.retrieveMap(markers, Theme.of(context).brightness, onMapTap),
             const Loading(),
             _buildWalkInfo(selectedWalk),
           ],
@@ -96,25 +81,5 @@ class WalkResultsMapView extends StatelessWidget {
         ),
       );
     }
-  }
-
-  Marker _buildMarker(Walk walk, BuildContext context) {
-    return Marker(
-      width: 25,
-      height: 25,
-      point: LatLng(walk.lat!, walk.long!),
-      builder: (ctx) => RawMaterialButton(
-        child: WalkIcon(walk, size: 21),
-        shape: const CircleBorder(),
-        elevation: selectedWalk == walk ? 5.0 : 2.0,
-        // TODO: find a way to not hardcode the colors here
-        fillColor: selectedWalk == walk
-            ? CompanyColors.lightestGreen
-            : CompanyColors.darkGreen,
-        onPressed: () {
-          onWalkSelect(walk);
-        },
-      ),
-    );
   }
 }

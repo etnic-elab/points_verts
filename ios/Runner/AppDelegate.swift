@@ -5,10 +5,13 @@ import GoogleMaps
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
   override func application(
+    NSString* mapsApiKey = [[NSProcessInfo processInfo] environment[@"MAPS_API_KEY"];
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GMSServices.provideAPIKey("AIzaSyCtJ-RZfX6h3GJM8OiGGefodNkM0MV8ri8")
+    if let value = ProcessInfo.processInfo.environment["GOOGLEMAPS_API_KEY_IOS"] {
+        GMSServices.provideAPIKey(value) 
+    } 
     GeneratedPluginRegistrant.register(with: self)
     UNUserNotificationCenter.current().delegate = self
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
