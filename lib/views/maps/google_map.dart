@@ -7,6 +7,7 @@ import 'package:points_verts/company_data.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/markers/marker_generator.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
+import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
 
 //Enum used for walk icon generation
@@ -169,7 +170,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
           },
           markers: _googleMarkers);
     } else {
-      return const SizedBox.shrink();
+      return const Loading();
     }
   }
 }
