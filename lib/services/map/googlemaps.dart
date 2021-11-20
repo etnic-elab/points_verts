@@ -5,15 +5,11 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:points_verts/company_data.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/services/map/markers/marker_generator.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
-import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/walks/walks_view.dart';
+import 'package:points_verts/views/maps/google_map.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -22,37 +18,6 @@ import 'dart:convert';
 
 import '../../models/walk.dart';
 import '../cache_managers/trip_cache_manager.dart';
-
-enum GoogleMapIcons {
-  unselectedWalkIcon,
-  unselectedCancelIcon,
-  selectedWalkIcon,
-  selectedCancelIcon
-}
-
-extension GoogleMapIconsExtension on GoogleMapIcons {
-  String get logo {
-    switch (this) {
-      case GoogleMapIcons.unselectedWalkIcon:
-      case GoogleMapIcons.selectedWalkIcon:
-        return Assets.logo;
-      case GoogleMapIcons.unselectedCancelIcon:
-      case GoogleMapIcons.selectedCancelIcon:
-        return Assets.logoAnnule;
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case GoogleMapIcons.unselectedWalkIcon:
-      case GoogleMapIcons.unselectedCancelIcon:
-        return CompanyColors.darkGreen;
-      case GoogleMapIcons.selectedWalkIcon:
-      case GoogleMapIcons.selectedCancelIcon:
-        return CompanyColors.lightestGreen;
-    }
-  }
-}
 
 class GoogleMaps implements MapInterface {
   final String? _apiKey = Environment.mapApiKey;
@@ -101,75 +66,11 @@ class GoogleMaps implements MapInterface {
   }
 
   @override
-  Widget retrieveMap(
-      List<MarkerInterface> markers, Brightness brightness, Function onMapTap,
+  Widget retrieveMap(List<MarkerInterface> markers, Function onMapTap,
       {double centerLat = 50.3155646,
       double centerLong = 5.009682,
       double zoom = 7.5}) {
-    final Completer<GoogleMapController> _controller = Completer();
-    //The angle, in degrees, of the camera angle from the nadir.
-    const double cameraTilt = 0;
-    // The camera's bearing in degrees, measured clockwise from north
-    const double cameraBearing = 0;
-    return FutureBuilder(
-        future: _createMapIcons(brightness),
-        builder: (BuildContext context,
-            AsyncSnapshot<Map<dynamic, BitmapDescriptor>> snapshot) {
-          if (snapshot.hasData) {
-            final Set<Marker> _googleMarkers = <Marker>{};
-            for (MarkerInterface marker in markers) {
-              _googleMarkers.add(marker.buildGoogleMarker(snapshot.data!));
-            }
-
-            return GoogleMap(
-                mapType: MapType
-                    .normal, // none, normal, hybrid, satellite and terrain
-                initialCameraPosition: CameraPosition(
-                    target: LatLng(centerLat, centerLong),
-                    zoom: zoom,
-                    tilt: cameraTilt,
-                    bearing: cameraBearing),
-                onMapCreated: (GoogleMapController controller) async {
-                  if (brightness == Brightness.dark) {
-                    final String style = await Assets.instance
-                        .assetJson(Assets.googlemapDarkJsonPath);
-                    controller.setMapStyle(style);
-                  }
-                  _controller.complete(controller);
-                },
-                onTap: (LatLng _) {
-                  onMapTap();
-                },
-                markers: _googleMarkers);
-          }
-          return const Loading();
-        });
-  }
-
-  Future<Map<dynamic, BitmapDescriptor>> _createMapIcons(
-      Brightness brightness) async {
-    final Map<dynamic, BitmapDescriptor> mapIcons =
-        <dynamic, BitmapDescriptor>{};
-    MarkerGenerator markerGenerator = MarkerGenerator(70);
-
-    for (var value in GoogleMapIcons.values) {
-      final byteData =
-          await Assets.instance.assetByteData(value.logo, brightness);
-      final BitmapDescriptor image =
-          await markerGenerator.createBitmapDescriptorFromByteData(
-              byteData, value.color, value.color);
-      mapIcons[value] = image;
-    }
-
-    for (var value in Places.values) {
-      Color color =
-          brightness == Brightness.light ? Colors.black : Colors.white;
-      final BitmapDescriptor image = await markerGenerator
-          .createBitmapDescriptorFromIconData(value.icon, color);
-      mapIcons[value] = image;
-    }
-
-    return mapIcons;
+    return GoogleMap(markers, onMapTap, centerLat, centerLong, zoom);
   }
 
   @override
@@ -218,20 +119,31 @@ class GoogleMaps implements MapInterface {
       double? long, double? lat, int width, int height, Brightness brightness,
       {double zoom = 16.0}) {
     {
-      var body = {
-        "size": "${width}x$height",
-        "center": "$lat,$long",
-        "markers": "color:blue|$lat,$long",
-        "zoom": "13",
-        "key": _apiKey
-      };
-      Uri url = Uri.https("maps.googleapis.com", "/maps/api/staticmap", body);
-
-      return CachedNetworkImage(
-        imageUrl: url.toString(),
-        progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-            child: CircularProgressIndicator(value: downloadProgress.progress)),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
+      return FutureBuilder(
+        future: Assets.instance.assetText(brightness, Assets.googleMapStatic),
+        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+          if (snapshot.hasData) {
+            var body = {
+              "size": "${width}x$height",
+              "center": "$lat,$long",
+              "markers": "color:blue|$lat,$long",
+              "zoom": "13",
+              "key": _apiKey
+            };
+            Uri url =
+                Uri.https("maps.googleapis.com", "/maps/api/staticmap", body);
+            String urlString = url.toString() + snapshot.data!;
+            return CachedNetworkImage(
+              imageUrl: urlString,
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  Center(
+                      child: CircularProgressIndicator(
+                          value: downloadProgress.progress)),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            );
+          }
+          return const SizedBox.shrink();
+        },
       );
     }
   }

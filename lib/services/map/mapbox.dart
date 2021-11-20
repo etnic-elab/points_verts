@@ -4,11 +4,10 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
+import 'package:points_verts/views/maps/flutter_map.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -55,32 +54,11 @@ class MapBox implements MapInterface {
   }
 
   @override
-  Widget retrieveMap(
-      List<MarkerInterface> markers, Brightness brightness, Function onMapTap,
+  Widget retrieveMap(List<MarkerInterface> markers, Function onMapTap,
       {double centerLat = 50.3155646,
       double centerLong = 5.009682,
       double zoom = 7.5}) {
-    final List<Marker> _flutterMarkers = [];
-    for (MarkerInterface marker in markers) {
-      _flutterMarkers.add(marker.buildFlutterMarker());
-    }
-    return FlutterMap(
-      options: MapOptions(center: LatLng(centerLat, centerLong), zoom: zoom),
-      layers: [
-        TileLayerOptions(
-          urlTemplate:
-              "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}@2x?access_token={accessToken}",
-          tileSize: 512,
-          maxZoom: 18,
-          zoomOffset: -1,
-          additionalOptions: {
-            'accessToken': _token!,
-            'id': brightness == Brightness.dark ? 'dark-v10' : 'light-v10',
-          },
-        ),
-        MarkerLayerOptions(markers: _flutterMarkers),
-      ],
-    );
+    return FlutterMap(markers, _token!, centerLat, centerLong, zoom);
   }
 
   @override

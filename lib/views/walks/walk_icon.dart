@@ -13,12 +13,12 @@ class WalkIcon extends StatelessWidget {
     final Brightness brightness = Theme.of(context).brightness;
     if (walk.isCancelled()) {
       return Image(
-          image: Assets.instance.assetImage(Assets.logoAnnule, brightness),
+          image: Assets.instance.assetImage(brightness, Assets.logoAnnule),
           height: size ?? 30,
           semanticLabel: "Point annulé");
     } else if (walk.type == 'Marche' || walk.type == 'Orientation') {
       return Image(
-          image: Assets.instance.assetImage(Assets.logo, brightness),
+          image: Assets.instance.assetImage(brightness, Assets.logo),
           height: size ?? 30,
           semanticLabel: "Marche/Orientation");
     } else {

@@ -50,8 +50,7 @@ class WalkResultsMapView extends StatelessWidget {
 
             return Stack(
               children: <Widget>[
-                map.retrieveMap(
-                    markers, Theme.of(context).brightness, onMapTap),
+                map.retrieveMap(markers, onMapTap),
                 _buildWalkInfo(selectedWalk),
               ],
             );
@@ -61,7 +60,7 @@ class WalkResultsMapView extends StatelessWidget {
         }
         return Stack(
           children: <Widget>[
-            map.retrieveMap(markers, Theme.of(context).brightness, onMapTap),
+            map.retrieveMap(markers, onMapTap),
             const Loading(),
             _buildWalkInfo(selectedWalk),
           ],

@@ -4,10 +4,10 @@ import 'package:latlong2/latlong.dart';
 
 import 'package:flutter_map/flutter_map.dart' as flutter;
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
-import 'package:points_verts/services/map/googlemaps.dart';
 
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/views/maps/google_map.dart';
 import 'package:points_verts/views/walks/walk_icon.dart';
 import 'package:points_verts/models/walk.dart';
 
@@ -39,8 +39,7 @@ class WalkMarker implements MarkerInterface {
   }
 
   @override
-  google.Marker buildGoogleMarker(
-      Map<dynamic, google.BitmapDescriptor> mapIcons) {
+  google.Marker buildGoogleMarker(Map<Enum, google.BitmapDescriptor> mapIcons) {
     google.MarkerId markerId =
         google.MarkerId(walk.lat!.toString() + walk.long!.toString());
     google.BitmapDescriptor icon;

@@ -22,8 +22,7 @@ abstract class MapInterface {
   /// @returns A Widget that contains the map.
   /// @throws ArgumentError If there is already an option with
   ///     the given name or abbreviation.
-  Widget retrieveMap(
-      List<MarkerInterface> markers, Brightness brightness, Function onMapTap,
+  Widget retrieveMap(List<MarkerInterface> markers, Function onMapTap,
       {double centerLat = 50.3155646,
       double centerLong = 5.009682,
       double zoom = 7.5});

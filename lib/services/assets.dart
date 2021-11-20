@@ -11,19 +11,19 @@ class Assets {
 
   static const String logo = 'logo';
   static const String logoAnnule = 'logo-annule';
-  static const String googlemapDarkJsonPath =
-      'assets/dark/google_map_style.json';
+  static const String googleMap = 'google_map_style';
+  static const String googleMapStatic = 'google_map_style_static';
 
-  String _assetImagePath(String asset, Brightness brightness) {
-    return 'assets/${brightness.toString().split('.').last}/$asset.png';
+  String _assetPath(Brightness brightness, String asset, String fileExtension) {
+    return 'assets/${brightness.toString().split('.').last}/$asset.$fileExtension';
   }
 
-  AssetImage assetImage(String asset, Brightness brightness) {
-    return AssetImage(_assetImagePath(asset, brightness));
+  AssetImage assetImage(Brightness brightness, String asset) {
+    return AssetImage(_assetPath(brightness, asset, 'png'));
   }
 
-  Future<ByteData> assetByteData(String asset, Brightness brightness) async {
-    return await rootBundle.load(_assetImagePath(asset, brightness));
+  Future<ByteData> assetByteData(Brightness brightness, String asset) async {
+    return await rootBundle.load(_assetPath(brightness, asset, 'png'));
   }
 
   Future<ui.Image> sizedImageBytes(ByteData data, int width) async {
@@ -36,7 +36,11 @@ class Assets {
     return await decodeImageFromList(bytes);
   }
 
-  Future<String> assetJson(String path) async {
-    return await rootBundle.loadString(path);
+  Future<String> assetJson(Brightness brightness, String asset) async {
+    return await rootBundle.loadString(_assetPath(brightness, asset, 'json'));
+  }
+
+  Future<String> assetText(Brightness brightness, String asset) async {
+    return await rootBundle.loadString(_assetPath(brightness, asset, 'txt'));
   }
 }
