@@ -30,10 +30,17 @@ Uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de
 googleMaps.apiKey=api_key
 ```
 
-- API key restricted to IOS App. Select `Maps SDK for IOS` API. Define the key in in a `.env` file in root folder:
+- API key restricted to IOS App. Select `Maps SDK for IOS` API. Define the key in a `GoogleMaps.plist` file in `ios/Runner` folder:
 
-```properties
-GOOGLEMAPS_API_KEY_IOS=api_key
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+<key>API_KEY</key>
+<string>api_key</string>
+</dict>
+</plist>
 ```
 
 - API key with no platform restriction. Select `Distance Matrix API`, `Geocoding API`, `Maps Static API`, `Places API` API's. Define the key in a `.env` file in root folder:
