@@ -127,7 +127,8 @@ class GoogleMaps implements MapInterface {
               "size": "${width}x$height",
               "center": "$lat,$long",
               "markers": "color:blue|$lat,$long",
-              "zoom": "13",
+              "scale": "2",
+              "zoom": "$zoom",
               "key": _apiKey
             };
             Uri url =
