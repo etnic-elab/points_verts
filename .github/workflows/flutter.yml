@@ -25,7 +25,8 @@ jobs:
           cp assets/dummy.png assets/light/splash.png
           cp assets/dummy.png assets/dark/splash.png
           touch android/app/src/main/res/mipmap/ic_launcher_foreground.png
-          cat '' > ios/Runner/GoogleMaps.plist
+          touch ios/Runner/GoogleMaps.plist
+          echo "" >> ios/Runner/GoogleMaps.plist
       - name: Generate splash screens
         run: flutter pub run flutter_native_splash:create
       - name: Run tests
