@@ -25,7 +25,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     print("[BackgroundFetch] Headless task: $taskId");
     await dotenv.load(fileName: '.env');
     await updateWalks();
-    await scheduleNextNearestWalkNotification();
+    await scheduleNextNearestWalkNotifications();
     await PrefsProvider.prefs.setString(
         "last_background_fetch", DateTime.now().toUtc().toIso8601String());
   } catch (err) {
