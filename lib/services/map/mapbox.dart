@@ -100,12 +100,12 @@ class MapBox implements MapInterface {
 
   @override
   Widget retrieveStaticImage(
-      double? long, double? lat, int width, int height, Brightness brightness,
+      Walk walk, int width, int height, Brightness brightness,
       {double zoom = 16.0}) {
     final String style =
         brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
     Uri url = Uri.parse(
-        "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l($long,$lat)/$long,$lat,$zoom,0,0/${width}x$height@2x?access_token=$_token");
+        "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l(${walk.long},${walk.lat})/${walk.long},${walk.lat},$zoom,0,0/${width}x$height@2x?access_token=$_token");
     return CachedNetworkImage(
       imageUrl: url.toString(),
       progressIndicatorBuilder: (context, url, downloadProgress) => Center(

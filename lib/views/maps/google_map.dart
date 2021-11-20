@@ -60,8 +60,6 @@ class GoogleMap extends StatefulWidget {
 
 class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   final Completer<google.GoogleMapController> _controller = Completer();
-  final double cameraTilt = 0;
-  final double cameraBearing = 0;
 
   Map<Brightness, String>? _mapStyles;
   Map<Brightness, Map<Enum, google.BitmapDescriptor>>? _mapIcons;
@@ -92,7 +90,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
         <Brightness, Map<Enum, google.BitmapDescriptor>>{};
 
     //Generate walk icons
-    MarkerGenerator markerGenerator = MarkerGenerator(70);
+    MarkerGenerator markerGenerator = MarkerGenerator(90);
     for (Brightness theme in [Brightness.dark, Brightness.light]) {
       final Map<Enum, google.BitmapDescriptor> icons =
           <Enum, google.BitmapDescriptor>{};
@@ -143,9 +141,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     google.CameraPosition initialLocation = google.CameraPosition(
         target: google.LatLng(widget.centerLat, widget.centerLong),
-        zoom: widget.zoom,
-        tilt: cameraTilt,
-        bearing: cameraBearing);
+        zoom: widget.zoom);
 
     final Set<google.Marker> _googleMarkers = <google.Marker>{};
     final Brightness theme = Theme.of(context).brightness;

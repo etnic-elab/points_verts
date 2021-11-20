@@ -33,6 +33,6 @@ abstract class MapInterface {
   Future<String?> retrieveAddress(double long, double lat);
 
   Widget retrieveStaticImage(
-      double? long, double? lat, int width, int height, Brightness brightness,
+      Walk walk, int width, int height, Brightness brightness,
       {double zoom = 16.0});
 }

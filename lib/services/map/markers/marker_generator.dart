@@ -13,7 +13,7 @@ class MarkerGenerator {
   final num _markerSize;
   late double _circleStrokeWidth;
   late double _circleOffset;
-  late double _outlineCircleWidth;
+  // late double _outlineCircleWidth;
   late double _fillCircleWidth;
   late double _iconSize;
   late double _iconOffset;
@@ -22,8 +22,8 @@ class MarkerGenerator {
     // calculate marker dimensions
     _circleStrokeWidth = _markerSize / 100.0;
     _circleOffset = _markerSize / 2;
-    _outlineCircleWidth = _circleOffset - (_circleStrokeWidth / 2);
-    _fillCircleWidth = _markerSize / 2;
+    // _outlineCircleWidth = _circleOffset - (_circleStrokeWidth / 2);
+    _fillCircleWidth = _markerSize / 2.35;
     final outlineCircleInnerWidth = _markerSize - (2 * _circleStrokeWidth);
     _iconSize = sqrt(pow(outlineCircleInnerWidth, 2) / 2);
     final rectDiagonal = sqrt(2 * pow(_markerSize, 2));
@@ -41,7 +41,7 @@ class MarkerGenerator {
         await Assets.instance.sizedImageBytes(assetData, _iconSize.round());
 
     _paintCircleFill(canvas, backgroundColor);
-    _paintCircleStroke(canvas, circleColor);
+    // _paintCircleStroke(canvas, circleColor);
     _paintImage(canvas, assetImage);
 
     final picture = pictureRecorder.endRecording();
@@ -79,14 +79,14 @@ class MarkerGenerator {
 
   /// Paints a circle around the icon
 
-  void _paintCircleStroke(Canvas canvas, Color color) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..color = color
-      ..strokeWidth = _circleStrokeWidth;
-    canvas.drawCircle(
-        Offset(_circleOffset, _circleOffset), _outlineCircleWidth, paint);
-  }
+  // void _paintCircleStroke(Canvas canvas, Color color) {
+  //   final paint = Paint()
+  //     ..style = PaintingStyle.stroke
+  //     ..color = color
+  //     ..strokeWidth = _circleStrokeWidth;
+  //   canvas.drawCircle(
+  //       Offset(_circleOffset, _circleOffset), _outlineCircleWidth, paint);
+  // }
 
   /// Paints the icon
   void _paintIcon(Canvas canvas, Color color, IconData iconData) {

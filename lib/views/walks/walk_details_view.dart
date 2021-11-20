@@ -56,8 +56,8 @@ class WalkDetailsView extends StatelessWidget {
     return SizedBox(
       height: height,
       width: width,
-      child: map.retrieveStaticImage(walk.long, walk.lat, width.round(),
-          height.round(), Theme.of(context).brightness),
+      child: map.retrieveStaticImage(
+          walk, width.round(), height.round(), Theme.of(context).brightness),
     );
   }
 }

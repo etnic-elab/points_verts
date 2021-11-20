@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:points_verts/company_data.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/map_interface.dart';
@@ -116,26 +117,28 @@ class GoogleMaps implements MapInterface {
 
   @override
   Widget retrieveStaticImage(
-      double? long, double? lat, int width, int height, Brightness brightness,
+      Walk walk, int width, int height, Brightness brightness,
       {double zoom = 16.0}) {
     {
+      String logoUrl = walk.isCancelled()
+          ? brightness == Brightness.dark
+              ? publicLogoCancelledDark
+              : publicLogoCancelledLight
+          : publicLogo;
       return FutureBuilder(
         future: Assets.instance.assetText(brightness, Assets.googleMapStatic),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData) {
             var body = {
               "size": "${width}x$height",
-              "center": "$lat,$long",
-              "markers": "color:blue|$lat,$long",
+              "markers": "anchor:center|icon:$logoUrl|${walk.lat},${walk.long}",
               "scale": "2",
-              "zoom": "$zoom",
               "key": _apiKey
             };
             Uri url =
                 Uri.https("maps.googleapis.com", "/maps/api/staticmap", body);
-            String urlString = url.toString() + snapshot.data!;
             return CachedNetworkImage(
-              imageUrl: urlString,
+              imageUrl: url.toString() + snapshot.data!,
               progressIndicatorBuilder: (context, url, downloadProgress) =>
                   Center(
                       child: CircularProgressIndicator(
