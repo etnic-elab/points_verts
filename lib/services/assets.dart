@@ -11,17 +11,19 @@ class Assets {
 
   static const String logo = 'logo';
   static const String logoAnnule = 'logo-annule';
+  static const String googlemapDarkJsonPath =
+      'assets/dark/google_map_style.json';
 
-  String _assetPath(String asset, Brightness brightness) {
+  String _assetImagePath(String asset, Brightness brightness) {
     return 'assets/${brightness.toString().split('.').last}/$asset.png';
   }
 
   AssetImage assetImage(String asset, Brightness brightness) {
-    return AssetImage(_assetPath(asset, brightness));
+    return AssetImage(_assetImagePath(asset, brightness));
   }
 
   Future<ByteData> assetByteData(String asset, Brightness brightness) async {
-    return await rootBundle.load(_assetPath(asset, brightness));
+    return await rootBundle.load(_assetImagePath(asset, brightness));
   }
 
   Future<ui.Image> sizedImageBytes(ByteData data, int width) async {
@@ -32,5 +34,9 @@ class Assets {
         .buffer
         .asUint8List();
     return await decodeImageFromList(bytes);
+  }
+
+  Future<String> assetJson(String path) async {
+    return await rootBundle.loadString(path);
   }
 }

@@ -129,7 +129,12 @@ class GoogleMaps implements MapInterface {
                     zoom: zoom,
                     tilt: cameraTilt,
                     bearing: cameraBearing),
-                onMapCreated: (GoogleMapController controller) {
+                onMapCreated: (GoogleMapController controller) async {
+                  if (brightness == Brightness.dark) {
+                    final String style = await Assets.instance
+                        .assetJson(Assets.googlemapDarkJsonPath);
+                    controller.setMapStyle(style);
+                  }
                   _controller.complete(controller);
                 },
                 onTap: (LatLng _) {
@@ -157,8 +162,10 @@ class GoogleMaps implements MapInterface {
     }
 
     for (var value in Places.values) {
-      final BitmapDescriptor image =
-          await markerGenerator.createBitmapDescriptorFromIconData(value.icon);
+      Color color =
+          brightness == Brightness.light ? Colors.black : Colors.white;
+      final BitmapDescriptor image = await markerGenerator
+          .createBitmapDescriptorFromIconData(value.icon, color);
       mapIcons[value] = image;
     }
 

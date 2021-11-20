@@ -53,8 +53,8 @@ class MarkerGenerator {
   }
 
   /// Creates a BitmapDescriptor from an IconData
-  Future<BitmapDescriptor> createBitmapDescriptorFromIconData(IconData iconData,
-      {Color iconColor = Colors.black}) async {
+  Future<BitmapDescriptor> createBitmapDescriptorFromIconData(
+      IconData iconData, Color iconColor) async {
     final pictureRecorder = ui.PictureRecorder();
     final canvas = Canvas(pictureRecorder);
 

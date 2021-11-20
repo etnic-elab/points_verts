@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:points_verts/services/map/googlemaps.dart';
 import 'package:points_verts/services/map/map_interface.dart';
@@ -50,7 +48,7 @@ const String tag = "dev.alpagaga.points_verts.Environment";
 class Environment {
   static final String? openWeatherToken = dotenv.env['OPENWEATHER_TOKEN'];
   static Maps? map;
-  //TODO: initialize singleton
+  //TODO: initialize as singleton
   static MapInterface? _mapInstance;
 
   static MapInterface get mapInterface {
