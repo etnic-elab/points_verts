@@ -1,7 +1,12 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -35,12 +40,20 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   }
 }
 
+Future<void> _addTrustedCert(String certPath) async {
+  ByteData data =
+      await Assets.instance.load('assets/raw/www-odwb-be-chain.pem');
+  SecurityContext context = SecurityContext.defaultContext;
+  context.setTrustedCertificatesBytes(data.buffer.asUint8List());
+}
+
 void main() async {
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
   await DBProvider.db.database;
+  await _addTrustedCert('assets/raw/www-odwb-be-chain.pem');
   runApp(const MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }

@@ -38,7 +38,7 @@ class MarkerGenerator {
     final pictureRecorder = ui.PictureRecorder();
     final canvas = Canvas(pictureRecorder);
     final assetImage =
-        await Assets.instance.sizedImageBytes(assetData, _iconSize.round());
+        await Assets.instance.sizedBytes(assetData, _iconSize.round());
 
     _paintCircleFill(canvas, backgroundColor);
     // _paintCircleStroke(canvas, circleColor);

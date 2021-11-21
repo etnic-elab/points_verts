@@ -69,7 +69,9 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
     _loadMapStyles();
-    _loadMapIcons();
+    Future.delayed(Duration.zero, () {
+      _loadMapIcons(context);
+    });
   }
 
   Future<void> _loadMapStyles() async {
@@ -77,7 +79,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     Map<Brightness, String> mapStyles = <Brightness, String>{};
     for (Brightness theme in [Brightness.dark, Brightness.light]) {
       mapStyles[theme] =
-          await Assets.instance.assetJson(theme, Assets.googleMap);
+          await Assets.instance.themedAssetJson(theme, Assets.googleMap);
     }
 
     setState(() {
@@ -85,19 +87,20 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     });
   }
 
-  Future<void> _loadMapIcons() async {
+  Future<void> _loadMapIcons(context) async {
     final Map<Brightness, Map<Enum, google.BitmapDescriptor>> mapIcons =
         <Brightness, Map<Enum, google.BitmapDescriptor>>{};
 
+    double width = MediaQuery.of(context).size.width / 10.6;
     //Generate walk icons
-    MarkerGenerator markerGenerator = MarkerGenerator(90);
+    MarkerGenerator markerGenerator = MarkerGenerator(width);
+
     for (Brightness theme in [Brightness.dark, Brightness.light]) {
       final Map<Enum, google.BitmapDescriptor> icons =
           <Enum, google.BitmapDescriptor>{};
 
       for (GoogleMapIcons mapEnum in GoogleMapIcons.values) {
-        final byteData =
-            await Assets.instance.assetByteData(theme, mapEnum.logo);
+        final byteData = await Assets.instance.themedAsset(theme, mapEnum.logo);
         final google.BitmapDescriptor image =
             await markerGenerator.createBitmapDescriptorFromByteData(
                 byteData, mapEnum.color, mapEnum.color);

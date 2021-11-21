@@ -126,7 +126,8 @@ class GoogleMaps implements MapInterface {
               : publicLogoCancelledLight
           : publicLogo;
       return FutureBuilder(
-        future: Assets.instance.assetText(brightness, Assets.googleMapStatic),
+        future:
+            Assets.instance.themedAssetText(brightness, Assets.googleMapStatic),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData) {
             var body = {
