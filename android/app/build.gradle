@@ -21,6 +21,11 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def googleMapsApiKey = localProperties.getProperty('googleMaps.apiKey')
+if (googleMapsApiKey == null) {
+    googleMapsApiKey = 'NO_API_KEY_FOUND'
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
@@ -44,10 +49,11 @@ android {
 
     defaultConfig {
         applicationId "dev.alpagaga.points_verts"
-        minSdkVersion 19
+        minSdkVersion 20
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders = [mapApiKey:googleMapsApiKey]
     }
 
     signingConfigs {

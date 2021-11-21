@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -23,7 +27,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   }
   try {
     print("[BackgroundFetch] Headless task: $taskId");
-    await dotenv.load(fileName: '.env');
+    await dotenv.load();
     await updateWalks();
     await scheduleNextNearestWalkNotifications();
     await PrefsProvider.prefs.setString(
@@ -35,12 +39,19 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   }
 }
 
+Future<void> _addTrustedCert(String certPath) async {
+  ByteData data = await Assets.instance.load(certPath);
+  SecurityContext context = SecurityContext.defaultContext;
+  context.setTrustedCertificatesBytes(data.buffer.asUint8List());
+}
+
 void main() async {
-  await dotenv.load(fileName: '.env');
+  await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
   await DBProvider.db.database;
+  await _addTrustedCert(Assets.letsEncryptCert);
   runApp(const MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
@@ -72,8 +83,8 @@ class MyApp extends StatelessWidget {
       ],
       navigatorKey: navigatorKey,
       title: applicationName,
-      theme: companyTheme,
-      darkTheme: companyDarkTheme,
+      theme: CompanyTheme.companyLightTheme(),
+      darkTheme: CompanyTheme.companyDarkTheme(),
       home: const WalksHomeScreen(),
       debugShowCheckedModeBanner: false,
     );

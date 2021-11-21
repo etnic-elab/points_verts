@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:points_verts/company_data.dart';
-import 'package:points_verts/asset.dart';
+import 'package:points_verts/environment.dart';
+import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 class About extends StatelessWidget {
@@ -21,7 +22,8 @@ class About extends StatelessWidget {
                   showAboutDialog(
                       context: context,
                       applicationIcon: Image(
-                          image: Assets.assetImage(Assets.logo, context),
+                          image: Assets.instance.themedAssetImage(
+                              Theme.of(context).brightness, Assets.logo),
                           height: 50),
                       applicationName: applicationName,
                       applicationVersion: snapshot.data!.version,
@@ -33,8 +35,8 @@ class About extends StatelessWidget {
                             "mailto:$companyMail?subject=Points Verts"),
                         const _AboutRow("Données des Points Verts",
                             "Open Data Wallonie-Bruxelles", opendataUrl),
-                        const _AboutRow("Données de navigation", "Mapbox",
-                            "https://www.mapbox.com"),
+                        _AboutRow("Données de navigation", Environment.mapApi,
+                            Environment.mapWebsite),
                         const _AboutRow("Données météorologiques",
                             "OpenWeather", "https://openweathermap.org")
                       ]);
