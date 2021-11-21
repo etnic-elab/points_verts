@@ -48,6 +48,8 @@ upload_certificate.pem
 # assets
 /assets/light/*.png
 /assets/dark/*.png
+/assets/google_static_markers/
+/assets/launcher_icons/
 /ios/Runner/Assets.xcassets/**/*.png
 /android/app/src/main/res/**/*.png
 /android/app/src/main/ic_launcher-playstore.png
