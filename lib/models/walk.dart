@@ -143,7 +143,7 @@ class Walk {
   }
 
   String? getFormattedDistance() {
-    double? dist =
+    num? dist =
         trip != null && trip!.distance != null ? trip!.distance : distance;
     if (dist == null) {
       return null;
