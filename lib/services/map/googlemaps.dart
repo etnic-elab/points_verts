@@ -132,7 +132,8 @@ class GoogleMaps implements MapInterface {
           if (snapshot.hasData) {
             var body = {
               "size": "${width}x$height",
-              "markers": "anchor:center|icon:$logoUrl|${walk.lat},${walk.long}",
+              "markers":
+                  "scale:2|anchor:center|icon:$logoUrl|${walk.lat},${walk.long}",
               "scale": "2",
               "key": _apiKey
             };

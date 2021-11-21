@@ -85,7 +85,13 @@ storeFile=<path>/key.jks
 flutter pub run flutter_native_splash:create
 ```
 
-6. The release can then be build with the following command for android (use Xcode for iOS):
+6. To generate the launcher_icons before release, use the following command:
+
+```bash
+flutter pub run flutter_launcher_icons:main
+```
+
+7. The release can then be build with the following command for android (use Xcode for iOS):
 
 ```bash
 flutter build appbundle

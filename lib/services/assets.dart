@@ -13,6 +13,7 @@ class Assets {
   static const String logoAnnule = 'logo-annule';
   static const String googleMap = 'google_map_style';
   static const String googleMapStatic = 'google_map_style_static';
+  static const String letsEncryptCert = 'assets/raw/isrgrootx1.pem';
 
   String _themedAssetPath(
       Brightness brightness, String asset, String fileExtension) {

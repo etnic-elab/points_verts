@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
@@ -41,8 +40,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 }
 
 Future<void> _addTrustedCert(String certPath) async {
-  ByteData data =
-      await Assets.instance.load('assets/raw/www-odwb-be-chain.pem');
+  ByteData data = await Assets.instance.load(certPath);
   SecurityContext context = SecurityContext.defaultContext;
   context.setTrustedCertificatesBytes(data.buffer.asUint8List());
 }
@@ -53,7 +51,7 @@ void main() async {
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
   await DBProvider.db.database;
-  await _addTrustedCert('assets/raw/www-odwb-be-chain.pem');
+  await _addTrustedCert(Assets.letsEncryptCert);
   runApp(const MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }

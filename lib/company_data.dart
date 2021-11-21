@@ -9,11 +9,11 @@ const String opendataUrl =
 const String _publicUrl = "https://adeps-points-verts.innovation-etnic.be";
 const String assistanceUrl = "$_publicUrl/assistance.html";
 const String privacyUrl = "$_publicUrl/privacy.html";
-const String publicLogo = "$_publicUrl/logo_32x32.png";
+const String publicLogo = "$_publicUrl/logo_64x64.png";
 const String publicLogoCancelledLight =
-    "$_publicUrl/logo_cancelled_light_32x32.png";
+    "$_publicUrl/logo_cancelled_light_64x64.png";
 const String publicLogoCancelledDark =
-    "$_publicUrl/logo_cancelled_dark_32x32.png";
+    "$_publicUrl/logo_cancelled_dark_64x64.png";
 
 class CompanyColors {
   static const greenPrimary = Color(0xFF6CB233);
@@ -34,7 +34,6 @@ class CompanyColors {
   static const red = Color(0xFFD7272E);
   static const lightRed = Color(0xFFF03B33);
   static const darkRed = Color(0xFF811620);
-  static const blue24bit = "0x52ABE4";
 
   static Color contextualRed(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark ? lightRed : red;

@@ -91,9 +91,9 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     final Map<Brightness, Map<Enum, google.BitmapDescriptor>> mapIcons =
         <Brightness, Map<Enum, google.BitmapDescriptor>>{};
 
-    double width = MediaQuery.of(context).size.width / 10.6;
+    double size = MediaQuery.of(context).devicePixelRatio * 40;
     //Generate walk icons
-    MarkerGenerator markerGenerator = MarkerGenerator(width);
+    MarkerGenerator markerGenerator = MarkerGenerator(size);
 
     for (Brightness theme in [Brightness.dark, Brightness.light]) {
       final Map<Enum, google.BitmapDescriptor> icons =
