@@ -40,8 +40,6 @@ lib/generated_plugin_registrant.dart
 /android/key*.properties
 /ios/Runner/GoogleMaps.plist
 key.jks
-upload-keystore.jks
-upload_certificate.pem
 .env
 /app_icons/
 

@@ -16,6 +16,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'prefs.dart';
 
 const String tag = "dev.alpagaga.points_verts.NotificationManager";
+const String defaultIcon = 'ic_notification';
 final DateFormat formatter = DateFormat('yyyyMMdd');
 
 class NotificationManager {
@@ -31,7 +32,7 @@ class NotificationManager {
     }
     log("creating a new plugin instance", name: tag);
     var initializationSettingsAndroid =
-        const AndroidInitializationSettings('ic_notification');
+        const AndroidInitializationSettings(defaultIcon);
     var initializationSettingsIOS = const IOSInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
@@ -63,7 +64,7 @@ class NotificationManager {
       var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
           'NEXT_NEAREST_WALK',
           'Prochain point à proximité',
-          'Indique la veille le prochain point vert Adeps le plus proche de votre domicile',
+          'Indique la veille le prochain point vert ADEPS le plus proche de votre domicile',
           importance: Importance.max,
           priority: Priority.high,
           color: CompanyColors.greenPrimary,
