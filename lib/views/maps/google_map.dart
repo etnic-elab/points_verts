@@ -160,6 +160,8 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
           mapType: google
               .MapType.normal, // none, normal, hybrid, satellite and terrain
           initialCameraPosition: initialLocation,
+          myLocationButtonEnabled: false,
+          zoomControlsEnabled: false,
           onMapCreated: (google.GoogleMapController controller) {
             controller.setMapStyle(_mapStyles![theme]);
             _controller.complete(controller);
