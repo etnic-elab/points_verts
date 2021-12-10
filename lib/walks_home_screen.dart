@@ -1,6 +1,5 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';

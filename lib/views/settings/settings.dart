@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/views/list_header.dart';

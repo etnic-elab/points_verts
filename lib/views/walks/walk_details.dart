@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/models/walk.dart';
