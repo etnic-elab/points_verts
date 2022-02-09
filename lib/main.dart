@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
@@ -50,13 +51,17 @@ Future<void> _addTrustedCert(String certPath) async {
 }
 
 void main() async {
+  FlutterNativeSplash.removeAfter(initialization);
+  runApp(const MyApp());
+}
+
+void initialization(BuildContext context) async {
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
   await DBProvider.db.database;
   await _addTrustedCert(Assets.letsEncryptCert);
-  runApp(const MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 

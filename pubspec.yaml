@@ -25,11 +25,12 @@ dependencies:
     sdk: flutter
   flutter_cache_manager: ^3.0.0-nullsafety.1
   flutter_dotenv: ^5.0.0
-  flutter_local_notifications: ^6.0.0
+  flutter_local_notifications: ^9.2.0
+  flutter_native_splash: ^2.0.2
   flutter_localizations:
     sdk: flutter
-  flutter_map: ^0.13.0
-  geolocator: ^7.1.0
+  flutter_map: ^0.14.0
+  geolocator: ^8.1.1
   google_maps_flutter: ^2.0.11
   http: ^0.13.0
   intl: ^0.17.0
@@ -41,7 +42,6 @@ dependencies:
 
 dev_dependencies:
   flutter_lints: ^1.0.4
-  flutter_native_splash: ^1.2.3
   flutter_launcher_icons: ^0.9.2
   flutter_test:
     sdk: flutter
