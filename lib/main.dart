@@ -42,7 +42,11 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 Future<void> _addTrustedCert(String certPath) async {
   ByteData data = await Assets.instance.load(certPath);
   SecurityContext context = SecurityContext.defaultContext;
-  context.setTrustedCertificatesBytes(data.buffer.asUint8List());
+  try {
+    context.setTrustedCertificatesBytes(data.buffer.asUint8List());
+  } catch (err) {
+    print("Cannot add certificate: $err");
+  }
 }
 
 void main() async {
