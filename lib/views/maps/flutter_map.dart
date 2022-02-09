@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as flutter;
 import 'package:points_verts/services/map/markers/marker_interface.dart';

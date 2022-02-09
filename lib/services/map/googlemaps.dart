@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/assets.dart';

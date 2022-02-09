@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 
 import '../../models/address_suggestion.dart';
