@@ -54,8 +54,7 @@ android {
 
     defaultConfig {
         applicationId "dev.alpagaga.points_verts"
-        // we set manually minSdkVersion here or flutter_launcher_icons:main will fail
-        minSdkVersion 21
+        minSdkVersion 21 // we set manually minSdkVersion here or flutter_launcher_icons:main will fail
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
