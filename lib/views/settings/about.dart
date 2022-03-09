@@ -22,8 +22,8 @@ class About extends StatelessWidget {
                   showAboutDialog(
                       context: context,
                       applicationIcon: Image(
-                          image: Assets.instance.themedAssetImage(
-                              Theme.of(context).brightness, Assets.logo),
+                          image: Assets.asset
+                              .image(Theme.of(context).brightness, Assets.logo),
                           height: 50),
                       applicationName: applicationName,
                       applicationVersion: snapshot.data!.version,

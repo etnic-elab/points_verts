@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:points_verts/environment.dart';
+import 'package:points_verts/models/gpx_path.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/flutter_map.dart';
@@ -25,7 +26,7 @@ class MapBox implements MapInterface {
     String destinations = "";
     for (int i = 0; i < min(walks.length, 5); i++) {
       Walk walk = walks[i];
-      if (walk.isPositionable()) {
+      if (walk.isPositionable) {
         destinations = destinations + ";${walk.long},${walk.lat}";
       }
     }
@@ -43,20 +44,12 @@ class MapBox implements MapInterface {
     if (distances != null && durations != null) {
       for (int i = 0; i < min(walks.length, 5); i++) {
         Walk walk = walks[i];
-        if (walk.isPositionable() && distances.length >= i) {
+        if (walk.isPositionable && distances.length >= i) {
           walk.trip =
               Trip(distance: distances[i + 1], duration: durations[i + 1]);
         }
       }
     }
-  }
-
-  @override
-  Widget retrieveMap(List<MarkerInterface> markers, Function onMapTap,
-      {double centerLat = 50.3155646,
-      double centerLong = 5.009682,
-      double zoom = 7.5}) {
-    return FlutterMap(markers, _token!, centerLat, centerLong, zoom);
   }
 
   @override
@@ -97,9 +90,23 @@ class MapBox implements MapInterface {
   }
 
   @override
+  Widget retrieveMap({
+    double centerLat = MapInterface.defaultLat,
+    double centerLong = MapInterface.defaultLong,
+    double zoom = MapInterface.defaultZoom,
+    locationEnabled = false,
+    List<MarkerInterface> markers = const [],
+    List<GpxPath> paths = const [],
+    Function? onTapMap,
+    Function(GpxPath)? onTapPath,
+  }) {
+    return FlutterMap(markers, _token!, centerLat, centerLong, zoom);
+  }
+
+  @override
   Widget retrieveStaticImage(
       Walk walk, int width, int height, Brightness brightness,
-      {double zoom = 16.0}) {
+      {double zoom = 16.0, Function? onTap}) {
     final String style =
         brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
     Uri url = Uri.parse(

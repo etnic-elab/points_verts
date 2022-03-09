@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/models/gpx_path.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/markers/marker_generator.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
-import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
 
 //Enum used for walk icon generation
@@ -43,25 +43,31 @@ extension GoogleMapIconsExtension on GoogleMapIcons {
 
 class GoogleMap extends StatefulWidget {
   const GoogleMap(
-      this.markers, this.onMapTap, this.centerLat, this.centerLong, this.zoom,
-      {Key? key})
+      {Key? key,
+      required this.initialLocation,
+      this.locationEnabled = false,
+      this.markers = const <MarkerInterface>[],
+      this.paths = const <GpxPath>[],
+      this.onTapMap,
+      this.onTapPath})
       : super(key: key);
 
+  final google.CameraPosition initialLocation;
+  final bool locationEnabled;
   final List<MarkerInterface> markers;
-  final Function onMapTap;
-  final double centerLat;
-  final double centerLong;
-  final double zoom;
+  final List<GpxPath> paths;
+  final Function? onTapMap;
+  final Function? onTapPath;
 
   @override
   State<StatefulWidget> createState() => _GoogleMapState();
 }
 
 class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
-  final Completer<google.GoogleMapController> _controller = Completer();
-
-  Map<Brightness, String>? _mapStyles;
-  Map<Brightness, Map<Enum, google.BitmapDescriptor>>? _mapIcons;
+  final Completer<google.GoogleMapController> _completer = Completer();
+  Map<Brightness, String> _mapStyles = {};
+  Map<Brightness, Map<Enum, google.BitmapDescriptor>> _mapIcons = {};
+  int? _selectedPath;
 
   @override
   void initState() {
@@ -69,63 +75,8 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     WidgetsBinding.instance!.addObserver(this);
     _loadMapStyles();
     Future.delayed(Duration.zero, () {
-      _loadMapIcons(context);
+      _loadMapIcons();
     });
-  }
-
-  Future<void> _loadMapStyles() async {
-    //Load light/dark map styles from assets
-    Map<Brightness, String> mapStyles = <Brightness, String>{};
-    for (Brightness theme in [Brightness.dark, Brightness.light]) {
-      mapStyles[theme] =
-          await Assets.instance.themedAssetJson(theme, Assets.googleMap);
-    }
-
-    setState(() {
-      _mapStyles = mapStyles;
-    });
-  }
-
-  Future<void> _loadMapIcons(context) async {
-    final Map<Brightness, Map<Enum, google.BitmapDescriptor>> mapIcons =
-        <Brightness, Map<Enum, google.BitmapDescriptor>>{};
-
-    double size = MediaQuery.of(context).devicePixelRatio * 40;
-    //Generate walk icons
-    MarkerGenerator markerGenerator = MarkerGenerator(size);
-
-    for (Brightness theme in [Brightness.dark, Brightness.light]) {
-      final Map<Enum, google.BitmapDescriptor> icons =
-          <Enum, google.BitmapDescriptor>{};
-
-      for (GoogleMapIcons mapEnum in GoogleMapIcons.values) {
-        final byteData = await Assets.instance.themedAsset(theme, mapEnum.logo);
-        final google.BitmapDescriptor image =
-            await markerGenerator.createBitmapDescriptorFromByteData(
-                byteData, mapEnum.color, mapEnum.color);
-        icons[mapEnum] = image;
-      }
-
-      //Generate Places icons
-      for (Places placeEnum in Places.values) {
-        Color color = theme == Brightness.light ? Colors.black : Colors.white;
-        final google.BitmapDescriptor image = await markerGenerator
-            .createBitmapDescriptorFromIconData(placeEnum.icon, color);
-        icons[placeEnum] = image;
-      }
-      mapIcons[theme] = icons;
-    }
-
-    setState(() {
-      _mapIcons = mapIcons;
-    });
-  }
-
-  //Update the mapstyle after a theme (light/dark) change
-  Future<void> _setMapStyle() async {
-    final controller = await _controller.future;
-    final theme = WidgetsBinding.instance!.window.platformBrightness;
-    controller.setMapStyle(_mapStyles![theme]);
   }
 
   @override
@@ -139,38 +90,118 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    google.CameraPosition initialLocation = google.CameraPosition(
-        target: google.LatLng(widget.centerLat, widget.centerLong),
-        zoom: widget.zoom);
+  Future<void> _loadMapStyles() async {
+    //Load light/dark map styles from assets
+    Map<Brightness, String> mapStyles = <Brightness, String>{};
+    for (Brightness brightness in [Brightness.dark, Brightness.light]) {
+      mapStyles[brightness] =
+          await Assets.asset.string(brightness, Assets.googleMapStyle);
+    }
+    _mapStyles = mapStyles;
+  }
 
-    final Set<google.Marker> _googleMarkers = <google.Marker>{};
-    final Brightness theme = Theme.of(context).brightness;
+  Future<void> _loadMapIcons() async {
+    if (widget.markers.isNotEmpty) {
+      final Map<Brightness, Map<Enum, google.BitmapDescriptor>> mapIcons = {};
 
-    if (_mapIcons?[theme] != null) {
-      for (MarkerInterface marker in widget.markers) {
-        _googleMarkers.add(marker.buildGoogleMarker(_mapIcons![theme]!));
+      double size = MediaQuery.of(context).devicePixelRatio * 40;
+      MarkerGenerator markerGenerator = MarkerGenerator(size);
+
+      //Generate walk icons
+      for (Brightness brightness in [Brightness.dark, Brightness.light]) {
+        final Map<Enum, google.BitmapDescriptor> icons = {};
+
+        for (GoogleMapIcons mapEnum in GoogleMapIcons.values) {
+          final byteData =
+              await Assets.asset.bytedata(brightness, mapEnum.logo);
+          final google.BitmapDescriptor image = await markerGenerator
+              .fromByteData(byteData, mapEnum.color, mapEnum.color);
+          icons[mapEnum] = image;
+        }
+
+        //Generate Places icons
+        for (Places placeEnum in Places.values) {
+          Color color =
+              brightness == Brightness.light ? Colors.black : Colors.white;
+          final google.BitmapDescriptor image =
+              await markerGenerator.fromIconData(placeEnum.icon, color);
+          icons[placeEnum] = image;
+        }
+        mapIcons[brightness] = icons;
+      }
+
+      if (mounted) {
+        setState(() {
+          _mapIcons = mapIcons;
+        });
       }
     }
+  }
 
-    if (_mapStyles != null) {
-      return google.GoogleMap(
-          mapType: google
-              .MapType.normal, // none, normal, hybrid, satellite and terrain
-          initialCameraPosition: initialLocation,
-          myLocationButtonEnabled: false,
-          zoomControlsEnabled: false,
-          onMapCreated: (google.GoogleMapController controller) {
-            controller.setMapStyle(_mapStyles![theme]);
-            _controller.complete(controller);
-          },
-          onTap: (google.LatLng _) {
-            widget.onMapTap();
-          },
-          markers: _googleMarkers);
-    } else {
-      return const Loading();
+  //Update the mapstyle after a theme (light/dark) change
+  Future<void> _setMapStyle() async {
+    final controller = await _completer.future;
+    final theme = WidgetsBinding.instance!.window.platformBrightness;
+    controller.setMapStyle(_mapStyles[theme]);
+  }
+
+  Set<google.Polyline> get _polylines {
+    final Set<google.Polyline> polylines = {};
+    Brightness brightness = Theme.of(context).brightness;
+
+    for (int i = 0; i < widget.paths.length; i++) {
+      GpxPath _path = widget.paths[i];
+
+      google.Polyline polyline = google.Polyline(
+        polylineId: google.PolylineId('polylineId_$i'),
+        color: GpxPath.color(brightness, i),
+        width: GpxPath.width,
+        visible: _selectedPath == null || _selectedPath == i,
+        points: _path.latLngList,
+        consumeTapEvents: widget.onTapPath != null,
+        onTap: () {
+          widget.onTapPath!(_path);
+          setState(() {
+            _selectedPath = i;
+          });
+        },
+      );
+
+      polylines.add(polyline);
     }
+
+    return polylines;
+  }
+
+  Set<google.Marker> get _markers {
+    final mapIcons = _mapIcons[Theme.of(context).brightness];
+    if (mapIcons == null) return {};
+    return widget.markers
+        .map<google.Marker>(
+            (MarkerInterface marker) => marker.buildGoogleMarker(mapIcons))
+        .toSet();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Brightness brightness = Theme.of(context).brightness;
+    return google.GoogleMap(
+        mapType: google
+            .MapType.normal, // none, normal, hybrid, satellite and terrain
+        initialCameraPosition: widget.initialLocation,
+        myLocationButtonEnabled: false,
+        zoomControlsEnabled: false,
+        myLocationEnabled: widget.locationEnabled,
+        onMapCreated: (google.GoogleMapController controller) {
+          controller.setMapStyle(_mapStyles[brightness]);
+          _completer.complete(controller);
+        },
+        polylines: _polylines,
+        onTap: (_) {
+          if (widget.onTapMap != null) {
+            widget.onTapMap!();
+          }
+        },
+        markers: _markers);
   }
 }

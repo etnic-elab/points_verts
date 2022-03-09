@@ -32,7 +32,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
 
   void init() async {
     String? filterString =
-        await PrefsProvider.prefs.getString("directory_walk_filter");
+        await PrefsProvider.prefs.getString(Prefs.directoryWalkFilter);
     WalkFilter filter;
     if (filterString != null) {
       filter = WalkFilter.fromJson(jsonDecode(filterString));
@@ -96,7 +96,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                                                 FilterPage(_filter, false)));
                                 if (newFilter != null) {
                                   await PrefsProvider.prefs.setString(
-                                      "directory_walk_filter",
+                                      Prefs.directoryWalkFilter,
                                       jsonEncode(newFilter));
                                   setState(() {
                                     _filter = newFilter;

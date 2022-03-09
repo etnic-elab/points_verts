@@ -35,7 +35,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
     }).catchError((err) {
       print("error init state");
     });
-    PrefsProvider.prefs.remove("last_selected_date");
+    PrefsProvider.prefs.remove(Prefs.lastSelectedDate);
     WidgetsBinding.instance!.addObserver(this);
     super.initState();
   }
@@ -83,8 +83,8 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
       print("[BackgroundFetch] taskId: $taskId");
       try {
         await scheduleNextNearestWalkNotifications();
-        await PrefsProvider.prefs.setString(
-            "last_background_fetch", DateTime.now().toUtc().toIso8601String());
+        await PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
+            DateTime.now().toUtc().toIso8601String());
       } catch (err) {
         print("Cannot schedule next nearest walk notification: $err");
       }

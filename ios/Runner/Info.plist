@@ -35,8 +35,8 @@
 		</array>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
-		<key>NSLocationAlwaysUsageDescription</key>
-		<string>Cette application nécessite l'accès à votre position actuelle pour calculer les distances vers les points de départ des marches</string>
+		<!-- <key>NSLocationAlwaysUsageDescription</key>
+		<string>Cette application nécessite l'accès à votre position actuelle pour calculer les distances vers les points de départ des marches</string> -->
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Cette application nécessite l'accès à votre position actuelle pour calculer les distances vers les points de départ des marches</string>
 		<key>UIBackgroundModes</key>

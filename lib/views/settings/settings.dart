@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/services/location.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -39,11 +40,10 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _retrievePrefs() async {
-    String? home = await PrefsProvider.prefs.getString("home_label");
-    bool useLocation =
-        await PrefsProvider.prefs.getBoolean(key: "use_location");
+    String? home = await PrefsProvider.prefs.getString(Prefs.homeLabel);
+    bool useLocation = await PrefsProvider.prefs.getBoolean(Prefs.useLocation);
     bool showNotification = await PrefsProvider.prefs
-        .getBoolean(key: "show_notification", defaultValue: false);
+        .getBoolean(Prefs.showNotification, defaultValue: false);
     setState(() {
       _home = home;
       _useLocation = useLocation;
@@ -53,9 +53,9 @@ class _SettingsState extends State<Settings> {
 
   Future<void> _setHome(AddressSuggestion suggestion) async {
     await PrefsProvider.prefs.setString(
-        "home_coords", "${suggestion.latitude},${suggestion.longitude}");
-    String? label =
-        await PrefsProvider.prefs.setString("home_label", suggestion.address);
+        Prefs.homeCoords, "${suggestion.latitude},${suggestion.longitude}");
+    String? label = await PrefsProvider.prefs
+        .setString(Prefs.homeLabel, suggestion.address);
     setState(() {
       _home = label;
     });
@@ -65,8 +65,8 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _removeHome() async {
-    await PrefsProvider.prefs.remove("home_coords");
-    await PrefsProvider.prefs.remove("home_label");
+    await PrefsProvider.prefs.remove(Prefs.homeCoords);
+    await PrefsProvider.prefs.remove(Prefs.homeLabel);
     setState(() {
       _home = null;
     });
@@ -74,16 +74,15 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _setUseLocation(bool newValue) async {
-    bool validated = false;
+    bool validated = true;
     if (newValue == true) {
       LocationPermission permission = await checkLocationPermission();
       validated = permission == LocationPermission.whileInUse ||
           permission == LocationPermission.always;
-    } else {
-      validated = true;
     }
+
     if (validated) {
-      await PrefsProvider.prefs.setBoolean("use_location", newValue);
+      await PrefsProvider.prefs.setBoolean(Prefs.useLocation, newValue);
       setState(() {
         _useLocation = newValue;
       });
@@ -91,7 +90,7 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _setShowNotification(bool newValue) async {
-    await PrefsProvider.prefs.setBoolean("show_notification", newValue);
+    await PrefsProvider.prefs.setBoolean(Prefs.showNotification, newValue);
     if (newValue == true) {
       bool? notificationsAllowed =
           await NotificationManager.instance.requestNotificationPermissions();
@@ -107,18 +106,6 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _showNotification = newValue;
     });
-  }
-
-  Future<LocationPermission> checkLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.deniedForever) {
-      await Geolocator.openAppSettings();
-      return permission;
-    } else if (permission == LocationPermission.denied) {
-      return Geolocator.requestPermission();
-    } else {
-      return permission;
-    }
   }
 
   @override

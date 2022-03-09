@@ -32,7 +32,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     await updateWalks();
     await scheduleNextNearestWalkNotifications();
     await PrefsProvider.prefs.setString(
-        "last_background_fetch", DateTime.now().toUtc().toIso8601String());
+        Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
   } catch (err) {
     print("Cannot schedule next nearest walk notification: $err");
   } finally {
@@ -41,7 +41,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 }
 
 Future<void> _addTrustedCert(String certPath) async {
-  ByteData data = await Assets.instance.load(certPath);
+  ByteData data = await Assets.asset.load(certPath);
   SecurityContext context = SecurityContext.defaultContext;
   try {
     context.setTrustedCertificatesBytes(data.buffer.asUint8List());
@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget {
         Locale('fr', 'FR'),
         Locale('fr', 'LU'),
       ],
-      navigatorKey: navigatorKey,
+      navigatorKey: MyApp.navigatorKey,
       title: applicationName,
       theme: CompanyTheme.companyLightTheme(),
       darkTheme: CompanyTheme.companyDarkTheme(),

@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:intl/intl.dart';
+import 'package:points_verts/models/gpx_path.dart';
 import 'package:points_verts/models/weather.dart';
+import 'package:collection/collection.dart';
 
 import 'trip.dart';
 
@@ -34,7 +38,8 @@ class Walk {
       required this.mountainBike,
       required this.waterSupply,
       required this.beWapp,
-      required this.lastUpdated});
+      required this.lastUpdated,
+      this.paths = const []});
 
   final int id;
   final String city;
@@ -64,6 +69,7 @@ class Walk {
   final bool waterSupply;
   final bool beWapp;
   final DateTime lastUpdated;
+  final List<GpxPath> paths;
 
   double? distance;
   Trip? trip;
@@ -71,34 +77,77 @@ class Walk {
 
   factory Walk.fromJson(Map<String, dynamic> json) {
     return Walk(
-        id: json['fields']['id'],
-        city: json['fields']['localite'],
-        entity: json['fields']['entite'],
-        type: json['fields']['activite'],
-        province: json['fields']['province'],
-        date: dateFormat.parse(json['fields']['date']),
-        long: json['fields']['geopoint'][1],
-        lat: json['fields']['geopoint'][0],
-        status: json['fields']['statut'],
-        meetingPoint: json['fields']['lieu_de_rendez_vous'],
-        meetingPointInfo: json['fields']['infos_rendez_vous'],
-        organizer: json['fields']['groupement'],
-        contactFirstName: json['fields']['prenom'],
-        contactLastName: json['fields']['nom'],
-        contactPhoneNumber: json['fields']['gsm'],
-        ign: json['fields']['ign'],
-        transport: json['fields']['gare'],
-        fifteenKm: json['fields']['15km'] == "Oui" ? true : false,
-        wheelchair: json['fields']['pmr'] == "Oui" ? true : false,
-        stroller: json['fields']['poussettes'] == "Oui" ? true : false,
-        extraOrientation: json['fields']['orientation'] == "Oui" ? true : false,
-        extraWalk: json['fields']['10km'] == "Oui" ? true : false,
-        guided: json['fields']['balade_guidee'] == "Oui" ? true : false,
-        bike: json['fields']['velo'] == "Oui" ? true : false,
-        mountainBike: json['fields']['vtt'] == "Oui" ? true : false,
-        waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
-        beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
-        lastUpdated: DateTime.parse(json['record_timestamp']));
+      id: json['fields']['id'],
+      city: json['fields']['localite'],
+      entity: json['fields']['entite'],
+      type: json['fields']['activite'],
+      province: json['fields']['province'],
+      date: dateFormat.parse(json['fields']['date']),
+      long: json['fields']['geopoint'][1],
+      lat: json['fields']['geopoint'][0],
+      status: json['fields']['statut'],
+      meetingPoint: json['fields']['lieu_de_rendez_vous'],
+      meetingPointInfo: json['fields']['infos_rendez_vous'],
+      organizer: json['fields']['groupement'],
+      contactFirstName: json['fields']['prenom'],
+      contactLastName: json['fields']['nom'],
+      contactPhoneNumber: json['fields']['gsm'],
+      ign: json['fields']['ign'],
+      transport: json['fields']['gare'],
+      fifteenKm: json['fields']['15km'] == "Oui" ? true : false,
+      wheelchair: json['fields']['pmr'] == "Oui" ? true : false,
+      stroller: json['fields']['poussettes'] == "Oui" ? true : false,
+      extraOrientation: json['fields']['orientation'] == "Oui" ? true : false,
+      extraWalk: json['fields']['10km'] == "Oui" ? true : false,
+      guided: json['fields']['balade_guidee'] == "Oui" ? true : false,
+      bike: json['fields']['velo'] == "Oui" ? true : false,
+      mountainBike: json['fields']['vtt'] == "Oui" ? true : false,
+      waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
+      beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
+      lastUpdated: DateTime.parse(json['record_timestamp']),
+      paths: [
+        GpxPath(
+            url:
+                'https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx',
+            title: 'Parcours 5km'),
+      ],
+    );
+  }
+
+  factory Walk.fromDb(List<Map<String, dynamic>> maps, int i) {
+    return Walk(
+      id: maps[i]['id'],
+      city: maps[i]['city'],
+      entity: maps[i]['entity'],
+      type: maps[i]['type'],
+      province: maps[i]['province'],
+      date: DateTime.parse(maps[i]['date']),
+      long: maps[i]['longitude'],
+      lat: maps[i]['latitude'],
+      status: maps[i]['status'],
+      meetingPoint: maps[i]['meeting_point'],
+      meetingPointInfo: maps[i]['meeting_point_info'],
+      organizer: maps[i]['organizer'],
+      contactFirstName: maps[i]['contact_first_name'],
+      contactLastName: maps[i]['contact_last_name'],
+      contactPhoneNumber: maps[i]['contact_phone_number']?.toString(),
+      ign: maps[i]['ign'],
+      transport: maps[i]['transport'],
+      fifteenKm: maps[i]['fifteen_km'] == 1 ? true : false,
+      wheelchair: maps[i]['wheelchair'] == 1 ? true : false,
+      stroller: maps[i]['stroller'] == 1 ? true : false,
+      extraOrientation: maps[i]['extra_orientation'] == 1 ? true : false,
+      extraWalk: maps[i]['extra_walk'] == 1 ? true : false,
+      guided: maps[i]['guided'] == 1 ? true : false,
+      bike: maps[i]['bike'] == 1 ? true : false,
+      mountainBike: maps[i]['mountain_bike'] == 1 ? true : false,
+      waterSupply: maps[i]['water_supply'] == 1 ? true : false,
+      beWapp: maps[i]['be_wapp'] == 1 ? true : false,
+      lastUpdated: DateTime.parse(maps[i]['last_updated']),
+      paths: (jsonDecode(maps[i]['paths']) as List)
+          .map<GpxPath>((json) => GpxPath.fromJson(json))
+          .toList(),
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -130,19 +179,16 @@ class Walk {
       'mountain_bike': mountainBike ? 1 : 0,
       'water_supply': waterSupply ? 1 : 0,
       'be_wapp': beWapp ? 1 : 0,
-      'last_updated': lastUpdated.toIso8601String()
+      'last_updated': lastUpdated.toIso8601String(),
+      'paths': jsonEncode(paths),
     };
   }
 
-  bool isCancelled() {
-    return status == "Annulé";
-  }
+  bool get isCancelled => status == "Annulé";
 
-  bool isModified() {
-    return status == "Modifié";
-  }
+  bool get isModified => status == "Modifié";
 
-  String? getFormattedDistance() {
+  String? get formattedDistance {
     num? dist =
         trip != null && trip!.distance != null ? trip!.distance : distance;
     if (dist == null) {
@@ -154,23 +200,17 @@ class Walk {
     }
   }
 
-  String? getNavigationLabel() {
-    if (trip != null && trip!.duration != null) {
-      return '${Duration(seconds: trip!.duration!.round()).inMinutes} min';
-    } else {
-      return getFormattedDistance();
-    }
-  }
+  String? get navigationLabel => (trip != null && trip!.duration != null)
+      ? '${Duration(seconds: trip!.duration!.round()).inMinutes} min'
+      : formattedDistance;
 
-  bool isPositionable() {
-    return long != null && lat != null && !isCancelled();
-  }
+  bool get isPositionable => hasPosition && !isCancelled;
 
-  String getContactLabel() {
-    if (contactPhoneNumber != null) {
-      return "$contactLastName $contactFirstName : $contactPhoneNumber";
-    } else {
-      return "$contactLastName $contactFirstName";
-    }
-  }
+  bool get hasPosition => lat != null && long != null;
+
+  bool get hasPath => paths.firstOrNull?.hasPoints != null;
+
+  String get contactLabel => (contactPhoneNumber != null)
+      ? "$contactLastName $contactFirstName : $contactPhoneNumber"
+      : "$contactLastName $contactFirstName";
 }

@@ -9,8 +9,8 @@ import 'package:points_verts/views/walks/outline_icon_button.dart';
 import '../tile_icon.dart';
 import 'walk_utils.dart';
 
-class WalkDetails extends StatelessWidget {
-  const WalkDetails(this.walk, {Key? key}) : super(key: key);
+class WalkDetailsInfo extends StatelessWidget {
+  const WalkDetailsInfo(this.walk, {Key? key}) : super(key: key);
 
   final Walk walk;
 
@@ -49,7 +49,7 @@ class WalkDetails extends StatelessWidget {
           ListTile(
             leading: const TileIcon(Icon(Icons.group)),
             title: Text(walk.organizer),
-            subtitle: Text(walk.getContactLabel()),
+            subtitle: Text(walk.contactLabel),
             trailing: OutlineIconButton(
                 onPressed: () {
                   if (walk.contactPhoneNumber != null) {
@@ -112,9 +112,9 @@ class WalkDetails extends StatelessWidget {
   Widget? _getGeoText() {
     if (walk.trip != null) {
       return Text(
-          "À ${walk.getFormattedDistance()}, ~${Duration(seconds: walk.trip!.duration!.round()).inMinutes} min. en voiture");
+          "À ${walk.formattedDistance}, ~${Duration(seconds: walk.trip!.duration!.round()).inMinutes} min. en voiture");
     } else if (walk.distance != null && walk.distance != double.maxFinite) {
-      return Text("À ${walk.getFormattedDistance()} (à vol d'oiseau)");
+      return Text("À ${walk.formattedDistance} (à vol d'oiseau)");
     } else {
       return null;
     }
@@ -158,7 +158,7 @@ class _StatusTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (walk.isCancelled()) {
+    if (walk.isCancelled) {
       return ListTile(
           leading: TileIcon(
               Icon(Icons.cancel, color: CompanyColors.contextualRed(context))),

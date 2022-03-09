@@ -56,14 +56,14 @@ class WalkTile extends StatelessWidget {
 
   Widget _subtitle() {
     if (tileType == TileType.directory) {
-      return Text(walk.getContactLabel());
+      return Text(walk.contactLabel);
     } else {
       return Text("${walk.type} - ${walk.province}");
     }
   }
 
   Widget _weatherIcon() {
-    if (walk.isCancelled() || walk.weathers.isEmpty) {
+    if (walk.isCancelled || walk.weathers.isEmpty) {
       return TileIcon(WalkIcon(walk));
     } else {
       return WeatherIcon(walk.weathers[0]);
