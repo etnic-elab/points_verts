@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/models/gpx_path.dart';
 import 'package:points_verts/services/map/map_interface.dart';
@@ -103,14 +104,36 @@ class MapBox implements MapInterface {
     return FlutterMap(markers, _token!, centerLat, centerLong, zoom);
   }
 
+  String _toMapboxHex(Color color) =>
+      '${color.red.toRadixString(16).padLeft(2, '0')}'
+      '${color.green.toRadixString(16).padLeft(2, '0')}'
+      '${color.blue.toRadixString(16).padLeft(2, '0')}';
+
+  String _getEncodedPath(Walk walk, Brightness brightness) {
+    String result = "";
+    if (walk.hasPath) {
+      List<GpxPath> paths = walk.paths;
+      for (int i = 0; i < paths.length; i++) {
+        final String path = encodePolyline(paths[i]
+            .latLngList
+            .map((latLng) => [latLng.latitude, latLng.longitude])
+            .toList());
+        final String color = _toMapboxHex(GpxPath.color(brightness, i));
+        result += ",path-2+$color-1(${Uri.encodeComponent(path)})";
+      }
+    }
+    return result;
+  }
+
   @override
   Widget retrieveStaticImage(
       Walk walk, int width, int height, Brightness brightness,
       {double zoom = 16.0, Function? onTap}) {
     final String style =
         brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
+    final String path = _getEncodedPath(walk, brightness);
     Uri url = Uri.parse(
-        "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l(${walk.long},${walk.lat})/${walk.long},${walk.lat},$zoom,0,0/${width}x$height@2x?access_token=$_token");
+        "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l(${walk.long},${walk.lat})$path/auto/${width}x$height@2x?access_token=$_token");
     return CachedNetworkImage(
       imageUrl: url.toString(),
       progressIndicatorBuilder: (context, url, downloadProgress) => Center(
