@@ -37,11 +37,14 @@ class WalkDetailsInfoView extends StatelessWidget {
     double width = landscape ? size.width / 2 : size.width;
 
     return SizedBox(
-      width: width.roundToDouble(),
-      height: height.roundToDouble(),
-      child: map.retrieveStaticImage(
-          walk, width.round(), height.round(), brightness,
-          onTap: walk.hasPath ? onTapMap : null),
-    );
+        width: width.roundToDouble(),
+        height: height.roundToDouble(),
+        child: Stack(
+          children: [
+            map.retrieveStaticImage(
+                walk, width.round(), height.round(), brightness,
+                onTap: walk.hasPath ? onTapMap : null),
+          ],
+        ));
   }
 }

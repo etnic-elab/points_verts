@@ -13,8 +13,7 @@ class About extends StatelessWidget {
     return FutureBuilder(
         future: PackageInfo.fromPlatform(),
         builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.hasData) {
+          if (snapshot.hasData) {
             return ListTile(
                 leading: const Icon(Icons.info),
                 title: const Text("À propos"),
@@ -41,9 +40,8 @@ class About extends StatelessWidget {
                             "OpenWeather", "https://openweathermap.org")
                       ]);
                 });
-          } else {
-            return const SizedBox.shrink();
           }
+          return const SizedBox.shrink();
         });
   }
 }

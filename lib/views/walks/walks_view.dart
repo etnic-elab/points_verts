@@ -7,12 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:points_verts/models/gpx_path.dart';
-import 'package:points_verts/models/path_point.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/services/gpx.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/filter_page.dart';
@@ -184,16 +181,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       print("Cannot retrieve weather info: $err");
     }
 
-    try {
-      _retrievePaths(await newList).then((_) {
-        if (mounted) {
-          setState(() {});
-        }
-      });
-    } catch (err) {
-      print("Cannot retrieve paths: $err");
-    }
-
     if (mounted) {
       setState(() {
         _currentWalks = newList;
@@ -230,22 +217,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       weathers.add(future);
     }
     return Future.wait(weathers);
-  }
-
-  Future _retrievePaths(List<Walk> walks) {
-    List<Future<List<PathPoint>>> paths = [];
-    for (Walk walk in walks) {
-      if (!walk.isCancelled) {
-        for (GpxPath path in walk.paths) {
-          Future<List<PathPoint>> future = retrievePathPoints(path.url);
-          future.then((_pathPoints) {
-            path.pathPoints = _pathPoints;
-          });
-          paths.add(future);
-        }
-      }
-    }
-    return Future.wait(paths);
   }
 
   void _firstLaunch() async {

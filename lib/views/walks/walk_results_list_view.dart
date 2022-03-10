@@ -25,25 +25,22 @@ class WalkResultsListView extends StatelessWidget {
       future: walks,
       initialData: const [],
       builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData) {
-            return WalkResultsList(snapshot.data!, position, currentPlace);
-          } else if (snapshot.hasError) {
-            return WalkListError(refreshWalks);
-          } else {
-            return const Loading();
-          }
-        } else {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Loading(),
-              Container(
-                  padding: const EdgeInsets.all(10),
-                  child: const Text("Chargement des points..."))
-            ],
-          );
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          return WalkResultsList(snapshot.data!, position, currentPlace);
         }
+        if (snapshot.hasError) {
+          return WalkListError(refreshWalks);
+        }
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Loading(),
+            Container(
+                padding: const EdgeInsets.all(10),
+                child: const Text("Chargement des points..."))
+          ],
+        );
       },
     );
   }

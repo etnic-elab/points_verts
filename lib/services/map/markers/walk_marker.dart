@@ -65,7 +65,9 @@ class WalkMarker implements MarkerInterface {
       consumeTapEvents: onWalkSelect != null,
       infoWindow: google.InfoWindow(title: infoWindowText),
       onTap: () {
-        onWalkSelect!(walk);
+        if (onWalkSelect != null) {
+          onWalkSelect!(walk);
+        }
       },
     );
   }

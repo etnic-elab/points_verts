@@ -153,15 +153,20 @@ class GoogleMaps implements MapInterface {
               imageBuilder: onTap == null
                   ? null
                   : (context, imageProvider) {
-                      return Material(
-                        elevation: 20,
-                        color: Colors.blueAccent,
-                        child: Ink.image(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
-                          child: InkWell(onTap: () {
-                            onTap();
-                          }),
+                      return Ink.image(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                              padding:
+                                  const EdgeInsets.only(right: 10, bottom: 15),
+                              child: FloatingActionButton.small(
+                                child: const Icon(Icons.open_in_full),
+                                onPressed: () {
+                                  onTap();
+                                },
+                              )),
                         ),
                       );
                     },

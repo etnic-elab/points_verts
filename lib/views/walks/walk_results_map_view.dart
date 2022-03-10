@@ -33,10 +33,10 @@ class WalkResultsMapView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: walks,
-      builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData) {
+        future: walks,
+        builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
             _setMarkers(snapshot.data!);
 
             return Stack(
@@ -45,13 +45,12 @@ class WalkResultsMapView extends StatelessWidget {
                 _buildWalkInfo(),
               ],
             );
-          } else if (snapshot.hasError) {
+          }
+          if (snapshot.hasError) {
             return WalkListError(refreshWalks);
           }
-        }
-        return const Loading();
-      },
-    );
+          return const Loading();
+        });
   }
 
   Widget _buildWalkInfo() {

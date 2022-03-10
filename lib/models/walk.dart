@@ -105,6 +105,7 @@ class Walk {
       waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
       beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
       lastUpdated: DateTime.parse(json['record_timestamp']),
+      //TODO: change hard coded to correct one
       paths: [
         GpxPath(
             url:
@@ -208,7 +209,7 @@ class Walk {
 
   bool get hasPosition => lat != null && long != null;
 
-  bool get hasPath => paths.firstOrNull?.hasPoints != null;
+  bool get hasPath => paths.firstOrNull?.hasPoints ?? false;
 
   String get contactLabel => (contactPhoneNumber != null)
       ? "$contactLastName $contactFirstName : $contactPhoneNumber"
