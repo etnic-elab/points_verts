@@ -8,19 +8,14 @@ import 'package:points_verts/services/location.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/services/map/markers/walk_marker.dart';
-import 'package:points_verts/views/loading.dart';
 import 'package:collection/collection.dart';
 
 class WalkDetailsMapView extends StatelessWidget {
-  WalkDetailsMapView(
-      this.walk, this.selectedPath, this.onTapMap, this.onTapPath,
-      {Key? key})
+  WalkDetailsMapView(this.walk, this.togglePathVisibility, {Key? key})
       : super(key: key);
 
   final Walk walk;
-  final GpxPath? selectedPath;
-  final Function() onTapMap;
-  final Function(GpxPath) onTapPath;
+  final Function(GpxPath, bool) togglePathVisibility;
   final MapInterface map = Environment.mapInterface;
 
   List<MarkerInterface> get _markers {
@@ -47,109 +42,139 @@ class WalkDetailsMapView extends StatelessWidget {
       future: checkLocationPermission(),
       builder:
           (BuildContext context, AsyncSnapshot<LocationPermission?> snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.done) {
           return Stack(
             children: <Widget>[
               map.retrieveMap(
-                centerLat: _centerLat,
-                centerLong: _centerLong,
-                zoom: 13,
-                locationEnabled: true,
-                markers: _markers,
-                paths: walk.paths,
-                onTapMap: onTapMap,
-                onTapPath: onTapPath,
-              ),
-              _buildPathSheet(context),
+                  centerLat: _centerLat,
+                  centerLong: _centerLong,
+                  zoom: 13,
+                  locationEnabled: true,
+                  markers: _markers,
+                  paths: walk.paths),
+              _buildPathSheet(context)
             ],
           );
         }
-        return const Loading();
+        return const SizedBox.shrink();
       },
     );
   }
 
-  Widget _buildPathInfo() {
-    if (selectedPath == null) {
-      return const SizedBox.shrink();
-    } else {
-      return SafeArea(
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Card(
-            margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-            child: ListTile(
-              leading: const Icon(Icons.hiking_rounded),
-              title: Text(selectedPath!.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis),
+  Widget _buildPathSheet(BuildContext context) {
+    Brightness brightness = Theme.of(context).brightness;
+    return ScrollConfiguration(
+      behavior: NoScrollGlowBehavior(),
+      child: DraggableScrollableSheet(
+        minChildSize: 0.1,
+        maxChildSize: 0.2,
+        initialChildSize: 0.1,
+        snap: true,
+        snapSizes: const [0.2],
+        builder: ((context, scrollController) {
+          return Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: brightness == Brightness.light
+                  ? Colors.white
+                  : CompanyColors.black,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: brightness == Brightness.light
+                      ? Colors.grey
+                      : Colors.white,
+                  offset: const Offset(0.0, 1.0), //(x,y)
+                  blurRadius: 6.0,
+                ),
+              ],
             ),
-          ),
-        ),
-      );
-    }
+            child: ListView(
+              controller: scrollController,
+              children: _buildPathTiles(brightness),
+            ),
+          );
+        }),
+      ),
+    );
   }
 
-  Widget _buildPathSheet(BuildContext context) {
-    // showBottomSheet(context: context, builder: builder)
-    return DraggableScrollableSheet(
-      minChildSize: 0.1,
-      maxChildSize: 0.2,
-      initialChildSize: 0.1,
-      snap: true,
-      snapSizes: const [0.2],
-      builder: ((context, scrollController) {
-        return Container(
-          padding: const EdgeInsets.all(8.0),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey,
-                offset: Offset(0.0, 1.0), //(x,y)
-                blurRadius: 6.0,
-              ),
-            ],
-          ),
-          child: ListView(
-            controller: scrollController,
-            children: [
-              Stack(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
-                    child: ListTile(
-                      leading: Icon(Icons.hiking),
-                      title: Text('Parcours',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis),
-                    ),
-                  ),
-                  Align(
-                      alignment: Alignment.topCenter,
-                      child: Icon(
-                        Icons.horizontal_rule_rounded,
-                        color: Colors.grey,
-                        size: 40,
-                      )),
-                ],
-              ),
-              SwitchListTile(
-                title: const Text('Parcours 5km'),
-                value: true,
-                onChanged: (newValue) {},
-                secondary: const Icon(
-                  Icons.circle,
-                  color: CompanyColors.black,
-                ),
-              ),
-            ],
-          ),
-        );
-      }),
+  _buildPathTiles(Brightness brightness) {
+    List<Widget> tiles = [];
+
+    Widget header = const ListTile(
+      leading: Icon(Icons.hiking),
+      title: Text('Parcours'),
     );
+    tiles.add(header);
+
+    for (int i = 0; i < walk.paths.length; i++) {
+      GpxPath _path = walk.paths[i];
+
+      Widget tile = SwitchListTile(
+        title: Text(
+          _path.title,
+        ),
+        value: _path.visible,
+        onChanged: (newValue) {
+          togglePathVisibility(_path, newValue);
+        },
+        secondary: Icon(Icons.circle, color: GpxPath.color(brightness, i)),
+      );
+
+      tiles.add(tile);
+    }
+
+    return tiles;
+  }
+
+  // Widget _buildPathInfo() {
+  //   if (selectedPath == null) {
+  //     return const SizedBox.shrink();
+  //   } else {
+  //     return SafeArea(
+  //       child: Align(
+  //         alignment: Alignment.bottomCenter,
+  //         child: Card(
+  //           margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+  //           child: ListTile(
+  //             leading: const Icon(Icons.hiking_rounded),
+  //             title: Text(selectedPath!.title,
+  //                 style: const TextStyle(fontWeight: FontWeight.bold),
+  //                 overflow: TextOverflow.ellipsis),
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
+
+  // _showBottomSheet(BuildContext context) {
+  //   if (walk.hasPath) {
+  //     // Brightness brightness = Theme.of(context).brightness;
+  //     showBottomSheet(
+  //         context: context,
+  //         shape: const RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+  //         enableDrag: true,
+  //         builder: (context) {
+  //           return const ListTile(
+  //             leading: Icon(Icons.hiking),
+  //             title: Text('Parcours',
+  //                 style: TextStyle(fontWeight: FontWeight.bold),
+  //                 overflow: TextOverflow.ellipsis),
+  //           );
+  //         });
+  //   }
+  // }
+}
+
+class NoScrollGlowBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
   }
 }

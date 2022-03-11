@@ -5,7 +5,6 @@ import 'package:points_verts/models/gpx_path.dart';
 import 'package:points_verts/models/path_point.dart';
 import 'package:points_verts/services/gpx.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/walk_details_info_view.dart';
 import 'package:points_verts/views/walks/walk_details_map_view.dart';
 
@@ -25,7 +24,6 @@ class WalkDetailsView extends StatefulWidget {
 class _WalkDetailsViewState extends State<WalkDetailsView> {
   final MapInterface map = Environment.mapInterface;
   _ViewType viewType = _ViewType.detail;
-  GpxPath? selectedPath;
 
   Future<List> _retrievePaths() {
     List<Future<List<PathPoint>>> paths = [];
@@ -71,16 +69,11 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
       body: FutureBuilder(
         future: _retrievePaths(),
         builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-          if (snapshot.hasData) {
-            return viewType == _ViewType.detail
-                ? WalkDetailsInfoView(widget.walk, () {
-                    _toggleView(_ViewType.map);
-                  })
-                : WalkDetailsMapView(
-                    widget.walk, selectedPath, onTapMap, onTapPath);
-          }
-
-          return const Loading();
+          return viewType == _ViewType.detail
+              ? WalkDetailsInfoView(widget.walk, () {
+                  _toggleView(_ViewType.map);
+                })
+              : WalkDetailsMapView(widget.walk, togglePathVisibility);
         },
       ),
     );
@@ -92,15 +85,9 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
     });
   }
 
-  void onTapMap() {
+  void togglePathVisibility(GpxPath path, bool newValue) {
     setState(() {
-      selectedPath = null;
-    });
-  }
-
-  void onTapPath(GpxPath path) {
-    setState(() {
-      selectedPath = path;
+      path.visible = newValue;
     });
   }
 }

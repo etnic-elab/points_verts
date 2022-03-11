@@ -126,7 +126,6 @@ class GoogleMaps implements MapInterface {
       paths: paths,
       markers: markers,
       onTapMap: onTapMap,
-      onTapPath: onTapPath,
     );
   }
 

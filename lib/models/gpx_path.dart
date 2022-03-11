@@ -11,6 +11,8 @@ class GpxPath {
   final String url;
   final String title;
   List<PathPoint> pathPoints = [];
+  bool visible = true;
+
   static Map<Brightness, List<Color>> colors = {
     Brightness.light: [
       CompanyColors.greenPrimary,
