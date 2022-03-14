@@ -8,6 +8,7 @@ import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/services/map/markers/walk_marker.dart';
 import 'package:collection/collection.dart';
+import 'package:points_verts/views/tile_icon.dart';
 
 class WalkDetailsMapView extends StatelessWidget {
   WalkDetailsMapView(
@@ -79,13 +80,13 @@ class WalkDetailsMapView extends StatelessWidget {
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
             child: ListTile(
-              leading: Icon(
+              leading: TileIcon(Icon(
                 Icons.circle,
                 color: GpxPath.color(
                     brightness,
                     walk.paths
                         .indexWhere((path) => path.url == selectedPath!.url)),
-              ),
+              )),
               title: Text(selectedPath!.title,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis),
