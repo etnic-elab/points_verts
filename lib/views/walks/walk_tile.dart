@@ -26,21 +26,67 @@ class WalkTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-      child: ListTile(
-        leading: _weatherIcon(),
-        title: _title(),
-        subtitle: _subtitle(),
+      child: InkWell(
         onTap: () => Navigator.push(context, _pageRoute()),
-        trailing: tileType == TileType.calendar
-            ? GeoButton(walk)
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(fullDate.format(walk.date)),
-                ],
-              ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: _weatherIcon(),
+              title: _title(),
+              subtitle: _subtitle(),
+              trailing: tileType == TileType.calendar
+                  ? GeoButton(walk)
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(fullDate.format(walk.date)),
+                      ],
+                    ),
+            ),
+            _infoRow(walk)
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _infoRow(Walk walk) {
+    return Wrap(children: <Widget>[
+      _chipRanges(walk.fifteenKm),
+      _chipIcon(Icons.accessible_forward, walk.wheelchair),
+      _chipIcon(Icons.child_friendly, walk.stroller),
+      _chipIcon(Icons.map, walk.extraOrientation),
+      _chipIcon(Icons.directions_walk, walk.extraWalk),
+      _chipIcon(Icons.nature_people, walk.guided),
+      _chipIcon(Icons.directions_bike, walk.bike),
+      _chipIcon(Icons.directions_bike, walk.mountainBike),
+      _chipIcon(Icons.local_drink, walk.waterSupply),
+      _chipIcon(Icons.delete, walk.beWapp)
+    ]);
+  }
+
+  Widget _chipRanges(bool has15km) {
+    String ranges = has15km ? "5-10-15-20 km" : "5-10-20 km";
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+          label: Text(ranges, style: const TextStyle(fontSize: 12.0)),
+          visualDensity: VisualDensity.compact),
+    );
+  }
+
+  Widget _chipIcon(IconData icon, bool value) {
+    if (value) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+        child: Chip(
+            label: Icon(icon, size: 15.0),
+            visualDensity: VisualDensity.compact),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
   }
 
   Widget _title() {
