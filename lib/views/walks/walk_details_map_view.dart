@@ -42,7 +42,7 @@ class WalkDetailsMapView extends StatelessWidget {
       future: checkLocationPermission(),
       builder:
           (BuildContext context, AsyncSnapshot<LocationPermission?> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.hasData) {
           return Stack(
             children: <Widget>[
               map.retrieveMap(
