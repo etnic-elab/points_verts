@@ -28,6 +28,7 @@ class WalkDetails extends StatelessWidget {
               title:
                   Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!)),
           _StatusTile(walk),
+          _RangesTile(walk),
           ListTile(
             leading: const TileIcon(Icon(Icons.location_on)),
             title: Text(walk.meetingPoint != null ? walk.meetingPoint! : ""),
@@ -72,16 +73,10 @@ class WalkDetails extends StatelessWidget {
 
   Widget _infoRow() {
     return Wrap(alignment: WrapAlignment.center, children: <Widget>[
-      _infoTile(Icons.directions_walk, walk.fifteenKm,
-          "Parcours suppl. de marche de 15 km"),
       _infoTile(Icons.accessible_forward, walk.wheelchair,
           "Parcours de 5 km accessible aux PMR"),
       _infoTile(Icons.child_friendly, walk.stroller,
           "Parcours de 5 km accessible aux landaus"),
-      _infoTile(Icons.map, walk.extraOrientation,
-          "Parcours suppl. d'orientation de +/- 8 km"),
-      _infoTile(Icons.directions_walk, walk.extraWalk,
-          "Parcours suppl. de marche de +/- 10 km"),
       _infoTile(Icons.nature_people, walk.guided, "Balade guidée Nature"),
       _infoTile(Icons.directions_bike, walk.bike,
           "Parcours suppl. de vélo de +/- 20 km"),
@@ -90,7 +85,9 @@ class WalkDetails extends StatelessWidget {
       _infoTile(Icons.local_drink, walk.waterSupply, "Ravitaillement"),
       _infoTile(
           Icons.delete, walk.beWapp, "Participe à \"Wallonie Plus Propre\"",
-          url: "https://www.walloniepluspropre.be/")
+          url: "https://www.walloniepluspropre.be/"),
+      _infoTile(Icons.sports_gymnastics, walk.adepSante,
+          "Possibilité de réaliser de petits exercices sur le parcours de 5 km")
     ]);
   }
 
@@ -147,6 +144,34 @@ class _WeatherSection extends StatelessWidget {
           title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: widgets));
+    }
+  }
+}
+
+class _RangesTile extends StatelessWidget {
+  const _RangesTile(this.walk);
+
+  final Walk walk;
+
+  @override
+  Widget build(BuildContext context) {
+    if (walk.type == 'Marche') {
+      return ListTile(
+        leading: const TileIcon(Icon(Icons.route)),
+        title: Text(walk.fifteenKm
+            ? "Parcours de 5 - 10 - 15 - 20 km"
+            : "Parcours de 5 - 10 - 20 km"),
+        subtitle:
+            walk.extraOrientation ? const Text("Parcours suppl. d'orientation de +/- 8 km") : null,
+      );
+    } else if (walk.type == 'Orientation') {
+      return ListTile(
+        leading: const TileIcon(Icon(Icons.route)),
+        title: const Text("Parcours de 4 - 8 - 16 km"),
+        subtitle: walk.extraWalk ? const Text("Parcours suppl. de marche de +/- 10 km") : null,
+      );
+    } else {
+      return const SizedBox.shrink();
     }
   }
 }
