@@ -34,6 +34,7 @@ class Walk {
       required this.mountainBike,
       required this.waterSupply,
       required this.beWapp,
+      required this.adepSante,
       required this.lastUpdated});
 
   final int id;
@@ -63,6 +64,7 @@ class Walk {
   final bool mountainBike;
   final bool waterSupply;
   final bool beWapp;
+  final bool adepSante;
   final DateTime lastUpdated;
 
   double? distance;
@@ -98,6 +100,7 @@ class Walk {
         mountainBike: json['fields']['vtt'] == "Oui" ? true : false,
         waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
         beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
+        adepSante: json['fields']['adep_sante'] == 'Oui' ? true : false,
         lastUpdated: DateTime.parse(json['record_timestamp']));
   }
 
@@ -130,6 +133,7 @@ class Walk {
       'mountain_bike': mountainBike ? 1 : 0,
       'water_supply': waterSupply ? 1 : 0,
       'be_wapp': beWapp ? 1 : 0,
+      'adep_sante': adepSante ? 1 : 0,
       'last_updated': lastUpdated.toIso8601String()
     };
   }
@@ -143,8 +147,7 @@ class Walk {
   }
 
   String? getFormattedDistance() {
-    num? dist =
-        trip != null && trip!.distance != null ? trip!.distance : distance;
+    num? dist = trip?.distance ?? distance;
     if (dist == null) {
       return null;
     } else if (dist < 1000) {
