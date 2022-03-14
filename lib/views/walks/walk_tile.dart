@@ -29,6 +29,7 @@ class WalkTile extends StatelessWidget {
       child: InkWell(
         onTap: () => Navigator.push(context, _pageRoute()),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
@@ -44,7 +45,11 @@ class WalkTile extends StatelessWidget {
                       ],
                     ),
             ),
-            _infoRow(walk)
+            const Divider(height: 0),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+              child: _infoRow(walk),
+            )
           ],
         ),
       ),
@@ -52,41 +57,20 @@ class WalkTile extends StatelessWidget {
   }
 
   Widget _infoRow(Walk walk) {
-    return Wrap(children: <Widget>[
-      _chipRanges(walk.fifteenKm),
-      _chipIcon(Icons.accessible_forward, walk.wheelchair),
-      _chipIcon(Icons.child_friendly, walk.stroller),
-      _chipIcon(Icons.map, walk.extraOrientation),
-      _chipIcon(Icons.directions_walk, walk.extraWalk),
-      _chipIcon(Icons.nature_people, walk.guided),
-      _chipIcon(Icons.directions_bike, walk.bike),
-      _chipIcon(Icons.directions_bike, walk.mountainBike),
-      _chipIcon(Icons.local_drink, walk.waterSupply),
-      _chipIcon(Icons.delete, walk.beWapp)
+    return Wrap(alignment: WrapAlignment.start, children: <Widget>[
+      _ChipRanges(walk.fifteenKm),
+      _ChipIcon(Icons.train, walk.transport != null),
+      _ChipIcon(Icons.accessible_forward, walk.wheelchair),
+      _ChipIcon(Icons.child_friendly, walk.stroller),
+      _ChipIcon(Icons.map, walk.extraOrientation),
+      _ChipIcon(Icons.directions_walk, walk.extraWalk),
+      _ChipIcon(Icons.nature_people, walk.guided),
+      _ChipIcon(Icons.directions_bike, walk.bike),
+      _ChipIcon(Icons.directions_bike, walk.mountainBike),
+      _ChipIcon(Icons.local_drink, walk.waterSupply),
+      _ChipIcon(Icons.delete, walk.beWapp),
+      _ChipIcon(Icons.sports_gymnastics, walk.adepSante)
     ]);
-  }
-
-  Widget _chipRanges(bool has15km) {
-    String ranges = has15km ? "5-10-15-20 km" : "5-10-20 km";
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      child: Chip(
-          label: Text(ranges, style: const TextStyle(fontSize: 12.0)),
-          visualDensity: VisualDensity.compact),
-    );
-  }
-
-  Widget _chipIcon(IconData icon, bool value) {
-    if (value) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2.0),
-        child: Chip(
-            label: Icon(icon, size: 15.0),
-            visualDensity: VisualDensity.compact),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
   }
 
   Widget _title() {
@@ -135,6 +119,45 @@ class WeatherIcon extends StatelessWidget {
         getWeatherIcon(weather),
         Text("${weather.temperature.round()}°"),
       ],
+    );
+  }
+}
+
+class _ChipIcon extends StatelessWidget {
+  const _ChipIcon(this.icon, this.value);
+
+  final IconData icon;
+  final bool value;
+
+  @override
+  Widget build(BuildContext context) {
+    if (value) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+        child: Chip(
+            label: Icon(icon, size: 15.0),
+            visualDensity: VisualDensity.compact),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
+  }
+}
+
+class _ChipRanges extends StatelessWidget {
+  const _ChipRanges(this.has15km);
+
+  final bool has15km;
+
+  @override
+  Widget build(BuildContext context) {
+    String ranges = has15km ? " 5-10-15-20 km" : " 5-10-20 km";
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+          avatar: const Icon(Icons.route, size: 15.0),
+          label: Text(ranges, style: const TextStyle(fontSize: 12.0)),
+          visualDensity: VisualDensity.compact),
     );
   }
 }
