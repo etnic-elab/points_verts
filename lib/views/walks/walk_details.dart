@@ -85,7 +85,9 @@ class WalkDetails extends StatelessWidget {
       _infoTile(Icons.local_drink, walk.waterSupply, "Ravitaillement"),
       _infoTile(
           Icons.delete, walk.beWapp, "Participe à \"Wallonie Plus Propre\"",
-          url: "https://www.walloniepluspropre.be/")
+          url: "https://www.walloniepluspropre.be/"),
+      _infoTile(Icons.sports_gymnastics, walk.adepSante,
+          "Possibilité de réaliser de petits exercices sur le parcours de 5 km")
     ]);
   }
 
