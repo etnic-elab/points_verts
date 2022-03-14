@@ -155,6 +155,10 @@ class _FilterPageState extends State<FilterPage> {
                       editedFilter.beWapp = value;
                       setState(() {});
                     }),
+                    _PaddedChip(editedFilter.beWapp, "Adep'santé", (value) {
+                      editedFilter.adepSante = value;
+                      setState(() {});
+                    }),
                   ],
                 ),
               ],
