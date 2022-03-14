@@ -30,11 +30,13 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
     List<Future<List<PathPoint>>> paths = [];
     if (!widget.walk.isCancelled && !widget.walk.hasPath) {
       for (GpxPath path in widget.walk.paths) {
-        Future<List<PathPoint>> future = retrievePathPoints(path.url);
-        future.then((_pathPoints) {
-          path.pathPoints = _pathPoints;
-        });
-        paths.add(future);
+        if (path.url?.isNotEmpty ?? false) {
+          Future<List<PathPoint>> future = retrievePathPoints(path.url!);
+          future.then((_pathPoints) {
+            path.pathPoints = _pathPoints;
+          });
+          paths.add(future);
+        }
       }
     }
     return Future.wait(paths);

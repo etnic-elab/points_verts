@@ -105,7 +105,7 @@ class Walk {
       waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
       beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
       lastUpdated: DateTime.parse(json['record_timestamp']),
-      //TODO: change hard coded to correct one
+      //TODO: change hard coded to ==> _pathsFromJson(jsonDecode(json['traces_gpx']))
       paths: [
         GpxPath(
             url:
@@ -145,9 +145,7 @@ class Walk {
       waterSupply: maps[i]['water_supply'] == 1 ? true : false,
       beWapp: maps[i]['be_wapp'] == 1 ? true : false,
       lastUpdated: DateTime.parse(maps[i]['last_updated']),
-      paths: (jsonDecode(maps[i]['paths']) as List)
-          .map<GpxPath>((json) => GpxPath.fromJson(json))
-          .toList(),
+      paths: _pathsFromJson(jsonDecode(maps[i]['paths'])),
     );
   }
 
@@ -183,6 +181,14 @@ class Walk {
       'last_updated': lastUpdated.toIso8601String(),
       'paths': jsonEncode(paths),
     };
+  }
+
+  static List<GpxPath> _pathsFromJson(dynamic json) {
+    if (json is List) {
+      return (json).map<GpxPath>((json) => GpxPath.fromJson(json)).toList();
+    }
+
+    return <GpxPath>[];
   }
 
   bool get isCancelled => status == "Annulé";

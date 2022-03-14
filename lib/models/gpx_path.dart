@@ -8,7 +8,7 @@ import 'path_point.dart';
 class GpxPath {
   GpxPath({required this.url, required this.title});
 
-  final String url;
+  final String? url;
   final String title;
   List<PathPoint> pathPoints = [];
 
@@ -42,7 +42,7 @@ class GpxPath {
 
   GpxPath.fromJson(Map<String, dynamic> json)
       : url = json['fichier'],
-        title = json['titre'];
+        title = json['titre'] ?? 'Parcours';
 
   Map<String, dynamic> toJson() => {
         'fichier': url,
