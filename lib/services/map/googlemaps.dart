@@ -126,6 +126,7 @@ class GoogleMaps implements MapInterface {
       paths: paths,
       markers: markers,
       onTapMap: onTapMap,
+      onTapPath: onTapPath,
     );
   }
 
@@ -155,17 +156,24 @@ class GoogleMaps implements MapInterface {
                       return Ink.image(
                         image: imageProvider,
                         fit: BoxFit.cover,
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                              padding:
-                                  const EdgeInsets.only(right: 10, bottom: 15),
-                              child: FloatingActionButton.small(
-                                child: const Icon(Icons.open_in_full),
-                                onPressed: () {
-                                  onTap();
-                                },
-                              )),
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 10, bottom: 15),
+                                  child: FloatingActionButton.small(
+                                    child: const Icon(Icons.open_in_full),
+                                    onPressed: () {},
+                                  )),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                onTap();
+                              },
+                            )
+                          ],
                         ),
                       );
                     },

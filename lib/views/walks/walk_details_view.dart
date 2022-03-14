@@ -24,6 +24,7 @@ class WalkDetailsView extends StatefulWidget {
 class _WalkDetailsViewState extends State<WalkDetailsView> {
   final MapInterface map = Environment.mapInterface;
   _ViewType viewType = _ViewType.detail;
+  GpxPath? selectedPath;
 
   Future<List> _retrievePaths() {
     List<Future<List<PathPoint>>> paths = [];
@@ -73,7 +74,8 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
               ? WalkDetailsInfoView(widget.walk, () {
                   _toggleView(_ViewType.map);
                 })
-              : WalkDetailsMapView(widget.walk, togglePathVisibility);
+              : WalkDetailsMapView(
+                  widget.walk, selectedPath, onTapMap, onTapPath);
         },
       ),
     );
@@ -85,9 +87,15 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
     });
   }
 
-  void togglePathVisibility(GpxPath path, bool newValue) {
+  void onTapMap() {
     setState(() {
-      path.visible = newValue;
+      selectedPath = null;
+    });
+  }
+
+  void onTapPath(GpxPath path) {
+    setState(() {
+      selectedPath = path;
     });
   }
 }

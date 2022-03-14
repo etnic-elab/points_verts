@@ -60,7 +60,7 @@ class WalkResultsMapView extends StatelessWidget {
       return SafeArea(
         child: Align(
           alignment: Alignment.bottomCenter,
-          child: WalkTile(selectedWalk!, TileType.calendar),
+          child: WalkTile(selectedWalk!, TileType.map),
         ),
       );
     }

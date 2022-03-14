@@ -14,7 +14,7 @@ import '../../services/openweather.dart';
 bool smallScreen = window.physicalSize.width <= 640;
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
-enum TileType { calendar, directory }
+enum TileType { calendar, directory, map }
 
 class WalkTile extends StatelessWidget {
   const WalkTile(this.walk, this.tileType, {Key? key}) : super(key: key);
@@ -25,21 +25,26 @@ class WalkTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      margin: tileType == TileType.map
+          ? const EdgeInsets.all(0)
+          : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      shape: tileType == TileType.map
+          ? const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)))
+          : null,
       child: ListTile(
-        leading: _weatherIcon(),
-        title: _title(),
-        subtitle: _subtitle(),
-        onTap: () => Navigator.push(context, _pageRoute()),
-        trailing: tileType == TileType.calendar
-            ? GeoButton(walk)
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(fullDate.format(walk.date)),
-                ],
-              ),
-      ),
+          leading: _weatherIcon(),
+          title: _title(),
+          subtitle: _subtitle(),
+          onTap: () => Navigator.push(context, _pageRoute()),
+          trailing: tileType == TileType.directory
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(fullDate.format(walk.date)),
+                  ],
+                )
+              : GeoButton(walk)),
     );
   }
 

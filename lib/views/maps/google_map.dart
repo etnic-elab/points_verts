@@ -48,7 +48,8 @@ class GoogleMap extends StatefulWidget {
       this.locationEnabled = false,
       this.markers = const <MarkerInterface>[],
       this.paths = const <GpxPath>[],
-      this.onTapMap})
+      this.onTapMap,
+      this.onTapPath})
       : super(key: key);
 
   final google.CameraPosition initialLocation;
@@ -56,6 +57,7 @@ class GoogleMap extends StatefulWidget {
   final List<MarkerInterface> markers;
   final List<GpxPath> paths;
   final Function? onTapMap;
+  final Function(GpxPath)? onTapPath;
 
   @override
   State<StatefulWidget> createState() => _GoogleMapState();
@@ -65,6 +67,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   final Completer<google.GoogleMapController> _completer = Completer();
   Map<Brightness, String> _mapStyles = {};
   Map<Brightness, Map<Enum, google.BitmapDescriptor>> _mapIcons = {};
+  int? _selectedPath;
 
   @override
   void initState() {
@@ -150,12 +153,20 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
       GpxPath _path = widget.paths[i];
 
       google.Polyline polyline = google.Polyline(
-        polylineId: google.PolylineId('polylineId_$i'),
-        color: GpxPath.color(brightness, i),
-        width: GpxPath.width,
-        visible: _path.visible,
-        points: _path.latLngList,
-      );
+          polylineId: google.PolylineId('polylineId_$i'),
+          color: GpxPath.color(brightness, i),
+          width: GpxPath.width,
+          visible: _selectedPath == null || _selectedPath == i,
+          points: _path.latLngList,
+          consumeTapEvents: widget.onTapPath != null,
+          onTap: () {
+            if (widget.onTapPath != null) {
+              widget.onTapPath!(_path);
+              setState(() {
+                _selectedPath = i;
+              });
+            }
+          });
 
       polylines.add(polyline);
     }
