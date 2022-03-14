@@ -117,6 +117,7 @@ class DBProvider {
     if (filter.mountainBike) where = where + " and mountain_bike = 1";
     if (filter.waterSupply) where = where + " and water_supply = 1";
     if (filter.beWapp) where = where + " and be_wapp = 1";
+    if (filter.adepSante) where = where + " and adep_sante = 1";
     if (filter.transport) where = where + " and transport is not null";
     return where;
   }
