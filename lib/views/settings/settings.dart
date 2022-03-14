@@ -176,12 +176,12 @@ class _SettingsState extends State<Settings> {
           ),
           const Divider(),
           ListTile(
-            leading: const Icon(Icons.help),
+            leading: const TileIcon(Icon(Icons.help)),
             title: const Text("Assistance"),
             onTap: () => launchURL(assistanceUrl),
           ),
           ListTile(
-            leading: const Icon(Icons.security),
+            leading: const TileIcon(Icon(Icons.security)),
             title: const Text("Charte de la vie privée"),
             onTap: () => launchURL(privacyUrl),
           ),
