@@ -119,7 +119,7 @@ class MapBox implements MapInterface {
             .map((latLng) => [latLng.latitude, latLng.longitude])
             .toList());
         final String color = _toMapboxHex(GpxPath.color(brightness, i));
-        encodedPaths.add("path-2+$color-0.7(${Uri.encodeComponent(path)})");
+        encodedPaths.add("path-2+$color-1(${Uri.encodeComponent(path)})");
       }
     }
     return encodedPaths.join(",");
