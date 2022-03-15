@@ -110,7 +110,7 @@ class MapBox implements MapInterface {
       '${color.blue.toRadixString(16).padLeft(2, '0')}';
 
   String _getEncodedPath(Walk walk, Brightness brightness) {
-    String result = "";
+    List<String> encodedPaths = [];
     if (walk.hasPath) {
       List<GpxPath> paths = walk.paths;
       for (int i = 0; i < paths.length; i++) {
@@ -119,10 +119,10 @@ class MapBox implements MapInterface {
             .map((latLng) => [latLng.latitude, latLng.longitude])
             .toList());
         final String color = _toMapboxHex(GpxPath.color(brightness, i));
-        result += ",path-2+$color-1(${Uri.encodeComponent(path)})";
+        encodedPaths.add("path-2+$color-0.7(${Uri.encodeComponent(path)})");
       }
     }
-    return result;
+    return encodedPaths.join(",");
   }
 
   @override
