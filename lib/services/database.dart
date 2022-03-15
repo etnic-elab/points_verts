@@ -25,14 +25,14 @@ class DBProvider {
         join(await getDatabasesPath(), 'points_verts_database.db'),
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
-        version: 6);
+        version: 7);
   }
 
   Future<void> _createWalkTable(Database db) async {
     await PrefsProvider.prefs.remove(Prefs.lastWalkUpdate);
     await db.execute("DROP table IF EXISTS walks");
     await db.execute(
-        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city TEXT, entity TEXT, type TEXT, province TEXT, date DATE, longitude DOUBLE, latitude DOUBLE, status TEXT, meeting_point TEXT, meeting_point_info TEXT, organizer TEXT, contact_first_name TEXT, contact_last_name TEXT, contact_phone_number TEXT, ign TEXT, transport TEXT, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, last_updated DATETIME, paths TEXT)");
+        "CREATE TABLE walks(id INTEGER PRIMARY KEY, city TEXT, entity TEXT, type TEXT, province TEXT, date DATE, longitude DOUBLE, latitude DOUBLE, status TEXT, meeting_point TEXT, meeting_point_info TEXT, organizer TEXT, contact_first_name TEXT, contact_last_name TEXT, contact_phone_number TEXT, ign TEXT, transport TEXT, fifteen_km TINYINT, wheelchair TINYINT, stroller TINYINT, extra_orientation TINYINT, extra_walk TINYINT, guided TINYINT, bike TINYINT, mountain_bike TINYINT, water_supply TINYINT, be_wapp TINYINT, adep_sante TINYINT, last_updated DATETIME, paths TEXT)");
     await db.execute("CREATE INDEX walks_date_index on walks(date)");
     await db.execute("CREATE INDEX walks_city_index on walks(city)");
   }
@@ -117,6 +117,7 @@ class DBProvider {
     if (filter.mountainBike) where = where + " and mountain_bike = 1";
     if (filter.waterSupply) where = where + " and water_supply = 1";
     if (filter.beWapp) where = where + " and be_wapp = 1";
+    if (filter.adepSante) where = where + " and adep_sante = 1";
     if (filter.transport) where = where + " and transport is not null";
     return where;
   }

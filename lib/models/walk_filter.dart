@@ -24,6 +24,7 @@ class WalkFilter {
   bool waterSupply = false;
   bool beWapp = false;
   bool transport = false;
+  bool adepSante = false;
 
   bool filterByProvince() {
     return !brabantWallon ||
@@ -67,6 +68,7 @@ class WalkFilter {
         waterSupply = json['water_supply'],
         beWapp = json['be_wapp'],
         transport = json['transport'],
+        adepSante = json['adep_sante'],
         selectedPlace = Places.values
             .firstWhereOrNull((e) => e.toString() == json['selected_place']);
 
@@ -90,6 +92,7 @@ class WalkFilter {
         'water_supply': waterSupply,
         'be_wapp': beWapp,
         'transport': transport,
+        'adep_sante': adepSante,
         'selected_place': selectedPlace?.toString()
       };
 
@@ -106,6 +109,7 @@ class WalkFilter {
     if (mountainBike) result.add("VTT");
     if (waterSupply) result.add("ravitaillement");
     if (beWapp) result.add("BeWaPP");
+    if (adepSante) result.add("Adep'santé");
     if (transport) result.add("transports en commun");
     return result.isEmpty ? "aucun" : result.join(", ");
   }

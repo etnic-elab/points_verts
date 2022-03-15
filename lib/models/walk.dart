@@ -38,6 +38,7 @@ class Walk {
       required this.mountainBike,
       required this.waterSupply,
       required this.beWapp,
+      required this.adepSante,
       required this.lastUpdated,
       this.paths = const []});
 
@@ -68,6 +69,7 @@ class Walk {
   final bool mountainBike;
   final bool waterSupply;
   final bool beWapp;
+  final bool adepSante;
   final DateTime lastUpdated;
   final List<GpxPath> paths;
 
@@ -104,6 +106,7 @@ class Walk {
       mountainBike: json['fields']['vtt'] == "Oui" ? true : false,
       waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
       beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
+      adepSante: json['fields']['adep_sante'] == 'Oui' ? true : false,
       lastUpdated: DateTime.parse(json['record_timestamp']),
       //TODO: change hard coded to ==> _pathsFromJson(jsonDecode(json['traces_gpx']))
       paths: [
@@ -144,6 +147,7 @@ class Walk {
       mountainBike: maps[i]['mountain_bike'] == 1 ? true : false,
       waterSupply: maps[i]['water_supply'] == 1 ? true : false,
       beWapp: maps[i]['be_wapp'] == 1 ? true : false,
+      adepSante: maps[i]['adep_sante'] == 1 ? true : false,
       lastUpdated: DateTime.parse(maps[i]['last_updated']),
       paths: _pathsFromJson(jsonDecode(maps[i]['paths'])),
     );
@@ -180,6 +184,7 @@ class Walk {
       'be_wapp': beWapp ? 1 : 0,
       'last_updated': lastUpdated.toIso8601String(),
       'paths': jsonEncode(paths),
+      'adep_sante': adepSante ? 1 : 0,
     };
   }
 
@@ -196,8 +201,7 @@ class Walk {
   bool get isModified => status == "Modifié";
 
   String? get formattedDistance {
-    num? dist =
-        trip != null && trip!.distance != null ? trip!.distance : distance;
+    num? dist = trip?.distance ?? distance;
     if (dist == null) {
       return null;
     } else if (dist < 1000) {

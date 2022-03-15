@@ -3,6 +3,7 @@ import 'package:package_info/package_info.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/assets.dart';
+import 'package:points_verts/views/tile_icon.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 class About extends StatelessWidget {
@@ -15,7 +16,7 @@ class About extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
           if (snapshot.hasData) {
             return ListTile(
-                leading: const Icon(Icons.info),
+                leading: const TileIcon(Icon(Icons.info)),
                 title: const Text("À propos"),
                 onTap: () {
                   showAboutDialog(
