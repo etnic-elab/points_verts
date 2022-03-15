@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/views/walks/walk_info.dart';
 
 import '../tile_icon.dart';
 import '../../models/walk.dart';
@@ -47,30 +48,14 @@ class WalkTile extends StatelessWidget {
             ),
             const Divider(height: 0),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
               child: _infoRow(walk),
             )
           ],
         ),
       ),
     );
-  }
-
-  Widget _infoRow(Walk walk) {
-    return Wrap(alignment: WrapAlignment.start, children: <Widget>[
-      _ChipRanges(walk.fifteenKm),
-      _ChipIcon(Icons.train, walk.transport != null),
-      _ChipIcon(Icons.accessible_forward, walk.wheelchair),
-      _ChipIcon(Icons.child_friendly, walk.stroller),
-      _ChipIcon(Icons.map, walk.extraOrientation),
-      _ChipIcon(Icons.directions_walk, walk.extraWalk),
-      _ChipIcon(Icons.nature_people, walk.guided),
-      _ChipIcon(Icons.directions_bike, walk.bike),
-      _ChipIcon(Icons.directions_bike, walk.mountainBike),
-      _ChipIcon(Icons.local_drink, walk.waterSupply),
-      _ChipIcon(Icons.delete, walk.beWapp),
-      _ChipIcon(Icons.sports_gymnastics, walk.adepSante)
-    ]);
   }
 
   Widget _title() {
@@ -98,6 +83,17 @@ class WalkTile extends StatelessWidget {
     } else {
       return WeatherIcon(walk.weathers[0]);
     }
+  }
+
+  Widget _infoRow(Walk walk) {
+    List<Widget> _infos = WalkInfo.values
+        .map((WalkInfo info) => info == WalkInfo.fifteenKm
+            ? _ChipLabel(RouteRange.label(walk, compact: true),
+                icon: RouteRange.icon)
+            : _ChipIcon(info.icon, info.walkValue(walk)))
+        .toList();
+
+    return Wrap(alignment: WrapAlignment.start, children: _infos);
   }
 
   PageRoute _pageRoute() {
@@ -144,19 +140,19 @@ class _ChipIcon extends StatelessWidget {
   }
 }
 
-class _ChipRanges extends StatelessWidget {
-  const _ChipRanges(this.has15km);
+class _ChipLabel extends StatelessWidget {
+  const _ChipLabel(this.text, {this.icon});
 
-  final bool has15km;
+  final String text;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
-    String ranges = has15km ? " 5-10-15-20 km" : " 5-10-20 km";
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: Chip(
-          avatar: const Icon(Icons.route, size: 15.0),
-          label: Text(ranges, style: const TextStyle(fontSize: 12.0)),
+          avatar: icon != null ? Icon(icon, size: 15.0) : null,
+          label: Text(text, style: const TextStyle(fontSize: 12.0)),
           visualDensity: VisualDensity.compact),
     );
   }
