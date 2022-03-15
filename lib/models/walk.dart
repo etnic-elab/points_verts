@@ -9,6 +9,8 @@ import 'trip.dart';
 
 final dateFormat = DateFormat("yyyy-MM-dd");
 
+const TRACES_GPX = "[{\"titre\": \"Parcours 5 kms\", \"fichier\": \"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx\", \"jourdemarche\": \"0\"}, {\"titre\": \"Parcours 10 kms\", \"fichier\": \"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=271&fichier=Parcours+10kms+%2Egpx\", \"jourdemarche\": \"0\"}, {\"titre\": \"Parcours 15 kms\", \"fichier\": \"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=272&fichier=Parcours+15kms+%2Egpx\", \"jourdemarche\": \"0\"}, {\"titre\": \"Parcours 20 kms\", \"fichier\": \"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=273&fichier=Parcours+20kms+%2Egpx\", \"jourdemarche\": \"0\"}]";
+
 class Walk {
   Walk(
       {required this.id,
@@ -108,13 +110,8 @@ class Walk {
       beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
       adepSante: json['fields']['adep_sante'] == 'Oui' ? true : false,
       lastUpdated: DateTime.parse(json['record_timestamp']),
-      //TODO: change hard coded to ==> _pathsFromJson(jsonDecode(json['traces_gpx']))
-      paths: [
-        GpxPath(
-            url:
-                'https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx',
-            title: 'Parcours 5km'),
-      ],
+      //TODO: replace with paths: _pathsFromJson(jsonDecode(json['fields']['traces_gpx'])),
+      paths: _pathsFromJson(jsonDecode(TRACES_GPX)),
     );
   }
 

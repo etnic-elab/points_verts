@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:points_verts/models/gpx_path.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -190,22 +191,24 @@ class GoogleMaps implements MapInterface {
     }
   }
 
-  String _getPaths(Walk walk, Brightness brightness) {
+  List<String> _getPaths(Walk walk, Brightness brightness) {
     List<String> _paths = [];
     for (int i = 0; i < walk.paths.length; i++) {
       GpxPath path = walk.paths[i];
       if (path.pathPoints.isNotEmpty) {
+        String polyline = encodePolyline(path.pathPoints
+            .map((pathPoint) =>
+        [pathPoint.latLng.latitude, pathPoint.latLng.longitude])
+            .toList());
         List<String> _path = [
           'color:${_toGoogleHex(GpxPath.color(brightness, i))}',
-          'weight:${GpxPath.width}'
+          'weight:${GpxPath.width}',
+          'enc:$polyline'
         ];
-        _path.addAll(path.latLngStringList);
         _paths.add(_path.join('|'));
       }
     }
-    String paths = _paths.join('&path=');
-
-    return paths;
+    return _paths;
   }
 
   Map<String, dynamic> _addMarkers(
