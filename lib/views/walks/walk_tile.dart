@@ -32,30 +32,38 @@ class WalkTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: _weatherIcon(),
-              title: _title(),
-              subtitle: _subtitle(),
-              trailing: tileType == TileType.calendar
-                  ? GeoButton(walk)
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(fullDate.format(walk.date)),
-                      ],
-                    ),
-            ),
-            const Divider(height: 0),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-              child: _infoRow(walk),
-            )
-          ],
+          children: _children,
         ),
       ),
     );
+  }
+
+  List<Widget> get _children {
+    List<Widget> _list = [
+      ListTile(
+        leading: _weatherIcon(),
+        title: _title(),
+        subtitle: _subtitle(),
+        trailing: tileType == TileType.calendar
+            ? GeoButton(walk)
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(fullDate.format(walk.date)),
+                ],
+              ),
+      )
+    ];
+
+    if (!walk.isCancelled()) {
+      _list.add(const Divider(height: 0));
+      _list.add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+        child: _infoRow(walk),
+      ));
+    }
+
+    return _list;
   }
 
   Widget _title() {
