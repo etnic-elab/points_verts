@@ -41,7 +41,7 @@ class WalkTile extends StatelessWidget {
   List<Widget> get _children {
     List<Widget> _list = [
       ListTile(
-        leading: _weatherIcon(),
+        leading: TileIcon(WalkIcon(walk)),
         title: _title(),
         subtitle: _subtitle(),
         trailing: tileType == TileType.calendar
@@ -85,21 +85,16 @@ class WalkTile extends StatelessWidget {
     }
   }
 
-  Widget _weatherIcon() {
-    if (walk.isCancelled() || walk.weathers.isEmpty) {
-      return TileIcon(WalkIcon(walk));
-    } else {
-      return WeatherIcon(walk.weathers[0]);
-    }
-  }
-
   Widget _infoRow(Walk walk) {
     List<Widget> _infos = WalkInfo.values
         .map((WalkInfo info) => info == WalkInfo.fifteenKm
-            ? _ChipLabel(RouteRange.label(walk, compact: true),
-                icon: RouteRange.icon)
+            ? _ChipLabel("+ 15 km", info.walkValue(walk))
             : _ChipIcon(info.icon, info.walkValue(walk)))
         .toList();
+
+    if (walk.weathers.isNotEmpty) {
+      _infos = [_WeatherChip(walk.weathers[0]), ..._infos];
+    }
 
     return Wrap(alignment: WrapAlignment.start, children: _infos);
   }
@@ -109,20 +104,22 @@ class WalkTile extends StatelessWidget {
   }
 }
 
-class WeatherIcon extends StatelessWidget {
-  const WeatherIcon(this.weather, {Key? key}) : super(key: key);
+class _WeatherChip extends StatelessWidget {
+  const _WeatherChip(this.weather, {Key? key}) : super(key: key);
 
   final Weather weather;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        getWeatherIcon(weather),
-        Text("${weather.temperature.round()}°"),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+        avatar: getWeatherIcon(weather,
+            iconSize: 15.0,
+            iconColor: Theme.of(context).textTheme.bodyText1?.color),
+        label: Text("${weather.temperature.round()}°"),
+        visualDensity: VisualDensity.compact,
+      ),
     );
   }
 }
@@ -149,19 +146,22 @@ class _ChipIcon extends StatelessWidget {
 }
 
 class _ChipLabel extends StatelessWidget {
-  const _ChipLabel(this.text, {this.icon});
+  const _ChipLabel(this.text, this.value);
 
   final String text;
-  final IconData? icon;
+  final bool value;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      child: Chip(
-          avatar: icon != null ? Icon(icon, size: 15.0) : null,
-          label: Text(text, style: const TextStyle(fontSize: 12.0)),
-          visualDensity: VisualDensity.compact),
-    );
+    if (value) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+        child: Chip(
+            label: Text(text, style: const TextStyle(fontSize: 12.0)),
+            visualDensity: VisualDensity.compact),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
   }
 }
