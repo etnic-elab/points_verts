@@ -42,7 +42,7 @@ class DBProvider {
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion <= 5) {
+    if (oldVersion <= 6) {
       await _createWalkTable(db);
     }
   }

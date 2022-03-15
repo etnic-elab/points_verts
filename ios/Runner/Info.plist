@@ -39,6 +39,8 @@
 		<string>Cette application nécessite l'accès à votre position actuelle pour calculer les distances vers les points de départ des marches</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Cette application nécessite l'accès à votre position actuelle pour calculer les distances vers les points de départ des marches</string>
+		<key>NSCalendarsUsageDescription</key>
+        <string>Cette application nécessite l'accès à votre calendrier pour y ajouter les rendez-vous des points de départ des marches</string>
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>fetch</string>

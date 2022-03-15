@@ -25,7 +25,11 @@ class WalkDetails extends StatelessWidget {
           ListTile(
               leading: const TileIcon(Icon(Icons.calendar_today)),
               title:
-                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!)),
+                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!),
+              trailing: OutlineIconButton(
+                onPressed: () => addToCalendar(walk),
+                iconData: Icons.edit_calendar,
+              )),
           _StatusTile(walk),
           _RangesTile(walk),
           ListTile(
