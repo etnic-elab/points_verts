@@ -62,7 +62,7 @@ extension WalkInfoExt on WalkInfo {
       case WalkInfo.beWapp:
         return Icons.eco;
       case WalkInfo.adepSante:
-        return Icons.sports_gymnastics;
+        return Icons.fitness_center;
     }
   }
 
