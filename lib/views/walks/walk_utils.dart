@@ -13,6 +13,7 @@ import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:add_2_calendar/add_2_calendar.dart';
 
 import '../../models/walk.dart';
 
@@ -29,6 +30,30 @@ Future<void> launchGeoApp(Walk walk) async {
           'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})');
     }
   }
+}
+
+void addToCalendar(Walk walk) {
+  final Event event = Event(
+    title: "Marche ADEPS de ${walk.city}",
+    description: _generateEventDescription(walk),
+    location: "${walk.meetingPoint}, ${walk.entity}",
+    startDate: walk.date.add(const Duration(hours: 8)),
+    endDate: walk.date.add(const Duration(hours: 18)),
+  );
+  Add2Calendar.addEvent2Cal(event);
+}
+
+String _generateEventDescription(Walk walk) {
+  String result = "";
+  result +=
+      "Groupement organisateur : ${walk.organizer} - ${walk.contactFirstName} ${walk.contactLastName}";
+  if (walk.contactPhoneNumber != null) {
+    result += " - ${walk.contactPhoneNumber}";
+  }
+  if (walk.meetingPointInfo != null) {
+    result += "\nRemarques : ${walk.meetingPointInfo}";
+  }
+  return result;
 }
 
 int sortWalks(Walk a, Walk b) {

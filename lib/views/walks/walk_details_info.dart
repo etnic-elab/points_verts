@@ -26,7 +26,11 @@ class WalkDetailsInfo extends StatelessWidget {
           ListTile(
               leading: const TileIcon(Icon(Icons.calendar_today)),
               title:
-                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!)),
+                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!),
+              trailing: OutlineIconButton(
+                onPressed: () => addToCalendar(walk),
+                iconData: Icons.edit_calendar,
+              )),
           _StatusTile(walk),
           _RangesTile(walk),
           ListTile(
@@ -161,14 +165,17 @@ class _RangesTile extends StatelessWidget {
         title: Text(walk.fifteenKm
             ? "Parcours de 5 - 10 - 15 - 20 km"
             : "Parcours de 5 - 10 - 20 km"),
-        subtitle:
-            walk.extraOrientation ? const Text("Parcours suppl. d'orientation de +/- 8 km") : null,
+        subtitle: walk.extraOrientation
+            ? const Text("Parcours suppl. d'orientation de +/- 8 km")
+            : null,
       );
     } else if (walk.type == 'Orientation') {
       return ListTile(
         leading: const TileIcon(Icon(Icons.route)),
         title: const Text("Parcours de 4 - 8 - 16 km"),
-        subtitle: walk.extraWalk ? const Text("Parcours suppl. de marche de +/- 10 km") : null,
+        subtitle: walk.extraWalk
+            ? const Text("Parcours suppl. de marche de +/- 10 km")
+            : null,
       );
     } else {
       return const SizedBox.shrink();
