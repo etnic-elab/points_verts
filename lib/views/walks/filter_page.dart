@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:points_verts/models/walk_filter.dart';
+import 'package:points_verts/views/walks/walk_info.dart';
 
 import '../list_header.dart';
 import 'walks_view.dart';
@@ -108,54 +109,54 @@ class _FilterPageState extends State<FilterPage> {
                 const ListHeader("Afficher uniquement Points ayant..."),
                 Wrap(
                   children: [
-                    _PaddedChip(editedFilter.fifteenKm, "Parcours 15 km",
-                        (value) {
+                    _infoPaddedChip(editedFilter, WalkInfo.fifteenKm, (value) {
                       editedFilter.fifteenKm = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.wheelchair, "PMR", (alue) {
-                      editedFilter.wheelchair = alue;
+                    _infoPaddedChip(editedFilter, WalkInfo.wheelchair, (value) {
+                      editedFilter.wheelchair = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.stroller, "Poussettes", (value) {
+                    _infoPaddedChip(editedFilter, WalkInfo.stroller, (value) {
                       editedFilter.stroller = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.extraOrientation, "+ Orientation",
+                    _infoPaddedChip(editedFilter, WalkInfo.extraOrientation,
                         (value) {
                       editedFilter.extraOrientation = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.extraWalk, "+ Marche", (value) {
+                    _infoPaddedChip(editedFilter, WalkInfo.extraWalk, (value) {
                       editedFilter.extraWalk = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.guided, "Balade guidée", (value) {
+                    _infoPaddedChip(editedFilter, WalkInfo.guided, (value) {
                       editedFilter.guided = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.bike, "Vélo", (value) {
+                    _infoPaddedChip(editedFilter, WalkInfo.bike, (value) {
                       editedFilter.bike = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.mountainBike, "VTT", (value) {
+                    _infoPaddedChip(editedFilter, WalkInfo.mountainBike,
+                        (value) {
                       editedFilter.mountainBike = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.transport, "Train/Bus", (value) {
+                    _infoPaddedChip(editedFilter, WalkInfo.transport, (value) {
                       editedFilter.transport = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.waterSupply, "Ravitaillement",
+                    _infoPaddedChip(editedFilter, WalkInfo.waterSupply,
                         (value) {
                       editedFilter.waterSupply = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.beWapp, "BeWaPP", (value) {
+                    _infoPaddedChip(editedFilter, WalkInfo.beWapp, (value) {
                       editedFilter.beWapp = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.adepSante, "Adep'santé", (value) {
+                    _infoPaddedChip(editedFilter, WalkInfo.adepSante, (value) {
                       editedFilter.adepSante = value;
                       setState(() {});
                     }),
@@ -189,18 +190,30 @@ class _FilterPageState extends State<FilterPage> {
   }
 }
 
+_infoPaddedChip(WalkFilter filter, WalkInfo walkInfo, Function(bool) callback) {
+  return _PaddedChip(walkInfo.filterValue(filter), walkInfo.label, callback,
+      icon: walkInfo.icon);
+}
+
 class _PaddedChip extends StatelessWidget {
-  const _PaddedChip(this.value, this.label, this.callback);
+  const _PaddedChip(this.value, this.label, this.callback, {this.icon});
 
   final bool value;
   final String label;
   final Function(bool) callback;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: FilterChip(
+        avatar: icon != null
+            ? Icon(
+                icon,
+                size: 15.0,
+              )
+            : null,
         label: Text(label),
         selected: value,
         onSelected: callback,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/walk_filter.dart';
 
-class RouteRange {
+class Range {
   static IconData icon = Icons.route;
   static label(Walk walk, {bool compact = false}) {
     if (walk.isWalk) {
@@ -40,7 +40,7 @@ extension WalkInfoExt on WalkInfo {
   IconData get icon {
     switch (this) {
       case WalkInfo.fifteenKm:
-        return Icons.directions_walk;
+        return Icons.add_circle;
       case WalkInfo.transport:
         return Icons.train;
       case WalkInfo.wheelchair:
@@ -69,7 +69,7 @@ extension WalkInfoExt on WalkInfo {
   String get label {
     switch (this) {
       case WalkInfo.fifteenKm:
-        return 'Parcours 15 km';
+        return '15 km';
       case WalkInfo.transport:
         return 'Train/Bus';
       case WalkInfo.wheelchair:

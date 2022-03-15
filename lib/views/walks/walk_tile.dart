@@ -88,7 +88,7 @@ class WalkTile extends StatelessWidget {
   Widget _infoRow(Walk walk) {
     List<Widget> _infos = WalkInfo.values
         .map((WalkInfo info) => info == WalkInfo.fifteenKm
-            ? _ChipLabel("+ 15 km", info.walkValue(walk))
+            ? _ChipLabel(info.label, info.walkValue(walk), icon: info.icon)
             : _ChipIcon(info.icon, info.walkValue(walk)))
         .toList();
 
@@ -146,10 +146,11 @@ class _ChipIcon extends StatelessWidget {
 }
 
 class _ChipLabel extends StatelessWidget {
-  const _ChipLabel(this.text, this.value);
+  const _ChipLabel(this.text, this.value, {this.icon});
 
   final String text;
   final bool value;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -157,6 +158,12 @@ class _ChipLabel extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 2.0),
         child: Chip(
+            avatar: icon != null
+                ? Icon(
+                    icon,
+                    size: 15.0,
+                  )
+                : null,
             label: Text(text, style: const TextStyle(fontSize: 12.0)),
             visualDensity: VisualDensity.compact),
       );

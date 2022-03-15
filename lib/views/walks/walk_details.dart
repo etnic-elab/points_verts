@@ -154,12 +154,12 @@ class _RangesTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (walk.isWalk || walk.isOrientation) {
-      String _title = RouteRange.label(walk);
+      String _title = Range.label(walk);
       WalkInfo? _subtitle =
           walk.isWalk ? WalkInfo.extraOrientation : WalkInfo.extraWalk;
 
       return ListTile(
-          leading: TileIcon(Icon(RouteRange.icon)),
+          leading: TileIcon(Icon(Range.icon)),
           title: Text(_title),
           subtitle:
               _subtitle.walkValue(walk) ? Text(_subtitle.description) : null);
