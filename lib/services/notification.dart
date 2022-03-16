@@ -105,10 +105,10 @@ class NotificationManager {
         iOS: iOSPlatformChannelSpecifics);
   }
 
-  displayNotification(String? title, String? body) async {
+  displayNotification(int id, String? title, String? body) async {
     FlutterLocalNotificationsPlugin instance = await plugin;
 
-    await instance.show(-1, title, body, _generateNotificationDetails());
+    await instance.show(id, title, body, _generateNotificationDetails());
   }
 
   Future<void> cancelNextNearestWalkNotifications() async {
