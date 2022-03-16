@@ -64,6 +64,12 @@ class _GeoPosTile extends StatelessWidget {
 }
 
 class _PendingNotificationsTile extends StatelessWidget {
+  testNotification(List<PendingNotificationRequest> requests) {
+    PendingNotificationRequest request = requests[0];
+    NotificationManager.instance
+        .displayNotification("[TEST] ${request.title}", request.body);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -80,6 +86,9 @@ class _PendingNotificationsTile extends StatelessWidget {
                   generatePendingNotificationsSubtitle(requests),
                   style: const TextStyle(fontSize: 12.0),
                 ),
+                trailing: OutlinedButton(
+                    onPressed: () => testNotification(requests),
+                    child: const Text("Test")),
               );
             }
           }
