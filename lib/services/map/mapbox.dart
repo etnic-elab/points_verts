@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:points_verts/environment.dart';
-import 'package:points_verts/models/gpx_path.dart';
+import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/flutter_map.dart';
@@ -97,9 +97,9 @@ class MapBox implements MapInterface {
     double zoom = MapInterface.defaultZoom,
     locationEnabled = false,
     List<MarkerInterface> markers = const [],
-    List<GpxPath> paths = const [],
+    List<Path> paths = const [],
     Function? onTapMap,
-    Function(GpxPath)? onTapPath,
+    Function(Path)? onTapPath,
   }) {
     return FlutterMap(markers, _token!, centerLat, centerLong, zoom);
   }
@@ -112,13 +112,13 @@ class MapBox implements MapInterface {
   String _getEncodedPath(Walk walk, Brightness brightness) {
     List<String> encodedPaths = [];
     if (walk.hasPath) {
-      List<GpxPath> paths = walk.paths;
+      List<Path> paths = walk.paths;
       for (int i = 0; i < paths.length; i++) {
         final String path = encodePolyline(paths[i]
             .latLngList
             .map((latLng) => [latLng.latitude, latLng.longitude])
             .toList());
-        final String color = _toMapboxHex(GpxPath.color(brightness, i));
+        final String color = _toMapboxHex(Path.color(brightness, i));
         encodedPaths.add("path-2+$color-1(${Uri.encodeComponent(path)})");
       }
     }

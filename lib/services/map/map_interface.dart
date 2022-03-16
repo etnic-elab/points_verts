@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:points_verts/models/gpx_path.dart';
+import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 
 import '../../models/address_suggestion.dart';
@@ -34,9 +34,9 @@ abstract class MapInterface {
     double zoom,
     locationEnabled,
     List<MarkerInterface> markers,
-    List<GpxPath> paths,
+    List<Path> paths,
     Function? onTapMap,
-    Function(GpxPath)? onTapPath,
+    Function(Path)? onTapPath,
   });
 
   Widget retrieveStaticImage(

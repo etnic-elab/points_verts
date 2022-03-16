@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:points_verts/company_data.dart';
-import 'package:collection/collection.dart';
 
 import 'path_point.dart';
 
-class GpxPath {
-  GpxPath({required this.url, required this.title});
+class Path {
+  Path({required this.url, required this.title});
 
   final String? url;
   final String title;
@@ -34,13 +33,12 @@ class GpxPath {
       CompanyColors.lightestGreen,
     ]
   };
-  static int width = 4;
 
   static Color color(Brightness brightness, int index) {
-    return colors[brightness]![index % GpxPath.colors[brightness]!.length];
+    return colors[brightness]![index % Path.colors[brightness]!.length];
   }
 
-  GpxPath.fromJson(Map<String, dynamic> json)
+  Path.fromJson(Map<String, dynamic> json)
       : url = json['fichier'],
         title = json['titre'] ?? 'Parcours';
 
@@ -55,5 +53,5 @@ class GpxPath {
   List<String> get latLngStringList =>
       pathPoints.map((point) => '$point').toList();
 
-  bool get hasPoints => pathPoints.firstOrNull != null;
+  bool get hasPoints => pathPoints.isNotEmpty;
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/environment.dart';
-import 'package:points_verts/models/gpx_path.dart';
+import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/services/location.dart';
 import 'package:points_verts/services/map/map_interface.dart';
@@ -17,9 +17,9 @@ class WalkDetailsMapView extends StatelessWidget {
       : super(key: key);
 
   final Walk walk;
-  final GpxPath? selectedPath;
+  final Path? selectedPath;
   final Function onTapMap;
-  final Function(GpxPath) onTapPath;
+  final Function(Path) onTapPath;
   final MapInterface map = Environment.mapInterface;
 
   List<MarkerInterface> get _markers {
@@ -52,7 +52,7 @@ class WalkDetailsMapView extends StatelessWidget {
               map.retrieveMap(
                   centerLat: _centerLat,
                   centerLong: _centerLong,
-                  zoom: 13,
+                  zoom: 11.5,
                   locationEnabled: true,
                   markers: _markers,
                   paths: walk.paths,
@@ -82,7 +82,7 @@ class WalkDetailsMapView extends StatelessWidget {
             child: ListTile(
               leading: TileIcon(Icon(
                 Icons.circle,
-                color: GpxPath.color(
+                color: Path.color(
                     brightness,
                     walk.paths
                         .indexWhere((path) => path.url == selectedPath!.url)),

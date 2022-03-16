@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
-import 'package:points_verts/models/gpx_path.dart';
+import 'package:points_verts/models/path.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
@@ -114,9 +114,9 @@ class GoogleMaps implements MapInterface {
     double zoom = MapInterface.defaultZoom,
     locationEnabled = false,
     List<MarkerInterface> markers = const [],
-    List<GpxPath> paths = const [],
+    List<Path> paths = const [],
     Function? onTapMap,
-    Function(GpxPath)? onTapPath,
+    Function(Path)? onTapPath,
   }) {
     google.CameraPosition _initialLocation = google.CameraPosition(
         target: google.LatLng(centerLat, centerLong), zoom: zoom);
@@ -192,23 +192,23 @@ class GoogleMaps implements MapInterface {
   }
 
   List<String> _getPaths(Walk walk, Brightness brightness) {
-    List<String> _paths = [];
+    List<String> paths = [];
     for (int i = 0; i < walk.paths.length; i++) {
-      GpxPath path = walk.paths[i];
-      if (path.pathPoints.isNotEmpty) {
-        String polyline = encodePolyline(path.pathPoints
+      Path _path = walk.paths[i];
+      if (_path.hasPoints) {
+        String polyline = encodePolyline(_path.pathPoints
             .map((pathPoint) =>
-        [pathPoint.latLng.latitude, pathPoint.latLng.longitude])
+                [pathPoint.latLng.latitude, pathPoint.latLng.longitude])
             .toList());
-        List<String> _path = [
-          'color:${_toGoogleHex(GpxPath.color(brightness, i))}',
-          'weight:${GpxPath.width}',
+        List<String> path = [
+          'color:${_toGoogleHex(Path.color(brightness, i))}',
+          'weight:2',
           'enc:$polyline'
         ];
-        _paths.add(_path.join('|'));
+        paths.add(path.join('|'));
       }
     }
-    return _paths;
+    return paths;
   }
 
   Map<String, dynamic> _addMarkers(

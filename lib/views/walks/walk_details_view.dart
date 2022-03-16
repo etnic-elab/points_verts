@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/environment.dart';
-import 'package:points_verts/models/gpx_path.dart';
+import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/path_point.dart';
 import 'package:points_verts/services/gpx.dart';
 import 'package:points_verts/services/map/map_interface.dart';
@@ -24,12 +24,12 @@ class WalkDetailsView extends StatefulWidget {
 class _WalkDetailsViewState extends State<WalkDetailsView> {
   final MapInterface map = Environment.mapInterface;
   _ViewType viewType = _ViewType.detail;
-  GpxPath? selectedPath;
+  Path? selectedPath;
 
   Future<List> _retrievePaths() {
     List<Future<List<PathPoint>>> paths = [];
     if (!widget.walk.isCancelled && !widget.walk.hasPath) {
-      for (GpxPath path in widget.walk.paths) {
+      for (Path path in widget.walk.paths) {
         if (path.url?.isNotEmpty ?? false) {
           Future<List<PathPoint>> future = retrievePathPoints(path.url!);
           future.then((_pathPoints) {
@@ -95,7 +95,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
     });
   }
 
-  void onTapPath(GpxPath path) {
+  void onTapPath(Path path) {
     setState(() {
       selectedPath = path;
     });

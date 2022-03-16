@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
-import 'package:points_verts/models/gpx_path.dart';
+import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:collection/collection.dart';
 
@@ -74,7 +74,7 @@ class Walk {
   final bool beWapp;
   final bool adepSante;
   final DateTime lastUpdated;
-  final List<GpxPath> paths;
+  final List<Path> paths;
 
   double? distance;
   Trip? trip;
@@ -115,9 +115,9 @@ class Walk {
     );
   }
 
-  static List<GpxPath> _decodePaths(json) {
+  static List<Path> _decodePaths(json) {
     try {
-      //TODO: replace with return _pathsFromJson(jsonDecode(json['fields']['traces_gpx']));
+      //TODO: replace with return _pathsFromJson(json['fields']['traces_gpx']);
       return _pathsFromJson(jsonDecode(TRACES_GPX));
     } catch (err) {
       print("Cannot decode paths for walk '${json['fields']['id']}': $err");
@@ -195,12 +195,12 @@ class Walk {
     };
   }
 
-  static List<GpxPath> _pathsFromJson(dynamic json) {
+  static List<Path> _pathsFromJson(dynamic json) {
     if (json is List) {
-      return (json).map<GpxPath>((json) => GpxPath.fromJson(json)).toList();
+      return (json).map<Path>((json) => Path.fromJson(json)).toList();
     }
 
-    return <GpxPath>[];
+    return <Path>[];
   }
 
   bool get isCancelled => status == "Annulé";
@@ -226,6 +226,7 @@ class Walk {
 
   bool get hasPosition => lat != null && long != null;
 
+  //TODO: change this method, not correct paths.filter().first
   bool get hasPath => paths.firstOrNull?.hasPoints ?? false;
 
   String get contactLabel => (contactPhoneNumber != null)
