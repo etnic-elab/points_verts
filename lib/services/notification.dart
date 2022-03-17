@@ -61,18 +61,6 @@ class NotificationManager {
     }
     try {
       initializeDateFormatting("fr_BE");
-      var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-          'NEXT_NEAREST_WALK',
-          'Prochain point à proximité',
-          channelDescription: 'Indique la veille le prochain point vert ADEPS le plus proche de votre domicile',
-          importance: Importance.max,
-          priority: Priority.high,
-          color: CompanyColors.greenPrimary,
-          ticker: 'ticker');
-      var iOSPlatformChannelSpecifics = const IOSNotificationDetails();
-      var platformChannelSpecifics = NotificationDetails(
-          android: androidPlatformChannelSpecifics,
-          iOS: iOSPlatformChannelSpecifics);
       DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
       FlutterLocalNotificationsPlugin instance = await plugin;
 
@@ -91,7 +79,7 @@ class NotificationManager {
       int id = int.parse(formatter.format(scheduledAt));
 
       await instance.zonedSchedule(
-          id, title, description, scheduledAt, platformChannelSpecifics,
+          id, title, description, scheduledAt, _generateNotificationDetails(),
           payload: walk.id.toString(),
           androidAllowWhileIdle: true,
           uiLocalNotificationDateInterpretation:
@@ -100,6 +88,27 @@ class NotificationManager {
     } catch (err) {
       print("cannot display notification: $err");
     }
+  }
+
+  NotificationDetails _generateNotificationDetails() {
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+        'NEXT_NEAREST_WALK', 'Prochain point à proximité',
+        channelDescription:
+            'Indique la veille le prochain point vert ADEPS le plus proche de votre domicile',
+        importance: Importance.max,
+        priority: Priority.high,
+        color: CompanyColors.greenPrimary,
+        ticker: 'ticker');
+    var iOSPlatformChannelSpecifics = const IOSNotificationDetails();
+    return NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics);
+  }
+
+  displayNotification(int id, String? title, String? body) async {
+    FlutterLocalNotificationsPlugin instance = await plugin;
+
+    await instance.show(id, title, body, _generateNotificationDetails());
   }
 
   Future<void> cancelNextNearestWalkNotifications() async {
