@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:points_verts/services/assets.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:points_verts/services/crashlytics.dart';
 import 'package:points_verts/services/database.dart';
@@ -25,9 +30,9 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   }
   try {
     print("[BackgroundFetch] Headless task: $taskId");
-    await dotenv.load(fileName: '.env');
+    await dotenv.load();
     await updateWalks();
-    await scheduleNextNearestWalkNotification();
+    await scheduleNextNearestWalkNotifications();
     await PrefsProvider.prefs.setString(
         "last_background_fetch", DateTime.now().toUtc().toIso8601String());
   } catch (err) {
@@ -37,24 +42,42 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   }
 }
 
+Future<void> _addTrustedCert(String certPath) async {
+  ByteData data = await Assets.instance.load(certPath);
+  SecurityContext context = SecurityContext.defaultContext;
+  try {
+    context.setTrustedCertificatesBytes(data.buffer.asUint8List());
+  } catch (err) {
+    print("Cannot add certificate: $err");
+  }
+}
+
 Future<void> initializeFirebase() async {
   await Firebase.initializeApp();
   await Crashlytics.initialize();
 }
 
 void main() async {
-  await dotenv.load(fileName: '.env');
+  FlutterNativeSplash.removeAfter(initialization);
+  runApp(const MyApp());
+}
+
+void initialization(BuildContext context) async {
+  await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
   await DBProvider.db.database;
+  await _addTrustedCert(Assets.letsEncryptCert);
   await initializeFirebase();
   runApp(new MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
 class MyApp extends StatelessWidget {
-  static final navigatorKey = new GlobalKey<NavigatorState>();
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
+  const MyApp({Key? key}) : super(key: key);
 
   static redirectToWalkDetails(int walkId) async {
     Walk? walk = await DBProvider.db.getWalk(walkId);
@@ -67,20 +90,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: [
-        const Locale('fr', 'BE'),
-        const Locale('fr', 'FR'),
-        const Locale('fr', 'LU'),
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: const [
+        Locale('fr', 'BE'),
+        Locale('fr', 'FR'),
+        Locale('fr', 'LU'),
       ],
       navigatorKey: navigatorKey,
       title: applicationName,
-      theme: companyTheme,
-      darkTheme: companyDarkTheme,
-      home: WalksHomeScreen(),
+      theme: CompanyTheme.companyLightTheme(),
+      darkTheme: CompanyTheme.companyDarkTheme(),
+      home: const WalksHomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

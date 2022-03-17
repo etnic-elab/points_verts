@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/services/crashlytics.dart';
@@ -16,6 +15,8 @@ import 'debug.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
+  const Settings({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _SettingsState();
 }
@@ -28,11 +29,13 @@ class _SettingsState extends State<Settings> {
 
   _SettingsState();
 
+  @override
   void initState() {
     super.initState();
     _retrievePrefs();
   }
 
+  @override
   void dispose() {
     super.dispose();
   }
@@ -62,7 +65,7 @@ class _SettingsState extends State<Settings> {
       _home = label;
     });
     if (_showNotification == true) {
-      scheduleNextNearestWalkNotification();
+      scheduleNextNearestWalkNotifications();
     }
   }
 
@@ -72,7 +75,7 @@ class _SettingsState extends State<Settings> {
     setState(() {
       _home = null;
     });
-    NotificationManager.instance.cancelNextNearestWalkNotification();
+    NotificationManager.instance.cancelNextNearestWalkNotifications();
   }
 
   Future<void> _setUseLocation(bool newValue) async {
@@ -98,13 +101,13 @@ class _SettingsState extends State<Settings> {
       bool? notificationsAllowed =
           await NotificationManager.instance.requestNotificationPermissions();
       if (notificationsAllowed == true) {
-        scheduleNextNearestWalkNotification();
+        scheduleNextNearestWalkNotifications();
       } else {
         _setShowNotification(false);
         return;
       }
     } else {
-      NotificationManager.instance.cancelNextNearestWalkNotification();
+      NotificationManager.instance.cancelNextNearestWalkNotifications();
     }
     setState(() {
       _showNotification = newValue;
@@ -130,34 +133,33 @@ class _SettingsState extends State<Settings> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
-            child: Text("Paramètres"),
+            child: const Text("Paramètres"),
             onLongPress: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => Debug()))),
+                .push(MaterialPageRoute(builder: (context) => const Debug()))),
       ),
       body: ListView(
         children: <Widget>[
-          ListHeader("Tri des points selon leur emplacement"),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-            child: Text(
-                "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",
-                style: Theme.of(context).textTheme.caption),
-          ),
+          const ListHeader("Tri des points selon leur emplacement"),
+          ListTile(
+              title: Text(
+                  "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",
+                  style: Theme.of(context).textTheme.caption)),
           SwitchListTile(
-            secondary: TileIcon(Icon(Icons.location_on)),
-            title: Text("Ma position actuelle"),
+            secondary: const TileIcon(Icon(Icons.location_on)),
+            title: const Text("Ma position actuelle"),
             value: _useLocation,
             onChanged: (bool value) {
               _setUseLocation(value);
             },
           ),
           ListTile(
-            leading: TileIcon(Icon(Icons.home)),
-            title: Text('Mon domicile'),
+            leading: const TileIcon(Icon(Icons.home)),
+            title: const Text('Mon domicile'),
             subtitle: getHomeLabel(),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -166,19 +168,18 @@ class _SettingsState extends State<Settings> {
             },
             trailing: _home != null
                 ? IconButton(
-                    icon: Icon(Icons.delete), onPressed: () => _removeHome())
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => _removeHome())
                 : null,
           ),
-          Divider(),
-          ListHeader("Notifications"),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-            child: Text(
-                "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
-                style: Theme.of(context).textTheme.caption),
-          ),
+          const Divider(),
+          const ListHeader("Notifications"),
+          ListTile(
+              title: Text(
+                  "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
+                  style: Theme.of(context).textTheme.caption)),
           SwitchListTile(
-            secondary: TileIcon(Icon(Icons.notifications)),
+            secondary: const TileIcon(Icon(Icons.notifications)),
             title: const Text("Notifier la veille (vers 20h)"),
             value: _showNotification,
             onChanged: (bool value) {
@@ -203,16 +204,16 @@ class _SettingsState extends State<Settings> {
           ),
           Divider(),
           ListTile(
-            leading: Icon(Icons.help),
-            title: Text("Assistance"),
+            leading: const TileIcon(Icon(Icons.help)),
+            title: const Text("Assistance"),
             onTap: () => launchURL(assistanceUrl),
           ),
           ListTile(
-            leading: Icon(Icons.security),
-            title: Text("Charte de la vie privée"),
+            leading: const TileIcon(Icon(Icons.security)),
+            title: const Text("Charte de la vie privée"),
             onTap: () => launchURL(privacyUrl),
           ),
-          About()
+          const About()
         ],
       ),
     );
@@ -220,9 +221,9 @@ class _SettingsState extends State<Settings> {
 
   Widget getHomeLabel() {
     if (_home == null) {
-      return Text("Aucun - appuyez ici pour le définir");
+      return const Text("Aucun - appuyez ici pour le définir");
     } else {
-      return Text(_home!, style: TextStyle(fontSize: 12.0));
+      return Text(_home!, style: const TextStyle(fontSize: 12.0));
     }
   }
 }

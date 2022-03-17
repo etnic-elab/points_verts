@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
@@ -24,11 +23,34 @@ import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
 
 enum Places { home, current }
+
+extension PlacesExtension on Places {
+  IconData get icon {
+    switch (this) {
+      case Places.current:
+        return Icons.location_on;
+      case Places.home:
+        return Icons.home;
+    }
+  }
+
+  String get text {
+    switch (this) {
+      case Places.current:
+        return "localisation";
+      case Places.home:
+        return "domicile";
+    }
+  }
+}
+
 enum ViewType { list, map }
 
-const String TAG = "dev.alpagaga.points_verts.WalkList";
+const String tag = "dev.alpagaga.points_verts.WalkList";
 
 class WalksView extends StatefulWidget {
+  const WalksView({Key? key}) : super(key: key);
+
   @override
   _WalksViewState createState() => _WalksViewState();
 }
@@ -70,7 +92,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     if (firstLaunch) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       final snackBar = SnackBar(
-          duration: Duration(days: 1),
+          duration: const Duration(days: 1),
           action: SnackBarAction(
             onPressed: () {
               PrefsProvider.prefs.setBoolean("first_launch", false);
@@ -211,7 +233,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendrier'),
+        title: const Text('Calendrier'),
         actions: <Widget>[
           IconButton(
             icon: Icon(_viewType == ViewType.list ? Icons.map : Icons.list),
@@ -234,27 +256,38 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Loading(),
+          const Loading(),
           Container(
-              padding: EdgeInsets.all(10),
-              child: Text("Récupération des données..."))
+              padding: const EdgeInsets.all(10),
+              child: const Text("Récupération des données..."))
         ],
       );
     }
     return Column(
       children: <Widget>[
         _defineSearchPart(dates),
-        Divider(height: 0.0),
+        const Divider(height: 0.0),
         Expanded(
             child: _viewType == ViewType.list
                 ? WalkResultsListView(_currentWalks, selectedPosition,
                     _filter!.selectedPlace, _retrieveData)
-                : WalkResultsMapView(_currentWalks, selectedPosition,
-                    _filter!.selectedPlace, _selectedWalk, (walk) {
-                    setState(() {
-                      _selectedWalk = walk;
-                    });
-                  }, _retrieveData)),
+                : WalkResultsMapView(
+                    _currentWalks,
+                    selectedPosition,
+                    _filter!.selectedPlace,
+                    _selectedWalk,
+                    (walk) {
+                      setState(() {
+                        _selectedWalk = walk;
+                      });
+                    },
+                    () {
+                      setState(() {
+                        _selectedWalk = null;
+                      });
+                    },
+                    _retrieveData,
+                  )),
       ],
     );
   }
@@ -295,16 +328,16 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                 onDateChanged: onDateChanged,
                 onFilterPressed: onFilterPressed);
           }
-          return SizedBox();
+          return const SizedBox();
         });
   }
 
   _getCurrentLocation() {
-    log("Retrieving current user location", name: TAG);
+    log("Retrieving current user location", name: tag);
     Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium)
         .then((Position position) {
-      log("Current user location is $position", name: TAG);
-      if (this.mounted) {
+      log("Current user location is $position", name: tag);
+      if (mounted) {
         setState(() {
           _currentPosition = Coordinates(
               latitude: position.latitude, longitude: position.longitude);
@@ -326,7 +359,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 }
 
 class _SearchPanel extends StatelessWidget {
-  _SearchPanel(
+  const _SearchPanel(
       {required this.dates,
       required this.selectedDate,
       required this.onDateChanged,
@@ -350,9 +383,9 @@ class _SearchPanel extends StatelessWidget {
                   onChanged: onDateChanged),
               ActionChip(
                 label: Row(
-                  children: <Widget>[
+                  children: const <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(right: 4.0),
+                      padding: EdgeInsets.only(right: 4.0),
                       child: Icon(Icons.tune, size: 16.0),
                     ),
                     Text("Filtres")

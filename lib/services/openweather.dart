@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/environment.dart';
 import 'package:weather_icons/weather_icons.dart';
 import 'dart:convert';
 
 import '../models/weather.dart';
-import 'weather_cache_manager.dart';
+import 'cache_managers/weather_cache_manager.dart';
 
-String? _token = dotenv.env['OPENWEATHER_TOKEN'];
+String? _token = Environment.openWeatherToken;
 
 Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
   String url =
       "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$long&lang=fr&units=metric&appid=$_token";
-  final http.Response response = await WeatherCacheManager.getData(url);
+  final http.Response response = await WeatherCacheManager.weather.getData(url);
   final decoded = json.decode(response.body);
   final list = decoded['list'];
 
   if (list != null) {
     List<Weather> results = [];
-    int from = date.add(Duration(hours: 6)).millisecondsSinceEpoch;
-    int to = date.add(Duration(hours: 18)).millisecondsSinceEpoch;
+    int from = date.add(const Duration(hours: 6)).millisecondsSinceEpoch;
+    int to = date.add(const Duration(hours: 18)).millisecondsSinceEpoch;
     for (var forecast in list) {
       int time = forecast['dt'] * 1000;
       if (time > from && time < to) {
@@ -44,7 +43,7 @@ Weather _createWeather(var forecast) {
       timestamp: DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000));
 }
 
-Widget getWeatherIcon(Weather weather) {
+Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
   IconData icon;
   switch (weather.weatherId) {
     case 200:
@@ -155,7 +154,7 @@ Widget getWeatherIcon(Weather weather) {
       icon = WeatherIcons.strong_wind;
       break;
     default:
-      return Icon(Icons.cancel, color: CompanyColors.red);
+      return const Icon(Icons.cancel, color: CompanyColors.red);
   }
-  return BoxedIcon(icon, color: CompanyColors.blue);
+  return BoxedIcon(icon, color: iconColor ?? CompanyColors.blue, size: iconSize);
 }

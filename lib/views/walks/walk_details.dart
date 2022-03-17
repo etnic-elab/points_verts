@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/views/walks/outline_icon_button.dart';
+import 'package:points_verts/views/walks/walk_info.dart';
 
 import '../tile_icon.dart';
 import 'walk_utils.dart';
 
 class WalkDetails extends StatelessWidget {
-  WalkDetails(this.walk);
+  const WalkDetails(this.walk, {Key? key}) : super(key: key);
 
   final Walk walk;
 
@@ -21,15 +21,20 @@ class WalkDetails extends StatelessWidget {
     return Expanded(
       child: ListView(
         children: <Widget>[
-          walk.weathers.isNotEmpty ? _WeatherSection(walk) : SizedBox.shrink(),
+          _WeatherSection(walk),
           ListTile(
-              leading: TileIcon(Icon(Icons.calendar_today)),
+              leading: const TileIcon(Icon(Icons.calendar_today)),
               title:
-                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!)),
+                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!),
+              trailing: OutlineIconButton(
+                onPressed: () => addToCalendar(walk),
+                iconData: Icons.edit_calendar,
+              )),
           _StatusTile(walk),
+          _RangesTile(walk),
           ListTile(
-            leading: TileIcon(Icon(Icons.location_on)),
-            title: Text(walk.meetingPoint != null ? walk.meetingPoint! : ""),
+            leading: const TileIcon(Icon(Icons.location_on)),
+            title: Text(walk.meetingPoint ?? ""),
             subtitle: _getGeoText(),
             trailing: OutlineIconButton(
                 onPressed: () => launchGeoApp(walk),
@@ -37,17 +42,17 @@ class WalkDetails extends StatelessWidget {
           ),
           walk.ign != null
               ? ListTile(
-                  leading: TileIcon(Icon(Icons.map)),
+                  leading: const TileIcon(Icon(Icons.map)),
                   title: Text("IGN ${walk.ign}"))
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           walk.meetingPointInfo != null
               ? ListTile(
-                  leading: TileIcon(Icon(Icons.info)),
+                  leading: const TileIcon(Icon(Icons.info)),
                   title: Text(walk.meetingPointInfo!))
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           ListTile(
-            leading: TileIcon(Icon(Icons.group)),
-            title: Text("${walk.organizer}"),
+            leading: const TileIcon(Icon(Icons.group)),
+            title: Text(walk.organizer),
             subtitle: Text(walk.getContactLabel()),
             trailing: OutlineIconButton(
                 onPressed: () {
@@ -60,9 +65,9 @@ class WalkDetails extends StatelessWidget {
           ),
           walk.transport != null
               ? ListTile(
-                  leading: TileIcon(Icon(Icons.train)),
+                  leading: const TileIcon(Icon(Icons.train)),
                   title: Text(walk.transport!))
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           _infoRow(),
         ],
       ),
@@ -70,41 +75,32 @@ class WalkDetails extends StatelessWidget {
   }
 
   Widget _infoRow() {
-    return Wrap(alignment: WrapAlignment.center, children: <Widget>[
-      _infoTile(Icons.directions_walk, walk.fifteenKm,
-          "Parcours suppl. de marche de 15 km"),
-      _infoTile(Icons.accessible_forward, walk.wheelchair,
-          "Parcours de 5 km accessible aux PMR"),
-      _infoTile(Icons.child_friendly, walk.stroller,
-          "Parcours de 5 km accessible aux landaus"),
-      _infoTile(Icons.map, walk.extraOrientation,
-          "Parcours suppl. d'orientation de +/- 8 km"),
-      _infoTile(Icons.directions_walk, walk.extraWalk,
-          "Parcours suppl. de marche de +/- 10 km"),
-      _infoTile(Icons.nature_people, walk.guided, "Balade guidée Nature"),
-      _infoTile(Icons.directions_bike, walk.bike,
-          "Parcours suppl. de vélo de +/- 20 km"),
-      _infoTile(Icons.directions_bike, walk.mountainBike,
-          "Parcours suppl. de VTT de +/- 20 km"),
-      _infoTile(Icons.local_drink, walk.waterSupply, "Ravitaillement"),
-      _infoTile(
-          Icons.delete, walk.beWapp, "Participe à \"Wallonie Plus Propre\"",
-          url: "https://www.walloniepluspropre.be/")
-    ]);
+    List<Widget> _infos = [
+      WalkInfo.wheelchair,
+      WalkInfo.stroller,
+      WalkInfo.guided,
+      WalkInfo.bike,
+      WalkInfo.mountainBike,
+      WalkInfo.waterSupply,
+      WalkInfo.beWapp,
+      WalkInfo.adepSante
+    ].map((WalkInfo info) => _infoTile(info)).toList();
+
+    return Wrap(alignment: WrapAlignment.center, children: _infos);
   }
 
-  Widget _infoTile(IconData icon, bool value, String message, {String? url}) {
-    if (value) {
+  Widget _infoTile(WalkInfo info) {
+    if (info.walkValue(walk)) {
       return ListTile(
-          leading: TileIcon(Icon(icon)),
-          title: Text(message),
-          onTap: url != null
+          leading: TileIcon(Icon(info.icon)),
+          title: Text(info.description),
+          onTap: info.url != null
               ? () {
-                  launchURL(url);
+                  launchURL(info.url);
                 }
               : null);
     } else {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
   }
 
@@ -121,14 +117,14 @@ class WalkDetails extends StatelessWidget {
 }
 
 class _WeatherSection extends StatelessWidget {
-  _WeatherSection(this.walk);
+  const _WeatherSection(this.walk);
 
   final Walk walk;
 
   @override
   Widget build(BuildContext context) {
     if (walk.weathers.isEmpty) {
-      return SizedBox();
+      return const SizedBox.shrink();
     } else {
       List<Widget> widgets = [];
       for (Weather weather in walk.weathers) {
@@ -150,8 +146,31 @@ class _WeatherSection extends StatelessWidget {
   }
 }
 
+class _RangesTile extends StatelessWidget {
+  const _RangesTile(this.walk);
+
+  final Walk walk;
+
+  @override
+  Widget build(BuildContext context) {
+    if (walk.isWalk || walk.isOrientation) {
+      String _title = Range.label(walk);
+      WalkInfo? _subtitle =
+          walk.isWalk ? WalkInfo.extraOrientation : WalkInfo.extraWalk;
+
+      return ListTile(
+          leading: TileIcon(Icon(Range.icon)),
+          title: Text(_title),
+          subtitle:
+              _subtitle.walkValue(walk) ? Text(_subtitle.description) : null);
+    }
+
+    return const SizedBox.shrink();
+  }
+}
+
 class _StatusTile extends StatelessWidget {
-  _StatusTile(this.walk);
+  const _StatusTile(this.walk);
 
   final Walk walk;
 
@@ -166,7 +185,7 @@ class _StatusTile extends StatelessWidget {
             style: TextStyle(color: CompanyColors.contextualRed(context)),
           ));
     } else {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
   }
 }

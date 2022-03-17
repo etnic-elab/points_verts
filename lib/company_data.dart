@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 const String applicationName = "ADEPS - Points Verts";
@@ -6,10 +5,14 @@ const String companyMail = "innovation@etnic.be";
 const String githubUrl = "https://github.com/etnic-elab/points_verts";
 const String opendataUrl =
     "https://www.odwb.be/explore/dataset/points-verts-de-ladeps";
-const String assistanceUrl =
-    "https://adeps-points-verts.innovation-etnic.be/assistance.html";
-const String privacyUrl =
-    "https://adeps-points-verts.innovation-etnic.be/privacy.html";
+const String _publicUrl = "https://adeps-points-verts.innovation-etnic.be";
+const String assistanceUrl = "$_publicUrl/assistance.html";
+const String privacyUrl = "$_publicUrl/privacy.html";
+const String publicLogo = "$_publicUrl/logo_64x64.png";
+const String publicLogoCancelledLight =
+    "$_publicUrl/logo_cancelled_light_64x64.png";
+const String publicLogoCancelledDark =
+    "$_publicUrl/logo_cancelled_dark_64x64.png";
 
 class CompanyColors {
   static const greenPrimary = Color(0xFF6CB233);
@@ -36,36 +39,45 @@ class CompanyColors {
   }
 }
 
-final greenPrimaryMatCol = _createMaterialColor(CompanyColors.greenPrimary);
+class CompanyTheme {
+  static final greenPrimaryMatCol =
+      _createMaterialColor(CompanyColors.greenPrimary);
 
-final ThemeData companyTheme =
-    ThemeData(primarySwatch: _createMaterialColor(greenPrimaryMatCol));
+  static final ThemeData companyDark = ThemeData(
+    brightness: Brightness.dark,
+    primarySwatch: _createMaterialColor(greenPrimaryMatCol),
+    toggleableActiveColor: greenPrimaryMatCol[400],
+    textSelectionTheme:
+        TextSelectionThemeData(selectionHandleColor: greenPrimaryMatCol[400]),
+  );
 
-final ThemeData companyDarkTheme = ThemeData(
-  brightness: Brightness.dark,
-  primarySwatch: _createMaterialColor(greenPrimaryMatCol),
-  accentColor: greenPrimaryMatCol[400],
-  toggleableActiveColor: greenPrimaryMatCol[400],
-  textSelectionTheme:
-      TextSelectionThemeData(selectionHandleColor: greenPrimaryMatCol[400]),
-);
-
-MaterialColor _createMaterialColor(Color color) {
-  List strengths = <double>[.05];
-  final swatch = <int, Color>{};
-  final int r = color.red, g = color.green, b = color.blue;
-
-  for (int i = 1; i < 10; i++) {
-    strengths.add(0.1 * i);
+  static ThemeData companyLightTheme() {
+    return ThemeData(primarySwatch: _createMaterialColor(greenPrimaryMatCol));
   }
-  strengths.forEach((strength) {
-    final double ds = 0.5 - strength;
-    swatch[(strength * 1000).round()] = Color.fromRGBO(
-      r + ((ds < 0 ? r : (255 - r)) * ds).round(),
-      g + ((ds < 0 ? g : (255 - g)) * ds).round(),
-      b + ((ds < 0 ? b : (255 - b)) * ds).round(),
-      1,
-    );
-  });
-  return MaterialColor(color.value, swatch);
+
+  static ThemeData companyDarkTheme() {
+    return companyDark.copyWith(
+        colorScheme: companyDark.colorScheme
+            .copyWith(secondary: greenPrimaryMatCol[400]));
+  }
+
+  static MaterialColor _createMaterialColor(Color color) {
+    List strengths = <double>[.05];
+    final swatch = <int, Color>{};
+    final int r = color.red, g = color.green, b = color.blue;
+
+    for (int i = 1; i < 10; i++) {
+      strengths.add(0.1 * i);
+    }
+    for (var strength in strengths) {
+      final double ds = 0.5 - strength;
+      swatch[(strength * 1000).round()] = Color.fromRGBO(
+        r + ((ds < 0 ? r : (255 - r)) * ds).round(),
+        g + ((ds < 0 ? g : (255 - g)) * ds).round(),
+        b + ((ds < 0 ? b : (255 - b)) * ds).round(),
+        1,
+      );
+    }
+    return MaterialColor(color.value, swatch);
+  }
 }

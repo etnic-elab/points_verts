@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
@@ -6,20 +5,22 @@ import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 
 class Debug extends StatelessWidget {
+  const Debug({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Debug"),
+          title: const Text("Debug"),
         ),
         body: ListView(
           children: <Widget>[
             _LastWalkUpdateTile(),
-            Divider(height: 0.5),
+            const Divider(height: 0.5),
             _GeoPosTile(),
-            Divider(height: 0.5),
+            const Divider(height: 0.5),
             _PendingNotificationsTile(),
-            Divider(height: 0.5),
+            const Divider(height: 0.5),
             _LastBackgroundFetch()
           ],
         ));
@@ -34,12 +35,11 @@ class _LastWalkUpdateTile extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           return ListTile(
-            title: Text("Dernière mise à jour de la liste des marches"),
+            title: const Text("Dernière mise à jour de la liste des marches"),
             subtitle: Text("${formatDate(snapshot.data!)} (heure locale)"),
           );
-        } else {
-          return SizedBox.shrink();
         }
+        return const SizedBox.shrink();
       },
     );
   }
@@ -53,12 +53,11 @@ class _GeoPosTile extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData) {
           return ListTile(
-            title: Text("Coordonnées GPS de l'emplacement de référence"),
+            title: const Text("Coordonnées GPS de l'emplacement de référence"),
             subtitle: Text(snapshot.data!),
           );
-        } else {
-          return SizedBox.shrink();
         }
+        return const SizedBox.shrink();
       },
     );
   }
@@ -73,19 +72,41 @@ class _PendingNotificationsTile extends StatelessWidget {
             AsyncSnapshot<List<PendingNotificationRequest>> snapshot) {
           if (snapshot.hasData) {
             List<PendingNotificationRequest> requests = snapshot.data!;
-            if (requests.length > 0) {
+            if (requests.isNotEmpty) {
               return ListTile(
                 isThreeLine: true,
-                title: Text("Prochaine notification planifiée"),
+                title: const Text("Prochaines notifications planifiées"),
                 subtitle: Text(
-                  requests[0].title! + '\n' + requests[0].body!,
-                  style: TextStyle(fontSize: 12.0),
+                  _generatePendingNotificationsSubtitle(requests),
+                  style: const TextStyle(fontSize: 12.0),
                 ),
+                trailing: OutlinedButton(
+                    onPressed: () => _testNotification(requests),
+                    child: const Text("Test")),
               );
             }
           }
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         });
+  }
+
+  _testNotification(List<PendingNotificationRequest> requests) {
+    PendingNotificationRequest request = requests[0];
+    NotificationManager.instance
+        .displayNotification(-1, "[TEST] ${request.title}", request.body);
+  }
+
+  String _generatePendingNotificationsSubtitle(
+      List<PendingNotificationRequest> requests) {
+    String result = "";
+    for (int i = 0; i < requests.length; i++) {
+      PendingNotificationRequest request = requests[i];
+      result = result + request.title! + '\n' + request.body!;
+      if (i != requests.length - 1) {
+        result = result + "\n\n";
+      }
+    }
+    return result;
   }
 }
 
@@ -97,17 +118,17 @@ class _LastBackgroundFetch extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
             return ListTile(
-              title: Text("Dernière actualisation en arrière-plan"),
+              title: const Text("Dernière actualisation en arrière-plan"),
               subtitle: Text("${formatDate(snapshot.data!)} (heure locale)"),
             );
           }
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         });
   }
 }
 
 String formatDate(String date) {
-  DateFormat dateFormat = new DateFormat.MMMMEEEEd("fr").add_Hms();
+  DateFormat dateFormat = DateFormat.MMMMEEEEd("fr").add_Hms();
   DateTime dateTime = DateTime.parse(date).toLocal();
   return dateFormat.format(dateTime);
 }

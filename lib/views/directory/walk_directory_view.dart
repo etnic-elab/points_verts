@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/database.dart';
@@ -15,6 +14,8 @@ import '../../models/walk.dart';
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
 class WalkDirectoryView extends StatefulWidget {
+  const WalkDirectoryView({Key? key}) : super(key: key);
+
   @override
   _WalkDirectoryViewState createState() => _WalkDirectoryViewState();
 }
@@ -60,13 +61,13 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                 actions: <Widget>[
                   walks != null
                       ? IconButton(
-                          icon: Icon(Icons.search),
+                          icon: const Icon(Icons.search),
                           onPressed: () {
                             showSearch(
                                 context: context, delegate: _DataSearch(walks));
                           },
                         )
-                      : SizedBox()
+                      : const SizedBox()
                 ],
               ),
               body: walks != null
@@ -79,9 +80,9 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                             child: ActionChip(
                               label: Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
+                                children: const <Widget>[
                                   Padding(
-                                    padding: const EdgeInsets.only(right: 4.0),
+                                    padding: EdgeInsets.only(right: 4.0),
                                     child: Icon(Icons.tune, size: 16.0),
                                   ),
                                   Text("Filtres")
@@ -107,7 +108,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                             ),
                           ),
                         ),
-                        Divider(height: 0.0),
+                        const Divider(height: 0.0),
                         Expanded(child: _DirectoryList(walks)),
                       ],
                     )
@@ -118,7 +119,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                 appBar: AppBar(
                   title: const Text("Annuaire"),
                 ),
-                body: Loading());
+                body: const Loading());
           }
         });
   }
@@ -127,12 +128,13 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
 class _DirectoryList extends StatelessWidget {
   final List<Walk> walks;
 
-  _DirectoryList(this.walks);
+  const _DirectoryList(this.walks);
 
   @override
   Widget build(BuildContext context) {
-    if (walks.length == 0) {
-      return Center(child: Text("Aucune marche ne correspond aux critères."));
+    if (walks.isEmpty) {
+      return const Center(
+          child: Text("Aucune marche ne correspond aux critères."));
     } else {
       return ListView.builder(
         itemBuilder: (context, index) =>
@@ -158,7 +160,7 @@ class _DataSearch extends SearchDelegate<String?> {
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
-          icon: Icon(Icons.clear),
+          icon: const Icon(Icons.clear),
           onPressed: () {
             query = '';
           })

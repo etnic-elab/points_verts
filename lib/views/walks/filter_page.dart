@@ -1,12 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:points_verts/models/walk_filter.dart';
+import 'package:points_verts/views/walks/walk_info.dart';
 
 import '../list_header.dart';
 import 'walks_view.dart';
 
 class FilterPage extends StatefulWidget {
-  FilterPage(this.currentFilter, this.showPlaces);
+  const FilterPage(this.currentFilter, this.showPlaces, {Key? key})
+      : super(key: key);
 
   final WalkFilter currentFilter;
   final bool showPlaces;
@@ -20,7 +21,7 @@ class _FilterPageState extends State<FilterPage> {
   Widget build(BuildContext context) {
     WalkFilter editedFilter = widget.currentFilter;
     return Scaffold(
-      appBar: AppBar(title: Text("Filtres des marches")),
+      appBar: AppBar(title: const Text("Filtres des marches")),
       body: Column(
         children: [
           Expanded(
@@ -31,22 +32,22 @@ class _FilterPageState extends State<FilterPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Row(
                           children: [
-                            Text("Distances à partir de : "),
+                            const Text("Distances à partir de : "),
                             ChoiceChip(
-                              label: Text("Domicile"),
+                              label: const Text("Domicile"),
                               selected:
                                   editedFilter.selectedPlace == Places.home,
-                              onSelected: (bool) {
+                              onSelected: (value) {
                                 setState(() {
                                   editedFilter.selectedPlace = Places.home;
                                 });
                               },
                             ),
                             ChoiceChip(
-                              label: Text("Position"),
+                              label: const Text("Position"),
                               selected:
                                   editedFilter.selectedPlace == Places.current,
-                              onSelected: (bool) {
+                              onSelected: (value) {
                                 setState(() {
                                   editedFilter.selectedPlace = Places.current;
                                 });
@@ -55,103 +56,108 @@ class _FilterPageState extends State<FilterPage> {
                           ],
                         ),
                       )
-                    : SizedBox.shrink(),
+                    : const SizedBox.shrink(),
                 Row(
                   children: <Widget>[
                     Checkbox(
-                        onChanged: (bool) {
-                          editedFilter.cancelledWalks = bool!;
+                        onChanged: (v) {
+                          editedFilter.cancelledWalks = v!;
                           setState(() {});
                         },
                         value: editedFilter.cancelledWalks),
-                    Text("Afficher les marches annulées")
+                    const Text("Afficher les marches annulées")
                   ],
                 ),
-                Divider(),
-                ListHeader("Provinces"),
+                const Divider(),
+                const ListHeader("Provinces"),
                 Wrap(
                   children: [
                     _PaddedChip(editedFilter.brabantWallon, "Brabant Wallon",
-                        (bool) {
-                      editedFilter.brabantWallon = bool;
+                        (value) {
+                      editedFilter.brabantWallon = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.bruxelles, "Bruxelles", (bool) {
-                      editedFilter.bruxelles = bool;
+                    _PaddedChip(editedFilter.bruxelles, "Bruxelles", (value) {
+                      editedFilter.bruxelles = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.hainautEst, "Hainaut Est", (bool) {
-                      editedFilter.hainautEst = bool;
+                    _PaddedChip(editedFilter.hainautEst, "Hainaut Est",
+                        (value) {
+                      editedFilter.hainautEst = value;
                       setState(() {});
                     }),
                     _PaddedChip(editedFilter.hainautOuest, "Hainaut Ouest",
-                        (bool) {
-                      editedFilter.hainautOuest = bool;
+                        (value) {
+                      editedFilter.hainautOuest = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.liege, "Liège", (bool) {
-                      editedFilter.liege = bool;
+                    _PaddedChip(editedFilter.liege, "Liège", (value) {
+                      editedFilter.liege = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.luxembourg, "Luxembourg", (bool) {
-                      editedFilter.luxembourg = bool;
+                    _PaddedChip(editedFilter.luxembourg, "Luxembourg", (value) {
+                      editedFilter.luxembourg = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.namur, "Namur", (bool) {
-                      editedFilter.namur = bool;
+                    _PaddedChip(editedFilter.namur, "Namur", (value) {
+                      editedFilter.namur = value;
                       setState(() {});
                     }),
                   ],
                 ),
-                Divider(),
-                ListHeader("Afficher uniquement Points ayant..."),
+                const Divider(),
+                const ListHeader("Afficher uniquement Points ayant..."),
                 Wrap(
                   children: [
-                    _PaddedChip(editedFilter.fifteenKm, "Parcours 15 km",
-                        (bool) {
-                      editedFilter.fifteenKm = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.fifteenKm, (value) {
+                      editedFilter.fifteenKm = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.wheelchair, "PMR", (bool) {
-                      editedFilter.wheelchair = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.wheelchair, (value) {
+                      editedFilter.wheelchair = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.stroller, "Poussettes", (bool) {
-                      editedFilter.stroller = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.stroller, (value) {
+                      editedFilter.stroller = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.extraOrientation, "+ Orientation",
-                        (bool) {
-                      editedFilter.extraOrientation = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.extraOrientation,
+                        (value) {
+                      editedFilter.extraOrientation = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.extraWalk, "+ Marche", (bool) {
-                      editedFilter.extraWalk = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.extraWalk, (value) {
+                      editedFilter.extraWalk = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.guided, "Balade guidée", (bool) {
-                      editedFilter.guided = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.guided, (value) {
+                      editedFilter.guided = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.bike, "Vélo", (bool) {
-                      editedFilter.bike = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.bike, (value) {
+                      editedFilter.bike = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.mountainBike, "VTT", (bool) {
-                      editedFilter.mountainBike = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.mountainBike,
+                        (value) {
+                      editedFilter.mountainBike = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.transport, "Train/Bus", (bool) {
-                      editedFilter.transport = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.transport, (value) {
+                      editedFilter.transport = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.waterSupply, "Ravitaillement",
-                        (bool) {
-                      editedFilter.waterSupply = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.waterSupply,
+                        (value) {
+                      editedFilter.waterSupply = value;
                       setState(() {});
                     }),
-                    _PaddedChip(editedFilter.beWapp, "BeWaPP", (bool) {
-                      editedFilter.beWapp = bool;
+                    _infoPaddedChip(editedFilter, WalkInfo.beWapp, (value) {
+                      editedFilter.beWapp = value;
+                      setState(() {});
+                    }),
+                    _infoPaddedChip(editedFilter, WalkInfo.adepSante, (value) {
+                      editedFilter.adepSante = value;
                       setState(() {});
                     }),
                   ],
@@ -184,19 +190,31 @@ class _FilterPageState extends State<FilterPage> {
   }
 }
 
+_infoPaddedChip(WalkFilter filter, WalkInfo walkInfo, Function(bool) callback) {
+  return _PaddedChip(walkInfo.filterValue(filter), walkInfo.label, callback,
+      icon: walkInfo.icon);
+}
+
 class _PaddedChip extends StatelessWidget {
-  _PaddedChip(this.value, this.label, this.callback);
+  const _PaddedChip(this.value, this.label, this.callback, {this.icon});
 
   final bool value;
   final String label;
   final Function(bool) callback;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: FilterChip(
-        label: Text(this.label),
+        avatar: icon != null
+            ? Icon(
+                icon,
+                size: 15.0,
+              )
+            : null,
+        label: Text(label),
         selected: value,
         onSelected: callback,
       ),

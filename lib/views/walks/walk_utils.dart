@@ -2,18 +2,22 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/environment.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/services/mapbox.dart';
+import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:add_2_calendar/add_2_calendar.dart';
 
 import '../../models/walk.dart';
 import '../../models/coordinates.dart';
 
-const String TAG = "dev.alpagaga.points_verts.WalksUtils";
+final MapInterface map = Environment.mapInterface;
+
+const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
 void launchGeoApp(Walk walk) async {
   if (walk.lat != null && walk.long != null) {
@@ -24,6 +28,29 @@ void launchGeoApp(Walk walk) async {
           'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})');
     }
   }
+}
+
+void addToCalendar(Walk walk) {
+  final Event event = Event(
+    title: "Marche ADEPS de ${walk.city}",
+    description: _generateEventDescription(walk),
+    location: "${walk.meetingPoint}, ${walk.entity}",
+    startDate: walk.date.add(const Duration(hours: 8)),
+    endDate: walk.date.add(const Duration(hours: 18)),
+  );
+  Add2Calendar.addEvent2Cal(event);
+}
+
+String _generateEventDescription(Walk walk) {
+  String result = "";
+  result += "Groupement organisateur : ${walk.organizer} - ${walk.contactFirstName} ${walk.contactLastName}";
+  if (walk.contactPhoneNumber != null) {
+    result += " - ${walk.contactPhoneNumber}";
+  }
+  if (walk.meetingPointInfo != null) {
+    result += "\nRemarques : ${walk.meetingPointInfo}";
+  }
+  return result;
 }
 
 int sortWalks(Walk a, Walk b) {
@@ -59,7 +86,9 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
   }
   walks.sort((a, b) => sortWalks(a, b));
   try {
-    await retrieveTrips(position.longitude, position.latitude, walks).then((_) {
+    await map
+        .retrieveTrips(position.longitude, position.latitude, walks)
+        .then((_) {
       walks.sort((a, b) => sortWalks(a, b));
     });
   } catch (err) {
@@ -79,7 +108,7 @@ launchURL(url) async {
 }
 
 updateWalks() async {
-  log("Updating walks", name: TAG);
+  log("Updating walks", name: tag);
   String? lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
   DateTime now = DateTime.now().toUtc();
   if (lastUpdate == null) {
@@ -91,7 +120,7 @@ updateWalks() async {
     }
   } else {
     DateTime lastUpdateDate = DateTime.parse(lastUpdate);
-    if (now.difference(lastUpdateDate) > Duration(hours: 1)) {
+    if (now.difference(lastUpdateDate) > const Duration(hours: 1)) {
       try {
         List<Walk> updatedWalks = await refreshAllWalks(lastUpdate);
         if (updatedWalks.isNotEmpty) {
@@ -106,7 +135,7 @@ updateWalks() async {
       }
     } else {
       log("Not refreshing walks list since it has been done less than an hour ago",
-          name: TAG);
+          name: tag);
     }
   }
 }
@@ -114,7 +143,7 @@ updateWalks() async {
 Future<List<DateTime>> retrieveNearestDates() async {
   List<DateTime> walkDates = await DBProvider.db.getWalkDates();
   DateTime now = DateTime.now();
-  DateTime inAWeek = now.add(Duration(days: 10));
+  DateTime inAWeek = now.add(const Duration(days: 10));
   walkDates.retainWhere(
       (element) => element.isAfter(now) && element.isBefore(inAWeek));
   return walkDates;

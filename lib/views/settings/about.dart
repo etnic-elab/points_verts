@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:points_verts/company_data.dart';
-import 'package:points_verts/asset.dart';
+import 'package:points_verts/environment.dart';
+import 'package:points_verts/services/assets.dart';
+import 'package:points_verts/views/tile_icon.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 class About extends StatelessWidget {
+  const About({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -13,38 +17,40 @@ class About extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
             return ListTile(
-                leading: Icon(Icons.info),
-                title: Text("À propos"),
+                leading: const TileIcon(Icon(Icons.info)),
+                title: const Text("À propos"),
                 onTap: () {
                   showAboutDialog(
                       context: context,
                       applicationIcon: Image(
-                          image: Assets.assetImage(Assets.logo, context),
+                          image: Assets.instance.themedAssetImage(
+                              Theme.of(context).brightness, Assets.logo),
                           height: 50),
                       applicationName: applicationName,
                       applicationVersion: snapshot.data!.version,
                       applicationLegalese: "GNU GPLv3",
                       children: [
-                        _AboutRow("Dépôt du code source", "GitHub", githubUrl),
-                        _AboutRow("Adresse de contact", companyMail,
+                        const _AboutRow(
+                            "Dépôt du code source", "GitHub", githubUrl),
+                        const _AboutRow("Adresse de contact", companyMail,
                             "mailto:$companyMail?subject=Points Verts"),
-                        _AboutRow("Données des Points Verts",
+                        const _AboutRow("Données des Points Verts",
                             "Open Data Wallonie-Bruxelles", opendataUrl),
-                        _AboutRow("Données de navigation", "Mapbox",
-                            "https://www.mapbox.com"),
-                        _AboutRow("Données météorologiques", "OpenWeather",
-                            "https://openweathermap.org")
+                        _AboutRow("Données de navigation", Environment.mapApi,
+                            Environment.mapWebsite),
+                        const _AboutRow("Données météorologiques",
+                            "OpenWeather", "https://openweathermap.org")
                       ]);
                 });
           } else {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
         });
   }
 }
 
 class _AboutRow extends StatelessWidget {
-  _AboutRow(this.label, this.buttonLabel, this.url);
+  const _AboutRow(this.label, this.buttonLabel, this.url);
 
   final String label;
   final String buttonLabel;

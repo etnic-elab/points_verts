@@ -2,9 +2,9 @@ name: Flutter CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
@@ -13,19 +13,25 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
         with:
-          java-version: '12.x'
+          java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          channel: 'stable'
+          channel: "stable"
       - name: Install dependencies
         run: flutter pub get
       - name: Touch placeholder files
         run: |
           touch .env
-          touch android/app/src/main/res/drawable/ic_notification.png
-          touch android/app/src/main/res/drawable/ic_splashscreen.png
-          touch android/app/src/main/res/drawable/ic_splashscreen_dark.png
-          touch android/app/src/main/res/mipmap/ic_launcher_foreground.png
+          cp assets/dummy.png assets/light/splash.png
+          cp assets/dummy.png assets/dark/splash.png
+          cp assets/dummy_icon.png assets/launcher_icons/icon_812x812.png
+          cp assets/dummy_icon.png assets/launcher_icons/icon_432x432.png
+          touch ios/Runner/GoogleMaps.plist
+          echo "" >> ios/Runner/GoogleMaps.plist
+      - name: Generate splash screens
+        run: flutter pub run flutter_native_splash:create
+      - name: Generate launcher icons
+        run: flutter pub run flutter_launcher_icons:main
       - name: Run tests
         run: flutter test
       - name: Run code analysis

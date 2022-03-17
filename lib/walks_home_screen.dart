@@ -1,6 +1,5 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
@@ -13,13 +12,19 @@ import 'views/settings/settings.dart';
 import 'views/walks/walks_view.dart';
 
 class WalksHomeScreen extends StatefulWidget {
+  const WalksHomeScreen({Key? key}) : super(key: key);
+
   @override
   _WalksHomeScreenState createState() => _WalksHomeScreenState();
 }
 
 class _WalksHomeScreenState extends State<WalksHomeScreen>
     with WidgetsBindingObserver {
-  List<Widget> _pages = [WalksView(), WalkDirectoryView(), Settings()];
+  final List<Widget> _pages = [
+    const WalksView(),
+    const WalkDirectoryView(),
+    const Settings()
+  ];
   int _selectedIndex = 0;
   bool _loading = true;
   bool _error = false;
@@ -89,7 +94,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
             startOnBoot: true), (String taskId) async {
       print("[BackgroundFetch] taskId: $taskId");
       try {
-        await scheduleNextNearestWalkNotification();
+        await scheduleNextNearestWalkNotifications();
         await PrefsProvider.prefs.setString(
             "last_background_fetch", DateTime.now().toUtc().toIso8601String());
       } catch (err) {
@@ -117,19 +122,19 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: <BottomNavigationBarItem>[
-          const BottomNavigationBarItem(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today), label: "Calendrier"),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
               icon: Icon(Icons.import_contacts), label: "Annuaire"),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
               icon: Icon(Icons.settings), label: "Paramètres"),
         ],
       ),
       body: _error
           ? WalkListError(fetchData)
           : _loading
-              ? Loading()
+              ? const Loading()
               : _pages[_selectedIndex],
     );
   }
