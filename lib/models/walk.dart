@@ -176,4 +176,8 @@ class Walk {
       return "$contactLastName $contactFirstName";
     }
   }
+
+  bool get isWalk => type == 'Marche';
+
+  bool get isOrientation => type == 'Orientation';
 }
