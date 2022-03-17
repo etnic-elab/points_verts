@@ -186,8 +186,8 @@ class _SettingsState extends State<Settings> {
               _setShowNotification(value);
             },
           ),
-          Divider(),
-          ListHeader("Diagnostic"),
+          const Divider(),
+          const ListHeader("Diagnostic"),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
             child: Text(
@@ -195,14 +195,14 @@ class _SettingsState extends State<Settings> {
                 style: Theme.of(context).textTheme.caption),
           ),
           SwitchListTile(
-            secondary: TileIcon(Icon(Icons.bug_report)),
-            title: const Text("Envoi de rapports  "),
+            secondary: const TileIcon(Icon(Icons.bug_report)),
+            title: const Text("Envoi de diagnostics"),
             value: _crashlyticsEnabled,
             onChanged: (bool value) {
               _setCrashlyticsEnabled(value);
             },
           ),
-          Divider(),
+          const Divider(),
           ListTile(
             leading: const TileIcon(Icon(Icons.help)),
             title: const Text("Assistance"),
