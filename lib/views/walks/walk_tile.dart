@@ -55,11 +55,12 @@ class WalkTile extends StatelessWidget {
       )
     ];
 
-    if (!walk.isCancelled()) {
+    List<Widget> _info = _infoRow(walk);
+    if (!walk.isCancelled() && _info.isNotEmpty) {
       _list.add(const Divider(height: 0));
       _list.add(Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-        child: _infoRow(walk),
+        child: Wrap(alignment: WrapAlignment.start, children: _info),
       ));
     }
 
@@ -85,18 +86,29 @@ class WalkTile extends StatelessWidget {
     }
   }
 
-  Widget _infoRow(Walk walk) {
-    List<Widget> _infos = WalkInfo.values
-        .map((WalkInfo info) => info == WalkInfo.fifteenKm
-            ? _ChipLabel(info.label, info.walkValue(walk), icon: info.icon)
-            : _ChipIcon(info.icon, info.walkValue(walk)))
-        .toList();
+  List<Widget> _infoRow(Walk walk) {
+    List<Widget> info = [];
 
     if (walk.weathers.isNotEmpty) {
-      _infos = [_WeatherChip(walk.weathers[0]), ..._infos];
+      info.add(_WeatherChip(walk.weathers[0]));
     }
 
-    return Wrap(alignment: WrapAlignment.start, children: _infos);
+    info.addAll(WalkInfo.values
+        .map((WalkInfo _info) {
+          bool _value = _info.walkValue(walk);
+
+          if (!_value) {
+            return null;
+          } else if (WalkInfo.fifteenKm == _info) {
+            return _ChipLabel('+ ${_info.label}', _value);
+          }
+
+          return _ChipIcon(_info.icon, _value);
+        })
+        .whereType<Widget>()
+        .toList());
+
+    return info;
   }
 
   PageRoute _pageRoute() {
