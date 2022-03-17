@@ -43,7 +43,7 @@ Weather _createWeather(var forecast) {
       timestamp: DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000));
 }
 
-Widget getWeatherIcon(Weather weather) {
+Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
   IconData icon;
   switch (weather.weatherId) {
     case 200:
@@ -156,5 +156,5 @@ Widget getWeatherIcon(Weather weather) {
     default:
       return const Icon(Icons.cancel, color: CompanyColors.red);
   }
-  return BoxedIcon(icon, color: CompanyColors.blue);
+  return BoxedIcon(icon, color: iconColor ?? CompanyColors.blue, size: iconSize);
 }

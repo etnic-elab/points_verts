@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/views/walks/walk_info.dart';
 
 import '../tile_icon.dart';
 import '../../models/walk.dart';
@@ -26,11 +27,23 @@ class WalkTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-      child: ListTile(
-        leading: _weatherIcon(),
+      child: InkWell(
+        onTap: () => Navigator.push(context, _pageRoute()),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: _children,
+        ),
+      ),
+    );
+  }
+
+  List<Widget> get _children {
+    List<Widget> _list = [
+      ListTile(
+        leading: TileIcon(WalkIcon(walk)),
         title: _title(),
         subtitle: _subtitle(),
-        onTap: () => Navigator.push(context, _pageRoute()),
         trailing: tileType == TileType.calendar
             ? GeoButton(walk)
             : Column(
@@ -39,8 +52,19 @@ class WalkTile extends StatelessWidget {
                   Text(fullDate.format(walk.date)),
                 ],
               ),
-      ),
-    );
+      )
+    ];
+
+    List<Widget> _info = _infoRow(walk);
+    if (!walk.isCancelled() && _info.isNotEmpty) {
+      _list.add(const Divider(height: 0));
+      _list.add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+        child: Wrap(alignment: WrapAlignment.start, children: _info),
+      ));
+    }
+
+    return _list;
   }
 
   Widget _title() {
@@ -62,12 +86,29 @@ class WalkTile extends StatelessWidget {
     }
   }
 
-  Widget _weatherIcon() {
-    if (walk.isCancelled() || walk.weathers.isEmpty) {
-      return TileIcon(WalkIcon(walk));
-    } else {
-      return WeatherIcon(walk.weathers[0]);
+  List<Widget> _infoRow(Walk walk) {
+    List<Widget> info = [];
+
+    if (walk.weathers.isNotEmpty) {
+      info.add(_WeatherChip(walk.weathers[0]));
     }
+
+    info.addAll(WalkInfo.values
+        .map((WalkInfo _info) {
+          bool _value = _info.walkValue(walk);
+
+          if (!_value) {
+            return null;
+          } else if (WalkInfo.fifteenKm == _info) {
+            return _ChipLabel('+ ${_info.label}');
+          }
+
+          return _ChipIcon(_info.icon);
+        })
+        .whereType<Widget>()
+        .toList());
+
+    return info;
   }
 
   PageRoute _pageRoute() {
@@ -75,20 +116,62 @@ class WalkTile extends StatelessWidget {
   }
 }
 
-class WeatherIcon extends StatelessWidget {
-  const WeatherIcon(this.weather, {Key? key}) : super(key: key);
+class _WeatherChip extends StatelessWidget {
+  const _WeatherChip(this.weather, {Key? key}) : super(key: key);
 
   final Weather weather;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        getWeatherIcon(weather),
-        Text("${weather.temperature.round()}°"),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+        avatar: getWeatherIcon(weather,
+            iconSize: 15.0,
+            iconColor: Theme.of(context).textTheme.bodyText1?.color),
+        label: Text("${weather.temperature.round()}°"),
+        visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+}
+
+class _ChipIcon extends StatelessWidget {
+  const _ChipIcon(this.icon);
+
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+        label: Icon(icon, size: 15.0),
+        visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+}
+
+class _ChipLabel extends StatelessWidget {
+  const _ChipLabel(this.text, {this.icon});
+
+  final String text;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+          avatar: icon != null
+              ? Icon(
+                  icon,
+                  size: 15.0,
+                )
+              : null,
+          label: Text(text, style: const TextStyle(fontSize: 12.0)),
+          visualDensity: VisualDensity.compact),
     );
   }
 }
