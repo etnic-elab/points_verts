@@ -100,10 +100,10 @@ class WalkTile extends StatelessWidget {
           if (!_value) {
             return null;
           } else if (WalkInfo.fifteenKm == _info) {
-            return _ChipLabel('+ ${_info.label}', _value);
+            return _ChipLabel('+ ${_info.label}');
           }
 
-          return _ChipIcon(_info.icon, _value);
+          return _ChipIcon(_info.icon);
         })
         .whereType<Widget>()
         .toList());
@@ -137,50 +137,41 @@ class _WeatherChip extends StatelessWidget {
 }
 
 class _ChipIcon extends StatelessWidget {
-  const _ChipIcon(this.icon, this.value);
+  const _ChipIcon(this.icon);
 
   final IconData icon;
-  final bool value;
 
   @override
   Widget build(BuildContext context) {
-    if (value) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2.0),
-        child: Chip(
-            label: Icon(icon, size: 15.0),
-            visualDensity: VisualDensity.compact),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+        label: Icon(icon, size: 15.0),
+        visualDensity: VisualDensity.compact,
+      ),
+    );
   }
 }
 
 class _ChipLabel extends StatelessWidget {
-  const _ChipLabel(this.text, this.value, {this.icon});
+  const _ChipLabel(this.text, {this.icon});
 
   final String text;
-  final bool value;
   final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
-    if (value) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2.0),
-        child: Chip(
-            avatar: icon != null
-                ? Icon(
-                    icon,
-                    size: 15.0,
-                  )
-                : null,
-            label: Text(text, style: const TextStyle(fontSize: 12.0)),
-            visualDensity: VisualDensity.compact),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+          avatar: icon != null
+              ? Icon(
+                  icon,
+                  size: 15.0,
+                )
+              : null,
+          label: Text(text, style: const TextStyle(fontSize: 12.0)),
+          visualDensity: VisualDensity.compact),
+    );
   }
 }
