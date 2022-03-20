@@ -96,9 +96,11 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
               : WalkDetailsMapView(widget.walk, closeSheet);
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _viewType == _ViewType.map
           ? FloatingActionButton(
-              child: Icon(_sheetOpen ? Icons.expand_less : Icons.layers),
+              child:
+                  Icon(_sheetOpen ? Icons.expand_less : Icons.layers_outlined),
               onPressed: () => _onTapFAB(),
             )
           : null,
