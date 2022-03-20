@@ -1,57 +1,61 @@
 import 'package:flutter/cupertino.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:points_verts/company_data.dart';
 
-import 'path_point.dart';
+import 'gpx_point.dart';
 
 class Path {
-  Path({required this.url, required this.title});
+  Path({required this.url, required this.title, required this.color});
 
   final String? url;
   final String title;
-  List<PathPoint> pathPoints = [];
+  final int? color;
+  bool visible = false;
+  List<GpxPoint> gpxPoints = [];
 
-  static Map<Brightness, List<Color>> colors = {
-    Brightness.light: [
-      CompanyColors.greenPrimary,
-      CompanyColors.darkBlue,
-      CompanyColors.darkBrown,
-      CompanyColors.purple,
-      CompanyColors.orange,
-      CompanyColors.pink,
-      CompanyColors.red,
-      CompanyColors.darkGreen,
-    ],
-    Brightness.dark: [
-      CompanyColors.greenPrimary,
-      CompanyColors.blue,
-      CompanyColors.brown,
-      CompanyColors.purple,
-      CompanyColors.orange,
-      CompanyColors.pink,
-      CompanyColors.lightRed,
-      CompanyColors.lightestGreen,
-    ]
-  };
+  Color getColor(Brightness brightness) {
+    bool _isLight = brightness == Brightness.light;
 
-  static Color color(Brightness brightness, int index) {
-    return colors[brightness]![index % Path.colors[brightness]!.length];
+    switch (color) {
+      case 1:
+        return _isLight ? CompanyColors.darkBlue : CompanyColors.blue;
+      case 2:
+        return CompanyColors.yellow;
+      case 3:
+        return CompanyColors.purple;
+      case 4:
+        return _isLight ? CompanyColors.red : CompanyColors.lightRed;
+      case 5:
+        return CompanyColors.orange;
+      default:
+        return CompanyColors.greenPrimary;
+    }
   }
 
   Path.fromJson(Map<String, dynamic> json)
       : url = json['fichier'],
-        title = json['titre'] ?? 'Parcours';
+        title = json['titre'] ?? 'Parcours',
+        color = _colorInt(json['color']);
 
   Map<String, dynamic> toJson() => {
         'fichier': url,
         'titre': title,
+        'color': color,
       };
 
-  List<LatLng> get latLngList =>
-      pathPoints.map((point) => point.latLng).toList();
+  static int? _colorInt(dynamic color) {
+    if (color is String) {
+      return int.tryParse(color);
+    }
 
-  List<String> get latLngStringList =>
-      pathPoints.map((point) => '$point').toList();
+    if (color is int) {
+      return color;
+    }
 
-  bool get hasPoints => pathPoints.isNotEmpty;
+    return null;
+  }
+
+  List<List<num>> get encodablePoints => gpxPoints
+      .map((GpxPoint _gpxPoint) =>
+          [_gpxPoint.latLng.latitude, _gpxPoint.latLng.longitude])
+      .toList();
 }

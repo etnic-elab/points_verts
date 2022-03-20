@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
-import 'package:points_verts/company_data.dart';
+import 'package:points_verts/models/gpx_point.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/markers/marker_generator.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
+import 'package:points_verts/extensions.dart';
 
 //Enum used for walk icon generation
 enum GoogleMapIcons {
@@ -17,47 +18,23 @@ enum GoogleMapIcons {
   selectedCancelIcon
 }
 
-extension GoogleMapIconsExtension on GoogleMapIcons {
-  String get logo {
-    switch (this) {
-      case GoogleMapIcons.unselectedWalkIcon:
-      case GoogleMapIcons.selectedWalkIcon:
-        return Assets.logo;
-      case GoogleMapIcons.unselectedCancelIcon:
-      case GoogleMapIcons.selectedCancelIcon:
-        return Assets.logoAnnule;
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case GoogleMapIcons.unselectedWalkIcon:
-      case GoogleMapIcons.unselectedCancelIcon:
-        return CompanyColors.darkGreen;
-      case GoogleMapIcons.selectedWalkIcon:
-      case GoogleMapIcons.selectedCancelIcon:
-        return CompanyColors.lightestGreen;
-    }
-  }
-}
-
 class GoogleMap extends StatefulWidget {
-  const GoogleMap(
-      {Key? key,
-      required this.initialLocation,
-      this.locationEnabled = false,
-      this.markers = const <MarkerInterface>[],
-      this.paths = const <Path>[],
-      this.onTapMap,
-      this.onTapPath})
-      : super(key: key);
+  const GoogleMap({
+    Key? key,
+    required this.initialLocation,
+    this.locationEnabled = false,
+    this.markers = const <MarkerInterface>[],
+    this.paths = const <Path>[],
+    this.onTapMap,
+    // this.onTapPath
+  }) : super(key: key);
 
   final google.CameraPosition initialLocation;
   final bool locationEnabled;
   final List<MarkerInterface> markers;
   final List<Path> paths;
   final Function? onTapMap;
-  final Function(Path)? onTapPath;
+  // final Function(Path)? onTapPath;
 
   @override
   State<StatefulWidget> createState() => _GoogleMapState();
@@ -67,7 +44,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   final Completer<google.GoogleMapController> _completer = Completer();
   Map<Brightness, String> _mapStyles = {};
   Map<Brightness, Map<Enum, google.BitmapDescriptor>> _mapIcons = {};
-  int? _selectedPath;
+  // int? _selectedPath;
 
   @override
   void initState() {
@@ -149,24 +126,25 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     final Set<google.Polyline> polylines = {};
     Brightness brightness = Theme.of(context).brightness;
 
-    for (int i = 0; i < widget.paths.length; i++) {
+    for (int i = 0; i < widget.paths.length; i) {
       Path _path = widget.paths[i];
 
       google.Polyline polyline = google.Polyline(
-          polylineId: google.PolylineId('polylineId_$i'),
-          color: Path.color(brightness, i),
-          width: 4,
-          visible: _selectedPath == null || _selectedPath == i,
-          points: _path.latLngList,
-          consumeTapEvents: widget.onTapPath != null,
-          onTap: () {
-            if (widget.onTapPath != null) {
-              widget.onTapPath!(_path);
-              setState(() {
-                _selectedPath = i;
-              });
-            }
-          });
+        polylineId: google.PolylineId('polylineId_$i'),
+        color: _path.getColor(brightness),
+        width: 4,
+        visible: _path.visible,
+        points: _path.gpxPoints.map((GpxPoint point) => point.latLng).toList(),
+        // consumeTapEvents: widget.onTapPath != null,
+        // onTap: () {
+        //   if (widget.onTapPath != null) {
+        //     widget.onTapPath!(_path);
+        //     setState(() {
+        //       _selectedPath = i;
+        //     });
+        //   }
+        // }
+      );
 
       polylines.add(polyline);
     }
@@ -201,9 +179,9 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
         onTap: (_) {
           if (widget.onTapMap != null) {
             widget.onTapMap!();
-            setState(() {
-              _selectedPath = null;
-            });
+            // setState(() {
+            //   _selectedPath = null;
+            // });
           }
         },
         markers: _markers);

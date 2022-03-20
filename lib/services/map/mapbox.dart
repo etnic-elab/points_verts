@@ -8,6 +8,7 @@ import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/flutter_map.dart';
+import 'package:points_verts/extensions.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -104,25 +105,17 @@ class MapBox implements MapInterface {
     return FlutterMap(markers, _token!, centerLat, centerLong, zoom);
   }
 
-  String _toMapboxHex(Color color) =>
-      '${color.red.toRadixString(16).padLeft(2, '0')}'
-      '${color.green.toRadixString(16).padLeft(2, '0')}'
-      '${color.blue.toRadixString(16).padLeft(2, '0')}';
-
-  String _getEncodedPath(Walk walk, Brightness brightness) {
-    List<String> encodedPaths = [];
-    if (walk.hasPath) {
-      List<Path> paths = walk.paths;
-      for (int i = 0; i < paths.length; i++) {
-        final String path = encodePolyline(paths[i]
-            .latLngList
-            .map((latLng) => [latLng.latitude, latLng.longitude])
-            .toList());
-        final String color = _toMapboxHex(Path.color(brightness, i));
-        encodedPaths.add("path-2+$color-1(${Uri.encodeComponent(path)})");
-      }
-    }
-    return encodedPaths.join(",");
+  String _getEncodedPath(List<Path> paths, Brightness brightness) {
+    return paths
+        .map((_path) {
+          List<List<num>> _encodable = _path.encodablePoints;
+          return _encodable.isNotEmpty
+              ? "path-2+${_path.getColor(brightness).toHex()}-1(${Uri.encodeComponent(encodePolyline(_encodable))})"
+              : null;
+        })
+        .whereType<String>()
+        .toList()
+        .join(',');
   }
 
   @override
@@ -131,7 +124,7 @@ class MapBox implements MapInterface {
       {double zoom = 16.0, Function? onTap}) {
     final String style =
         brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
-    final String path = _getEncodedPath(walk, brightness);
+    final String path = _getEncodedPath(walk.paths, brightness);
     Uri url = Uri.parse(
         "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l(${walk.long},${walk.lat})$path/auto/${width}x$height@2x?access_token=$_token");
     return CachedNetworkImage(

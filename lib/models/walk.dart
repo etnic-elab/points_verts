@@ -3,14 +3,13 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/weather.dart';
-import 'package:collection/collection.dart';
 
 import 'trip.dart';
 
 final dateFormat = DateFormat("yyyy-MM-dd");
 
 const TRACES_GPX =
-    "[{\"titre\": \"Parcours 5 kms\", \"fichier\": \"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx\", \"jourdemarche\": \"0\"}, {\"titre\": \"Parcours 10 kms\", \"fichier\": \"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=271&fichier=Parcours+10kms+%2Egpx\", \"jourdemarche\": \"0\"}, {\"titre\": \"Parcours 15 kms\", \"fichier\": \"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=272&fichier=Parcours+15kms+%2Egpx\", \"jourdemarche\": \"0\"}, {\"titre\": \"Parcours 20 kms\", \"fichier\": \"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=273&fichier=Parcours+20kms+%2Egpx\", \"jourdemarche\": \"0\"}]";
+    "[{\"titre\":\"Parcours 5 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx\",\"jourdemarche\":\"0\",\"color\":\"1\"},{\"titre\":\"Parcours 10 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=271&fichier=Parcours+10kms+%2Egpx\",\"jourdemarche\":\"0\",\"color\":\"2\"},{\"titre\":\"Parcours 15 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=272&fichier=Parcours+15kms+%2Egpx\",\"jourdemarche\":\"0\",\"color\":\"3\"},{\"titre\":\"Parcours 20 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=273&fichier=Parcours+20kms+%2Egpx\",\"jourdemarche\":\"0\",\"color\":\"4\"}]";
 
 class Walk {
   Walk(
@@ -115,16 +114,6 @@ class Walk {
     );
   }
 
-  static List<Path> _decodePaths(json) {
-    try {
-      //TODO: replace with return _pathsFromJson(json['fields']['traces_gpx']);
-      return _pathsFromJson(jsonDecode(TRACES_GPX));
-    } catch (err) {
-      print("Cannot decode paths for walk '${json['fields']['id']}': $err");
-      return [];
-    }
-  }
-
   factory Walk.fromDb(List<Map<String, dynamic>> maps, int i) {
     return Walk(
       id: maps[i]['id'],
@@ -195,6 +184,16 @@ class Walk {
     };
   }
 
+  static List<Path> _decodePaths(json) {
+    try {
+      //TODO: replace with return _pathsFromJson(json['fields']['traces_gpx']);
+      return _pathsFromJson(jsonDecode(TRACES_GPX));
+    } catch (err) {
+      print("Cannot decode paths for walk '${json['fields']['id']}': $err");
+      return [];
+    }
+  }
+
   static List<Path> _pathsFromJson(dynamic json) {
     if (json is List) {
       return (json).map<Path>((json) => Path.fromJson(json)).toList();
@@ -225,9 +224,6 @@ class Walk {
   bool get isPositionable => hasPosition && !isCancelled;
 
   bool get hasPosition => lat != null && long != null;
-
-  //TODO: change this method, not correct paths.filter().first
-  bool get hasPath => paths.firstOrNull?.hasPoints ?? false;
 
   String get contactLabel => (contactPhoneNumber != null)
       ? "$contactLastName $contactFirstName : $contactPhoneNumber"

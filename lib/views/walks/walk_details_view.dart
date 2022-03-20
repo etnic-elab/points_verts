@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:points_verts/environment.dart';
 import 'package:points_verts/models/path.dart';
-import 'package:points_verts/models/path_point.dart';
+import 'package:points_verts/models/gpx_point.dart';
 import 'package:points_verts/services/gpx.dart';
-import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/views/walks/walk_details_info_view.dart';
 import 'package:points_verts/views/walks/walk_details_map_view.dart';
 
@@ -22,22 +20,41 @@ class WalkDetailsView extends StatefulWidget {
 }
 
 class _WalkDetailsViewState extends State<WalkDetailsView> {
-  final MapInterface map = Environment.mapInterface;
-  _ViewType viewType = _ViewType.detail;
-  Path? selectedPath;
+  final scaffoldState = GlobalKey<ScaffoldState>();
+  _ViewType _viewType = _ViewType.detail;
+  bool _sheetOpen = false;
+  PersistentBottomSheetController? _sheetController;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   Future<List> _retrievePaths() {
-    List<Future<List<PathPoint>>> paths = [];
-    if (!widget.walk.isCancelled && !widget.walk.hasPath) {
-      for (Path path in widget.walk.paths) {
-        if (path.url?.isNotEmpty ?? false) {
-          Future<List<PathPoint>> future = retrievePathPoints(path.url!);
-          future.then((_pathPoints) {
-            path.pathPoints = _pathPoints;
-          });
-          paths.add(future);
-        }
-      }
+    List<Future> paths = [];
+    if (!widget.walk.isCancelled) {
+      paths = widget.walk.paths
+          .map<Future?>((Path _path) {
+            if ((_path.url?.isNotEmpty ?? false) && _path.gpxPoints.isEmpty) {
+              Future<List<GpxPoint>> future = retrieveGpxPoints(_path.url!);
+              future.then((List<GpxPoint> _gpxPoints) {
+                _path.gpxPoints = _gpxPoints;
+                _path.visible = _gpxPoints.isNotEmpty;
+              });
+              return future;
+            } else if (_path.gpxPoints.isNotEmpty) {
+              _path.visible = true;
+            }
+
+            return null;
+          })
+          .whereType<Future>()
+          .toList();
     }
     return Future.wait(paths);
   }
@@ -46,16 +63,16 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   Widget build(BuildContext context) {
     DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
     return Scaffold(
+      key: scaffoldState,
       appBar: AppBar(
-        leading: viewType == _ViewType.detail
+        leading: _viewType == _ViewType.detail
             ? IconButton(
+                icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.maybePop(context),
-                icon: const Icon(Icons.arrow_back))
+              )
             : IconButton(
                 icon: const Icon(Icons.close),
-                onPressed: () {
-                  _toggleView(_ViewType.detail);
-                },
+                onPressed: () => _toggleView(_ViewType.detail),
               ),
         title: FittedBox(
             fit: BoxFit.fitWidth,
@@ -72,32 +89,98 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
       body: FutureBuilder(
         future: _retrievePaths(),
         builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-          return viewType == _ViewType.detail
+          return _viewType == _ViewType.detail
               ? WalkDetailsInfoView(widget.walk, () {
                   _toggleView(_ViewType.map);
-                })
-              : WalkDetailsMapView(
-                  widget.walk, selectedPath, onTapMap, onTapPath);
+                }, snapshot.hasData)
+              : WalkDetailsMapView(widget.walk, closeSheet);
         },
       ),
+      floatingActionButton: _viewType == _ViewType.map
+          ? FloatingActionButton(
+              child: Icon(_sheetOpen ? Icons.expand_less : Icons.layers),
+              onPressed: () => _onTapFAB(),
+            )
+          : null,
     );
   }
 
   void _toggleView(_ViewType type) {
-    setState(() {
-      viewType = type;
-    });
+    setState(() => _viewType = type);
+    closeSheet();
   }
 
-  void onTapMap() {
-    setState(() {
-      selectedPath = null;
-    });
+  void _onTapFAB() {
+    if (_sheetOpen) closeSheet();
+    if (!_sheetOpen) _openSheet();
   }
 
-  void onTapPath(Path path) {
+  void _openSheet() {
+    _sheetController = scaffoldState.currentState?.showBottomSheet(
+      (context) => _BottomSheet(widget.walk, togglePathVisibility),
+      elevation: 16,
+      enableDrag: false,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    );
+
+    if (_sheetController != null) setState(() => _sheetOpen = true);
+  }
+
+  Future<void> closeSheet() async {
+    _sheetController?.close();
+    _sheetController?.closed.then((_) => setState(() => _sheetOpen = false));
+  }
+
+  void togglePathVisibility(Path path, bool newValue) {
     setState(() {
-      selectedPath = path;
+      path.visible = newValue;
     });
+  }
+}
+
+class _BottomSheet extends StatefulWidget {
+  const _BottomSheet(this.walk, this.togglePathVisibility, {Key? key})
+      : super(key: key);
+  final Walk walk;
+  final Function(Path, bool) togglePathVisibility;
+
+  @override
+  State<_BottomSheet> createState() => __BottomSheet();
+}
+
+class __BottomSheet extends State<_BottomSheet> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Wrap(children: _children),
+    );
+  }
+
+  List<Widget> get _children {
+    Brightness brightness = Theme.of(context).brightness;
+    Widget header = const ListTile(
+      leading: Icon(Icons.route),
+      title: Text('Les parcours'),
+    );
+    List<Widget> _paths = widget.walk.paths
+        .map((path) => path.gpxPoints.isNotEmpty
+            ? SwitchListTile(
+                title: Text(
+                  path.title,
+                ),
+                value: path.visible,
+                onChanged: (bool newValue) {
+                  widget.togglePathVisibility(path, newValue);
+                  setState(() => path.visible = newValue);
+                },
+                secondary: Icon(Icons.circle, color: path.getColor(brightness)),
+              )
+            : null)
+        .whereType<Widget>()
+        .toList();
+
+    return [header, const Divider(), ..._paths];
   }
 }

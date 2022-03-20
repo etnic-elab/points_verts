@@ -11,6 +11,7 @@ import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/google_map.dart';
+import 'package:points_verts/extensions.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -127,7 +128,7 @@ class GoogleMaps implements MapInterface {
       paths: paths,
       markers: markers,
       onTapMap: onTapMap,
-      onTapPath: onTapPath,
+      // onTapPath: onTapPath,
     );
   }
 
@@ -140,7 +141,7 @@ class GoogleMaps implements MapInterface {
       body['size'] = '${width}x$height';
       body['scale'] = '2';
       body['key'] = _apiKey;
-      body['path'] = _getPaths(walk, brightness);
+      body['path'] = _getPaths(walk.paths, brightness);
       body = _addMarkers(body, walk, brightness);
 
       Uri url = Uri.https("maps.googleapis.com", "/maps/api/staticmap", body);
@@ -191,24 +192,21 @@ class GoogleMaps implements MapInterface {
     }
   }
 
-  List<String> _getPaths(Walk walk, Brightness brightness) {
-    List<String> paths = [];
-    for (int i = 0; i < walk.paths.length; i++) {
-      Path _path = walk.paths[i];
-      if (_path.hasPoints) {
-        String polyline = encodePolyline(_path.pathPoints
-            .map((pathPoint) =>
-                [pathPoint.latLng.latitude, pathPoint.latLng.longitude])
-            .toList());
-        List<String> path = [
-          'color:${_toGoogleHex(Path.color(brightness, i))}',
-          'weight:2',
-          'enc:$polyline'
-        ];
-        paths.add(path.join('|'));
-      }
-    }
-    return paths;
+  List<String> _getPaths(List<Path> paths, Brightness brightness) {
+    return paths
+        .map((Path _path) {
+          List<List<num>> _encodable = _path.encodablePoints;
+
+          return _encodable.isNotEmpty
+              ? [
+                  'color:${_path.getColor(brightness).toHex(transparancy: true)}',
+                  'weight:2',
+                  'enc:${encodePolyline(_encodable)}'
+                ].join('|')
+              : null;
+        })
+        .whereType<String>()
+        .toList();
   }
 
   Map<String, dynamic> _addMarkers(
@@ -228,10 +226,4 @@ class GoogleMaps implements MapInterface {
 
     return body;
   }
-
-  String _toGoogleHex(Color color) => '0x'
-      '${color.red.toRadixString(16).padLeft(2, '0')}'
-      '${color.green.toRadixString(16).padLeft(2, '0')}'
-      '${color.blue.toRadixString(16).padLeft(2, '0')}'
-      '${color.alpha.toRadixString(16).padLeft(2, '0')}';
 }

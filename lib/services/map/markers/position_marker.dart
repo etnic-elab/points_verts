@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart' as latlong;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:points_verts/extensions.dart';
 
 import 'package:flutter_map/flutter_map.dart' as flutter;
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;

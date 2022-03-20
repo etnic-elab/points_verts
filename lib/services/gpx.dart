@@ -1,37 +1,14 @@
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
+import 'package:points_verts/extensions.dart';
 
-import '../models/path_point.dart';
+import '../models/gpx_point.dart';
 
 import 'package:points_verts/services/cache_managers/gpx_cache_manager.dart';
 
 enum GpxCourse { track, route, waypoints }
 
-extension GpxCourseExtension on GpxCourse {
-  String get segment {
-    switch (this) {
-      case GpxCourse.track:
-        return 'trkseg';
-      case GpxCourse.route:
-        return 'rte';
-      case GpxCourse.waypoints:
-        return 'wpt';
-    }
-  }
-
-  String get point {
-    switch (this) {
-      case GpxCourse.track:
-        return 'trkpt';
-      case GpxCourse.route:
-        return 'rtept';
-      case GpxCourse.waypoints:
-        return 'wpt';
-    }
-  }
-}
-
-Future<List<PathPoint>> retrievePathPoints(String url) async {
+Future<List<GpxPoint>> retrieveGpxPoints(String url) async {
   final http.Response response = await GpxCacheManager.gpx.getData(url);
   if (response.statusCode == 200) {
     XmlDocument xmlFile;
@@ -48,17 +25,17 @@ Future<List<PathPoint>> retrievePathPoints(String url) async {
         course = xmlFile.findAllElements(GpxCourse.waypoints.point);
       }
 
-      List<PathPoint> pathPoints = [];
+      List<GpxPoint> gpxPoints = [];
       for (XmlElement element in course) {
         try {
-          PathPoint point = PathPoint.fromXmlElement(element);
-          pathPoints.add(point);
+          GpxPoint point = GpxPoint.fromXmlElement(element);
+          gpxPoints.add(point);
         } catch (err) {
-          print("Cannot create PathPoint from XmlElement: $err");
+          print("Cannot create GpxPoint from XmlElement: $err");
         }
       }
 
-      return pathPoints;
+      return gpxPoints;
     } catch (err) {
       print("A problem occured parsing gpx file: $err");
     }

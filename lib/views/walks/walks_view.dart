@@ -21,27 +21,6 @@ import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
 
 enum Places { home, current }
-
-extension PlacesExtension on Places {
-  IconData get icon {
-    switch (this) {
-      case Places.current:
-        return Icons.location_on;
-      case Places.home:
-        return Icons.home;
-    }
-  }
-
-  String get text {
-    switch (this) {
-      case Places.current:
-        return "localisation";
-      case Places.home:
-        return "domicile";
-    }
-  }
-}
-
 enum _ViewType { list, map }
 
 const String tag = "dev.alpagaga.points_verts.WalkList";
