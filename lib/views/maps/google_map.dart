@@ -126,7 +126,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     final Set<google.Polyline> polylines = {};
     Brightness brightness = Theme.of(context).brightness;
 
-    for (int i = 0; i < widget.paths.length; i) {
+    for (int i = 0; i < widget.paths.length; i++) {
       Path _path = widget.paths[i];
 
       google.Polyline polyline = google.Polyline(

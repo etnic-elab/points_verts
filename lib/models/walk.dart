@@ -228,4 +228,8 @@ class Walk {
   String get contactLabel => (contactPhoneNumber != null)
       ? "$contactLastName $contactFirstName : $contactPhoneNumber"
       : "$contactLastName $contactFirstName";
+
+  bool get isWalk => type == 'Marche';
+
+  bool get isOrientation => type == 'Orientation';
 }

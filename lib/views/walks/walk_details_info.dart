@@ -5,6 +5,7 @@ import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/views/walks/outline_icon_button.dart';
+import 'package:points_verts/views/walks/walk_info.dart';
 
 import '../tile_icon.dart';
 import 'walk_utils.dart';
@@ -20,9 +21,7 @@ class WalkDetailsInfo extends StatelessWidget {
     return Expanded(
       child: ListView(
         children: <Widget>[
-          walk.weathers.isNotEmpty
-              ? _WeatherSection(walk)
-              : const SizedBox.shrink(),
+          _WeatherSection(walk),
           ListTile(
               leading: const TileIcon(Icon(Icons.calendar_today)),
               title:
@@ -35,7 +34,7 @@ class WalkDetailsInfo extends StatelessWidget {
           _RangesTile(walk),
           ListTile(
             leading: const TileIcon(Icon(Icons.location_on)),
-            title: Text(walk.meetingPoint != null ? walk.meetingPoint! : ""),
+            title: Text(walk.meetingPoint ?? ""),
             subtitle: _getGeoText(),
             trailing: OutlineIconButton(
                 onPressed: () => launchGeoApp(walk),
@@ -76,33 +75,28 @@ class WalkDetailsInfo extends StatelessWidget {
   }
 
   Widget _infoRow() {
-    return Wrap(alignment: WrapAlignment.center, children: <Widget>[
-      _infoTile(Icons.accessible_forward, walk.wheelchair,
-          "Parcours de 5 km accessible aux PMR"),
-      _infoTile(Icons.child_friendly, walk.stroller,
-          "Parcours de 5 km accessible aux landaus"),
-      _infoTile(Icons.nature_people, walk.guided, "Balade guidée Nature"),
-      _infoTile(Icons.directions_bike, walk.bike,
-          "Parcours suppl. de vélo de +/- 20 km"),
-      _infoTile(Icons.directions_bike, walk.mountainBike,
-          "Parcours suppl. de VTT de +/- 20 km"),
-      _infoTile(Icons.local_drink, walk.waterSupply, "Ravitaillement"),
-      _infoTile(
-          Icons.delete, walk.beWapp, "Participe à \"Wallonie Plus Propre\"",
-          url: "https://www.walloniepluspropre.be/"),
-      _infoTile(Icons.sports_gymnastics, walk.adepSante,
-          "Possibilité de réaliser de petits exercices sur le parcours de 5 km")
-    ]);
+    List<Widget> _infos = [
+      WalkInfo.wheelchair,
+      WalkInfo.stroller,
+      WalkInfo.guided,
+      WalkInfo.bike,
+      WalkInfo.mountainBike,
+      WalkInfo.waterSupply,
+      WalkInfo.beWapp,
+      WalkInfo.adepSante
+    ].map((WalkInfo info) => _infoTile(info)).toList();
+
+    return Wrap(alignment: WrapAlignment.center, children: _infos);
   }
 
-  Widget _infoTile(IconData icon, bool value, String message, {String? url}) {
-    if (value) {
+  Widget _infoTile(WalkInfo info) {
+    if (info.walkValue(walk)) {
       return ListTile(
-          leading: TileIcon(Icon(icon)),
-          title: Text(message),
-          onTap: url != null
+          leading: TileIcon(Icon(info.icon)),
+          title: Text(info.description),
+          onTap: info.url != null
               ? () {
-                  launchURL(url);
+                  launchURL(info.url);
                 }
               : null);
     } else {
@@ -130,7 +124,7 @@ class _WeatherSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (walk.weathers.isEmpty) {
-      return const SizedBox();
+      return const SizedBox.shrink();
     } else {
       List<Widget> widgets = [];
       for (Weather weather in walk.weathers) {
@@ -159,27 +153,19 @@ class _RangesTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (walk.type == 'Marche') {
+    if (walk.isWalk || walk.isOrientation) {
+      String _title = Range.label(walk);
+      WalkInfo? _subtitle =
+          walk.isWalk ? WalkInfo.extraOrientation : WalkInfo.extraWalk;
+
       return ListTile(
-        leading: const TileIcon(Icon(Icons.route)),
-        title: Text(walk.fifteenKm
-            ? "Parcours de 5 - 10 - 15 - 20 km"
-            : "Parcours de 5 - 10 - 20 km"),
-        subtitle: walk.extraOrientation
-            ? const Text("Parcours suppl. d'orientation de +/- 8 km")
-            : null,
-      );
-    } else if (walk.type == 'Orientation') {
-      return ListTile(
-        leading: const TileIcon(Icon(Icons.route)),
-        title: const Text("Parcours de 4 - 8 - 16 km"),
-        subtitle: walk.extraWalk
-            ? const Text("Parcours suppl. de marche de +/- 10 km")
-            : null,
-      );
-    } else {
-      return const SizedBox.shrink();
+          leading: TileIcon(Icon(Range.icon)),
+          title: Text(_title),
+          subtitle:
+              _subtitle.walkValue(walk) ? Text(_subtitle.description) : null);
     }
+
+    return const SizedBox.shrink();
   }
 }
 
