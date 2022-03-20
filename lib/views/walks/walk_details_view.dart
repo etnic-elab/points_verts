@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/gpx_point.dart';
 import 'package:points_verts/services/gpx.dart';
+import 'package:points_verts/services/location.dart';
 import 'package:points_verts/views/walks/walk_details_info_view.dart';
 import 'package:points_verts/views/walks/walk_details_map_view.dart';
 
@@ -24,10 +25,13 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   _ViewType _viewType = _ViewType.detail;
   bool _sheetOpen = false;
   PersistentBottomSheetController? _sheetController;
+  Future<List>? _paths;
+  bool _locationAcquired = false;
 
   @override
   void initState() {
     super.initState();
+    _paths = _retrievePaths();
   }
 
   @override
@@ -47,8 +51,6 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
                 _path.visible = _gpxPoints.isNotEmpty;
               });
               return future;
-            } else if (_path.gpxPoints.isNotEmpty) {
-              _path.visible = true;
             }
 
             return null;
@@ -87,13 +89,13 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
             )),
       ),
       body: FutureBuilder(
-        future: _retrievePaths(),
+        future: _paths,
         builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
           return _viewType == _ViewType.detail
               ? WalkDetailsInfoView(widget.walk, () {
                   _toggleView(_ViewType.map);
                 }, snapshot.hasData)
-              : WalkDetailsMapView(widget.walk, closeSheet);
+              : WalkDetailsMapView(widget.walk, closeSheet, fetchLocation);
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -138,6 +140,19 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
     setState(() {
       path.visible = newValue;
     });
+  }
+
+  Future<bool> fetchLocation() async {
+    if (!_locationAcquired) {
+      await checkLocationPermission();
+      setState(() {
+        _locationAcquired = true;
+      });
+
+      return true;
+    }
+
+    return Future.delayed(Duration.zero, () => true);
   }
 }
 
