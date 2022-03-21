@@ -187,6 +187,8 @@ class __BottomSheet extends State<_BottomSheet> {
                 title: Text(
                   path.title,
                 ),
+                subtitle:
+                    path.description != null ? Text(path.description!) : null,
                 value: path.visible,
                 onChanged: (bool newValue) {
                   widget.togglePathVisibility(path, newValue);

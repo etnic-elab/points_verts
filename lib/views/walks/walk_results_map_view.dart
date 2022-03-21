@@ -68,15 +68,15 @@ class WalkResultsMapView extends StatelessWidget {
 
   void _setMarkers(List<Walk> walks) {
     markers.clear();
+        if (position != null) {
+      markers.add(PositionMarker(
+          position!.latitude, position!.longitude, currentPlace!));
+    }
     for (Walk walk in walks) {
       if (walk.hasPosition) {
         markers.add(WalkMarker(walk,
             selectedWalk: selectedWalk, onWalkSelect: onWalkSelect));
       }
-    }
-    if (position != null) {
-      markers.add(PositionMarker(
-          position!.latitude, position!.longitude, currentPlace!));
     }
   }
 }

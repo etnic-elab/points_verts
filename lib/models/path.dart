@@ -4,15 +4,26 @@ import 'package:points_verts/company_data.dart';
 import 'gpx_point.dart';
 
 class Path extends Comparable<Path> {
-  Path({required this.url, required this.title, required this.color});
+  Path({required this.url, required this.title, required this.type});
 
   final String? url;
   final String title;
-  final String? color;
+  final String? type;
   bool visible = false;
   List<GpxPoint> gpxPoints = [];
 
-// 1=Bleu (Parcours 5km)
+  Path.fromJson(Map<String, dynamic> json)
+      : url = json['fichier'],
+        title = json['titre'] ?? 'Parcours',
+        type = json['couleur'];
+
+  Map<String, dynamic> toJson() => {
+        'fichier': url,
+        'titre': title,
+        'couleur': type,
+      };
+
+  // 1=Bleu (Parcours 5km)
 // 2=Jaune (Parcours 10km)
 // 3=Rouge (Parcours 20km)
 // 4=Vert (Parcours commun)
@@ -22,7 +33,7 @@ class Path extends Comparable<Path> {
   Color getColor(Brightness brightness) {
     bool _isLight = brightness == Brightness.light;
 
-    switch (color) {
+    switch (type) {
       case '1':
         return _isLight ? CompanyColors.darkBlue : CompanyColors.blue;
       case '2':
@@ -40,16 +51,24 @@ class Path extends Comparable<Path> {
     }
   }
 
-  Path.fromJson(Map<String, dynamic> json)
-      : url = json['fichier'],
-        title = json['titre'] ?? 'Parcours',
-        color = json['couleur'];
-
-  Map<String, dynamic> toJson() => {
-        'fichier': url,
-        'titre': title,
-        'couleur': color,
-      };
+  String? get description {
+    switch (type) {
+      case '1':
+        return 'Parcours 5km';
+      case '2':
+        return 'Parcours 10km';
+      case '3':
+        return 'Parcours 20km';
+      case '4':
+        return 'Parcours commun';
+      case '5':
+        return 'Parcours 15km';
+      case '6':
+        return 'Parcours 5km poussettes/PMR';
+      default:
+        return null;
+    }
+  }
 
   List<List<num>> get encodablePoints => gpxPoints
       .map((GpxPoint _gpxPoint) =>
@@ -59,8 +78,8 @@ class Path extends Comparable<Path> {
   @override
   int compareTo(Path other) {
     List _sortList = ['4', '6', '1', '2', '5', '3'];
-    int indexThis = _sortList.indexOf(color);
-    int indexOther = _sortList.indexOf(other.color);
+    int indexThis = _sortList.indexOf(type);
+    int indexOther = _sortList.indexOf(other.type);
 
     if (indexThis > indexOther) return -1;
     if (indexThis < indexOther) return 1;
