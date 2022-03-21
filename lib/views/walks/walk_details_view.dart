@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/gpx_point.dart';
@@ -26,7 +27,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   bool _sheetOpen = false;
   PersistentBottomSheetController? _sheetController;
   Future<List>? _paths;
-  bool _locationAcquired = false;
+  Future<LocationPermission>? _location;
 
   @override
   void initState() {
@@ -42,21 +43,16 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   Future<List> _retrievePaths() {
     List<Future> paths = [];
     if (!widget.walk.isCancelled) {
-      paths = widget.walk.paths
-          .map<Future?>((Path _path) {
-            if ((_path.url?.isNotEmpty ?? false) && _path.gpxPoints.isEmpty) {
-              Future<List<GpxPoint>> future = retrieveGpxPoints(_path.url!);
-              future.then((List<GpxPoint> _gpxPoints) {
-                _path.gpxPoints = _gpxPoints;
-                _path.visible = _gpxPoints.isNotEmpty;
-              });
-              return future;
-            }
-
-            return null;
-          })
-          .whereType<Future>()
-          .toList();
+      for (Path path in widget.walk.paths) {
+        if ((path.url?.isNotEmpty ?? false) && path.gpxPoints.isEmpty) {
+          Future<List<GpxPoint>> future = retrieveGpxPoints(path.url!);
+          future.then((List<GpxPoint> _gpxPoints) {
+            path.gpxPoints = _gpxPoints;
+            path.visible = _gpxPoints.isNotEmpty;
+          });
+          paths.add(future);
+        }
+      }
     }
     return Future.wait(paths);
   }
@@ -95,7 +91,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
               ? WalkDetailsInfoView(widget.walk, () {
                   _toggleView(_ViewType.map);
                 }, snapshot.hasData)
-              : WalkDetailsMapView(widget.walk, closeSheet, fetchLocation);
+              : WalkDetailsMapView(widget.walk, closeSheet, location);
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -142,17 +138,8 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
     });
   }
 
-  Future<bool> fetchLocation() async {
-    if (!_locationAcquired) {
-      await checkLocationPermission();
-      setState(() {
-        _locationAcquired = true;
-      });
-
-      return true;
-    }
-
-    return Future.delayed(Duration.zero, () => true);
+  Future<LocationPermission> location() {
+    return _location ??= checkLocationPermission();
   }
 }
 
