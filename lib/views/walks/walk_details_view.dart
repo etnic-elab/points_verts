@@ -181,7 +181,7 @@ class __BottomSheet extends State<_BottomSheet> {
       leading: Icon(Icons.route),
       title: Text('Les parcours'),
     );
-    List<Widget> _paths = widget.walk.paths
+    List<Widget> _paths = widget.walk.paths.reversed
         .map((path) => path.gpxPoints.isNotEmpty
             ? SwitchListTile(
                 title: Text(

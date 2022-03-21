@@ -9,7 +9,7 @@ import 'trip.dart';
 final dateFormat = DateFormat("yyyy-MM-dd");
 
 const TRACES_GPX =
-    "[{\"titre\":\"Parcours 5 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx\",\"jourdemarche\":\"0\",\"color\":\"1\"},{\"titre\":\"Parcours 10 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=271&fichier=Parcours+10kms+%2Egpx\",\"jourdemarche\":\"0\",\"color\":\"2\"},{\"titre\":\"Parcours 15 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=272&fichier=Parcours+15kms+%2Egpx\",\"jourdemarche\":\"0\",\"color\":\"3\"},{\"titre\":\"Parcours 20 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=273&fichier=Parcours+20kms+%2Egpx\",\"jourdemarche\":\"0\",\"color\":\"4\"}]";
+    "[{\"titre\":\"Parcours 5 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"1\"},{\"titre\":\"Parcours 10 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=271&fichier=Parcours+10kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"2\"},{\"titre\":\"Parcours 15 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=272&fichier=Parcours+15kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"5\"},{\"titre\":\"Parcours 20 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=273&fichier=Parcours+20kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"3\"}]";
 
 class Walk {
   Walk(
@@ -81,37 +81,36 @@ class Walk {
 
   factory Walk.fromJson(Map<String, dynamic> json) {
     return Walk(
-      id: json['fields']['id'],
-      city: json['fields']['localite'],
-      entity: json['fields']['entite'],
-      type: json['fields']['activite'],
-      province: json['fields']['province'],
-      date: dateFormat.parse(json['fields']['date']),
-      long: json['fields']['geopoint'][1],
-      lat: json['fields']['geopoint'][0],
-      status: json['fields']['statut'],
-      meetingPoint: json['fields']['lieu_de_rendez_vous'],
-      meetingPointInfo: json['fields']['infos_rendez_vous'],
-      organizer: json['fields']['groupement'],
-      contactFirstName: json['fields']['prenom'],
-      contactLastName: json['fields']['nom'],
-      contactPhoneNumber: json['fields']['gsm'],
-      ign: json['fields']['ign'],
-      transport: json['fields']['gare'],
-      fifteenKm: json['fields']['15km'] == "Oui" ? true : false,
-      wheelchair: json['fields']['pmr'] == "Oui" ? true : false,
-      stroller: json['fields']['poussettes'] == "Oui" ? true : false,
-      extraOrientation: json['fields']['orientation'] == "Oui" ? true : false,
-      extraWalk: json['fields']['10km'] == "Oui" ? true : false,
-      guided: json['fields']['balade_guidee'] == "Oui" ? true : false,
-      bike: json['fields']['velo'] == "Oui" ? true : false,
-      mountainBike: json['fields']['vtt'] == "Oui" ? true : false,
-      waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
-      beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
-      adepSante: json['fields']['adep_sante'] == 'Oui' ? true : false,
-      lastUpdated: DateTime.parse(json['record_timestamp']),
-      paths: _decodePaths(json),
-    );
+        id: json['fields']['id'],
+        city: json['fields']['localite'],
+        entity: json['fields']['entite'],
+        type: json['fields']['activite'],
+        province: json['fields']['province'],
+        date: dateFormat.parse(json['fields']['date']),
+        long: json['fields']['geopoint'][1],
+        lat: json['fields']['geopoint'][0],
+        status: json['fields']['statut'],
+        meetingPoint: json['fields']['lieu_de_rendez_vous'],
+        meetingPointInfo: json['fields']['infos_rendez_vous'],
+        organizer: json['fields']['groupement'],
+        contactFirstName: json['fields']['prenom'],
+        contactLastName: json['fields']['nom'],
+        contactPhoneNumber: json['fields']['gsm'],
+        ign: json['fields']['ign'],
+        transport: json['fields']['gare'],
+        fifteenKm: json['fields']['15km'] == "Oui" ? true : false,
+        wheelchair: json['fields']['pmr'] == "Oui" ? true : false,
+        stroller: json['fields']['poussettes'] == "Oui" ? true : false,
+        extraOrientation: json['fields']['orientation'] == "Oui" ? true : false,
+        extraWalk: json['fields']['10km'] == "Oui" ? true : false,
+        guided: json['fields']['balade_guidee'] == "Oui" ? true : false,
+        bike: json['fields']['velo'] == "Oui" ? true : false,
+        mountainBike: json['fields']['vtt'] == "Oui" ? true : false,
+        waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
+        beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
+        adepSante: json['fields']['adep_sante'] == 'Oui' ? true : false,
+        lastUpdated: DateTime.parse(json['record_timestamp']),
+        paths: _decodePaths(json));
   }
 
   factory Walk.fromDb(List<Map<String, dynamic>> maps, int i) {
@@ -196,7 +195,10 @@ class Walk {
 
   static List<Path> _pathsFromJson(dynamic json) {
     if (json is List) {
-      return (json).map<Path>((json) => Path.fromJson(json)).toList();
+      List<Path> paths =
+          (json).map<Path>((json) => Path.fromJson(json)).toList();
+      paths.sort();
+      return paths;
     }
 
     return <Path>[];
