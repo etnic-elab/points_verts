@@ -26,6 +26,7 @@ class WalkDetailsInfo extends StatelessWidget {
               leading: const TileIcon(Icon(Icons.calendar_today)),
               title:
                   Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!),
+              subtitle: const Text('Secrétariat ouvert de 8h à 18h'),
               trailing: OutlineIconButton(
                 onPressed: () => addToCalendar(walk),
                 iconData: Icons.edit_calendar,
