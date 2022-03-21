@@ -60,7 +60,10 @@ class WalkTile extends StatelessWidget {
       _list.add(const Divider(height: 0));
       _list.add(Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-        child: Wrap(alignment: WrapAlignment.start, children: _info),
+        child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            primary: true,
+            child: Row(children: _info)),
       ));
     }
 
@@ -97,13 +100,23 @@ class WalkTile extends StatelessWidget {
         .map((WalkInfo _info) {
           bool _value = _info.walkValue(walk);
 
-          if (!_value) {
-            return null;
-          } else if (WalkInfo.fifteenKm == _info) {
-            return _ChipLabel('+ ${_info.label}');
+          if (WalkInfo.fifteenKm == _info) {
+            if (!_value) {
+              if (walk.isOrientation) {
+                return const _ChipLabel('4-8-12 km');
+              } else {
+                return const _ChipLabel('5-10-20 km');
+              }
+            } else {
+              return const _ChipLabel('5-10-15-20 km');
+            }
           }
 
-          return _ChipIcon(_info.icon);
+          if (!_value) {
+            return null;
+          } else {
+            return _ChipIcon(_info.icon);
+          }
         })
         .whereType<Widget>()
         .toList());
