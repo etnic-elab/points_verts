@@ -56,6 +56,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           actions: <Widget>[
             IconButton(
