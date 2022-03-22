@@ -6,29 +6,24 @@ import 'package:flutter/services.dart';
 
 class Assets {
   Assets._();
-  static final Assets instance = Assets._();
+  static final Assets asset = Assets._();
 
-  static const String logo = 'logo';
-  static const String logoAnnule = 'logo-annule';
-  static const String googleMap = 'google_map_style';
-  static const String googleMapStatic = 'google_map_style_static';
+  static const String logo = 'logo.png';
+  static const String logoAnnule = 'logo-annule.png';
+  static const String googleMapStyle = 'google_map_style.json';
+  static const String googleMapStaticStyle = 'google_map_style_static.txt';
   static const String letsEncryptCert = 'assets/raw/isrgrootx1.pem';
 
-  String _themedAssetPath(
-      Brightness brightness, String asset, String fileExtension) {
-    return 'assets/${brightness.toString().split('.').last}/$asset.$fileExtension';
-  }
-
-  AssetImage themedAssetImage(Brightness brightness, String asset) {
-    return AssetImage(_themedAssetPath(brightness, asset, 'png'));
+  String _path(Brightness brightness, String asset) {
+    return 'assets/${brightness.toString().split('.').last}/$asset';
   }
 
   Future<ByteData> load(String path) async {
     return await rootBundle.load(path);
   }
 
-  Future<ByteData> themedAsset(Brightness brightness, String asset) async {
-    return await load(_themedAssetPath(brightness, asset, 'png'));
+  Future<ByteData> bytedata(Brightness brightness, String asset) async {
+    return await load(_path(brightness, asset));
   }
 
   Future<ui.Image> sizedBytes(ByteData data, int width) async {
@@ -41,13 +36,11 @@ class Assets {
     return await decodeImageFromList(bytes);
   }
 
-  Future<String> themedAssetJson(Brightness brightness, String asset) async {
-    return await rootBundle
-        .loadString(_themedAssetPath(brightness, asset, 'json'));
+  Future<String> string(Brightness brightness, String asset) async {
+    return await rootBundle.loadString(_path(brightness, asset));
   }
 
-  Future<String> themedAssetText(Brightness brightness, String asset) async {
-    return await rootBundle
-        .loadString(_themedAssetPath(brightness, asset, 'txt'));
+  AssetImage image(Brightness brightness, String asset) {
+    return AssetImage(_path(brightness, asset));
   }
 }

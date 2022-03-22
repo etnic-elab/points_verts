@@ -2,25 +2,27 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/models/walk_filter.dart';
+import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/map/map_interface.dart';
+import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
 
 import '../../models/walk.dart';
-import '../../models/coordinates.dart';
 
 final MapInterface map = Environment.mapInterface;
 
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
-void launchGeoApp(Walk walk) async {
-  if (walk.lat != null && walk.long != null) {
+Future<void> launchGeoApp(Walk walk) async {
+  if (walk.hasPosition) {
     if (Platform.isIOS) {
       launchURL('https://maps.apple.com/?q=${walk.lat},${walk.long}');
     } else {
@@ -43,7 +45,8 @@ void addToCalendar(Walk walk) {
 
 String _generateEventDescription(Walk walk) {
   String result = "";
-  result += "Groupement organisateur : ${walk.organizer} - ${walk.contactFirstName} ${walk.contactLastName}";
+  result +=
+      "Groupement organisateur : ${walk.organizer} - ${walk.contactFirstName} ${walk.contactLastName}";
   if (walk.contactPhoneNumber != null) {
     result += " - ${walk.contactPhoneNumber}";
   }
@@ -56,9 +59,9 @@ String _generateEventDescription(Walk walk) {
 int sortWalks(Walk a, Walk b) {
   if (a.trip != null && b.trip != null) {
     return a.trip!.duration!.compareTo(b.trip!.duration!);
-  } else if (!a.isCancelled() && b.isCancelled()) {
+  } else if (!a.isCancelled && b.isCancelled) {
     return -1;
-  } else if (a.isCancelled() && !b.isCancelled()) {
+  } else if (a.isCancelled && !b.isCancelled) {
     return 1;
   } else if (a.distance != null && b.distance != null) {
     return a.distance!.compareTo(b.distance!);
@@ -70,14 +73,14 @@ int sortWalks(Walk a, Walk b) {
 }
 
 Future<List<Walk>> retrieveSortedWalks(DateTime? date,
-    {Coordinates? position, WalkFilter? filter}) async {
+    {LatLng? position, WalkFilter? filter}) async {
   List<Walk> walks = await DBProvider.db.getWalks(date, filter: filter);
   if (position == null) {
     walks.sort((a, b) => sortWalks(a, b));
     return walks;
   }
   for (Walk walk in walks) {
-    if (walk.isPositionable()) {
+    if (walk.isPositionable) {
       double distance = Geolocator.distanceBetween(
           position.latitude, position.longitude, walk.lat!, walk.long!);
       walk.distance = distance;
@@ -97,7 +100,7 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
   return walks;
 }
 
-launchURL(url) async {
+Future<void> launchURL(url) async {
   if (await canLaunch(url)) {
     try {
       await launch(url);
@@ -107,27 +110,30 @@ launchURL(url) async {
   }
 }
 
-updateWalks() async {
+Future<void> updateWalks() async {
   log("Updating walks", name: tag);
-  String? lastUpdate = await PrefsProvider.prefs.getString("last_walk_update");
-  DateTime now = DateTime.now().toUtc();
-  if (lastUpdate == null) {
-    List<Walk> newWalks = await fetchAllWalks();
+  String? lastUpdateIso8601Utc =
+      await PrefsProvider.prefs.getString(Prefs.lastWalkUpdate);
+  DateTime nowDateLocal = DateTime.now();
+  DateTime nowDateUtc = nowDateLocal.toUtc();
+  String nowIso8601Utc = nowDateUtc.toIso8601String();
+  if (lastUpdateIso8601Utc == null) {
+    List<Walk> newWalks = await fetchAllWalks(fromDateLocal: nowDateLocal);
     if (newWalks.isNotEmpty) {
       await DBProvider.db.insertWalks(newWalks);
-      PrefsProvider.prefs.setString("last_walk_update", now.toIso8601String());
+      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
       await _fixNextWalks();
     }
   } else {
-    DateTime lastUpdateDate = DateTime.parse(lastUpdate);
-    if (now.difference(lastUpdateDate) > const Duration(hours: 1)) {
+    if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
+        const Duration(hours: 1)) {
       try {
-        List<Walk> updatedWalks = await refreshAllWalks(lastUpdate);
+        List<Walk> updatedWalks = await refreshAllWalks(lastUpdateIso8601Utc,
+            fromDateLocal: nowDateLocal);
         if (updatedWalks.isNotEmpty) {
           await DBProvider.db.insertWalks(updatedWalks);
         }
-        PrefsProvider.prefs
-            .setString("last_walk_update", now.toIso8601String());
+        PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
         await _fixNextWalks();
         await DBProvider.db.deleteOldWalks();
       } catch (err) {
@@ -149,18 +155,25 @@ Future<List<DateTime>> retrieveNearestDates() async {
   return walkDates;
 }
 
-Future<Coordinates?> retrieveHomePosition() async {
-  String? homePos = await PrefsProvider.prefs.getString("home_coords");
+Future<LatLng?> retrieveHomePosition() async {
+  String? homePos = await PrefsProvider.prefs.getString(Prefs.homeCoords);
   if (homePos == null) return null;
   List<String> split = homePos.split(",");
-  return Coordinates(
-      latitude: double.parse(split[0]), longitude: double.parse(split[1]));
+  return LatLng(double.parse(split[0]), double.parse(split[1]));
+}
+
+Future<List<Weather>> retrieveWeather(Walk walk) {
+  if (walk.weathers.isEmpty && walk.isPositionable) {
+    return getWeather(walk.long!, walk.lat!, walk.date);
+  }
+
+  return Future.value([]);
 }
 
 // For some reasons, the API is not as up-to-date as the website.
 // To fix that until it is resolved, retrieve the statuses from the website
 // for the walks of the next walk date when we refresh data from the API.
-_fixNextWalks() async {
+Future<void> _fixNextWalks() async {
   List<DateTime> nextDates = await retrieveNearestDates();
   for (DateTime walkDate in nextDates) {
     List<WebsiteWalk> fromWebsite = await retrieveWalksFromWebSite(walkDate);

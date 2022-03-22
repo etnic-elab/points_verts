@@ -13,9 +13,13 @@ import 'package:points_verts/models/walk.dart';
 class WalkMarker implements MarkerInterface {
   final Walk walk;
   final Walk? selectedWalk;
-  final Function(Walk) onWalkSelect;
+  final Function(Walk)? onWalkSelect;
+  final String infoWindowText;
 
-  WalkMarker(this.walk, this.selectedWalk, this.onWalkSelect);
+  WalkMarker(this.walk,
+      {this.selectedWalk,
+      this.onWalkSelect,
+      this.infoWindowText = 'Point de rendez-vous'});
 
   @override
   flutter.Marker buildFlutterMarker() {
@@ -31,7 +35,9 @@ class WalkMarker implements MarkerInterface {
             ? CompanyColors.lightestGreen
             : CompanyColors.darkGreen,
         onPressed: () {
-          onWalkSelect(walk);
+          if (onWalkSelect != null) {
+            onWalkSelect!(walk);
+          }
         },
       ),
     );
@@ -42,7 +48,7 @@ class WalkMarker implements MarkerInterface {
     google.MarkerId markerId =
         google.MarkerId(walk.lat!.toString() + walk.long!.toString());
     google.BitmapDescriptor icon;
-    if (walk.isCancelled()) {
+    if (walk.isCancelled) {
       icon = mapIcons[selectedWalk == walk
           ? GoogleMapIcons.selectedCancelIcon
           : GoogleMapIcons.unselectedCancelIcon]!;
@@ -56,9 +62,12 @@ class WalkMarker implements MarkerInterface {
       markerId: markerId,
       position: google.LatLng(walk.lat!, walk.long!),
       icon: icon,
-      consumeTapEvents: true,
+      consumeTapEvents: onWalkSelect != null,
+      infoWindow: google.InfoWindow(title: infoWindowText),
       onTap: () {
-        onWalkSelect(walk);
+        if (onWalkSelect != null) {
+          onWalkSelect!(walk);
+        }
       },
     );
   }

@@ -2,10 +2,13 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:points_verts/environment.dart';
+import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/flutter_map.dart';
+import 'package:points_verts/extensions.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -25,7 +28,7 @@ class MapBox implements MapInterface {
     String destinations = "";
     for (int i = 0; i < min(walks.length, 5); i++) {
       Walk walk = walks[i];
-      if (walk.isPositionable()) {
+      if (walk.isPositionable) {
         destinations = destinations + ";${walk.long},${walk.lat}";
       }
     }
@@ -43,20 +46,12 @@ class MapBox implements MapInterface {
     if (distances != null && durations != null) {
       for (int i = 0; i < min(walks.length, 5); i++) {
         Walk walk = walks[i];
-        if (walk.isPositionable() && distances.length >= i) {
+        if (walk.isPositionable && distances.length >= i) {
           walk.trip =
               Trip(distance: distances[i + 1], duration: durations[i + 1]);
         }
       }
     }
-  }
-
-  @override
-  Widget retrieveMap(List<MarkerInterface> markers, Function onMapTap,
-      {double centerLat = 50.3155646,
-      double centerLong = 5.009682,
-      double zoom = 7.5}) {
-    return FlutterMap(markers, _token!, centerLat, centerLong, zoom);
   }
 
   @override
@@ -97,13 +92,41 @@ class MapBox implements MapInterface {
   }
 
   @override
+  Widget retrieveMap({
+    double centerLat = MapInterface.defaultLat,
+    double centerLong = MapInterface.defaultLong,
+    double zoom = MapInterface.defaultZoom,
+    locationEnabled = false,
+    List<MarkerInterface> markers = const [],
+    List<Path> paths = const [],
+    Function? onTapMap,
+    Function(Path)? onTapPath,
+  }) {
+    return FlutterMap(markers, _token!, centerLat, centerLong, zoom);
+  }
+
+  String _getEncodedPath(List<Path> paths, Brightness brightness) {
+    return paths
+        .map((_path) {
+          List<List<num>> _encodable = _path.encodablePoints;
+          return _encodable.isNotEmpty
+              ? "path-2+${_path.getColor(brightness).toHex()}-1(${Uri.encodeComponent(encodePolyline(_encodable))})"
+              : null;
+        })
+        .whereType<String>()
+        .toList()
+        .join(',');
+  }
+
+  @override
   Widget retrieveStaticImage(
       Walk walk, int width, int height, Brightness brightness,
-      {double zoom = 16.0}) {
+      {double zoom = 16.0, Function? onTap}) {
     final String style =
         brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
+    final String path = _getEncodedPath(walk.paths, brightness);
     Uri url = Uri.parse(
-        "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l(${walk.long},${walk.lat})/${walk.long},${walk.lat},$zoom,0,0/${width}x$height@2x?access_token=$_token");
+        "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l(${walk.long},${walk.lat})$path/auto/${width}x$height@2x?access_token=$_token");
     return CachedNetworkImage(
       imageUrl: url.toString(),
       progressIndicatorBuilder: (context, url, downloadProgress) => Center(

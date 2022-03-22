@@ -11,23 +11,26 @@ import 'cache_managers/weather_cache_manager.dart';
 String? _token = Environment.openWeatherToken;
 
 Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
-  String url =
-      "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$long&lang=fr&units=metric&appid=$_token";
-  final http.Response response = await WeatherCacheManager.weather.getData(url);
-  final decoded = json.decode(response.body);
-  final list = decoded['list'];
+  if (date.difference(DateTime.now()).inDays < 5) {
+    String url =
+        "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$long&lang=fr&units=metric&appid=$_token";
+    final http.Response response =
+        await WeatherCacheManager.weather.getData(url);
+    final decoded = json.decode(response.body);
+    final list = decoded['list'];
 
-  if (list != null) {
-    List<Weather> results = [];
-    int from = date.add(const Duration(hours: 6)).millisecondsSinceEpoch;
-    int to = date.add(const Duration(hours: 18)).millisecondsSinceEpoch;
-    for (var forecast in list) {
-      int time = forecast['dt'] * 1000;
-      if (time > from && time < to) {
-        results.add(_createWeather(forecast));
+    if (list != null) {
+      List<Weather> results = [];
+      int from = date.add(const Duration(hours: 6)).millisecondsSinceEpoch;
+      int to = date.add(const Duration(hours: 18)).millisecondsSinceEpoch;
+      for (var forecast in list) {
+        int time = forecast['dt'] * 1000;
+        if (time > from && time < to) {
+          results.add(_createWeather(forecast));
+        }
       }
+      return results;
     }
-    return results;
   }
 
   return [];

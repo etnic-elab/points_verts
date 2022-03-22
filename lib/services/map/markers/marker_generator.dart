@@ -33,12 +33,12 @@ class MarkerGenerator {
   }
 
   /// Creates a BitmapDescriptor from an IconData
-  Future<BitmapDescriptor> createBitmapDescriptorFromByteData(
+  Future<BitmapDescriptor> fromByteData(
       ByteData assetData, Color circleColor, Color backgroundColor) async {
     final pictureRecorder = ui.PictureRecorder();
     final canvas = Canvas(pictureRecorder);
     final assetImage =
-        await Assets.instance.sizedBytes(assetData, _iconSize.round());
+        await Assets.asset.sizedBytes(assetData, _iconSize.round());
 
     _paintCircleFill(canvas, backgroundColor);
     // _paintCircleStroke(canvas, circleColor);
@@ -53,7 +53,7 @@ class MarkerGenerator {
   }
 
   /// Creates a BitmapDescriptor from an IconData
-  Future<BitmapDescriptor> createBitmapDescriptorFromIconData(
+  Future<BitmapDescriptor> fromIconData(
       IconData iconData, Color iconColor) async {
     final pictureRecorder = ui.PictureRecorder();
     final canvas = Canvas(pictureRecorder);

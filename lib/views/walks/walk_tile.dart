@@ -15,7 +15,7 @@ import '../../services/openweather.dart';
 bool smallScreen = window.physicalSize.width <= 640;
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
-enum TileType { calendar, directory }
+enum TileType { calendar, directory, map }
 
 class WalkTile extends StatelessWidget {
   const WalkTile(this.walk, this.tileType, {Key? key}) : super(key: key);
@@ -26,7 +26,13 @@ class WalkTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      margin: tileType == TileType.map
+          ? const EdgeInsets.all(0)
+          : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      shape: tileType == TileType.map
+          ? const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)))
+          : null,
       child: InkWell(
         onTap: () => Navigator.push(context, _pageRoute()),
         child: Column(
@@ -56,7 +62,7 @@ class WalkTile extends StatelessWidget {
     ];
 
     List<Widget> _info = _infoRow(walk);
-    if (!walk.isCancelled() && _info.isNotEmpty) {
+    if (!walk.isCancelled && _info.isNotEmpty) {
       _list.add(const Divider(height: 0));
       _list.add(Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
@@ -83,7 +89,7 @@ class WalkTile extends StatelessWidget {
 
   Widget _subtitle() {
     if (tileType == TileType.directory) {
-      return Text(walk.getContactLabel());
+      return Text(walk.contactLabel);
     } else {
       return Text("${walk.type} - ${walk.province}");
     }

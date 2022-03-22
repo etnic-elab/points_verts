@@ -56,6 +56,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           actions: <Widget>[
             IconButton(
@@ -95,47 +96,42 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
         future: _suggestions,
         builder: (BuildContext context,
             AsyncSnapshot<List<AddressSuggestion>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              List<AddressSuggestion> suggestions = snapshot.data!;
-              return ListView.separated(
-                  itemCount: suggestions.length,
-                  separatorBuilder: (context, i) => const Divider(height: 0.5),
-                  itemBuilder: (context, i) {
-                    AddressSuggestion suggestion = suggestions[i];
-                    return ListTile(
-                        title: Text(suggestion.text),
-                        subtitle: Text(suggestion.address,
-                            overflow: TextOverflow.ellipsis),
-                        onTap: () {
-                          widget.setHomeCallback(suggestion);
-                          _homeSearchController
-                              .removeListener(_onSearchChanged);
-                          Navigator.of(context).pop();
-                        });
-                  });
-            } else if (snapshot.hasError) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(Icons.warning),
-                  Container(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Row(children: const [
-                        Expanded(
-                            child: Center(
-                                child: Text(
-                                    "Une erreur est survenue lors de la récupération des données. Merci de réessayer plus tard.",
-                                    textAlign: TextAlign.center)))
-                      ]))
-                ],
-              );
-            } else {
-              return const Loading();
-            }
-          } else {
-            return const Loading();
+          if (snapshot.hasData) {
+            List<AddressSuggestion> suggestions = snapshot.data!;
+            return ListView.separated(
+                itemCount: suggestions.length,
+                separatorBuilder: (context, i) => const Divider(height: 0.5),
+                itemBuilder: (context, i) {
+                  AddressSuggestion suggestion = suggestions[i];
+                  return ListTile(
+                      title: Text(suggestion.text),
+                      subtitle: Text(suggestion.address,
+                          overflow: TextOverflow.ellipsis),
+                      onTap: () {
+                        widget.setHomeCallback(suggestion);
+                        _homeSearchController.removeListener(_onSearchChanged);
+                        Navigator.of(context).pop();
+                      });
+                });
           }
+          if (snapshot.hasError) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Icon(Icons.warning),
+                Container(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(children: const [
+                      Expanded(
+                          child: Center(
+                              child: Text(
+                                  "Une erreur est survenue lors de la récupération des données. Merci de réessayer plus tard.",
+                                  textAlign: TextAlign.center)))
+                    ]))
+              ],
+            );
+          }
+          return const Loading();
         });
   }
 

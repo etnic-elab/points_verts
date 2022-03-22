@@ -13,18 +13,21 @@ const String baseUrl =
     "https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps";
 const int pageSize = 500;
 
-Future<List<Walk>> fetchAllWalks() async {
+Future<List<Walk>> fetchAllWalks({DateTime? fromDateLocal}) async {
   log("Fetching all future walks", name: tag);
+  fromDateLocal ??= DateTime.now();
   DateFormat dateFormat = DateFormat("yyyy/MM/dd");
   return _retrieveWalks(
-      "$baseUrl&q=date+>%3D+${dateFormat.format(DateTime.now())}");
+      "$baseUrl&q=date+>%3D+${dateFormat.format(fromDateLocal)}");
 }
 
-Future<List<Walk>> refreshAllWalks(String lastUpdate) async {
-  log("Refreshing future walks list since $lastUpdate", name: tag);
+Future<List<Walk>> refreshAllWalks(String lastUpdateIso8601Utc,
+    {DateTime? fromDateLocal}) async {
+  log("Refreshing future walks list since $lastUpdateIso8601Utc", name: tag);
+  fromDateLocal ??= DateTime.now();
   DateFormat dateFormat = DateFormat("yyyy/MM/dd");
   return _retrieveWalks(
-      "$baseUrl&q=(date+>%3D+${dateFormat.format(DateTime.now())}+AND+record_timestamp+>$lastUpdate)");
+      "$baseUrl&q=(date+>%3D+${dateFormat.format(fromDateLocal)}+AND+record_timestamp+>$lastUpdateIso8601Utc)");
 }
 
 Future<List<Walk>> _retrieveWalks(String baseUrl) async {

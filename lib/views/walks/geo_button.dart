@@ -14,11 +14,11 @@ class GeoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (walk.isCancelled()) {
+    if (walk.isCancelled) {
       return Text("Annulé",
           style: TextStyle(color: CompanyColors.contextualRed(context)));
     } else {
-      String? label = walk.getNavigationLabel();
+      String? label = walk.navigationLabel;
       if (label != null) {
         return OutlinedButton.icon(
             onPressed: () => launchGeoApp(walk),

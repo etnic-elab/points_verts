@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:intl/intl.dart';
+import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/weather.dart';
 
 import 'trip.dart';
 
 final dateFormat = DateFormat("yyyy-MM-dd");
+
+// const TRACES_GPX =
+//     "[{\"titre\":\"Parcours 5 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"1\"},{\"titre\":\"Parcours 10 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=271&fichier=Parcours+10kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"2\"},{\"titre\":\"Parcours 15 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=272&fichier=Parcours+15kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"5\"},{\"titre\":\"Parcours 20 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=273&fichier=Parcours+20kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"3\"}]";
 
 class Walk {
   Walk(
@@ -35,7 +41,8 @@ class Walk {
       required this.waterSupply,
       required this.beWapp,
       required this.adepSante,
-      required this.lastUpdated});
+      required this.lastUpdated,
+      this.paths = const []});
 
   final int id;
   final String city;
@@ -66,6 +73,7 @@ class Walk {
   final bool beWapp;
   final bool adepSante;
   final DateTime lastUpdated;
+  final List<Path> paths;
 
   double? distance;
   Trip? trip;
@@ -101,7 +109,43 @@ class Walk {
         waterSupply: json['fields']['ravitaillement'] == "Oui" ? true : false,
         beWapp: json['fields']['bewapp'] == "Oui" ? true : false,
         adepSante: json['fields']['adep_sante'] == 'Oui' ? true : false,
-        lastUpdated: DateTime.parse(json['record_timestamp']));
+        lastUpdated: DateTime.parse(json['record_timestamp']),
+        paths: _decodePaths(json));
+  }
+
+  factory Walk.fromDb(List<Map<String, dynamic>> maps, int i) {
+    return Walk(
+      id: maps[i]['id'],
+      city: maps[i]['city'],
+      entity: maps[i]['entity'],
+      type: maps[i]['type'],
+      province: maps[i]['province'],
+      date: DateTime.parse(maps[i]['date']),
+      long: maps[i]['longitude'],
+      lat: maps[i]['latitude'],
+      status: maps[i]['status'],
+      meetingPoint: maps[i]['meeting_point'],
+      meetingPointInfo: maps[i]['meeting_point_info'],
+      organizer: maps[i]['organizer'],
+      contactFirstName: maps[i]['contact_first_name'],
+      contactLastName: maps[i]['contact_last_name'],
+      contactPhoneNumber: maps[i]['contact_phone_number']?.toString(),
+      ign: maps[i]['ign'],
+      transport: maps[i]['transport'],
+      fifteenKm: maps[i]['fifteen_km'] == 1 ? true : false,
+      wheelchair: maps[i]['wheelchair'] == 1 ? true : false,
+      stroller: maps[i]['stroller'] == 1 ? true : false,
+      extraOrientation: maps[i]['extra_orientation'] == 1 ? true : false,
+      extraWalk: maps[i]['extra_walk'] == 1 ? true : false,
+      guided: maps[i]['guided'] == 1 ? true : false,
+      bike: maps[i]['bike'] == 1 ? true : false,
+      mountainBike: maps[i]['mountain_bike'] == 1 ? true : false,
+      waterSupply: maps[i]['water_supply'] == 1 ? true : false,
+      beWapp: maps[i]['be_wapp'] == 1 ? true : false,
+      adepSante: maps[i]['adep_sante'] == 1 ? true : false,
+      lastUpdated: DateTime.parse(maps[i]['last_updated']),
+      paths: _pathsFromJson(jsonDecode(maps[i]['paths'])),
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -133,20 +177,38 @@ class Walk {
       'mountain_bike': mountainBike ? 1 : 0,
       'water_supply': waterSupply ? 1 : 0,
       'be_wapp': beWapp ? 1 : 0,
+      'last_updated': lastUpdated.toIso8601String(),
+      'paths': jsonEncode(paths),
       'adep_sante': adepSante ? 1 : 0,
-      'last_updated': lastUpdated.toIso8601String()
     };
   }
 
-  bool isCancelled() {
-    return status == "Annulé";
+  static List<Path> _decodePaths(json) {
+    try {
+      return _pathsFromJson(json['fields']['traces_gpx']);
+      // return _pathsFromJson(jsonDecode(TRACES_GPX));
+    } catch (err) {
+      print("Cannot decode paths for walk '${json['fields']['id']}': $err");
+      return [];
+    }
   }
 
-  bool isModified() {
-    return status == "Modifié";
+  static List<Path> _pathsFromJson(dynamic json) {
+    if (json is List) {
+      List<Path> paths =
+          (json).map<Path>((json) => Path.fromJson(json)).toList();
+      paths.sort();
+      return paths;
+    }
+
+    return <Path>[];
   }
 
-  String? getFormattedDistance() {
+  bool get isCancelled => status == "Annulé";
+
+  bool get isModified => status == "Modifié";
+
+  String? get formattedDistance {
     num? dist = trip?.distance ?? distance;
     if (dist == null) {
       return null;
@@ -157,25 +219,17 @@ class Walk {
     }
   }
 
-  String? getNavigationLabel() {
-    if (trip != null && trip!.duration != null) {
-      return '${Duration(seconds: trip!.duration!.round()).inMinutes} min';
-    } else {
-      return getFormattedDistance();
-    }
-  }
+  String? get navigationLabel => (trip != null && trip!.duration != null)
+      ? '${Duration(seconds: trip!.duration!.round()).inMinutes} min'
+      : formattedDistance;
 
-  bool isPositionable() {
-    return long != null && lat != null && !isCancelled();
-  }
+  bool get isPositionable => hasPosition && !isCancelled;
 
-  String getContactLabel() {
-    if (contactPhoneNumber != null) {
-      return "$contactLastName $contactFirstName : $contactPhoneNumber";
-    } else {
-      return "$contactLastName $contactFirstName";
-    }
-  }
+  bool get hasPosition => lat != null && long != null;
+
+  String get contactLabel => (contactPhoneNumber != null)
+      ? "$contactLastName $contactFirstName : $contactPhoneNumber"
+      : "$contactLastName $contactFirstName";
 
   bool get isWalk => type == 'Marche';
 

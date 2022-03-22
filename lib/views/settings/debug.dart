@@ -31,7 +31,7 @@ class _LastWalkUpdateTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: PrefsProvider.prefs.getString("last_walk_update"),
+      future: PrefsProvider.prefs.getString(Prefs.lastWalkUpdate),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           return ListTile(
@@ -49,7 +49,7 @@ class _GeoPosTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: PrefsProvider.prefs.getString("home_coords"),
+      future: PrefsProvider.prefs.getString(Prefs.homeCoords),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData) {
           return ListTile(
@@ -114,7 +114,7 @@ class _LastBackgroundFetch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: PrefsProvider.prefs.getString("last_background_fetch"),
+        future: PrefsProvider.prefs.getString(Prefs.lastBackgroundFetch),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
             return ListTile(

@@ -1,47 +1,8 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:points_verts/services/map/googlemaps.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/services/map/mapbox.dart';
+import 'extensions.dart';
 
 enum Maps { google, mapbox }
-
-extension MapsExtension on Maps {
-  String get api {
-    switch (this) {
-      case Maps.google:
-        return 'Google';
-      case Maps.mapbox:
-        return 'MapBox';
-    }
-  }
-
-  String get website {
-    switch (this) {
-      case Maps.google:
-        return 'https://mapsplatform.google.com/';
-      case Maps.mapbox:
-        return 'https://www.mapbox.com';
-    }
-  }
-
-  MapInterface get instance {
-    switch (this) {
-      case Maps.google:
-        return GoogleMaps();
-      case Maps.mapbox:
-        return MapBox();
-    }
-  }
-
-  String get key {
-    switch (this) {
-      case Maps.google:
-        return 'GOOGLEMAPS_API_KEY';
-      case Maps.mapbox:
-        return 'MAPBOX_TOKEN';
-    }
-  }
-}
 
 const String tag = "dev.alpagaga.points_verts.Environment";
 

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/walk_filter.dart';
@@ -15,36 +15,13 @@ import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/filter_page.dart';
 
 import 'dates_dropdown.dart';
-import '../../services/openweather.dart';
 import '../../models/walk.dart';
-import '../../models/coordinates.dart';
 import 'walk_results_list_view.dart';
 import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
 
 enum Places { home, current }
-
-extension PlacesExtension on Places {
-  IconData get icon {
-    switch (this) {
-      case Places.current:
-        return Icons.location_on;
-      case Places.home:
-        return Icons.home;
-    }
-  }
-
-  String get text {
-    switch (this) {
-      case Places.current:
-        return "localisation";
-      case Places.home:
-        return "domicile";
-    }
-  }
-}
-
-enum ViewType { list, map }
+enum _ViewType { list, map }
 
 const String tag = "dev.alpagaga.points_verts.WalkList";
 
@@ -60,9 +37,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Future<List<Walk>>? _currentWalks;
   Walk? _selectedWalk;
   DateTime? _selectedDate;
-  Coordinates? _currentPosition;
-  Coordinates? _homePosition;
-  ViewType _viewType = ViewType.list;
+  LatLng? _currentPosition;
+  LatLng? _homePosition;
+  _ViewType _viewType = _ViewType.list;
   WalkFilter? _filter;
 
   @override
@@ -86,29 +63,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
   }
 
-  void _firstLaunch() async {
-    bool firstLaunch = await PrefsProvider.prefs
-        .getBoolean(key: 'first_launch', defaultValue: true);
-    if (firstLaunch) {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      final snackBar = SnackBar(
-          duration: const Duration(days: 1),
-          action: SnackBarAction(
-            onPressed: () {
-              PrefsProvider.prefs.setBoolean("first_launch", false);
-            },
-            label: "OK",
-          ),
-          content: const Text(
-              "Pour voir en un coup d'œil les marches les plus proches de chez vous, n'hésitez pas à indiquer votre adresse dans les Paramètres !",
-              textAlign: TextAlign.justify));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-  }
-
   Future<void> _retrieveData() async {
     String? filterString =
-        await PrefsProvider.prefs.getString("calendar_walk_filter");
+        await PrefsProvider.prefs.getString(Prefs.calendarWalkFilter);
     WalkFilter filter;
     if (filterString != null) {
       filter = WalkFilter.fromJson(jsonDecode(filterString));
@@ -125,30 +82,57 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     _retrieveDates();
   }
 
-  _retrievePosition() async {
-    Coordinates? home = await retrieveHomePosition();
-    if (home != null) {
+  void _retrieveDates() async {
+    await _retrievePosition();
+    _dates = DBProvider.db.getWalkDates();
+    _dates!.then((List<DateTime> items) async {
+      String? lastSelectedDateString =
+          await PrefsProvider.prefs.getString(Prefs.lastSelectedDate);
+      if (lastSelectedDateString != null) {
+        setState(() {
+          _selectedDate = DateTime.parse(lastSelectedDateString);
+        });
+      }
+      if (items.isNotEmpty && !items.contains(_selectedDate)) {
+        setState(() {
+          _selectedDate = items.first;
+        });
+
+        PrefsProvider.prefs
+            .setString(Prefs.lastSelectedDate, items.first.toIso8601String());
+      }
+      _retrieveWalks();
+    }).catchError((err) {
+      print("Cannot retrieve dates: $err");
       setState(() {
-        _homePosition = home;
-        _filter!.selectedPlace = Places.home;
+        _currentWalks = Future.error(err);
       });
-    } else {
-      setState(() {
-        _filter!.selectedPlace = Places.current;
-      });
-    }
-    if (await PrefsProvider.prefs.getBoolean(key: "use_location") == true) {
-      _getCurrentLocation();
-    }
+    });
   }
 
-  Coordinates? get selectedPosition {
-    if (_filter!.selectedPlace == Places.current) {
-      return _currentPosition;
-    } else if (_filter!.selectedPlace == Places.home) {
-      return _homePosition;
-    } else {
-      return null;
+  _retrievePosition() async {
+    bool useLocation =
+        await PrefsProvider.prefs.getBoolean(Prefs.useLocation) == true;
+    _homePosition = await retrieveHomePosition();
+
+    if (_filter!.selectedPlace == null) {
+      if (_homePosition != null) {
+        _filter!.selectedPlace = Places.home;
+      } else if (useLocation) {
+        _filter!.selectedPlace = Places.current;
+      }
+    } else if (_filter!.selectedPlace == Places.home && _homePosition == null) {
+      if (useLocation) {
+        _filter!.selectedPlace = Places.current;
+      } else {
+        _filter!.selectedPlace = null;
+      }
+    } else if (_filter!.selectedPlace == Places.current && !useLocation) {
+      if (_homePosition != null) {
+        _filter!.selectedPlace = Places.home;
+      } else {
+        _filter!.selectedPlace = null;
+      }
     }
   }
 
@@ -161,72 +145,115 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   _retrieveWalksHelper() async {
+    if (_filter!.selectedPlace == Places.current && _currentPosition == null) {
+      await _retrieveCurrentPosition();
+    }
     Future<List<Walk>> newList = retrieveSortedWalks(_selectedDate,
         filter: _filter, position: selectedPosition);
-    if (_selectedDate != null &&
-        _selectedDate!.difference(DateTime.now()).inDays < 5) {
-      try {
-        _retrieveWeathers(await newList).then((_) {
+    try {
+      _retrieveWeathers(await newList).then((_) {
+        if (mounted) {
           setState(() {});
-        });
-      } catch (err) {
-        print("Cannot retrieve weather info: $err");
-      }
+        }
+      });
+    } catch (err) {
+      print("Cannot retrieve weather info: $err");
     }
-    setState(() {
-      _currentWalks = newList;
-    });
+
+    if (mounted) {
+      setState(() {
+        _currentWalks = newList;
+      });
+    }
+
     _firstLaunch();
-    newList.then((_) {
-      setState(() {});
-    });
+  }
+
+  Future<void> _retrieveCurrentPosition() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.medium,
+          timeLimit: const Duration(seconds: 4));
+      _currentPosition = LatLng(position.latitude, position.longitude);
+    } catch (e) {
+      if (e is PlatformException) {
+        PlatformException platformException = e;
+        if (platformException.code == 'PERMISSION_DENIED') {
+          PrefsProvider.prefs.setBoolean(Prefs.useLocation, false);
+        }
+      } else {
+        _locationExceptionMessage();
+      }
+
+      print("Cannot retrieve current position: $e");
+    }
   }
 
   Future _retrieveWeathers(List<Walk> walks) async {
     List<Future<List<Weather>>> weathers = [];
     for (int i = 0; i < math.min(walks.length, 5); i++) {
       Walk walk = walks[i];
-      if (_selectedDate != null &&
-          walk.weathers.isEmpty &&
-          walk.long != null &&
-          walk.lat != null &&
-          !walk.isCancelled()) {
-        Future<List<Weather>> future =
-            getWeather(walk.long!, walk.lat!, _selectedDate!);
-        future.then((weathers) {
-          walk.weathers = weathers;
-        });
-        weathers.add(future);
-      }
+      Future<List<Weather>> future = retrieveWeather(walk);
+      future.then((weathers) {
+        walk.weathers = weathers;
+      });
+      weathers.add(future);
     }
     return Future.wait(weathers);
   }
 
-  void _retrieveDates() async {
-    _dates = DBProvider.db.getWalkDates();
-    await _retrievePosition();
-    _dates!.then((List<DateTime> items) async {
-      String? lastSelectedDateString =
-          await PrefsProvider.prefs.getString("last_selected_date");
-      if (lastSelectedDateString != null) {
-        setState(() {
-          _selectedDate = DateTime.parse(lastSelectedDateString);
-        });
-      }
-      if (items.isNotEmpty && !items.contains(_selectedDate)) {
-        setState(() {
-          _selectedDate = items.first;
-        });
-        PrefsProvider.prefs
-            .setString("last_selected_date", items.first.toIso8601String());
-      }
-      _retrieveWalks();
-    }).catchError((err) {
-      print("Cannot retrieve dates: $err");
-      setState(() {
-        _currentWalks = Future.error(err);
-      });
-    });
+  void _firstLaunch() async {
+    bool firstLaunch = await PrefsProvider.prefs
+        .getBoolean(Prefs.firstLaunch, defaultValue: true);
+    if (firstLaunch) {
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      final snackBar = SnackBar(
+          duration: const Duration(days: 1),
+          action: SnackBarAction(
+            onPressed: () {
+              PrefsProvider.prefs.setBoolean(Prefs.firstLaunch, false);
+            },
+            label: "OK",
+          ),
+          content: const Text(
+              "Pour voir en un coup d'œil les marches les plus proches de chez vous, n'hésitez pas à indiquer votre adresse dans les Paramètres !",
+              textAlign: TextAlign.justify));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  void _locationExceptionMessage() {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    final snackBar = SnackBar(
+        content: Row(
+      children: const [
+        Padding(
+          padding: EdgeInsets.only(right: 16.0),
+          child: Icon(
+            Icons.error,
+            color: Colors.red,
+          ),
+        ),
+        Flexible(
+          child: Text(
+            "Une erreur s'est produite lors de la récupération de votre position actuelle",
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    ));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  LatLng? get selectedPosition {
+    if (_filter!.selectedPlace == Places.current) {
+      return _currentPosition;
+    } else if (_filter!.selectedPlace == Places.home) {
+      return _homePosition;
+    } else {
+      return null;
+    }
   }
 
   @override
@@ -236,11 +263,12 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         title: const Text('Calendrier'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(_viewType == ViewType.list ? Icons.map : Icons.list),
+            icon: Icon(_viewType == _ViewType.list ? Icons.map : Icons.list),
             onPressed: () {
               setState(() {
-                _viewType =
-                    _viewType == ViewType.list ? ViewType.map : ViewType.list;
+                _viewType = _viewType == _ViewType.list
+                    ? _ViewType.map
+                    : _ViewType.list;
               });
             },
           )
@@ -268,7 +296,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         _defineSearchPart(dates),
         const Divider(height: 0.0),
         Expanded(
-            child: _viewType == ViewType.list
+            child: _viewType == _ViewType.list
                 ? WalkResultsListView(_currentWalks, selectedPosition,
                     _filter!.selectedPlace, _retrieveData)
                 : WalkResultsMapView(
@@ -276,7 +304,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
                     selectedPosition,
                     _filter!.selectedPlace,
                     _selectedWalk,
-                    (walk) {
+                    (Walk walk) {
                       setState(() {
                         _selectedWalk = walk;
                       });
@@ -293,24 +321,24 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   void onDateChanged(DateTime date) {
-    setState(() {
-      _selectedDate = date;
-      _retrieveWalks();
-    });
-    PrefsProvider.prefs.setString("last_selected_date", date.toIso8601String());
+    _selectedDate = date;
+    _retrieveWalks();
+
+    PrefsProvider.prefs
+        .setString(Prefs.lastSelectedDate, date.toIso8601String());
   }
 
   void onFilterPressed() async {
+    bool useLocation =
+        await PrefsProvider.prefs.getBoolean(Prefs.useLocation) == true;
     WalkFilter? newFilter = await Navigator.of(context).push<WalkFilter>(
         MaterialPageRoute(
-            builder: (context) => FilterPage(
-                _filter!, _homePosition != null && _currentPosition != null)));
+            builder: (context) =>
+                FilterPage(_filter!, _homePosition != null && useLocation)));
     if (newFilter != null) {
-      setState(() {
-        _filter = newFilter;
-      });
       await PrefsProvider.prefs
-          .setString("calendar_walk_filter", jsonEncode(newFilter));
+          .setString(Prefs.calendarWalkFilter, jsonEncode(newFilter));
+      _filter = newFilter;
       _retrieveWalks();
     }
   }
@@ -330,31 +358,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
           }
           return const SizedBox();
         });
-  }
-
-  _getCurrentLocation() {
-    log("Retrieving current user location", name: tag);
-    Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium)
-        .then((Position position) {
-      log("Current user location is $position", name: tag);
-      if (mounted) {
-        setState(() {
-          _currentPosition = Coordinates(
-              latitude: position.latitude, longitude: position.longitude);
-        });
-        if (_filter!.selectedPlace == Places.current && _selectedDate != null) {
-          _retrieveWalks();
-        }
-      }
-    }).catchError((e) {
-      if (e is PlatformException) {
-        PlatformException platformException = e;
-        if (platformException.code == 'PERMISSION_DENIED') {
-          PrefsProvider.prefs.setBoolean("use_location", false);
-        }
-      }
-      print("Cannot retrieve current position: $e");
-    });
   }
 }
 
