@@ -186,6 +186,7 @@ class Walk {
   static List<Path> _decodePaths(json) {
     try {
       return _pathsFromJson(json['fields']['traces_gpx']);
+      // return _pathsFromJson(json['fields']['traces_gpx']);
     } catch (err) {
       print("Cannot decode paths for walk '${json['fields']['id']}': $err");
       return [];
