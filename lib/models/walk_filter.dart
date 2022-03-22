@@ -1,4 +1,5 @@
 import 'package:points_verts/views/walks/walks_view.dart';
+import 'package:collection/collection.dart';
 
 class WalkFilter {
   WalkFilter();
@@ -66,8 +67,10 @@ class WalkFilter {
         mountainBike = json['mountain_bike'],
         waterSupply = json['water_supply'],
         beWapp = json['be_wapp'],
+        transport = json['transport'],
         adepSante = json['adep_sante'],
-        transport = json['transport'];
+        selectedPlace = Places.values
+            .firstWhereOrNull((e) => e.toString() == json['selected_place']);
 
   Map<String, dynamic> toJson() => {
         'cancelled_walks': cancelledWalks,
@@ -88,8 +91,9 @@ class WalkFilter {
         'mountain_bike': mountainBike,
         'water_supply': waterSupply,
         'be_wapp': beWapp,
+        'transport': transport,
         'adep_sante': adepSante,
-        'transport': transport
+        'selected_place': selectedPlace?.toString()
       };
 
   String getLabel() {

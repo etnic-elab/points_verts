@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:points_verts/models/coordinates.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:points_verts/models/walk.dart';
 
 import '../list_header.dart';
@@ -12,7 +12,7 @@ class WalkResultsList extends StatelessWidget {
       : super(key: key);
 
   final List<Walk> walks;
-  final Coordinates? position;
+  final LatLng? position;
   final Places? currentPlace;
 
   @override

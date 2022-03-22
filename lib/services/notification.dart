@@ -3,12 +3,12 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/main.dart';
 import 'package:points_verts/models/walk.dart';
-import 'package:points_verts/models/coordinates.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -139,15 +139,16 @@ class NotificationManager {
 
 Future<void> scheduleNextNearestWalkNotifications() async {
   bool showNotification = await PrefsProvider.prefs
-      .getBoolean(key: "show_notification", defaultValue: false);
+      .getBoolean(Prefs.showNotification, defaultValue: false);
   if (!showNotification) return;
-  Coordinates? home = await retrieveHomePosition();
+  LatLng? home = await retrieveHomePosition();
   if (home == null) return;
   List<DateTime> dates = await retrieveNearestDates();
   NotificationManager.instance.cancelNextNearestWalkNotifications();
   for (DateTime date in dates) {
     List<Walk> walks = await retrieveSortedWalks(date, position: home);
-    if (walks.isNotEmpty && !walks[0].isCancelled()) {
+    if (walks.isNotEmpty && !walks[0].isCancelled) {
+      walks[0].weathers = await retrieveWeather(walks[0]);
       await NotificationManager.instance.scheduleNextNearestWalk(walks[0]);
     }
   }

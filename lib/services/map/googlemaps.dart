@@ -1,13 +1,17 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
+import 'package:points_verts/models/path.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/google_map.dart';
+import 'package:points_verts/extensions.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -28,7 +32,7 @@ class GoogleMaps implements MapInterface {
 
     for (int i = 0; i < min(walks.length, 5); i++) {
       Walk walk = walks[i];
-      if (walk.isPositionable()) {
+      if (walk.isPositionable) {
         destinationsList.add("${walk.lat},${walk.long}");
       }
     }
@@ -54,21 +58,13 @@ class GoogleMaps implements MapInterface {
       for (int i = 0; i < min(walks.length, 5); i++) {
         var distanceDuration = distanceDurations[i];
         Walk walk = walks[i];
-        if (walk.isPositionable() && distanceDuration?['status'] == 'OK') {
+        if (walk.isPositionable && distanceDuration?['status'] == 'OK') {
           walk.trip = Trip(
               distance: distanceDuration["distance"]["value"],
               duration: distanceDuration["duration"]["value"]);
         }
       } // update the trip distance/duration for each walk
     }
-  }
-
-  @override
-  Widget retrieveMap(List<MarkerInterface> markers, Function onMapTap,
-      {double centerLat = 50.3155646,
-      double centerLong = 5.009682,
-      double zoom = 7.5}) {
-    return GoogleMap(markers, onMapTap, centerLat, centerLong, zoom);
   }
 
   @override
@@ -113,31 +109,76 @@ class GoogleMaps implements MapInterface {
   }
 
   @override
+  Widget retrieveMap({
+    double centerLat = MapInterface.defaultLat,
+    double centerLong = MapInterface.defaultLong,
+    double zoom = MapInterface.defaultZoom,
+    locationEnabled = false,
+    List<MarkerInterface> markers = const [],
+    List<Path> paths = const [],
+    Function? onTapMap,
+    Function(Path)? onTapPath,
+  }) {
+    google.CameraPosition _initialLocation = google.CameraPosition(
+        target: google.LatLng(centerLat, centerLong), zoom: zoom);
+
+    return GoogleMap(
+      initialLocation: _initialLocation,
+      locationEnabled: locationEnabled,
+      paths: paths,
+      markers: markers,
+      onTapMap: onTapMap,
+      // onTapPath: onTapPath,
+    );
+  }
+
+  @override
   Widget retrieveStaticImage(
       Walk walk, int width, int height, Brightness brightness,
-      {double zoom = 16.0}) {
+      {double? zoom, Function? onTap}) {
     {
-      String logoUrl = walk.isCancelled()
-          ? brightness == Brightness.dark
-              ? publicLogoCancelledDark
-              : publicLogoCancelledLight
-          : publicLogo;
+      Map<String, dynamic> body = {};
+      body['size'] = '${width}x$height';
+      body['scale'] = '2';
+      body['key'] = _apiKey;
+      body['path'] = _getPaths(walk.paths, brightness);
+      body = _addMarkers(body, walk, brightness);
+
+      Uri url = Uri.https("maps.googleapis.com", "/maps/api/staticmap", body);
+
       return FutureBuilder(
-        future:
-            Assets.instance.themedAssetText(brightness, Assets.googleMapStatic),
+        future: Assets.asset.string(brightness, Assets.googleMapStaticStyle),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData) {
-            var body = {
-              "size": "${width}x$height",
-              "markers":
-                  "scale:2|anchor:center|icon:$logoUrl|${walk.lat},${walk.long}",
-              "scale": "2",
-              "key": _apiKey
-            };
-            Uri url =
-                Uri.https("maps.googleapis.com", "/maps/api/staticmap", body);
             return CachedNetworkImage(
               imageUrl: url.toString() + snapshot.data!,
+              imageBuilder: onTap == null
+                  ? null
+                  : (context, imageProvider) {
+                      return Ink.image(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 10, bottom: 15),
+                                  child: FloatingActionButton.small(
+                                    child: const Icon(Icons.open_in_full),
+                                    onPressed: () {},
+                                  )),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                onTap();
+                              },
+                            )
+                          ],
+                        ),
+                      );
+                    },
               progressIndicatorBuilder: (context, url, downloadProgress) =>
                   Center(
                       child: CircularProgressIndicator(
@@ -149,5 +190,40 @@ class GoogleMaps implements MapInterface {
         },
       );
     }
+  }
+
+  List<String> _getPaths(List<Path> paths, Brightness brightness) {
+    return paths
+        .map((Path _path) {
+          List<List<num>> _encodable = _path.encodablePoints;
+
+          return _encodable.isNotEmpty
+              ? [
+                  'color:${_path.getColor(brightness).toHex(transparancy: true)}',
+                  'weight:2',
+                  'enc:${encodePolyline(_encodable)}'
+                ].join('|')
+              : null;
+        })
+        .whereType<String>()
+        .toList();
+  }
+
+  Map<String, dynamic> _addMarkers(
+      Map<String, dynamic> body, Walk walk, Brightness brightness) {
+    if (walk.hasPosition) {
+      String logoUrl = walk.isCancelled
+          ? brightness == Brightness.dark
+              ? publicLogoCancelledDark
+              : publicLogoCancelledLight
+          : publicLogo;
+      body['markers'] =
+          'scale:2|anchor:center|icon:$logoUrl|${walk.lat},${walk.long}';
+    } else {
+      body['center'] = '${MapInterface.defaultLat},${MapInterface.defaultLong}';
+      body['zoom'] = '${MapInterface.defaultZoom}';
+    }
+
+    return body;
   }
 }
