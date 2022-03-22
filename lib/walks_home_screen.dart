@@ -1,5 +1,6 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
@@ -34,6 +35,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
       _initPlatformState();
     }).catchError((err) {
       print("error init state");
+      FlutterNativeSplash.remove();
     });
     PrefsProvider.prefs.remove("last_selected_date");
     WidgetsBinding.instance!.addObserver(this);
@@ -72,6 +74,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
   }
 
   Future<void> _initPlatformState() async {
+    FlutterNativeSplash.remove();
     BackgroundFetch.configure(
         BackgroundFetchConfig(
             minimumFetchInterval: 60 * 6,
