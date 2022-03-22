@@ -51,17 +51,14 @@ Future<void> _addTrustedCert(String certPath) async {
 }
 
 void main() async {
-  FlutterNativeSplash.removeAfter(initialization);
-  runApp(const MyApp());
-}
-
-void initialization(BuildContext context) async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await dotenv.load();
-  WidgetsFlutterBinding.ensureInitialized();
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
   await DBProvider.db.database;
   await _addTrustedCert(Assets.letsEncryptCert);
+  runApp(const MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
