@@ -172,7 +172,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Future<void> _retrieveCurrentPosition() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.medium);
+          desiredAccuracy: LocationAccuracy.medium,
+          timeLimit: const Duration(seconds: 4));
       _currentPosition = LatLng(position.latitude, position.longitude);
     } catch (e) {
       if (e is PlatformException) {
@@ -180,7 +181,10 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         if (platformException.code == 'PERMISSION_DENIED') {
           PrefsProvider.prefs.setBoolean(Prefs.useLocation, false);
         }
+      } else {
+        _locationExceptionMessage();
       }
+
       print("Cannot retrieve current position: $e");
     }
   }
@@ -216,6 +220,30 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
               textAlign: TextAlign.justify));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+  }
+
+  void _locationExceptionMessage() {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    final snackBar = SnackBar(
+        content: Row(
+      children: const [
+        Padding(
+          padding: EdgeInsets.only(right: 16.0),
+          child: Icon(
+            Icons.error,
+            color: Colors.red,
+          ),
+        ),
+        Flexible(
+          child: Text(
+            "Une erreur s'est produite lors de la récupération de votre position actuelle",
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    ));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   LatLng? get selectedPosition {
