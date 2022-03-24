@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:points_verts/extensions.dart';
 
 enum Prefs {
   lastBackgroundFetch,
@@ -29,40 +30,40 @@ class PrefsProvider {
 
   Future<bool> remove(Prefs key) async {
     SharedPreferences prefs = await preferences;
-    return prefs.remove('$key');
+    return prefs.remove(key.name);
   }
 
   Future<String?> setString(Prefs key, String value) async {
     SharedPreferences prefs = await preferences;
-    await prefs.setString('$key', value);
-    return prefs.getString('$key');
+    await prefs.setString(key.name, value);
+    return prefs.getString(key.name);
   }
 
   Future<String?> getString(Prefs key) async {
     SharedPreferences prefs = await preferences;
-    return prefs.getString('$key');
+    return prefs.getString(key.name);
   }
 
   Future<int?> setInt(Prefs key, int value) async {
     SharedPreferences prefs = await preferences;
-    await prefs.setInt('$key', value);
-    return prefs.getInt('$key');
+    await prefs.setInt(key.name, value);
+    return prefs.getInt(key.name);
   }
 
   Future<int?> getInt(Prefs key) async {
     SharedPreferences prefs = await preferences;
-    return prefs.getInt('$key');
+    return prefs.getInt(key.name);
   }
 
   Future<bool?> setBoolean(Prefs key, bool value) async {
     SharedPreferences prefs = await preferences;
-    await prefs.setBool('$key', value);
-    return prefs.getBool('$key');
+    await prefs.setBool(key.name, value);
+    return prefs.getBool(key.name);
   }
 
   Future<bool> getBoolean(Prefs key, {bool? defaultValue}) async {
     SharedPreferences prefs = await preferences;
-    bool? result = prefs.getBool('$key');
+    bool? result = prefs.getBool(key.name);
     return result ?? defaultValue ?? false;
   }
 }
