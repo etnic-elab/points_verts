@@ -6,6 +6,7 @@ import 'package:points_verts/services/gpx.dart';
 import 'package:points_verts/services/map/googlemaps.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/mapbox.dart';
+import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/maps/google_map.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
 
@@ -121,6 +122,33 @@ extension PlacesExtension on Places {
         return "localisation";
       case Places.home:
         return "domicile";
+    }
+  }
+}
+
+extension PrefsExt on Prefs {
+  String get name {
+    switch (this) {
+      case Prefs.lastBackgroundFetch:
+        return 'last_background_fetch';
+      case Prefs.lastWalkUpdate:
+        return 'last_walk_update';
+      case Prefs.showNotification:
+        return 'show_notification';
+      case Prefs.directoryWalkFilter:
+        return 'directory_walk_filter';
+      case Prefs.homeCoords:
+        return 'home_coords';
+      case Prefs.homeLabel:
+        return 'home_label';
+      case Prefs.useLocation:
+        return 'use_location';
+      case Prefs.firstLaunch:
+        return 'first_launch';
+      case Prefs.calendarWalkFilter:
+        return 'calendar_walk_filter';
+      case Prefs.lastSelectedDate:
+        return 'last_selected_date';
     }
   }
 }
