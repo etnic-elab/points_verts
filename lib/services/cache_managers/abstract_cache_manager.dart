@@ -4,14 +4,14 @@ import 'package:http/http.dart' as http;
 import 'cache_http_file_service.dart';
 
 abstract class AbstractCacheManager {
-  CacheManager? instance;
+  CacheManager? _instance;
 
   String get key;
   String get contentType;
   Duration get cacheDuration;
 
-  CacheManager getInstance() {
-    return instance ??= CacheManager(
+  CacheManager get instance {
+    return _instance ??= CacheManager(
       Config(
         key,
         fileService: CacheHttpFileService(cacheDuration),
@@ -20,7 +20,7 @@ abstract class AbstractCacheManager {
   }
 
   Future<http.Response> getData(String url) async {
-    var file = await getInstance().getSingleFile(url);
+    var file = await instance.getSingleFile(url);
     if (await file.exists()) {
       var res = await file.readAsString();
       return http.Response(res, 200, headers: {'content-type': contentType});

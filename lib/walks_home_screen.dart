@@ -1,14 +1,12 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
-import 'views/directory/walk_directory_view.dart';
-import 'views/settings/settings.dart';
 import 'views/walks/walks_view.dart';
 
 class WalksHomeScreen extends StatefulWidget {
@@ -20,26 +18,20 @@ class WalksHomeScreen extends StatefulWidget {
 
 class _WalksHomeScreenState extends State<WalksHomeScreen>
     with WidgetsBindingObserver {
-  final List<Widget> _pages = [
-    const WalksView(),
-    const WalkDirectoryView(),
-    const Settings()
-  ];
-  int _selectedIndex = 0;
+  final PrefsProvider prefs = locator<PrefsProvider>();
   bool _loading = true;
-  bool _error = false;
+  bool _error = true;
 
   @override
   void initState() {
+    super.initState();
     fetchData().then((_) {
       _initPlatformState();
     }).catchError((err) {
       print("error init state");
-      FlutterNativeSplash.remove();
     });
-    PrefsProvider.prefs.remove(Prefs.lastSelectedDate);
+    //TODO: remove last selected date in filter;
     WidgetsBinding.instance!.addObserver(this);
-    super.initState();
   }
 
   @override
@@ -73,8 +65,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
     }
   }
 
-  Future<void> _initPlatformState() async {
-    FlutterNativeSplash.remove();
+  void _initPlatformState() {
     BackgroundFetch.configure(
         BackgroundFetchConfig(
             minimumFetchInterval: 60 * 6,
@@ -85,8 +76,9 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
             startOnBoot: true), (String taskId) async {
       print("[BackgroundFetch] taskId: $taskId");
       try {
-        await scheduleNextNearestWalkNotifications();
-        await PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
+        await locator<NotificationManager>()
+            .scheduleNextNearestWalkNotifications();
+        await prefs.setString(Prefs.lastBackgroundFetch,
             DateTime.now().toUtc().toIso8601String());
       } catch (err) {
         print("Cannot schedule next nearest walk notification: $err");
@@ -109,30 +101,10 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), label: "Calendrier"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.import_contacts), label: "Annuaire"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: "Paramètres"),
-        ],
-      ),
-      body: _error
-          ? WalkListError(fetchData)
-          : _loading
-              ? const Loading()
-              : _pages[_selectedIndex],
-    );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    return _error
+        ? WalkListError(fetchData)
+        : _loading
+            ? const Loading()
+            : const WalksView();
   }
 }

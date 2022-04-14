@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:points_verts/company_data.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/abstractions/company_data.dart';
+import 'package:points_verts/abstractions/environment.dart';
 import 'package:weather_icons/weather_icons.dart';
 import 'dart:convert';
 
@@ -159,5 +159,6 @@ Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
     default:
       return const Icon(Icons.cancel, color: CompanyColors.red);
   }
-  return BoxedIcon(icon, color: iconColor ?? CompanyColors.blue, size: iconSize);
+  return BoxedIcon(icon,
+      color: iconColor ?? CompanyColors.blue, size: iconSize);
 }

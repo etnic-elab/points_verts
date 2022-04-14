@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/abstractions/environment.dart';
 import 'package:points_verts/models/walk.dart';
+import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/walk_details_info.dart';
@@ -13,7 +14,7 @@ class WalkDetailsInfoView extends StatelessWidget {
   final Walk walk;
   final Function onTapMap;
   final bool pathsLoaded;
-  final MapInterface map = Environment.mapInterface;
+  final MapInterface map = locator<Environment>().map;
 
   @override
   Widget build(BuildContext context) {

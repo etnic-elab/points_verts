@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/abstractions/environment.dart';
 import 'package:points_verts/models/walk.dart';
+import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/services/map/markers/marker_interface.dart';
-import 'package:points_verts/services/map/markers/walk_marker.dart';
 import 'package:collection/collection.dart';
+import 'package:points_verts/views/maps/markers/marker_interface.dart';
+import 'package:points_verts/views/maps/markers/walk_marker.dart';
 
 class WalkDetailsMapView extends StatelessWidget {
   WalkDetailsMapView(this.walk, this.onTapMap, this.location, {Key? key})
@@ -14,7 +15,7 @@ class WalkDetailsMapView extends StatelessWidget {
   final Walk walk;
   final Function onTapMap;
   final Function location;
-  final MapInterface map = Environment.mapInterface;
+  final MapInterface map = locator<Environment>().map;
 
   List<MarkerInterface> get _markers {
     if (walk.hasPosition) {

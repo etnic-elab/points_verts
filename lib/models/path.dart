@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:points_verts/company_data.dart';
+import 'package:points_verts/abstractions/company_data.dart';
 
 import 'gpx_point.dart';
 

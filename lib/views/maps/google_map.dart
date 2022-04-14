@@ -2,21 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
+import 'package:points_verts/abstractions/company_data.dart';
 import 'package:points_verts/models/gpx_point.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/assets.dart';
-import 'package:points_verts/services/map/markers/marker_generator.dart';
-import 'package:points_verts/services/map/markers/marker_interface.dart';
-import 'package:points_verts/views/walks/walks_view.dart';
-import 'package:points_verts/extensions.dart';
-
-//Enum used for walk icon generation
-enum GoogleMapIcons {
-  unselectedWalkIcon,
-  unselectedCancelIcon,
-  selectedWalkIcon,
-  selectedCancelIcon
-}
+import 'package:points_verts/services/map/marker_generator.dart';
+import 'package:points_verts/views/maps/markers/marker_interface.dart';
+import 'package:points_verts/views/walks/places.dart';
 
 class GoogleMap extends StatefulWidget {
   const GoogleMap({
@@ -185,5 +177,37 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
           }
         },
         markers: _markers);
+  }
+}
+
+//Enum used for walk icon generation
+enum GoogleMapIcons {
+  unselectedWalkIcon,
+  unselectedCancelIcon,
+  selectedWalkIcon,
+  selectedCancelIcon
+}
+
+extension GoogleMapIconsExtension on GoogleMapIcons {
+  String get logo {
+    switch (this) {
+      case GoogleMapIcons.unselectedWalkIcon:
+      case GoogleMapIcons.selectedWalkIcon:
+        return Assets.logo;
+      case GoogleMapIcons.unselectedCancelIcon:
+      case GoogleMapIcons.selectedCancelIcon:
+        return Assets.logoAnnule;
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case GoogleMapIcons.unselectedWalkIcon:
+      case GoogleMapIcons.unselectedCancelIcon:
+        return CompanyColors.darkGreen;
+      case GoogleMapIcons.selectedWalkIcon:
+      case GoogleMapIcons.selectedCancelIcon:
+        return CompanyColors.lightestGreen;
+    }
   }
 }

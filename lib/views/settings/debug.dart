@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 
@@ -31,7 +32,7 @@ class _LastWalkUpdateTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: PrefsProvider.prefs.getString(Prefs.lastWalkUpdate),
+      future: locator<PrefsProvider>().getString(Prefs.lastWalkUpdate),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           return ListTile(
@@ -49,7 +50,7 @@ class _GeoPosTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: PrefsProvider.prefs.getString(Prefs.homeCoords),
+      future: locator<PrefsProvider>().getString(Prefs.homeCoords),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData) {
           return ListTile(
@@ -64,10 +65,11 @@ class _GeoPosTile extends StatelessWidget {
 }
 
 class _PendingNotificationsTile extends StatelessWidget {
+  final NotificationManager notifManager = locator<NotificationManager>();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: NotificationManager.instance.pendingNotifications(),
+        future: notifManager.pendingNotifications(),
         builder: (BuildContext context,
             AsyncSnapshot<List<PendingNotificationRequest>> snapshot) {
           if (snapshot.hasData) {
@@ -92,8 +94,8 @@ class _PendingNotificationsTile extends StatelessWidget {
 
   _testNotification(List<PendingNotificationRequest> requests) {
     PendingNotificationRequest request = requests[0];
-    NotificationManager.instance
-        .displayNotification(-1, "[TEST] ${request.title}", request.body);
+    notifManager.displayNotification(
+        -1, "[TEST] ${request.title}", request.body);
   }
 
   String _generatePendingNotificationsSubtitle(
@@ -114,7 +116,7 @@ class _LastBackgroundFetch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: PrefsProvider.prefs.getString(Prefs.lastBackgroundFetch),
+        future: locator<PrefsProvider>().getString(Prefs.lastBackgroundFetch),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
             return ListTile(

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/gpx_point.dart';
 import 'package:points_verts/services/gpx.dart';
-import 'package:points_verts/services/location.dart';
+import 'package:points_verts/services/positioning.dart';
 import 'package:points_verts/views/walks/walk_details_info_view.dart';
 import 'package:points_verts/views/walks/walk_details_map_view.dart';
 
@@ -27,7 +26,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   bool _sheetOpen = false;
   PersistentBottomSheetController? _sheetController;
   Future<List>? _paths;
-  Future<LocationPermission>? _location;
+  Future<LocationPermission>? _locationPermission;
 
   @override
   void initState() {
@@ -59,7 +58,6 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
     return Scaffold(
       key: scaffoldState,
       appBar: AppBar(
@@ -78,9 +76,9 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(widget.walk.city),
-                Text(
-                    "${widget.walk.type} du ${fullDate.format(widget.walk.date)}",
-                    style: const TextStyle(fontSize: 14)),
+                Text('${widget.walk.type} - ${widget.walk.province}',
+                    style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                        color: Theme.of(context).textTheme.caption!.color)),
               ],
             )),
       ),
@@ -99,7 +97,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
           ? FloatingActionButton(
               child:
                   Icon(_sheetOpen ? Icons.expand_less : Icons.layers_outlined),
-              onPressed: () => _onTapFAB(),
+              onPressed: _onTapFAB,
             )
           : null,
     );
@@ -139,7 +137,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   }
 
   Future<LocationPermission> location() {
-    return _location ??= checkLocationPermission();
+    return _locationPermission ??= checkPermission();
   }
 }
 

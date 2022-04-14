@@ -15,9 +15,15 @@ const String publicLogoCancelledDark =
     "$_publicUrl/logo_cancelled_dark_64x64.png";
 
 class CompanyColors {
+  CompanyColors._(this.context);
+
+  final BuildContext context;
+  factory CompanyColors.of(BuildContext context) {
+    return CompanyColors._(context);
+  }
   static const greenPrimary = Color(0xFF6CB233);
   static const greenSecondary = Color(0xFF5B9434);
-  static const lightGreen = Color(0xFF3FBA44);
+  static const lightGreen = Color.fromARGB(255, 10, 68, 12);
   static const lightestGreen = Color(0xFF7ECC2F);
   static const darkGreen = Color(0xFF246739);
   static const darkestGreen = Color(0xFF466025);
@@ -34,9 +40,8 @@ class CompanyColors {
   static const lightRed = Color(0xFFF03B33);
   static const darkRed = Color(0xFF811620);
 
-  static Color contextualRed(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? lightRed : red;
-  }
+  Color getRed() =>
+      Theme.of(context).brightness == Brightness.dark ? lightRed : red;
 }
 
 class CompanyTheme {
@@ -46,19 +51,26 @@ class CompanyTheme {
   static final ThemeData companyDark = ThemeData(
     brightness: Brightness.dark,
     primarySwatch: _createMaterialColor(greenPrimaryMatCol),
+    scaffoldBackgroundColor: Colors.black,
+    bottomNavigationBarTheme:
+        const BottomNavigationBarThemeData(backgroundColor: Colors.black),
     toggleableActiveColor: greenPrimaryMatCol[400],
     textSelectionTheme:
         TextSelectionThemeData(selectionHandleColor: greenPrimaryMatCol[400]),
   );
 
   static ThemeData companyLightTheme() {
-    return ThemeData(primarySwatch: _createMaterialColor(greenPrimaryMatCol));
+    return ThemeData(
+      primarySwatch: _createMaterialColor(greenPrimaryMatCol),
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+    );
   }
 
   static ThemeData companyDarkTheme() {
     return companyDark.copyWith(
         colorScheme: companyDark.colorScheme
-            .copyWith(secondary: greenPrimaryMatCol[400]));
+            .copyWith(secondary: greenPrimaryMatCol[400]),
+        visualDensity: VisualDensity.adaptivePlatformDensity);
   }
 
   static MaterialColor _createMaterialColor(Color color) {

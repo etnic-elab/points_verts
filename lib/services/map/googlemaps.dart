@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
-import 'package:points_verts/company_data.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/abstractions/company_data.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/google_map.dart';
-import 'package:points_verts/extensions.dart';
+import 'package:points_verts/abstractions/extensions.dart';
+import 'package:points_verts/views/maps/markers/marker_interface.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -21,8 +21,13 @@ import 'dart:convert';
 import '../../models/walk.dart';
 import '../cache_managers/trip_cache_manager.dart';
 
-class GoogleMaps implements MapInterface {
-  final String? _apiKey = Environment.mapApiKey;
+class GoogleMaps extends MapInterface {
+  @override
+  String get website => 'https://mapsplatform.google.com/';
+  @override
+  String get key => 'GOOGLEMAPS_API_KEY';
+  @override
+  String get name => 'Google';
 
   @override
   Future<void> retrieveTrips(
@@ -32,19 +37,14 @@ class GoogleMaps implements MapInterface {
 
     for (int i = 0; i < min(walks.length, 5); i++) {
       Walk walk = walks[i];
-      if (walk.isPositionable) {
-        destinationsList.add("${walk.lat},${walk.long}");
-      }
+      if (walk.isPositionable) destinationsList.add("${walk.lat},${walk.long}");
     }
-
-    if (destinationsList.isEmpty) {
-      return;
-    }
+    if (destinationsList.isEmpty) return;
 
     var body = {
       "origins": origin,
       "destinations": destinationsList.join("|"),
-      "key": _apiKey
+      "key": apiKey
     };
 
     final String url =
@@ -54,7 +54,7 @@ class GoogleMaps implements MapInterface {
     final decoded = json.decode(response.body);
     final distanceDurations = decoded["rows"]?[0]?["elements"];
 
-    if (!distanceDurations?.isEmpty) {
+    if (distanceDurations?.isNotEmpty ?? false) {
       for (int i = 0; i < min(walks.length, 5); i++) {
         var distanceDuration = distanceDurations[i];
         Walk walk = walks[i];
@@ -63,7 +63,7 @@ class GoogleMaps implements MapInterface {
               distance: distanceDuration["distance"]["value"],
               duration: distanceDuration["duration"]["value"]);
         }
-      } // update the trip distance/duration for each walk
+      }
     }
   }
 
@@ -71,7 +71,7 @@ class GoogleMaps implements MapInterface {
   Future<List<AddressSuggestion>> retrieveSuggestions(
       String country, String search) async {
     if (search.isNotEmpty) {
-      var body = {"query": search, "key": _apiKey};
+      var body = {"query": search, "key": apiKey};
       Uri url = Uri.https(
           "maps.googleapis.com", "/maps/api/place/textsearch/json", body);
       http.Response response = await http.get(url);
@@ -96,7 +96,7 @@ class GoogleMaps implements MapInterface {
   Future<String?> retrieveAddress(double long, double lat) async {
     var body = {
       "latlng": lat.toString() + "," + long.toString(),
-      "key": _apiKey
+      "key": apiKey
     };
     Uri url = Uri.https("maps.googleapis.com", "/maps/api/geocode/json", body);
     http.Response response = await http.get(url);
@@ -140,7 +140,7 @@ class GoogleMaps implements MapInterface {
       Map<String, dynamic> body = {};
       body['size'] = '${width}x$height';
       body['scale'] = '2';
-      body['key'] = _apiKey;
+      body['key'] = apiKey;
       body['path'] = _getPaths(walk.paths, brightness);
       body = _addMarkers(body, walk, brightness);
 

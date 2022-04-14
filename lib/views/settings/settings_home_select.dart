@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/abstractions/environment.dart';
+import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/models/address_suggestion.dart';
 
@@ -23,7 +24,7 @@ class SettingsHomeSelect extends StatefulWidget {
 }
 
 class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
-  final MapInterface map = Environment.mapInterface;
+  final MapInterface map = locator<Environment>().map;
 
   final _homeSearchController = TextEditingController();
   Timer? _debounce;

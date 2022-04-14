@@ -2,9 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:points_verts/views/walks/walk_info.dart';
+import 'package:points_verts/abstractions/extended_value.dart';
 
-import '../tile_icon.dart';
+import '../centered_tile_icon.dart';
 import '../../models/walk.dart';
 import 'geo_button.dart';
 import 'walk_details_view.dart';
@@ -25,58 +25,66 @@ class WalkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: tileType == TileType.map
-          ? const EdgeInsets.all(0)
-          : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-      shape: tileType == TileType.map
-          ? const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)))
-          : null,
-      child: InkWell(
-        onTap: () => Navigator.push(context, _pageRoute()),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: _children,
-        ),
+    return ListTile(
+      shape: _shape,
+      onTap: () => Navigator.push(context, _pageRoute()),
+      title: _title,
+      isThreeLine: true,
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _subtitle,
+          Wrap(
+            children: _infoRow(walk),
+          )
+        ],
       ),
+      trailing: tileType == TileType.calendar
+          ? GeoButton(walk)
+          : Text(fullDate.format(walk.date)),
     );
   }
 
-  List<Widget> get _children {
-    List<Widget> _list = [
-      ListTile(
-        leading: TileIcon(WalkIcon(walk)),
-        title: _title(),
-        subtitle: _subtitle(),
-        trailing: tileType == TileType.calendar
-            ? GeoButton(walk)
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(fullDate.format(walk.date)),
-                ],
-              ),
-      )
-    ];
-
-    List<Widget> _info = _infoRow(walk);
-    if (!walk.isCancelled && _info.isNotEmpty) {
-      _list.add(const Divider(height: 0));
-      _list.add(Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-        child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            primary: true,
-            child: Row(children: _info)),
-      ));
+  ShapeBorder? get _shape {
+    switch (tileType) {
+      case TileType.map:
+        return const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)));
+      default:
+        return null;
     }
-
-    return _list;
   }
 
-  Widget _title() {
+  // List<Widget> get _children {
+  //   List<Widget> _info = [..._infoRow(walk), ..._infoRow(walk)];
+  //   List<Widget> _list = [
+  //     ListTile(
+  //       leading: CenteredTileIcon(WalkIcon(walk)),
+  //       title: _title,
+  //       subtitle: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           _subtitle,
+  //           Wrap(
+  //             children: _info,
+  //           )
+  //         ],
+  //       ),
+  //       trailing: tileType == TileType.calendar
+  //           ? GeoButton(walk)
+  //           : Column(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: <Widget>[
+  //                 Text(fullDate.format(walk.date)),
+  //               ],
+  //             ),
+  //     )
+  //   ];
+
+  //   return _list;
+  // }
+
+  Widget get _title {
     if (tileType == TileType.directory) {
       return Text("${walk.city} (${walk.entity})",
           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -87,7 +95,7 @@ class WalkTile extends StatelessWidget {
     }
   }
 
-  Widget _subtitle() {
+  Widget get _subtitle {
     if (tileType == TileType.directory) {
       return Text(walk.contactLabel);
     } else {
@@ -98,35 +106,24 @@ class WalkTile extends StatelessWidget {
   List<Widget> _infoRow(Walk walk) {
     List<Widget> info = [];
 
-    if (walk.weathers.isNotEmpty) {
-      info.add(_WeatherChip(walk.weathers[0]));
-    }
-
-    info.addAll(WalkInfo.values
-        .map((WalkInfo _info) {
-          bool _value = _info.walkValue(walk);
-
-          if (WalkInfo.fifteenKm == _info) {
-            if (!_value) {
-              if (walk.isOrientation) {
-                return const _ChipLabel('4-8-12 km');
-              } else {
-                return const _ChipLabel('5-10-20 km');
-              }
-            } else {
-              return const _ChipLabel('5-10-15-20 km');
-            }
-          }
-
-          if (!_value) {
-            return null;
-          } else {
-            return _ChipIcon(_info.icon);
-          }
-        })
+    if (walk.weathers.isNotEmpty) info.add(_WeatherChip(walk.weathers[0]));
+    info.add(_ChipLabel(walk.rangeLabel(compact: true)));
+    info.addAll([
+      ExtendedValue(walk.transport?.isNotEmpty ?? false,
+          layout: LayoutExtension.transport()),
+      ExtendedValue(walk.wheelchair, layout: LayoutExtension.wheelchair()),
+      ExtendedValue(walk.stroller, layout: LayoutExtension.stroller()),
+      ExtendedValue(walk.bike, layout: LayoutExtension.bike()),
+      ExtendedValue(walk.mountainBike, layout: LayoutExtension.mountainBike()),
+      ExtendedValue(walk.guided, layout: LayoutExtension.guided()),
+      ExtendedValue(walk.beWapp, layout: LayoutExtension.beWapp()),
+      ExtendedValue(walk.adepSante, layout: LayoutExtension.adepSante()),
+      ExtendedValue(walk.waterSupply, layout: LayoutExtension.waterSupply()),
+    ]
+        .map((ExtendedValue extended) =>
+            extended.value == true ? _ChipIcon(extended.layout!.icon!) : null)
         .whereType<Widget>()
         .toList());
-
     return info;
   }
 

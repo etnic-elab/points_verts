@@ -17,6 +17,7 @@ class DatesDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
     return ActionChip(
+        tooltip: "Choisir la date",
         onPressed: () async {
           DateTime? pickedDate = await showDatePicker(
               context: context,
@@ -44,12 +45,12 @@ class DatesDropdown extends StatelessWidget {
         ));
   }
 
-  static List<DropdownMenuItem<DateTime>> generateDropdownItems(
-      List<DateTime> dates) {
-    DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
-    return dates.map((DateTime walkDate) {
-      return DropdownMenuItem<DateTime>(
-          value: walkDate, child: Text(fullDate.format(walkDate)));
-    }).toList();
-  }
+  // static List<DropdownMenuItem<DateTime>> generateDropdownItems(
+  //     List<DateTime> dates) {
+  //   DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
+  //   return dates.map((DateTime walkDate) {
+  //     return DropdownMenuItem<DateTime>(
+  //         value: walkDate, child: Text(fullDate.format(walkDate)));
+  //   }).toList();
+  // }
 }

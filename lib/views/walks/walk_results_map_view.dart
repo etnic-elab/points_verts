@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/abstractions/environment.dart';
+import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/services/map/markers/marker_interface.dart';
 
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/models/walk.dart';
-import 'package:points_verts/services/map/markers/walk_marker.dart';
-import 'package:points_verts/services/map/markers/position_marker.dart';
-import 'walks_view.dart';
+import 'package:points_verts/views/maps/markers/marker_interface.dart';
+import 'package:points_verts/views/maps/markers/position_marker.dart';
+import 'package:points_verts/views/maps/markers/walk_marker.dart';
+import 'package:points_verts/views/walks/places.dart';
 import 'walk_list_error.dart';
 import 'walk_tile.dart';
 
@@ -28,7 +29,7 @@ class WalkResultsMapView extends StatelessWidget {
   final Function refreshWalks;
   final List<MarkerInterface> markers = [];
   final List<Map> rawMarkers = [];
-  final MapInterface map = Environment.mapInterface;
+  final MapInterface map = locator<Environment>().map;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +69,7 @@ class WalkResultsMapView extends StatelessWidget {
 
   void _setMarkers(List<Walk> walks) {
     markers.clear();
-        if (position != null) {
+    if (position != null) {
       markers.add(PositionMarker(
           position!.latitude, position!.longitude, currentPlace!));
     }

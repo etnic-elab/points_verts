@@ -3,21 +3,26 @@ import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/abstractions/environment.dart';
+import 'package:points_verts/models/walk_sort.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/models/website_walk.dart';
+import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/openweather.dart';
+import 'package:points_verts/services/positioning.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
 
 import '../../models/walk.dart';
 
-final MapInterface map = Environment.mapInterface;
+final MapInterface _map = locator<Environment>().map;
+final DBProvider _db = locator<DBProvider>();
+final PrefsProvider _prefs = locator<PrefsProvider>();
 
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
@@ -56,29 +61,24 @@ String _generateEventDescription(Walk walk) {
   return result;
 }
 
-int sortWalks(Walk a, Walk b) {
-  if (a.trip != null && b.trip != null) {
+int sortByPosition(Walk a, Walk b) {
+  if (a.trip?.duration != null && b.trip?.duration != null) {
     return a.trip!.duration!.compareTo(b.trip!.duration!);
-  } else if (!a.isCancelled && b.isCancelled) {
-    return -1;
-  } else if (a.isCancelled && !b.isCancelled) {
-    return 1;
-  } else if (a.distance != null && b.distance != null) {
-    return a.distance!.compareTo(b.distance!);
-  } else if (a.distance != null) {
-    return -1;
-  } else {
-    return 1;
   }
+  if (a.distance != null && b.distance != null) {
+    return a.distance!.compareTo(b.distance!);
+  }
+  if (a.distance != null) return -1;
+
+  return 1;
 }
 
-Future<List<Walk>> retrieveSortedWalks(DateTime? date,
-    {LatLng? position, WalkFilter? filter}) async {
-  List<Walk> walks = await DBProvider.db.getWalks(date, filter: filter);
-  if (position == null) {
-    walks.sort((a, b) => sortWalks(a, b));
-    return walks;
-  }
+Future<List<Walk>> retrieveSortedWalks(
+    {WalkFilter? filter, SortBy? sortBy, LatLng? position}) async {
+  List<Walk> walks = await _db.getWalks(filter: filter, sortBy: sortBy);
+
+  if (position == null) return walks;
+
   for (Walk walk in walks) {
     if (walk.isPositionable) {
       double distance = Geolocator.distanceBetween(
@@ -87,12 +87,12 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
       walk.trip = null;
     }
   }
-  walks.sort((a, b) => sortWalks(a, b));
+  walks.sort((a, b) => sortByPosition(a, b));
   try {
-    await map
+    await _map
         .retrieveTrips(position.longitude, position.latitude, walks)
         .then((_) {
-      walks.sort((a, b) => sortWalks(a, b));
+      walks.sort((a, b) => sortByPosition(a, b));
     });
   } catch (err) {
     print("Cannot retrieve trips: $err");
@@ -112,42 +112,39 @@ Future<void> launchURL(url) async {
 
 Future<void> updateWalks() async {
   log("Updating walks", name: tag);
-  String? lastUpdateIso8601Utc =
-      await PrefsProvider.prefs.getString(Prefs.lastWalkUpdate);
+  String? lastUpdateIso8601Utc = await _prefs.getString(Prefs.lastWalkUpdate);
   DateTime nowDateLocal = DateTime.now();
   DateTime nowDateUtc = nowDateLocal.toUtc();
   String nowIso8601Utc = nowDateUtc.toIso8601String();
   if (lastUpdateIso8601Utc == null) {
     List<Walk> newWalks = await fetchAllWalks(fromDateLocal: nowDateLocal);
     if (newWalks.isNotEmpty) {
-      await DBProvider.db.insertWalks(newWalks);
-      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
+      await _db.insertWalks(newWalks);
+      _prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
       await _fixNextWalks();
     }
-  } else {
-    if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
-        const Duration(hours: 1)) {
-      try {
-        List<Walk> updatedWalks = await refreshAllWalks(lastUpdateIso8601Utc,
-            fromDateLocal: nowDateLocal);
-        if (updatedWalks.isNotEmpty) {
-          await DBProvider.db.insertWalks(updatedWalks);
-        }
-        PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
-        await _fixNextWalks();
-        await DBProvider.db.deleteOldWalks();
-      } catch (err) {
-        print("Cannot refresh walks list: $err");
+  } else if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
+      const Duration(hours: 1)) {
+    try {
+      List<Walk> updatedWalks = await refreshAllWalks(lastUpdateIso8601Utc,
+          fromDateLocal: nowDateLocal);
+      if (updatedWalks.isNotEmpty) {
+        await _db.insertWalks(updatedWalks);
       }
-    } else {
-      log("Not refreshing walks list since it has been done less than an hour ago",
-          name: tag);
+      _prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
+      await _fixNextWalks();
+      await _db.deleteOldWalks();
+    } catch (err) {
+      print("Cannot refresh walks list: $err");
     }
+  } else {
+    log("Not refreshing walks list since it has been done less than an hour ago",
+        name: tag);
   }
 }
 
 Future<List<DateTime>> retrieveNearestDates() async {
-  List<DateTime> walkDates = await DBProvider.db.getWalkDates();
+  List<DateTime> walkDates = await _db.getWalkDates();
   DateTime now = DateTime.now();
   DateTime inAWeek = now.add(const Duration(days: 10));
   walkDates.retainWhere(
@@ -156,10 +153,17 @@ Future<List<DateTime>> retrieveNearestDates() async {
 }
 
 Future<LatLng?> retrieveHomePosition() async {
-  String? homePos = await PrefsProvider.prefs.getString(Prefs.homeCoords);
+  String? homePos = await _prefs.getString(Prefs.homeCoords);
   if (homePos == null) return null;
   List<String> split = homePos.split(",");
   return LatLng(double.parse(split[0]), double.parse(split[1]));
+}
+
+Future<LatLng?> retrieveCurrentPosition() async {
+  Position position = await determinePosition(
+      desiredAccuracy: LocationAccuracy.medium,
+      timeLimit: const Duration(seconds: 4));
+  return LatLng(position.latitude, position.longitude);
 }
 
 Future<List<Weather>> retrieveWeather(Walk walk) {
@@ -177,7 +181,7 @@ Future<void> _fixNextWalks() async {
   List<DateTime> nextDates = await retrieveNearestDates();
   for (DateTime walkDate in nextDates) {
     List<WebsiteWalk> fromWebsite = await retrieveWalksFromWebSite(walkDate);
-    List<Walk> fromDb = await DBProvider.db.getWalks(walkDate);
+    List<Walk> fromDb = await _db.getWalks(filter: WalkFilter.date(walkDate));
     List<Walk> fromDbUpdated = [];
     for (Walk walk in fromDb) {
       WebsiteWalk? website;
@@ -195,6 +199,6 @@ Future<void> _fixNextWalks() async {
         fromDbUpdated.add(walk);
       }
     }
-    await DBProvider.db.insertWalks(fromDbUpdated);
+    await _db.insertWalks(fromDbUpdated);
   }
 }

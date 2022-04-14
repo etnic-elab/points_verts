@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/models/walk_filter.dart';
+import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
@@ -21,6 +22,8 @@ class WalkDirectoryView extends StatefulWidget {
 }
 
 class _WalkDirectoryViewState extends State<WalkDirectoryView> {
+  final db = locator<DBProvider>();
+  final prefs = locator<PrefsProvider>();
   Future<List<Walk>>? _walks;
   WalkFilter _filter = WalkFilter();
 
@@ -31,8 +34,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
   }
 
   void init() async {
-    String? filterString =
-        await PrefsProvider.prefs.getString(Prefs.directoryWalkFilter);
+    String? filterString = await prefs.getString(Prefs.directoryWalkFilter);
     WalkFilter filter;
     if (filterString != null) {
       filter = WalkFilter.fromJson(jsonDecode(filterString));
@@ -44,7 +46,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
       _filter = filter;
     });
     setState(() {
-      _walks = DBProvider.db.getSortedWalks(filter: _filter);
+      _walks = db.getWalks(filter: _filter);
     });
   }
 
@@ -95,13 +97,12 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                                             builder: (context) =>
                                                 FilterPage(_filter, false)));
                                 if (newFilter != null) {
-                                  await PrefsProvider.prefs.setString(
+                                  await prefs.setString(
                                       Prefs.directoryWalkFilter,
                                       jsonEncode(newFilter));
                                   setState(() {
                                     _filter = newFilter;
-                                    _walks = DBProvider.db
-                                        .getSortedWalks(filter: newFilter);
+                                    _walks = db.getWalks(filter: newFilter);
                                   });
                                 }
                               },

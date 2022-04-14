@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
-import 'package:points_verts/company_data.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/abstractions/company_data.dart';
+import 'package:points_verts/abstractions/environment.dart';
+import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/assets.dart';
-import 'package:points_verts/views/tile_icon.dart';
+import 'package:points_verts/views/centered_tile_icon.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 class About extends StatelessWidget {
-  const About({Key? key}) : super(key: key);
+  About({Key? key}) : super(key: key);
+
+  final env = locator<Environment>();
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,7 @@ class About extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
           if (snapshot.hasData) {
             return ListTile(
-                leading: const TileIcon(Icon(Icons.info)),
+                leading: const CenteredTileWidget(Icon(Icons.info)),
                 title: const Text("À propos"),
                 onTap: () {
                   showAboutDialog(
@@ -35,8 +38,8 @@ class About extends StatelessWidget {
                             "mailto:$companyMail?subject=Points Verts"),
                         const _AboutRow("Données des Points Verts",
                             "Open Data Wallonie-Bruxelles", opendataUrl),
-                        _AboutRow("Données de navigation", Environment.mapApi,
-                            Environment.mapWebsite),
+                        _AboutRow("Données de navigation", env.map.name,
+                            env.map.website),
                         const _AboutRow("Données météorologiques",
                             "OpenWeather", "https://openweathermap.org")
                       ]);

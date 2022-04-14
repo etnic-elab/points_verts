@@ -113,38 +113,38 @@ class Walk {
         paths: _decodePaths(json));
   }
 
-  factory Walk.fromDb(List<Map<String, dynamic>> maps, int i) {
+  factory Walk.fromDb(Map<String, dynamic>? map) {
     return Walk(
-      id: maps[i]['id'],
-      city: maps[i]['city'],
-      entity: maps[i]['entity'],
-      type: maps[i]['type'],
-      province: maps[i]['province'],
-      date: DateTime.parse(maps[i]['date']),
-      long: maps[i]['longitude'],
-      lat: maps[i]['latitude'],
-      status: maps[i]['status'],
-      meetingPoint: maps[i]['meeting_point'],
-      meetingPointInfo: maps[i]['meeting_point_info'],
-      organizer: maps[i]['organizer'],
-      contactFirstName: maps[i]['contact_first_name'],
-      contactLastName: maps[i]['contact_last_name'],
-      contactPhoneNumber: maps[i]['contact_phone_number']?.toString(),
-      ign: maps[i]['ign'],
-      transport: maps[i]['transport'],
-      fifteenKm: maps[i]['fifteen_km'] == 1 ? true : false,
-      wheelchair: maps[i]['wheelchair'] == 1 ? true : false,
-      stroller: maps[i]['stroller'] == 1 ? true : false,
-      extraOrientation: maps[i]['extra_orientation'] == 1 ? true : false,
-      extraWalk: maps[i]['extra_walk'] == 1 ? true : false,
-      guided: maps[i]['guided'] == 1 ? true : false,
-      bike: maps[i]['bike'] == 1 ? true : false,
-      mountainBike: maps[i]['mountain_bike'] == 1 ? true : false,
-      waterSupply: maps[i]['water_supply'] == 1 ? true : false,
-      beWapp: maps[i]['be_wapp'] == 1 ? true : false,
-      adepSante: maps[i]['adep_sante'] == 1 ? true : false,
-      lastUpdated: DateTime.parse(maps[i]['last_updated']),
-      paths: _pathsFromJson(jsonDecode(maps[i]['paths'])),
+      id: map?['id'],
+      city: map?['city'],
+      entity: map?['entity'],
+      type: map?['type'],
+      province: map?['province'],
+      date: DateTime.parse(map?['date']),
+      long: map?['longitude'],
+      lat: map?['latitude'],
+      status: map?['status'],
+      meetingPoint: map?['meeting_point'],
+      meetingPointInfo: map?['meeting_point_info'],
+      organizer: map?['organizer'],
+      contactFirstName: map?['contact_first_name'],
+      contactLastName: map?['contact_last_name'],
+      contactPhoneNumber: map?['contact_phone_number']?.toString(),
+      ign: map?['ign'],
+      transport: map?['transport'],
+      fifteenKm: map?['fifteen_km'] == 1 ? true : false,
+      wheelchair: map?['wheelchair'] == 1 ? true : false,
+      stroller: map?['stroller'] == 1 ? true : false,
+      extraOrientation: map?['extra_orientation'] == 1 ? true : false,
+      extraWalk: map?['extra_walk'] == 1 ? true : false,
+      guided: map?['guided'] == 1 ? true : false,
+      bike: map?['bike'] == 1 ? true : false,
+      mountainBike: map?['mountain_bike'] == 1 ? true : false,
+      waterSupply: map?['water_supply'] == 1 ? true : false,
+      beWapp: map?['be_wapp'] == 1 ? true : false,
+      adepSante: map?['adep_sante'] == 1 ? true : false,
+      lastUpdated: DateTime.parse(map?['last_updated']),
+      paths: _pathsFromJson(jsonDecode(map?['paths'])),
     );
   }
 
@@ -210,16 +210,13 @@ class Walk {
 
   String? get formattedDistance {
     num? dist = trip?.distance ?? distance;
-    if (dist == null) {
-      return null;
-    } else if (dist < 1000) {
-      return '${dist.round().toString()} m';
-    } else {
-      return '${(dist / 1000).round().toString()} km';
-    }
+    if (dist == null) return null;
+    if (dist < 1000) return '${dist.round().toString()} m';
+
+    return '${(dist / 1000).round().toString()} km';
   }
 
-  String? get navigationLabel => (trip != null && trip!.duration != null)
+  String? get navigationLabel => (trip?.duration != null)
       ? '${Duration(seconds: trip!.duration!.round()).inMinutes} min'
       : formattedDistance;
 
@@ -227,11 +224,34 @@ class Walk {
 
   bool get hasPosition => lat != null && long != null;
 
-  String get contactLabel => (contactPhoneNumber != null)
-      ? "$contactLastName $contactFirstName : $contactPhoneNumber"
-      : "$contactLastName $contactFirstName";
+  String get contactLabel {
+    String label = '$contactLastName $contactFirstName';
+    if (contactPhoneNumber != null) label += ' : $contactPhoneNumber';
 
-  bool get isWalk => type == 'Marche';
+    return label;
+  }
 
+  bool get isWalk => !isOrientation;
   bool get isOrientation => type == 'Orientation';
+
+  String rangeLabel({required bool compact}) {
+    List<int> labels = [];
+    String start = compact ? '' : 'Parcours de ';
+    String end = ' km';
+    String join = compact ? '-' : ' - ';
+
+    if (isWalk) {
+      labels.addAll([5, 10, 20]);
+      if (fifteenKm) labels.add(15);
+      if (extraOrientation) labels.add(8);
+    } else {
+      labels.addAll([4, 8, 16]);
+      if (extraWalk) labels.add(10);
+    }
+
+    labels.sort();
+    return start + labels.join(join) + end;
+  }
+
+  bool get hasExtraRoute => isWalk ? extraOrientation : extraWalk;
 }

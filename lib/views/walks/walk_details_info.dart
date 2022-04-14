@@ -1,119 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:points_verts/company_data.dart';
+import 'package:points_verts/abstractions/company_data.dart';
+import 'package:points_verts/abstractions/extended_value.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/views/walks/outline_icon_button.dart';
-import 'package:points_verts/views/walks/walk_info.dart';
 
-import '../tile_icon.dart';
+import '../centered_tile_icon.dart';
 import 'walk_utils.dart';
 
 class WalkDetailsInfo extends StatelessWidget {
-  const WalkDetailsInfo(this.walk, {Key? key}) : super(key: key);
+  WalkDetailsInfo(this.walk, {Key? key}) : super(key: key);
 
   final Walk walk;
+  final DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
 
   @override
   Widget build(BuildContext context) {
-    DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
     return Expanded(
       child: ListView(
-        children: <Widget>[
-          _WeatherSection(walk),
-          ListTile(
-              leading: const TileIcon(Icon(Icons.calendar_today)),
-              title:
-                  Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!),
-              subtitle: const Text('Secrétariat ouvert de 8h à 18h'),
-              trailing: OutlineIconButton(
-                onPressed: () => addToCalendar(walk),
-                iconData: Icons.edit_calendar,
-              )),
-          _StatusTile(walk),
-          _RangesTile(walk),
-          ListTile(
-            leading: const TileIcon(Icon(Icons.location_on)),
-            title: Text(walk.meetingPoint ?? ""),
-            subtitle: _getGeoText(),
-            trailing: OutlineIconButton(
-                onPressed: () => launchGeoApp(walk),
-                iconData: Icons.directions),
-          ),
-          walk.ign != null
-              ? ListTile(
-                  leading: const TileIcon(Icon(Icons.map)),
-                  title: Text("IGN ${walk.ign}"))
-              : const SizedBox.shrink(),
-          walk.meetingPointInfo != null
-              ? ListTile(
-                  leading: const TileIcon(Icon(Icons.info)),
-                  title: Text(walk.meetingPointInfo!))
-              : const SizedBox.shrink(),
-          ListTile(
-            leading: const TileIcon(Icon(Icons.group)),
-            title: Text(walk.organizer),
-            subtitle: Text(walk.contactLabel),
-            trailing: OutlineIconButton(
-                onPressed: () {
-                  if (walk.contactPhoneNumber != null) {
-                    launchURL(
-                        "tel:${walk.contactPhoneNumber!.replaceAll(' ', '')}");
-                  }
-                },
-                iconData: Icons.call),
-          ),
-          walk.transport != null
-              ? ListTile(
-                  leading: const TileIcon(Icon(Icons.train)),
-                  title: Text(walk.transport!))
-              : const SizedBox.shrink(),
-          _infoRow(),
-        ],
+        children: _tiles(context),
       ),
     );
   }
 
-  Widget _infoRow() {
-    List<Widget> _infos = [
-      WalkInfo.wheelchair,
-      WalkInfo.stroller,
-      WalkInfo.guided,
-      WalkInfo.bike,
-      WalkInfo.mountainBike,
-      WalkInfo.waterSupply,
-      WalkInfo.beWapp,
-      WalkInfo.adepSante
-    ].map((WalkInfo info) => _infoTile(info)).toList();
+  List<Widget> _tiles(BuildContext context) {
+    //weather, cancelled, date, range, ign, meetingpoint, train/bus, contact, remaining
+    List<Widget> tiles = [
+      _WeatherSection(walk),
+      _ExtendedValueTile(ExtendedValue<bool>(walk.isCancelled,
+          layout: LayoutExtension.cancelled()
+              .colored(CompanyColors.of(context).getRed()))),
+      _DateTile(walk),
+      _RangeTile(walk),
+      _ExtendedValueTile(ExtendedValue<String?>(walk.ign,
+          layout:
+              LayoutExtension.ign().copyWith(description: 'IGN ${walk.ign}'))),
+      _MeetingPointTile(walk),
+      _ExtendedValueTile(ExtendedValue<String?>(walk.transport,
+          layout: LayoutExtension.transport()
+              .copyWith(description: walk.transport))),
+      _OrganizerTile(walk),
+    ];
 
-    return Wrap(alignment: WrapAlignment.center, children: _infos);
-  }
+    tiles.addAll([
+      ExtendedValue<bool>(walk.wheelchair,
+          layout: LayoutExtension.wheelchair()),
+      ExtendedValue<bool>(walk.stroller, layout: LayoutExtension.stroller()),
+      ExtendedValue<bool>(walk.bike, layout: LayoutExtension.bike()),
+      ExtendedValue<bool>(walk.mountainBike,
+          layout: LayoutExtension.mountainBike()),
+      ExtendedValue<bool>(walk.guided, layout: LayoutExtension.guided()),
+      ExtendedValue<bool>(walk.beWapp, layout: LayoutExtension.beWapp()),
+      ExtendedValue<bool>(walk.adepSante, layout: LayoutExtension.adepSante()),
+      ExtendedValue<bool>(walk.waterSupply,
+          layout: LayoutExtension.waterSupply()),
+    ].map((ExtendedValue value) => _ExtendedValueTile(value)));
 
-  Widget _infoTile(WalkInfo info) {
-    if (info.walkValue(walk)) {
-      return ListTile(
-          leading: TileIcon(Icon(info.icon)),
-          title: Text(info.description),
-          onTap: info.url != null
-              ? () {
-                  launchURL(info.url);
-                }
-              : null);
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
-
-  Widget? _getGeoText() {
-    if (walk.trip != null) {
-      return Text(
-          "À ${walk.formattedDistance}, ~${Duration(seconds: walk.trip!.duration!.round()).inMinutes} min. en voiture");
-    } else if (walk.distance != null && walk.distance != double.maxFinite) {
-      return Text("À ${walk.formattedDistance} (à vol d'oiseau)");
-    } else {
-      return null;
-    }
+    return tiles;
   }
 }
 
@@ -124,69 +69,157 @@ class _WeatherSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (walk.weathers.isEmpty) {
-      return const SizedBox.shrink();
-    } else {
-      List<Widget> widgets = [];
-      for (Weather weather in walk.weathers) {
-        widgets.add(Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("${weather.timestamp.hour}h", textScaleFactor: 0.8),
-            getWeatherIcon(weather),
-            Text("${weather.temperature.round()}°", textScaleFactor: 0.8),
-            Text("${weather.windSpeed.round()} km/h", textScaleFactor: 0.8)
-          ],
-        ));
-      }
-      return ListTile(
-          title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: widgets));
+    return walk.weathers.isNotEmpty
+        ? ListTile(
+            title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: _widgets))
+        : const SizedBox.shrink();
+  }
+
+  List<Widget> get _widgets {
+    List<Widget> widgets = [];
+    for (Weather weather in walk.weathers) {
+      widgets.add(Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text("${weather.timestamp.hour}h", textScaleFactor: 0.8),
+          getWeatherIcon(weather),
+          Text("${weather.temperature.round()}°", textScaleFactor: 0.8),
+          Text("${weather.windSpeed.round()} km/h", textScaleFactor: 0.8)
+        ],
+      ));
     }
+
+    return widgets;
   }
 }
 
-class _RangesTile extends StatelessWidget {
-  const _RangesTile(this.walk);
+class _DateTile extends StatelessWidget {
+  const _DateTile(this.walk, {Key? key}) : super(key: key);
+
+  final Walk walk;
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const CenteredTileWidget(Icon(Icons.calendar_today)),
+      title: Text(toBeginningOfSentenceCase(
+          DateFormat.yMMMMEEEEd("fr_BE").format(walk.date))!),
+      subtitle: const Text('Secrétariat ouvert de 8h à 18h'),
+      trailing: OutlineIconButton(
+        onPressed: () => addToCalendar(walk),
+        iconData: Icons.edit_calendar,
+      ),
+    );
+  }
+}
+
+class _RangeTile extends StatelessWidget {
+  const _RangeTile(this.walk, {Key? key}) : super(key: key);
 
   final Walk walk;
 
   @override
   Widget build(BuildContext context) {
-    if (walk.isWalk || walk.isOrientation) {
-      String _title = Range.label(walk);
-      WalkInfo? _subtitle =
-          walk.isWalk ? WalkInfo.extraOrientation : WalkInfo.extraWalk;
+    return ListTile(
+      leading: const CenteredTileWidget(Icon(Icons.route)),
+      title: Text(walk.rangeLabel(compact: false)),
+      subtitle: _subtitle != null ? Text(_subtitle!) : null,
+    );
+  }
 
-      return ListTile(
-          leading: TileIcon(Icon(Range.icon)),
-          title: Text(_title),
-          subtitle:
-              _subtitle.walkValue(walk) ? Text(_subtitle.description) : null);
+  String? get _subtitle {
+    if (walk.isWalk) {
+      return walk.extraOrientation
+          ? LayoutExtension.extraOrientation().description
+          : null;
     }
-
-    return const SizedBox.shrink();
+    return walk.extraWalk ? LayoutExtension.extraWalk().description : null;
   }
 }
 
-class _StatusTile extends StatelessWidget {
-  const _StatusTile(this.walk);
+class _MeetingPointTile extends StatelessWidget {
+  const _MeetingPointTile(this.walk, {Key? key}) : super(key: key);
 
   final Walk walk;
 
   @override
   Widget build(BuildContext context) {
-    if (walk.isCancelled) {
-      return ListTile(
-          leading: TileIcon(
-              Icon(Icons.cancel, color: CompanyColors.contextualRed(context))),
-          title: Text(
-            "Ce Point Vert est annulé",
-            style: TextStyle(color: CompanyColors.contextualRed(context)),
-          ));
-    } else {
-      return const SizedBox.shrink();
+    return walk.meetingPoint != null
+        ? ListTile(
+            leading: const CenteredTileWidget(Icon(Icons.location_on)),
+            title: Text(walk.meetingPoint!),
+            subtitle: _subtitle.isNotEmpty ? Text(_subtitle) : null,
+            isThreeLine: _isThreeLine,
+            trailing: OutlineIconButton(
+                onPressed: () => launchGeoApp(walk),
+                iconData: Icons.directions),
+          )
+        : const SizedBox.shrink();
+  }
+
+  String? get _info => walk.meetingPointInfo;
+  String? get _distance {
+    if (walk.trip?.duration != null) {
+      return "À ${walk.formattedDistance}, ~${Duration(seconds: walk.trip!.duration!.round()).inMinutes} min. en voiture";
     }
+
+    if (walk.distance != null && walk.distance != double.maxFinite) {
+      return "À ${walk.formattedDistance} (à vol d'oiseau)";
+    }
+
+    return null;
+  }
+
+  String get _subtitle {
+    return [_info, _distance].whereType<String>().join('\n');
+  }
+
+  bool get _isThreeLine => _info != null && _distance != null;
+}
+
+class _OrganizerTile extends StatelessWidget {
+  const _OrganizerTile(this.walk, {Key? key}) : super(key: key);
+
+  final Walk walk;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const CenteredTileWidget(Icon(Icons.group)),
+      title: Text(walk.organizer),
+      subtitle: Text(walk.contactLabel),
+      trailing: OutlineIconButton(
+          onPressed: () {
+            if (walk.contactPhoneNumber != null) {
+              launchURL("tel:${walk.contactPhoneNumber!.replaceAll(' ', '')}");
+            }
+          },
+          iconData: Icons.call),
+    );
+  }
+}
+
+class _ExtendedValueTile extends StatelessWidget {
+  const _ExtendedValueTile(this.item, {Key? key}) : super(key: key);
+
+  final ExtendedValue item;
+
+  @override
+  Widget build(BuildContext context) {
+    print('${item.value} : ${item.layout?.icon != null}');
+    return item.hasValue
+        ? ListTile(
+            iconColor: item.layout!.iconColor,
+            leading: item.layout!.icon != null
+                ? CenteredTileWidget(Icon(item.layout!.icon))
+                : null,
+            textColor: item.layout!.descriptionColor,
+            title: Text(item.layout!.description),
+            onTap: item.layout!.url != null
+                ? () => launchURL(item.layout!.url)
+                : null,
+          )
+        : const SizedBox.shrink();
   }
 }
