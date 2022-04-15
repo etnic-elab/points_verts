@@ -135,15 +135,6 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
         width: 4,
         visible: _path.visible,
         points: _path.gpxPoints.map((GpxPoint point) => point.latLng).toList(),
-        // consumeTapEvents: widget.onTapPath != null,
-        // onTap: () {
-        //   if (widget.onTapPath != null) {
-        //     widget.onTapPath!(_path);
-        //     setState(() {
-        //       _selectedPath = i;
-        //     });
-        //   }
-        // }
       );
 
       polylines.add(polyline);

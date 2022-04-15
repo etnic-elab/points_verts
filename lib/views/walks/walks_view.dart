@@ -7,11 +7,14 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/models/news.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/database.dart';
+import 'package:points_verts/services/news.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/services/prefs.dart';
+import 'package:points_verts/views/news.dart';
 import 'package:points_verts/views/walks/filter_page.dart';
 
 import 'dates_dropdown.dart';
@@ -41,6 +44,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   LatLng? _homePosition;
   _ViewType _viewType = _ViewType.list;
   WalkFilter? _filter;
+  bool newsOpen = false;
 
   @override
   void initState() {
@@ -167,6 +171,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
 
     _firstLaunch();
+    _news();
   }
 
   Future<void> _retrieveCurrentPosition() async {
@@ -244,6 +249,28 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       ],
     ));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void _news() async {
+    if (newsOpen == false) {
+      List<dynamic> futures = await Future.wait(
+          [PrefsProvider.prefs.getString(Prefs.news), retrieveNews()]);
+
+      Set oldNews = futures[0] != null ? jsonDecode(futures[0]).toSet() : {};
+      List<News> news = futures[1];
+
+      int initialPage =
+          news.indexWhere((News news) => !oldNews.contains(news.name));
+
+      if (mounted && initialPage >= 0) {
+        setState(() => newsOpen = true);
+        Set<int> viewed = await showNews(context, news, initialPage);
+        oldNews.addAll(viewed.map((int index) => news[index].name));
+        await PrefsProvider.prefs
+            .setString(Prefs.news, jsonEncode(oldNews.toList()));
+        setState(() => newsOpen = false);
+      }
+    }
   }
 
   LatLng? get selectedPosition {
