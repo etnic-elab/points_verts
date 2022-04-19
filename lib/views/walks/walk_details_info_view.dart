@@ -37,7 +37,8 @@ class WalkDetailsInfoView extends StatelessWidget {
   Widget _buildMap(BuildContext context, bool landscape) {
     Brightness brightness = Theme.of(context).brightness;
     Size size = MediaQuery.of(context).size;
-    double height = landscape ? size.height : 200.0;
+    double height =
+        landscape ? size.height : MediaQuery.of(context).size.height * 0.35;
     double width = landscape ? size.width / 2 : size.width;
 
     return SizedBox(
