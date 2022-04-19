@@ -29,28 +29,33 @@ Future showNews(BuildContext context, List<News> news, int initialPage) {
             backgroundColor: Colors.transparent,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0)),
-            child: CarouselWithIndicator(
-                news.map((news) => _NewsImage(news)).toList(), initialPage)),
+            child: _Carousel(news, initialPage)),
       );
     },
   );
 }
 
-class CarouselWithIndicator extends StatefulWidget {
-  const CarouselWithIndicator(this.images, this.initialPage, {Key? key})
-      : super(key: key);
+class _Carousel extends StatefulWidget {
+  const _Carousel(this.news, this.initialPage, {Key? key}) : super(key: key);
 
-  final List<Widget> images;
+  final List<News> news;
   final int initialPage;
 
   @override
-  State<StatefulWidget> createState() => _CarouselWithIndicator();
+  State<StatefulWidget> createState() => _CarouselState();
 }
 
-class _CarouselWithIndicator extends State<CarouselWithIndicator> {
+class _CarouselState extends State<_Carousel> {
   int _current = 0;
+  late final List<Widget> images;
   final Set<int> _viewed = {0};
   final CarouselController _controller = CarouselController();
+
+  @override
+  void initState() {
+    super.initState();
+    images = widget.news.map((news) => _Image(news)).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,13 +73,13 @@ class _CarouselWithIndicator extends State<CarouselWithIndicator> {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: CarouselSlider(
-                items: widget.images,
+                items: images,
                 carouselController: _controller,
                 options: CarouselOptions(
                     viewportFraction: 1,
                     initialPage: widget.initialPage,
-                    enableInfiniteScroll: widget.images.length > 1,
-                    autoPlay: widget.images.length > 1,
+                    enableInfiniteScroll: images.length > 1,
+                    autoPlay: images.length > 1,
                     autoPlayInterval: const Duration(seconds: 15),
                     enlargeCenterPage: true,
                     disableCenter: true,
@@ -90,7 +95,7 @@ class _CarouselWithIndicator extends State<CarouselWithIndicator> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: widget.images.asMap().entries.map((entry) {
+                children: images.asMap().entries.map((entry) {
                   return GestureDetector(
                     onTap: () => _controller.animateToPage(entry.key),
                     child: Container(
@@ -130,8 +135,8 @@ class _CarouselWithIndicator extends State<CarouselWithIndicator> {
   }
 }
 
-class _NewsImage extends StatelessWidget {
-  const _NewsImage(this.news, {Key? key}) : super(key: key);
+class _Image extends StatelessWidget {
+  const _Image(this.news, {Key? key}) : super(key: key);
 
   final News news;
 

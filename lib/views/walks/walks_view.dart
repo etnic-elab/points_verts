@@ -44,7 +44,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   LatLng? _homePosition;
   _ViewType _viewType = _ViewType.list;
   WalkFilter? _filter;
-  bool newsOpen = false;
+  bool newsLaunched = false;
 
   @override
   void initState() {
@@ -252,7 +252,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   void _news() async {
-    if (newsOpen == false) {
+    if (newsLaunched == false) {
       List<dynamic> futures = await Future.wait(
           [PrefsProvider.prefs.getString(Prefs.news), retrieveNews()]);
 
@@ -263,12 +263,14 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
           news.indexWhere((News news) => !oldNews.contains(news.name));
 
       if (mounted && initialPage >= 0) {
-        setState(() => newsOpen = true);
-        Set<int> viewed = await showNews(context, news, initialPage);
-        oldNews.addAll(viewed.map((int index) => news[index].name));
-        await PrefsProvider.prefs
-            .setString(Prefs.news, jsonEncode(oldNews.toList()));
-        setState(() => newsOpen = false);
+        setState(() => newsLaunched = true);
+
+        if (news.isNotEmpty) {
+          Set<int> viewed = await showNews(context, news, initialPage);
+          oldNews.addAll(viewed.map((int index) => news[index].name));
+          await PrefsProvider.prefs
+              .setString(Prefs.news, jsonEncode(oldNews.toList()));
+        }
       }
     }
   }
