@@ -44,7 +44,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   LatLng? _homePosition;
   _ViewType _viewType = _ViewType.list;
   WalkFilter? _filter;
-  bool newsLaunched = false;
+  Future? _newsRunning;
 
   @override
   void initState() {
@@ -252,26 +252,39 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   void _news() async {
-    if (newsLaunched == false) {
+    if (_newsRunning != null) {
+      await _newsRunning;
+      _news();
+    }
+
+    var completer = Completer();
+    _newsRunning = completer.future;
+    DateTime now = DateTime.now();
+    String? lastFetch =
+        await PrefsProvider.prefs.getString(Prefs.lastNewsFetch);
+
+    if (DateTime.tryParse(lastFetch ?? '')
+            ?.add(const Duration(days: 1))
+            .isBefore(now) ??
+        true) {
       List<dynamic> futures = await Future.wait(
           [PrefsProvider.prefs.getString(Prefs.news), retrieveNews()]);
-
       Set oldNews = futures[0] != null ? jsonDecode(futures[0]).toSet() : {};
       List<News> news = futures[1];
-
       int initialPage =
           news.indexWhere((News news) => !oldNews.contains(news.name));
 
-      if (mounted && initialPage >= 0) {
-        setState(() => newsLaunched = true);
-
-        if (news.isNotEmpty) {
-          Set<int> viewed = await showNews(context, news, initialPage);
-          oldNews.addAll(viewed.map((int index) => news[index].name));
-          await PrefsProvider.prefs
-              .setString(Prefs.news, jsonEncode(oldNews.toList()));
-        }
+      if (initialPage >= 0 && mounted) {
+        Set<int> viewed = await showNews(context, news, initialPage);
+        oldNews.addAll(viewed.map((int index) => news[index].name));
+        await PrefsProvider.prefs
+            .setString(Prefs.news, jsonEncode(oldNews.toList()));
       }
+
+      await PrefsProvider.prefs
+          .setString(Prefs.lastNewsFetch, now.toIso8601String());
+      completer.complete();
+      _newsRunning = null;
     }
   }
 

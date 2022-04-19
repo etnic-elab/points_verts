@@ -13,6 +13,7 @@ enum Prefs {
   calendarWalkFilter,
   lastSelectedDate,
   news,
+  lastNewsFetch,
 }
 
 class PrefsProvider {
