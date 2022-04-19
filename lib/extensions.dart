@@ -151,6 +151,8 @@ extension PrefsExt on Prefs {
         return 'last_selected_date';
       case Prefs.news:
         return 'news';
+      case Prefs.lastNewsFetch:
+        return 'last_news_fetch';
     }
   }
 }
