@@ -116,7 +116,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   void _openSheet() {
     _sheetController = scaffoldState.currentState?.showBottomSheet(
       (context) => _BottomSheet(widget.walk, togglePathVisibility),
-      elevation: 16,
+      elevation: 6.0,
       enableDrag: false,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
@@ -127,7 +127,8 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
 
   Future<void> closeSheet() async {
     _sheetController?.close();
-    _sheetController?.closed.then((_) => setState(() => _sheetOpen = false));
+    _sheetController?.closed
+        .whenComplete(() => setState(() => _sheetOpen = false));
   }
 
   void togglePathVisibility(Path path, bool newValue) {

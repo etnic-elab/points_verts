@@ -10,8 +10,8 @@ class WalkListError extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
         child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        const Spacer(),
         const Icon(
           Icons.warning,
           color: CompanyColors.red,
@@ -27,7 +27,6 @@ class WalkListError extends StatelessWidget {
             ])),
         ElevatedButton(
             child: const Text("Réessayer"), onPressed: () => refreshWalks()),
-        const Spacer()
       ],
     ));
   }

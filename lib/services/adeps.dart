@@ -13,21 +13,17 @@ const String baseUrl =
     "https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps";
 const int pageSize = 500;
 
-Future<List<Walk>> fetchAllWalks({DateTime? fromDateLocal}) async {
+Future<List<Walk>> fetchWalks(DateTime fromDateLocal) async {
   log("Fetching all future walks", name: tag);
-  fromDateLocal ??= DateTime.now();
-  DateFormat dateFormat = DateFormat("yyyy/MM/dd");
   return _retrieveWalks(
-      "$baseUrl&q=date+>%3D+${dateFormat.format(fromDateLocal)}");
+      "$baseUrl&q=date+>%3D+${DateFormat("yyyy/MM/dd").format(fromDateLocal)}");
 }
 
-Future<List<Walk>> refreshAllWalks(String lastUpdateIso8601Utc,
-    {DateTime? fromDateLocal}) async {
+Future<List<Walk>> refreshWalks(
+    DateTime fromDateLocal, String lastUpdateIso8601Utc) async {
   log("Refreshing future walks list since $lastUpdateIso8601Utc", name: tag);
-  fromDateLocal ??= DateTime.now();
-  DateFormat dateFormat = DateFormat("yyyy/MM/dd");
   return _retrieveWalks(
-      "$baseUrl&q=(date+>%3D+${dateFormat.format(fromDateLocal)}+AND+record_timestamp+>$lastUpdateIso8601Utc)");
+      "$baseUrl&q=(date+>%3D+${DateFormat("yyyy/MM/dd").format(fromDateLocal)}+AND+record_timestamp+>$lastUpdateIso8601Utc)");
 }
 
 Future<List<Walk>> _retrieveWalks(String baseUrl) async {
@@ -64,12 +60,8 @@ Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
 }
 
 List<Walk> _convertWalks(Map<String, dynamic> data) {
-  List<Walk> newList = [];
   List<dynamic> list = data['records'];
-  for (Map<String, dynamic> walkJson in list) {
-    newList.add(Walk.fromJson(walkJson));
-  }
-  return newList;
+  return list.map((json) => Walk.fromJson(json)).toList();
 }
 
 String? _convertStatus(String webSiteStatus) {

@@ -1,9 +1,9 @@
 class SortBy {
+  SortBy(this.type, this.direction);
   SortBy.defaultValue()
       : type = SortType.city,
         direction = SortDirection.asc;
-  SortBy.alphabetical(this.direction, [this.type = SortType.city]);
-  SortBy.position(this.type, [this.direction = SortDirection.asc]);
+  SortBy.fromType(this.type, {this.direction = SortDirection.asc});
 
   final SortType type;
   final SortDirection direction;

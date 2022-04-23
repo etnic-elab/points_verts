@@ -10,7 +10,7 @@ import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/views/maps/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/markers/position_marker.dart';
 import 'package:points_verts/views/maps/markers/walk_marker.dart';
-import 'package:points_verts/views/walks/places.dart';
+import 'package:points_verts/views/places.dart';
 import 'walk_list_error.dart';
 import 'walk_tile.dart';
 

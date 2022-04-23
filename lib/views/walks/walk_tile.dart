@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/abstractions/extended_value.dart';
 
-import '../centered_tile_icon.dart';
 import '../../models/walk.dart';
 import 'geo_button.dart';
 import 'walk_details_view.dart';
-import 'walk_icon.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
@@ -29,6 +27,7 @@ class WalkTile extends StatelessWidget {
       shape: _shape,
       onTap: () => Navigator.push(context, _pageRoute()),
       title: _title,
+      textColor: walk.isCancelled ? Theme.of(context).disabledColor : null,
       isThreeLine: true,
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +106,8 @@ class WalkTile extends StatelessWidget {
     List<Widget> info = [];
 
     if (walk.weathers.isNotEmpty) info.add(_WeatherChip(walk.weathers[0]));
-    info.add(_ChipLabel(walk.rangeLabel(compact: true)));
+    info.add(
+        _ChipLabel(walk.rangeLabel(compact: true), disabled: walk.isCancelled));
     info.addAll([
       ExtendedValue(walk.transport?.isNotEmpty ?? false,
           layout: LayoutExtension.transport()),
@@ -120,8 +120,9 @@ class WalkTile extends StatelessWidget {
       ExtendedValue(walk.adepSante, layout: LayoutExtension.adepSante()),
       ExtendedValue(walk.waterSupply, layout: LayoutExtension.waterSupply()),
     ]
-        .map((ExtendedValue extended) =>
-            extended.value == true ? _ChipIcon(extended.layout!.icon!) : null)
+        .map((ExtendedValue extended) => extended.value == true
+            ? _ChipIcon(extended.layout!.icon!, disabled: walk.isCancelled)
+            : null)
         .whereType<Widget>()
         .toList());
     return info;
@@ -153,16 +154,21 @@ class _WeatherChip extends StatelessWidget {
 }
 
 class _ChipIcon extends StatelessWidget {
-  const _ChipIcon(this.icon);
+  const _ChipIcon(this.icon, {this.disabled = false});
 
   final IconData icon;
+  final bool disabled;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: Chip(
-        label: Icon(icon, size: 15.0),
+        label: Icon(
+          icon,
+          size: 15.0,
+          color: disabled ? Theme.of(context).disabledColor : null,
+        ),
         visualDensity: VisualDensity.compact,
       ),
     );
@@ -170,10 +176,11 @@ class _ChipIcon extends StatelessWidget {
 }
 
 class _ChipLabel extends StatelessWidget {
-  const _ChipLabel(this.text, {this.icon});
+  const _ChipLabel(this.text, {this.icon, this.disabled = false});
 
   final String text;
   final IconData? icon;
+  final bool disabled;
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +191,11 @@ class _ChipLabel extends StatelessWidget {
               ? Icon(
                   icon,
                   size: 15.0,
+                  color: disabled ? Theme.of(context).disabledColor : null,
                 )
+              : null,
+          labelStyle: disabled
+              ? TextStyle(color: Theme.of(context).disabledColor)
               : null,
           label: Text(text, style: const TextStyle(fontSize: 12.0)),
           visualDensity: VisualDensity.compact),

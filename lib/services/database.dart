@@ -83,7 +83,6 @@ class DBProvider {
   String _generateWhereFromFilter(WalkFilter filter) {
     Set<String> wheres = {'1=1'};
     if (filter.filterByProvince) {
-      print(filter.provinceFilter);
       wheres.add('province in ${filter.provinceFilter.map((e) => "?")}');
     }
 
@@ -126,7 +125,7 @@ class DBProvider {
 
     sortBy = sortBy ?? SortBy.defaultValue();
     if (!sortBy.position) {
-      orderBy = '${sortBy.type.name} ${sortBy.direction.name}';
+      orderBy = '${sortBy.type.name} ${sortBy.direction.name}, city ASC';
     }
 
     final Database db = await database;

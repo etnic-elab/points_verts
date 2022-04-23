@@ -39,7 +39,7 @@ Future<void> launchGeoApp(Walk walk) async {
 
 void addToCalendar(Walk walk) {
   final Event event = Event(
-    title: "Marche ADEPS de ${walk.city}",
+    title: "Point Vert ADEPS de ${walk.city}",
     description: _generateEventDescription(walk),
     location: "${walk.meetingPoint}, ${walk.entity}",
     startDate: walk.date.add(const Duration(hours: 8)),
@@ -117,7 +117,7 @@ Future<void> updateWalks() async {
   DateTime nowDateUtc = nowDateLocal.toUtc();
   String nowIso8601Utc = nowDateUtc.toIso8601String();
   if (lastUpdateIso8601Utc == null) {
-    List<Walk> newWalks = await fetchAllWalks(fromDateLocal: nowDateLocal);
+    List<Walk> newWalks = await fetchWalks(nowDateLocal);
     if (newWalks.isNotEmpty) {
       await _db.insertWalks(newWalks);
       _prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
@@ -126,8 +126,8 @@ Future<void> updateWalks() async {
   } else if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
       const Duration(hours: 1)) {
     try {
-      List<Walk> updatedWalks = await refreshAllWalks(lastUpdateIso8601Utc,
-          fromDateLocal: nowDateLocal);
+      List<Walk> updatedWalks =
+          await refreshWalks(nowDateLocal, lastUpdateIso8601Utc);
       if (updatedWalks.isNotEmpty) {
         await _db.insertWalks(updatedWalks);
       }
@@ -159,11 +159,12 @@ Future<LatLng?> retrieveHomePosition() async {
   return LatLng(double.parse(split[0]), double.parse(split[1]));
 }
 
-Future<LatLng?> retrieveCurrentPosition() async {
-  Position position = await determinePosition(
-      desiredAccuracy: LocationAccuracy.medium,
-      timeLimit: const Duration(seconds: 4));
-  return LatLng(position.latitude, position.longitude);
+Future<LatLng?> retrieveCurrentPosition() {
+  return determinePosition(
+          desiredAccuracy: LocationAccuracy.medium,
+          timeLimit: const Duration(seconds: 4))
+      .then(
+          (Position position) => LatLng(position.latitude, position.longitude));
 }
 
 Future<List<Weather>> retrieveWeather(Walk walk) {

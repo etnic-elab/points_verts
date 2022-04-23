@@ -8,24 +8,21 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/services/assets.dart';
-import 'package:points_verts/services/database.dart';
+
+import 'package:points_verts/services/navigation.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/walks/walk_details_view.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
-import 'package:points_verts/walks_home_screen.dart';
 import 'package:points_verts/abstractions/company_data.dart';
 
-import 'models/walk.dart';
-
 void main() async {
-  await initialize();
+  await _initialize();
   runApp(const MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
-Future initialize({bool addCert = true}) {
+Future _initialize({bool addCert = true}) {
   setupLocator();
   return Future.wait(
       [dotenv.load(), if (addCert) _addTrustedCert(Assets.letsEncryptCert)]);
@@ -43,7 +40,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   }
   try {
     print("[BackgroundFetch] Headless task: $taskId");
-    await initialize(addCert: false);
+    await _initialize(addCert: false);
     await updateWalks();
     await locator<NotificationManager>().scheduleNextNearestWalkNotifications();
     await locator<PrefsProvider>().setString(
@@ -65,16 +62,30 @@ Future _addTrustedCert(String certPath) async {
   }
 }
 
-class MyApp extends StatelessWidget {
-  static final navigatorKey = GlobalKey<NavigatorState>();
-
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  static redirectToWalkDetails(int walkId) async {
-    Walk? walk = await locator<DBProvider>().getWalk(walkId);
-    if (walk != null) {
-      navigatorKey.currentState!
-          .push(MaterialPageRoute(builder: (context) => WalkDetailsView(walk)));
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      updateWalks();
     }
   }
 
@@ -89,7 +100,8 @@ class MyApp extends StatelessWidget {
         Locale('fr', 'FR'),
         Locale('fr', 'LU'),
       ],
-      navigatorKey: navigatorKey,
+      navigatorKey: locator<NavigationService>().navigatorKey,
+      onGenerateRoute: NavigationRouter.generateRoute,
       title: applicationName,
       theme: FlexThemeData.light(
           appBarBackground: Colors.white,
@@ -101,7 +113,7 @@ class MyApp extends StatelessWidget {
               primary: CompanyColors.greenPrimary,
               secondary: CompanyColors.greenSecondary),
           darkIsTrueBlack: true),
-      home: const WalksHomeScreen(),
+      initialRoute: initScreenRoute,
       debugShowCheckedModeBanner: false,
     );
   }

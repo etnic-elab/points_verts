@@ -30,7 +30,7 @@ class WalkMarker implements MarkerInterface {
       builder: (ctx) => RawMaterialButton(
         child: WalkIcon(walk, size: 21),
         shape: const CircleBorder(),
-        elevation: selectedWalk == walk ? 5.0 : 2.0,
+        elevation: selectedWalk == walk ? 6.0 : 2.0,
         fillColor: selectedWalk == walk
             ? CompanyColors.lightestGreen
             : CompanyColors.darkGreen,

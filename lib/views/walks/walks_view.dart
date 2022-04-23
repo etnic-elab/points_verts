@@ -3,9 +3,8 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:points_verts/abstractions/company_data.dart';
 import 'package:points_verts/abstractions/extended_value.dart';
 import 'package:points_verts/models/walk_filter.dart';
@@ -16,15 +15,11 @@ import 'package:points_verts/services/exceptions.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/walks/filter_page.dart';
 import 'package:points_verts/models/walk_sort.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_results_list.dart';
 
-import 'dates_dropdown.dart';
 import '../../models/walk.dart';
-import 'walk_results_list_view.dart';
-import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
 
 const String tag = "dev.alpagaga.points_verts.WalkList";
@@ -56,6 +51,8 @@ class _WalksViewState extends State<WalksView> {
   SortBy _sortBy = SortBy.defaultValue();
   _ViewType _viewType = _ViewType.list;
   bool _reachedFilterBarOffset = false;
+  int? _results;
+  bool _searching = false;
   DateTime? lastRefresh;
 
   @override
@@ -87,15 +84,19 @@ class _WalksViewState extends State<WalksView> {
       _sortBy = sortBy ?? _sortBy;
     });
 
-    _refreshData();
+    refreshData();
   }
 
-  Future<void> _refreshData() async {
+  Future<void> refreshData() async {
     bool doRefresh = lastRefresh == null ||
         const Duration(seconds: 30) < DateTime.now().difference(lastRefresh!);
     if (!doRefresh) return;
     try {
-      await Future.wait([_updatePosition(), _retrieveDates()]);
+      await Future.wait([
+        _updatePosition().catchError((error, stackTrace) =>
+            setState(() => _sortBy = SortBy.defaultValue())),
+        _retrieveDates()
+      ]);
       updateWalks();
       setState(() => lastRefresh = DateTime.now());
     } on DatesNotFoundException catch (err) {
@@ -104,26 +105,65 @@ class _WalksViewState extends State<WalksView> {
     }
   }
 
-  void updateWalks() {
+  Future updateWalks() {
     _currentWalks = _retrieveWalks();
-    _currentWalks!.then(
-        (walks) => _resultsSnackbar(!_reachedFilterBarOffset, walks.length));
+    return _currentWalks!
+        .then((walks) => setState(() => _results = walks.length));
   }
 
-  Future<void> _updatePosition({SortBy? onErrorValue}) async {
+  Future<int?> newSearch({WalkFilter? filter, SortBy? sortBy}) async {
+    if (!mounted) return null;
+    setState(() => _searching = true);
+
     try {
-      if (_sortBy.type == SortType.currentPosition) {
-        _currentPosition = await retrieveCurrentPosition();
+      if (sortBy?.position ?? false) await _updatePosition(update: sortBy);
+
+      setState(() {
+        _filter = filter ?? _filter;
+        _sortBy = sortBy ?? _sortBy;
+      });
+
+      await updateWalks();
+
+      if (filter != null) {
+        _prefs.setString(Prefs.calendarWalkFilter, jsonEncode(_filter));
       }
 
-      if (_sortBy.type == SortType.homePosition) {
-        _homePosition = await retrieveHomePosition();
-        if (_homePosition == null) throw ArgumentError.value(_homePosition);
+      if (sortBy != null) {
+        _prefs.setString(Prefs.calendarSortBy, jsonEncode(_sortBy));
       }
-
-      if (mounted) setState(() {});
     } catch (err) {
-      setState(() => _sortBy = onErrorValue ?? SortBy.defaultValue());
+      print(err);
+      if (mounted) setState((() => _results = null));
+    }
+
+    _scrollToTop();
+    setState(() => _searching = false);
+    return _results;
+  }
+
+  Future<void> _updatePosition({SortBy? update}) async {
+    SortBy sortBy = update ?? _sortBy;
+
+    try {
+      if (sortBy.position) {
+        if (sortBy.type == SortType.currentPosition) {
+          _currentPosition = await retrieveCurrentPosition();
+        }
+
+        if (sortBy.type == SortType.homePosition) {
+          _homePosition = await retrieveHomePosition();
+          if (_homePosition == null) {
+            //TODO: make screen visible so that user can input homeposition instead of direct error;
+            throw ArgumentError.value(_homePosition);
+          }
+        }
+
+        if (mounted) setState(() {});
+      }
+    } catch (err) {
+      print(err); //TODO: make something visible to user
+      rethrow;
     }
   }
 
@@ -143,7 +183,7 @@ class _WalksViewState extends State<WalksView> {
     Future<List<Walk>> walks = retrieveSortedWalks(
         filter: _filter, sortBy: _sortBy, position: _selectedPosition);
     try {
-      _retrieveWeathers(await walks).then((_) {
+      _retrieveWeathers(await walks).whenComplete(() {
         if (mounted) setState(() {});
       });
     } catch (err) {
@@ -161,17 +201,14 @@ class _WalksViewState extends State<WalksView> {
           retrieveWeather(walk).then((weather) => walk.weathers = weather);
       weathers.add(future);
     }
-    return Future.wait(weathers);
+    await Future.wait(weathers);
   }
 
   void _scrollListener() {
-    bool showFAB = scrollController.offset > filterBarOffset;
-    bool visibleSnackbar = scrollController.offset < filterBarOffset - 2.0;
-    if (showFAB != _reachedFilterBarOffset) {
-      setState(() => _reachedFilterBarOffset = showFAB);
+    bool reachedFilterBarOffset = scrollController.offset > filterBarOffset;
+    if (reachedFilterBarOffset != _reachedFilterBarOffset) {
+      setState(() => _reachedFilterBarOffset = reachedFilterBarOffset);
     }
-    _currentWalks
-        ?.then((walks) => _resultsSnackbar(visibleSnackbar, walks.length));
   }
 
   LatLng? get _selectedPosition {
@@ -185,193 +222,293 @@ class _WalksViewState extends State<WalksView> {
     }
   }
 
-  void _resultsSnackbar(bool visible, int results) async {
-    if (visible == true) {
-      bool isLight = Theme.of(context).brightness == Brightness.light;
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      final snackBar = SnackBar(
-          elevation: 0,
-          padding: const EdgeInsets.all(18),
-          backgroundColor: isLight ? Colors.white : Colors.black,
-          duration: const Duration(days: 10),
-          content: Text(_resultsSnackbarLabel(results),
-              textAlign: TextAlign.center,
-              textScaleFactor: 1.3,
-              style: TextStyle(color: isLight ? Colors.black : Colors.white)));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    } else {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    }
-  }
-
-  String _resultsSnackbarLabel(int results) =>
-      '$results résultat' + (results > 1 ? 's' : '');
-
-  Function get refreshData => _refreshData;
+  void _scrollToTop() => scrollController.jumpTo(0.0);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _dates,
-      builder: (BuildContext context, AsyncSnapshot dates) {
-        if (dates.hasError) return WalkListError(refreshData);
-        if (!dates.hasData) {
-          return const LoadingText("Récupération des données...");
+      builder: (BuildContext context, AsyncSnapshot<List<DateTime>> dates) {
+        if (dates.hasData) {
+          return FutureBuilder(
+            future: _currentWalks,
+            builder: (BuildContext context, AsyncSnapshot<List<Walk>> walks) {
+              return Scaffold(
+                drawer: const Drawer(),
+                endDrawer: walks.hasData
+                    ? FilterDrawer(_filter, walks.data!.length, filterUpdate)
+                    : null,
+                body: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    RefreshIndicator(
+                      onRefresh: refreshData,
+                      displacement: 25.0,
+                      edgeOffset: 150.0,
+                      child: CustomScrollView(
+                        semanticChildCount: walks.data?.length,
+                        controller: scrollController,
+                        slivers: [
+                          SliverAppBar(
+                            elevation: 6.0,
+                            pinned: true,
+                            leading: Opacity(
+                              opacity: 0.8,
+                              child: IconButton(
+                                icon: const Icon(Icons.menu),
+                                splashRadius:
+                                    Material.defaultSplashRadius / 1.5,
+                                tooltip: 'Ouvrir le menu de navigation',
+                                onPressed: () =>
+                                    Scaffold.of(context).openDrawer(),
+                              ),
+                            ),
+                            actions: [
+                              IconButton(
+                                icon: const Icon(Icons.calendar_today),
+                                splashRadius:
+                                    Material.defaultSplashRadius / 1.5,
+                                tooltip: 'Choisir la date',
+                                onPressed: () => dateUpdate(dates.data!),
+                              ),
+                              IconButton(
+                                splashRadius:
+                                    Material.defaultSplashRadius / 1.5,
+                                icon: Icon(
+                                  _viewType == _ViewType.list
+                                      ? Icons.map
+                                      : Icons.list,
+                                ),
+                                tooltip: _viewType == _ViewType.list
+                                    ? 'Voir sur la carte'
+                                    : 'Voir en liste',
+                                onPressed: () {
+                                  setState(() {
+                                    _viewType = _viewType == _ViewType.list
+                                        ? _ViewType.map
+                                        : _ViewType.list;
+                                  });
+                                },
+                              ),
+                            ],
+                            title: SizedBox(
+                              width: double.infinity,
+                              child: GestureDetector(
+                                child: Opacity(
+                                  opacity: 0.8,
+                                  child: Tooltip(
+                                      child: Text(
+                                          DateFormat.yMMMEd("fr_BE")
+                                              .format(_filter.date!),
+                                          overflow: TextOverflow.ellipsis),
+                                      message: 'La date sélectionnée'),
+                                ),
+                                onTap: () => dateUpdate(dates.data!),
+                              ),
+                            ),
+                          ),
+                          if (walks.hasData)
+                            SliverToBoxAdapter(
+                              child: FilterBar(showSort),
+                            ),
+                          walks.hasError
+                              ? SliverFillRemaining(
+                                  hasScrollBody: false,
+                                  child: WalkListError(refreshData))
+                              : _searching
+                                  ? const SliverFillRemaining(
+                                      hasScrollBody: false,
+                                      child: LoadingText(
+                                          'Rechercher les points...'),
+                                    )
+                                  : walks.hasData == false
+                                      ? const SliverFillRemaining(
+                                          hasScrollBody: false,
+                                          child: LoadingText(
+                                              'Chargement des points...'),
+                                        )
+                                      : walks.data!.isEmpty
+                                          ? const SliverFillRemaining(
+                                              child: Center(
+                                                  child:
+                                                      Text("Aucun résultat")))
+                                          : WalkResultSliverList(walks.data!),
+                        ],
+                      ),
+                    ),
+                    AnimatedBuilder(
+                      animation: scrollController,
+                      child: FilterFAB(showSort),
+                      builder: (BuildContext context, Widget? child) {
+                        double _bottom = -55.0;
+                        if (scrollController.position.hasContentDimensions &&
+                            scrollController.position.extentAfter > 146.0) {
+                          double extent = math.min(
+                              scrollController.position.extentBefore,
+                              scrollController.position.extentAfter);
+                          _bottom = math.min(extent - 55.0, 15.0);
+                        }
+                        return Positioned(child: child!, bottom: _bottom);
+                      },
+                    ),
+                    if (_searching == false)
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: AnimatedSlide(
+                          duration: const Duration(milliseconds: 310),
+                          offset: _results != null && !_reachedFilterBarOffset
+                              ? Offset.zero
+                              : const Offset(0, 3),
+                          curve: Curves.decelerate,
+                          child: _ResultsBar(_results),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          );
         }
 
-        return FutureBuilder(
-          future: _currentWalks,
-          builder: (BuildContext context, AsyncSnapshot<List<Walk>> walks) {
-            int results = walks.data?.length ?? 0;
-            return Scaffold(
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerFloat,
-              floatingActionButton:
-                  FilterFAB(_reachedFilterBarOffset && results > 0),
-              drawer: const Drawer(),
-              endDrawer: walks.hasData
-                  ? FilterDrawer(_filter, walks.data!.length, filterUpdate)
-                  : null,
-              body: NestedScrollView(
-                controller: scrollController,
-                headerSliverBuilder: (context, innerBoxScrolled) => [
-                  SliverAppBar(
-                    elevation: 4,
-                    forceElevated: innerBoxScrolled,
-                    pinned: true,
-                    leading: Opacity(
-                      opacity: 0.8,
-                      child: IconButton(
-                        icon: const Icon(Icons.menu),
-                        splashRadius: Material.defaultSplashRadius / 1.5,
-                        tooltip: 'Ouvrir le menu de navigation',
-                        onPressed: () => Scaffold.of(context).openDrawer(),
-                      ),
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.calendar_today),
-                        splashRadius: Material.defaultSplashRadius / 1.5,
-                        tooltip: 'Choisir la date',
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        splashRadius: Material.defaultSplashRadius / 1.5,
-                        icon: Icon(
-                          _viewType == _ViewType.list ? Icons.map : Icons.list,
-                        ),
-                        tooltip: _viewType == _ViewType.list
-                            ? 'Voir sur la carte'
-                            : 'Voir en liste',
-                        onPressed: () {
-                          setState(() {
-                            _viewType = _viewType == _ViewType.list
-                                ? _ViewType.map
-                                : _ViewType.list;
-                          });
-                        },
-                      ),
-                    ],
-                    title: SizedBox(
-                      width: double.infinity,
-                      child: GestureDetector(
-                        child: const Opacity(
-                          opacity: 0.8,
-                          child: Tooltip(
-                              child:
-                                  Text('date', overflow: TextOverflow.ellipsis),
-                              message: 'La date'),
-                        ),
-                        onTap: () {},
-                      ),
-                    ),
-                  ),
-                  if (walks.hasData)
-                    const SliverToBoxAdapter(
-                      child: FilterBar(),
-                    ),
-                ],
-                body: walks.hasError
-                    ? WalkListError(refreshData)
-                    : walks.hasData
-                        ? RefreshIndicator(
-                            displacement: 25.0,
-                            onRefresh: _refreshData,
-                            child: WalkResultsList(walks.data!),
-                          )
-                        : const LoadingText('Chargement des points...'),
-              ),
-            );
-          },
-        );
+        return Scaffold(
+            body: dates.hasError
+                ? WalkListError(refreshData)
+                : const LoadingText("Récupération des données..."));
       },
     );
   }
 
   Future<int?> filterUpdate(WalkFilter newFilter) async {
-    if (mounted) setState(() => _filter = newFilter);
-    updateWalks();
-    try {
-      List<dynamic> futures = await Future.wait([
-        _currentWalks!,
-        _prefs.setString(Prefs.calendarWalkFilter, jsonEncode(newFilter)),
-      ]);
-      if (scrollController.offset > filterBarOffset) {
-        scrollController.animateTo(filterBarOffset + 0.1,
-            duration: const Duration(milliseconds: 300), curve: Curves.linear);
-      }
+    return newSearch(filter: newFilter);
+  }
 
-      return futures[0].length;
-    } catch (err) {
-      return null;
+  Future dateUpdate(List<DateTime> allDates) async {
+    DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: _filter.date!,
+        selectableDayPredicate: (date) => allDates.contains(date),
+        fieldLabelText: "Choix de la date",
+        helpText: "Choix de la date",
+        fieldHintText: "dd/mm/aaaa",
+        errorInvalidText: "Pas de Point à la date choisie.",
+        errorFormatText: "Format invalide.",
+        firstDate: allDates.first,
+        lastDate: allDates.last);
+    if (pickedDate != null) {
+      _filter.date = pickedDate;
+      newSearch(filter: _filter);
     }
   }
+
+  Future<void> showSort() async {
+    SortBy? sortBy = await showModalBottomSheet(
+        elevation: 6.0,
+        isScrollControlled: true,
+        isDismissible: true,
+        enableDrag: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.0))),
+        context: context,
+        builder: (context) => _SortSheet(_sortBy));
+
+    if (sortBy != null && sortBy != _sortBy) {
+      try {
+        newSearch(sortBy: sortBy);
+      } catch (err) {
+        print(err);
+      }
+    }
+  }
+
+  // void _resultsSnackbar(bool hide, int results) async {
+  //   if (hide == true) {
+  //     ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  //   } else {
+  //     bool isLight = Theme.of(context).brightness == Brightness.light;
+  //     ScaffoldMessenger.of(context).removeCurrentSnackBar();
+  //     final snackBar = SnackBar(
+  //         elevation: 6.0,
+  //         dismissDirection: DismissDirection.none,
+  //         padding: const EdgeInsets.all(18),
+  //         backgroundColor: isLight ? Colors.white : Colors.black,
+  //         duration: const Duration(days: 10),
+  //         content: Text(_resultsSnackbarLabel(results),
+  //             textAlign: TextAlign.center,
+  //             textScaleFactor: 1.3,
+  //             style: TextStyle(color: isLight ? Colors.black : Colors.white)));
+  //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //   }
+  // }
+
+  // String _resultsSnackbarLabel(int results) =>
+  //     '$results résultat' + (results > 1 ? 's' : '');
+}
+
+class _ResultsBar extends StatelessWidget {
+  const _ResultsBar(this.results, {Key? key}) : super(key: key);
+
+  final int? results;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(0),
+      elevation: 0.0,
+      child: SizedBox(
+        width: double.infinity,
+        height: 60,
+        child: Center(
+          child: Text(
+            label,
+            textScaleFactor: 1.3,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String get label =>
+      results != null ? '$results résultat' + (results! > 1 ? 's' : '') : '';
 }
 
 class FilterFAB extends StatelessWidget {
-  const FilterFAB(this.isVisible, {Key? key}) : super(key: key);
+  const FilterFAB(this.showSort, {Key? key}) : super(key: key);
 
-  final bool isVisible;
-  final Offset _visible = Offset.zero;
-  final Offset _invisible = const Offset(0, 3);
+  final Future<void> Function() showSort;
 
   @override
   Widget build(BuildContext context) {
     bool isLight = Theme.of(context).brightness == Brightness.light;
-    return AnimatedSlide(
-      duration: const Duration(milliseconds: 350),
-      offset: isVisible ? _visible : _invisible,
-      child: Container(
-        width: 220,
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-        decoration: BoxDecoration(
-            color: CompanyColors.greenPrimary,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(50)),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextButton.icon(
-                style: _buttonStyle(isLight),
-                icon: const Icon(Icons.sort),
-                label: const Text('Trier'),
-                onPressed: () {},
-              ),
+    return Container(
+      width: 220,
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+      decoration: BoxDecoration(
+          color: CompanyColors.greenPrimary,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(50)),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextButton.icon(
+              style: _buttonStyle(isLight),
+              icon: const Icon(Icons.sort),
+              label: const Text('Trier'),
+              onPressed: showSort,
             ),
-            Text(
-              '|',
-              style: TextStyle(color: isLight ? Colors.white : Colors.black),
+          ),
+          Text(
+            '|',
+            style: TextStyle(color: isLight ? Colors.white : Colors.black),
+          ),
+          Expanded(
+            child: TextButton.icon(
+              style: _buttonStyle(isLight),
+              icon: const Icon(Icons.filter_list),
+              label: const Text('Filtrer'),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
-            Expanded(
-              child: TextButton.icon(
-                style: _buttonStyle(isLight),
-                icon: const Icon(Icons.filter_list),
-                label: const Text('Filtrer'),
-                onPressed: () => Scaffold.of(context).openEndDrawer(),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -386,7 +523,9 @@ class FilterFAB extends StatelessWidget {
 }
 
 class FilterBar extends StatelessWidget {
-  const FilterBar({Key? key}) : super(key: key);
+  const FilterBar(this.showSort, {Key? key}) : super(key: key);
+
+  final Future<void> Function() showSort;
 
   @override
   Widget build(BuildContext context) {
@@ -398,7 +537,7 @@ class FilterBar extends StatelessWidget {
           TextButton(
             style: _buttonStyle,
             child: _buttonText('Trier', Icons.sort),
-            onPressed: () {},
+            onPressed: showSort,
           ),
           TextButton(
             style: _buttonStyle,
@@ -461,7 +600,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.9,
       child: Drawer(
-        elevation: 8,
+        elevation: 6.0,
         child: Column(
           children: [
             AppBar(
@@ -632,8 +771,7 @@ class _PaddedChip extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: FilterChip(
-        //TODO: check elevation
-        elevation: 5,
+        elevation: 6.0,
         avatar: extendedValue.layout!.icon != null
             ? Icon(
                 extendedValue.layout!.icon,
@@ -650,26 +788,70 @@ class _PaddedChip extends StatelessWidget {
   }
 }
 
-  // void _locationExceptionMessage() {
-  //   ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  //   final snackBar = SnackBar(
-  //       content: Row(
-  //     children: const [
-  //       Padding(
-  //         padding: EdgeInsets.only(right: 16.0),
-  //         child: Icon(
-  //           Icons.error,
-  //           color: Colors.red,
-  //         ),
-  //       ),
-  //       Flexible(
-  //         child: Text(
-  //           "Une erreur s'est produite lors de la récupération de votre position actuelle",
-  //           maxLines: 3,
-  //           overflow: TextOverflow.ellipsis,
-  //         ),
-  //       ),
-  //     ],
-  //   ));
-  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  // }
+class _SortSheet extends StatelessWidget {
+  const _SortSheet(this.sortBy, {Key? key}) : super(key: key);
+
+  final SortBy sortBy;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const ListTile(
+          title: Text('Trier'),
+        ),
+        ListView.separated(
+          shrinkWrap: true,
+          separatorBuilder: ((context, index) => const Divider(
+                indent: 10,
+                endIndent: 10,
+                thickness: 1,
+              )),
+          itemBuilder: (context, i) {
+            String title = choices.values.elementAt(i);
+            SortBy value = choices.keys.elementAt(i);
+            return RadioListTile(
+                title: Text(title),
+                value: value,
+                groupValue: sortBy,
+                onChanged: (newValue) =>
+                    Navigator.of(context).pop(newValue as SortBy));
+          },
+          itemCount: choices.length,
+        ),
+      ]),
+    );
+  }
+
+  Map<SortBy, String> get choices => {
+        SortBy.fromType(SortType.city): 'Ville : A à Z',
+        SortBy.fromType(SortType.province): 'Province : A à Z',
+        SortBy.fromType(SortType.homePosition): 'Domicile : Les plus proches',
+        SortBy.fromType(SortType.currentPosition):
+            'Position actuelle : Les plus proches',
+      };
+}
+// void _locationExceptionMessage() {
+//   ScaffoldMessenger.of(context).removeCurrentSnackBar();
+//   final snackBar = SnackBar(
+//       content: Row(
+//     children: const [
+//       Padding(
+//         padding: EdgeInsets.only(right: 16.0),
+//         child: Icon(
+//           Icons.error,
+//           color: Colors.red,
+//         ),
+//       ),
+//       Flexible(
+//         child: Text(
+//           "Une erreur s'est produite lors de la récupération de votre position actuelle",
+//           maxLines: 3,
+//           overflow: TextOverflow.ellipsis,
+//         ),
+//       ),
+//     ],
+//   ));
+//   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+// }

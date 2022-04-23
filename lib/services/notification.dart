@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:points_verts/services/database.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/abstractions/company_data.dart';
-import 'package:points_verts/main.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/models/walk_filter.dart';
+import 'package:points_verts/services/navigation.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -45,11 +46,20 @@ class NotificationManager {
         onSelectNotification: (String? payload) async {
       int? walkId = int.tryParse(payload!);
       if (walkId != null) {
-        MyApp.redirectToWalkDetails(walkId);
+        _redirectToWalkDetails(walkId);
       }
     });
     tz.initializeTimeZones();
     return plugin;
+  }
+
+  void _redirectToWalkDetails(int walkId) async {
+    Walk? walk = await locator<DBProvider>().getWalk(walkId);
+    if (walk != null) {
+      locator<NavigationService>()
+          .navigate
+          .pushNamed(walkDetailRoute, arguments: walk);
+    }
   }
 
   scheduleNextNearestWalk(Walk walk) async {
