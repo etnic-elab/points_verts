@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/models/walk.dart';
@@ -37,7 +39,15 @@ class WalkDetailsInfoView extends StatelessWidget {
   Widget _buildMap(BuildContext context, bool landscape) {
     Brightness brightness = Theme.of(context).brightness;
     Size size = MediaQuery.of(context).size;
-    double height = landscape ? size.height : 200.0;
+    bool hasPaths =
+        walk.paths.firstWhereOrNull((_path) => _path.gpxPoints.isNotEmpty) !=
+            null;
+
+    double height = landscape
+        ? size.height
+        : hasPaths
+            ? max(200, size.height * 0.35)
+            : max(200, size.height * 0.25);
     double width = landscape ? size.width / 2 : size.width;
 
     return SizedBox(
