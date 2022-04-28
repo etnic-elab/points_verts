@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:points_verts/models/news.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
-Future showNews(BuildContext context, List<News> news, int initialPage) {
+Future showNews(BuildContext context, List<News> news) {
   return showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: 'news_dialog',
@@ -29,17 +29,16 @@ Future showNews(BuildContext context, List<News> news, int initialPage) {
             backgroundColor: Colors.transparent,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0)),
-            child: _Carousel(news, initialPage)),
+            child: _Carousel(news)),
       );
     },
   );
 }
 
 class _Carousel extends StatefulWidget {
-  const _Carousel(this.news, this.initialPage, {Key? key}) : super(key: key);
+  const _Carousel(this.news, {Key? key}) : super(key: key);
 
   final List<News> news;
-  final int initialPage;
 
   @override
   State<StatefulWidget> createState() => _CarouselState();
@@ -48,7 +47,6 @@ class _Carousel extends StatefulWidget {
 class _CarouselState extends State<_Carousel> {
   int _current = 0;
   late final List<Widget> images;
-  final Set<int> _viewed = {0};
   final CarouselController _controller = CarouselController();
 
   @override
@@ -59,77 +57,67 @@ class _CarouselState extends State<_Carousel> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context, _viewed);
-        return false;
-      },
-      child: SizedBox(
-        height: min(MediaQuery.of(context).size.height * 0.92, 680),
-        width: min(MediaQuery.of(context).size.width * 0.92, 1000),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: CarouselSlider(
-                items: images,
-                carouselController: _controller,
-                options: CarouselOptions(
-                    viewportFraction: 1,
-                    initialPage: widget.initialPage,
-                    enableInfiniteScroll: images.length > 1,
-                    autoPlay: images.length > 1,
-                    autoPlayInterval: const Duration(seconds: 15),
-                    enlargeCenterPage: true,
-                    disableCenter: true,
-                    pageSnapping: true,
-                    onPageChanged: (index, reason) => setState(() {
-                          _current = index;
-                          _viewed.add(index);
-                        })),
+    return SizedBox(
+      height: min(MediaQuery.of(context).size.height * 0.92, 680),
+      width: min(MediaQuery.of(context).size.width * 0.92, 1000),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: CarouselSlider(
+              items: images,
+              carouselController: _controller,
+              options: CarouselOptions(
+                  viewportFraction: 1,
+                  enableInfiniteScroll: images.length > 1,
+                  autoPlay: images.length > 1,
+                  autoPlayInterval: const Duration(seconds: 15),
+                  enlargeCenterPage: true,
+                  disableCenter: true,
+                  pageSnapping: true,
+                  onPageChanged: (index, _) =>
+                      setState(() => _current = index)),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: images.asMap().entries.map((entry) {
+                return GestureDetector(
+                  onTap: () => _controller.animateToPage(entry.key),
+                  child: Container(
+                    width: 12.0,
+                    height: 12.0,
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 4.0),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black)
+                            .withOpacity(_current == entry.key ? 0.9 : 0.4)),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          Positioned(
+            right: 0.0,
+            top: 0.0,
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                padding: const EdgeInsets.all(0),
+                onPressed: () => Navigator.pop(context),
+                tooltip: 'Fermer la fenêtre',
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: images.asMap().entries.map((entry) {
-                  return GestureDetector(
-                    onTap: () => _controller.animateToPage(entry.key),
-                    child: Container(
-                      width: 12.0,
-                      height: 12.0,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 4.0),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: (Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black)
-                              .withOpacity(_current == entry.key ? 0.9 : 0.4)),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            Positioned(
-              right: 0.0,
-              top: 0.0,
-              child: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: IconButton(
-                  icon: const Icon(Icons.close),
-                  padding: const EdgeInsets.all(0),
-                  onPressed: () => Navigator.pop(context, _viewed),
-                  tooltip: 'Fermer la fenêtre',
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
