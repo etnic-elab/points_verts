@@ -10,7 +10,7 @@ import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/google_map.dart';
 import 'package:points_verts/extensions.dart';
-import 'package:points_verts/views/maps/google_static_image.dart';
+import 'package:points_verts/views/maps/google_static_map.dart';
 
 import '../../models/address_suggestion.dart';
 import '../../models/trip.dart';
@@ -145,7 +145,7 @@ class GoogleMaps implements MapInterface {
 
       Uri url = Uri.https("maps.googleapis.com", "/maps/api/staticmap", body);
 
-      return GoogleStaticImage(url.toString(), onTap);
+      return GoogleStaticMap(url.toString(), onTap);
     }
   }
 
