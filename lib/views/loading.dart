@@ -19,12 +19,15 @@ class LoadingText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        const Loading(),
-        Container(padding: const EdgeInsets.all(10), child: Text(text))
-      ],
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const Loading(),
+          const SizedBox(height: 10),
+          Text(text)
+        ],
+      ),
     );
   }
 }
@@ -51,4 +54,19 @@ class LoadingScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Future showLoadingDialog(BuildContext context) {
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) => SimpleDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          children: const [LoadingText("Rechercher les points...")]),
+      barrierDismissible: false,
+      barrierLabel: 'loadingDialog');
+}
+
+void closeLoadingDialog(BuildContext context) {
+  Navigator.pop(context);
 }

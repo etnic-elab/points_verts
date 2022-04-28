@@ -45,7 +45,6 @@ class WalkResultSliverList extends StatelessWidget {
         if (index.isEven) return WalkTile(walks[itemIndex], TileType.calendar);
 
         return const Divider(
-          height: 50,
           indent: 10,
           endIndent: 10,
           thickness: 1,

@@ -15,7 +15,7 @@ extension PlacesExtension on Places {
   String get text {
     switch (this) {
       case Places.current:
-        return "position";
+        return "position actuelle";
       case Places.home:
         return "domicile";
     }

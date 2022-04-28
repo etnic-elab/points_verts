@@ -12,16 +12,16 @@ import 'package:points_verts/views/places.dart';
 class PositionMarker implements MarkerInterface {
   final double latitude;
   final double longitude;
-  final Places currentPlace;
+  final Places place;
 
-  PositionMarker(this.latitude, this.longitude, this.currentPlace);
+  PositionMarker(this.latitude, this.longitude, this.place);
 
   @override
   flutter.Marker buildFlutterMarker() {
     return flutter.Marker(
       point: latlong.LatLng(latitude, longitude),
       builder: (ctx) => IgnorePointer(
-        child: Icon(currentPlace.icon),
+        child: Icon(place.icon),
       ),
     );
   }
@@ -35,7 +35,7 @@ class PositionMarker implements MarkerInterface {
     return google.Marker(
         markerId: markerId,
         position: google.LatLng(latitude, longitude),
-        infoWindow: InfoWindow(title: "Votre ${currentPlace.text}"),
-        icon: mapIcons[currentPlace]!);
+        infoWindow: InfoWindow(title: "Votre ${place.text}"),
+        icon: mapIcons[place]!);
   }
 }

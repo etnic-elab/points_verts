@@ -207,7 +207,6 @@ class _ExtendedValueTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('${item.value} : ${item.layout?.icon != null}');
     return item.hasValue
         ? ListTile(
             iconColor: item.layout!.iconColor,

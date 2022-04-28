@@ -3,7 +3,7 @@ import 'package:points_verts/init_screen.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/views/directory/walk_directory_view.dart';
 import 'package:points_verts/views/walks/walk_details_view.dart';
-import 'package:points_verts/views/walks/walks_view.dart';
+import 'package:points_verts/views/walks/calendar_view.dart';
 
 const String initScreenRoute = '/';
 const String calendarRoute = '/calendar';
@@ -16,7 +16,7 @@ class NavigationRouter {
       case initScreenRoute:
         return MaterialPageRoute(builder: (_) => const InitScreen());
       case calendarRoute:
-        return MaterialPageRoute(builder: (_) => const WalksView());
+        return MaterialPageRoute(builder: (_) => const CalendarView());
       case directoryRoute:
         return MaterialPageRoute(builder: (_) => const WalkDirectoryView());
       case walkDetailRoute:

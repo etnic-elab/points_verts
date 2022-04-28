@@ -23,24 +23,30 @@ class WalkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return Material(
       shape: _shape,
-      onTap: () => Navigator.push(context, _pageRoute()),
-      title: _title,
-      textColor: walk.isCancelled ? Theme.of(context).disabledColor : null,
-      isThreeLine: true,
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _subtitle,
-          Wrap(
-            children: _infoRow(walk),
-          )
-        ],
+      elevation: tileType == TileType.map ? 6.0 : 0.0,
+      child: ListTile(
+        minVerticalPadding: 16.0,
+        shape: _shape,
+        onTap: () => Navigator.push(context, _pageRoute()),
+        title: _title,
+        textColor: walk.isCancelled ? Theme.of(context).disabledColor : null,
+        isThreeLine: true,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _subtitle,
+            Wrap(
+              children: _infoRow(walk),
+            )
+          ],
+        ),
+        trailing: tileType == TileType.directory
+            ? Text(fullDate.format(walk.date))
+            : GeoButton(walk),
       ),
-      trailing: tileType == TileType.calendar
-          ? GeoButton(walk)
-          : Text(fullDate.format(walk.date)),
     );
   }
 
@@ -48,40 +54,12 @@ class WalkTile extends StatelessWidget {
     switch (tileType) {
       case TileType.map:
         return const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)));
+            borderRadius: BorderRadius.vertical(
+                top: Radius.circular(20), bottom: Radius.zero));
       default:
         return null;
     }
   }
-
-  // List<Widget> get _children {
-  //   List<Widget> _info = [..._infoRow(walk), ..._infoRow(walk)];
-  //   List<Widget> _list = [
-  //     ListTile(
-  //       leading: CenteredTileIcon(WalkIcon(walk)),
-  //       title: _title,
-  //       subtitle: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           _subtitle,
-  //           Wrap(
-  //             children: _info,
-  //           )
-  //         ],
-  //       ),
-  //       trailing: tileType == TileType.calendar
-  //           ? GeoButton(walk)
-  //           : Column(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: <Widget>[
-  //                 Text(fullDate.format(walk.date)),
-  //               ],
-  //             ),
-  //     )
-  //   ];
-
-  //   return _list;
-  // }
 
   Widget get _title {
     if (tileType == TileType.directory) {
