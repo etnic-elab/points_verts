@@ -149,6 +149,10 @@ extension PrefsExt on Prefs {
         return 'calendar_walk_filter';
       case Prefs.lastSelectedDate:
         return 'last_selected_date';
+      case Prefs.news:
+        return 'news';
+      case Prefs.lastNewsFetch:
+        return 'last_news_fetch';
     }
   }
 }

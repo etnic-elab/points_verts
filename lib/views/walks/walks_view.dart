@@ -2,16 +2,21 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:points_verts/models/news.dart';
+import 'package:points_verts/models/news_seen.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/database.dart';
+import 'package:points_verts/services/news.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/services/prefs.dart';
+import 'package:points_verts/views/news.dart';
 import 'package:points_verts/views/walks/filter_page.dart';
 
 import 'dates_dropdown.dart';
@@ -41,6 +46,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   LatLng? _homePosition;
   _ViewType _viewType = _ViewType.list;
   WalkFilter? _filter;
+  Future? _newsRunning;
 
   @override
   void initState() {
@@ -167,6 +173,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
 
     _firstLaunch();
+    _news();
   }
 
   Future<void> _retrieveCurrentPosition() async {
@@ -244,6 +251,68 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       ],
     ));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void _news() async {
+    try {
+      if (_newsRunning != null) {
+        await _newsRunning;
+        return _news();
+      }
+
+      DateTime now = DateTime.now();
+      var completer = Completer();
+      _newsRunning = completer.future;
+
+      String? lastFetch =
+          await PrefsProvider.prefs.getString(Prefs.lastNewsFetch);
+      if (DateTime.tryParse(lastFetch ?? '')
+              ?.add(const Duration(days: 1))
+              .isBefore(now) ??
+          true) {
+        List<dynamic> futures = await Future.wait(
+            [PrefsProvider.prefs.getString(Prefs.news), retrieveNews()]);
+
+        List<NewsSeen> oldNews = [];
+        List list = jsonDecode(futures[0] ?? '[]');
+        oldNews =
+            list.map<NewsSeen>((json) => NewsSeen.fromJson(json)).toList();
+
+        List<News> news = futures[1];
+        List<News> toShow = [];
+        for (News _news in news) {
+          NewsSeen? seen = oldNews
+              .firstWhereOrNull((NewsSeen seen) => _news.name == seen.name);
+          if (seen == null ||
+              (_news.intervalHours != null &&
+                  seen.at
+                      .add(Duration(hours: _news.intervalHours!))
+                      .isBefore(now))) {
+            toShow.add(_news);
+          }
+        }
+
+        if (mounted && toShow.isNotEmpty) {
+          await showNews(context, toShow);
+
+          for (News shown in toShow) {
+            NewsSeen? seen = oldNews
+                .firstWhereOrNull((NewsSeen seen) => shown.name == seen.name);
+            seen == null
+                ? oldNews.add(NewsSeen.fromNews(shown, now))
+                : seen.at = now;
+          }
+          await PrefsProvider.prefs.setString(Prefs.news, jsonEncode(oldNews));
+        }
+
+        await PrefsProvider.prefs
+            .setString(Prefs.lastNewsFetch, now.toIso8601String());
+        completer.complete();
+        _newsRunning = null;
+      }
+    } catch (err) {
+      print('Unable to show news: $err');
+    }
   }
 
   LatLng? get selectedPosition {

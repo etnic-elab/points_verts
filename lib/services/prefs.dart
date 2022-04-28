@@ -11,7 +11,9 @@ enum Prefs {
   useLocation,
   firstLaunch,
   calendarWalkFilter,
-  lastSelectedDate
+  lastSelectedDate,
+  news,
+  lastNewsFetch,
 }
 
 class PrefsProvider {
