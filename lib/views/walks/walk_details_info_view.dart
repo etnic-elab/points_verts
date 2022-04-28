@@ -37,12 +37,11 @@ class WalkDetailsInfoView extends StatelessWidget {
   }
 
   Widget _buildMap(BuildContext context, bool landscape) {
-    Brightness brightness = Theme.of(context).brightness;
-    Size size = MediaQuery.of(context).size;
     bool hasPaths =
         walk.paths.firstWhereOrNull((_path) => _path.gpxPoints.isNotEmpty) !=
             null;
-
+    Brightness brightness = Theme.of(context).brightness;
+    Size size = MediaQuery.of(context).size;
     double height = landscape
         ? size.height
         : hasPaths
@@ -56,11 +55,7 @@ class WalkDetailsInfoView extends StatelessWidget {
       child: pathsLoaded
           ? map.retrieveStaticImage(
               walk, width.round(), height.round(), brightness,
-              onTap: walk.paths.firstWhereOrNull(
-                          (_path) => _path.gpxPoints.isNotEmpty) !=
-                      null
-                  ? onTapMap
-                  : null)
+              onTap: hasPaths ? onTapMap : null)
           : const Loading(),
     );
   }
