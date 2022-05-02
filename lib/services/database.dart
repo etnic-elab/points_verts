@@ -25,7 +25,7 @@ class DBProvider {
         join(await getDatabasesPath(), 'points_verts_database.db'),
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
-        version: 8);
+        version: 9);
   }
 
   Future<void> _createWalkTable(Database db) async {
@@ -42,7 +42,7 @@ class DBProvider {
   }
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion <= 7) {
+    if (oldVersion <= 8) {
       await _createWalkTable(db);
     }
   }
