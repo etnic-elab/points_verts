@@ -254,14 +254,11 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   void _news() async {
+    var completer = Completer();
     try {
-      if (_newsRunning != null) {
-        await _newsRunning;
-        return _news();
-      }
+      if (_newsRunning != null) return;
 
       DateTime now = DateTime.now();
-      var completer = Completer();
       _newsRunning = completer.future;
 
       String? lastFetch =
@@ -307,12 +304,13 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
         await PrefsProvider.prefs
             .setString(Prefs.lastNewsFetch, now.toIso8601String());
-        completer.complete();
-        _newsRunning = null;
       }
     } catch (err) {
       print('Unable to show news: $err');
     }
+
+    completer.complete();
+    _newsRunning = null;
   }
 
   LatLng? get selectedPosition {
