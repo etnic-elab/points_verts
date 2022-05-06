@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/services/crashlytics.dart';
 import 'package:points_verts/services/location.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
@@ -25,6 +26,7 @@ class _SettingsState extends State<Settings> {
   String? _home;
   bool _useLocation = false;
   bool _showNotification = false;
+  bool _crashlyticsEnabled = false;
 
   _SettingsState();
 
@@ -41,13 +43,17 @@ class _SettingsState extends State<Settings> {
 
   Future<void> _retrievePrefs() async {
     String? home = await PrefsProvider.prefs.getString(Prefs.homeLabel);
-    bool useLocation = await PrefsProvider.prefs.getBoolean(Prefs.useLocation);
-    bool showNotification = await PrefsProvider.prefs
-        .getBoolean(Prefs.showNotification, defaultValue: false);
+    bool useLocation =
+        await PrefsProvider.prefs.getBoolean(Prefs.useLocation) == true;
+    bool showNotification =
+        await PrefsProvider.prefs.getBoolean(Prefs.showNotification) == true;
+    bool crashlyticsEnabled =
+        await PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled) == true;
     setState(() {
       _home = home;
       _useLocation = useLocation;
       _showNotification = showNotification;
+      _crashlyticsEnabled = crashlyticsEnabled;
     });
   }
 
@@ -108,6 +114,11 @@ class _SettingsState extends State<Settings> {
     });
   }
 
+  void _setCrashlyticsEnabled(bool newValue) {
+    Crashlytics.toggleCollectionEnabled(newValue);
+    setState(() => _crashlyticsEnabled = newValue);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,10 +131,12 @@ class _SettingsState extends State<Settings> {
       body: ListView(
         children: <Widget>[
           const ListHeader("Tri des points selon leur emplacement"),
-          ListTile(
-              title: Text(
-                  "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",
-                  style: Theme.of(context).textTheme.caption)),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+            child: Text(
+                "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",
+                style: Theme.of(context).textTheme.caption),
+          ),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.location_on)),
             title: const Text("Ma position actuelle"),
@@ -149,10 +162,12 @@ class _SettingsState extends State<Settings> {
           ),
           const Divider(),
           const ListHeader("Notifications"),
-          ListTile(
-              title: Text(
-                  "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
-                  style: Theme.of(context).textTheme.caption)),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+            child: Text(
+                "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
+                style: Theme.of(context).textTheme.caption),
+          ),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.notifications)),
             title: const Text("Notifier la veille (vers 20h)"),
@@ -161,6 +176,23 @@ class _SettingsState extends State<Settings> {
               _setShowNotification(value);
             },
           ),
+          const Divider(),
+          const ListHeader("Diagnostic"),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+            child: Text(
+                "L'envoi automatique de données de diagnostic nous permet d'améliorer l'application.",
+                style: Theme.of(context).textTheme.caption),
+          ),
+          SwitchListTile(
+            secondary: TileIcon(Icon(Icons.bug_report)),
+            title: const Text("Envoi de rapports  "),
+            value: _crashlyticsEnabled,
+            onChanged: (bool value) {
+              _setCrashlyticsEnabled(value);
+            },
+          ),
+          const Divider(),
           const Divider(),
           ListTile(
             leading: const TileIcon(Icon(Icons.help)),

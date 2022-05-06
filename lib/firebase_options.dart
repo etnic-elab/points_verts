@@ -53,7 +53,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1002305900075',
     projectId: 'points-verts-328310',
     storageBucket: 'points-verts-328310.appspot.com',
-    iosClientId: '1002305900075-9ur2idsnunh35i9gtnd2a8h950gv0vlf.apps.googleusercontent.com',
+    iosClientId:
+        '1002305900075-9ur2idsnunh35i9gtnd2a8h950gv0vlf.apps.googleusercontent.com',
     iosBundleId: 'dev.alpagaga.pointsverts',
   );
 }

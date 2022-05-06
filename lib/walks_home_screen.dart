@@ -1,6 +1,7 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:points_verts/services/crashlytics.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
@@ -31,12 +32,14 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
 
   @override
   void initState() {
+    Crashlytics.initialize(context);
     fetchData().then((_) {
       _initPlatformState();
     }).catchError((err) {
       print("error init state");
       FlutterNativeSplash.remove();
     });
+
     PrefsProvider.prefs.remove(Prefs.lastSelectedDate);
     WidgetsBinding.instance!.addObserver(this);
     super.initState();
@@ -48,12 +51,12 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
     super.dispose();
   }
 
-  Future<void> fetchData() async {
+  Future<void> fetchData() {
     setState(() {
       _error = false;
       _loading = true;
     });
-    updateWalks().then((_) {
+    return updateWalks().then((_) {
       setState(() {
         _loading = false;
       });

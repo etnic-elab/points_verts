@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:background_fetch/background_fetch.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -23,26 +26,26 @@ import 'models/walk.dart';
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
   String taskId = task.taskId;
   bool isTimeout = task.timeout;
-  if (isTimeout) {
-    print("[BackgroundFetch] Headless TIMEOUT: $taskId");
-    BackgroundFetch.finish(taskId);
-    return;
-  }
-  try {
-    print("[BackgroundFetch] Headless task: $taskId");
-    await dotenv.load();
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    await updateWalks();
-    await scheduleNextNearestWalkNotifications();
-    await PrefsProvider.prefs.setString(
-        Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
-  } catch (err) {
-    print("Cannot schedule next nearest walk notification: $err");
-  } finally {
-    BackgroundFetch.finish(taskId);
-  }
+  runZonedGuarded<Future<void>>(() async {
+    if (isTimeout) {
+      print("[BackgroundFetch] Headless TIMEOUT: $taskId");
+      BackgroundFetch.finish(taskId);
+      return;
+    }
+    try {
+      print("[BackgroundFetch] Headless task: $taskId");
+      await _initializeFirebase();
+      await dotenv.load();
+      await updateWalks();
+      await scheduleNextNearestWalkNotifications();
+      await PrefsProvider.prefs.setString(
+          Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
+    } catch (err) {
+      print("Cannot schedule next nearest walk notification: $err");
+    } finally {
+      BackgroundFetch.finish(taskId);
+    }
+  }, (error, stack) => FirebaseCrashlytics.instance.recordError(error, stack));
 }
 
 Future<void> _addTrustedCert(String certPath) async {
@@ -55,19 +58,34 @@ Future<void> _addTrustedCert(String certPath) async {
   }
 }
 
-void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  await dotenv.load();
+Future<void> _initializeFirebase() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  //TODO: improve how we initialize these singletons (get_it package?)
-  await NotificationManager.instance.plugin;
-  await DBProvider.db.database;
-  await _addTrustedCert(Assets.letsEncryptCert);
-  runApp(const MyApp());
-  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+  Isolate.current.addErrorListener(RawReceivePort((pair) async {
+    final List<dynamic> errorAndStacktrace = pair;
+    await FirebaseCrashlytics.instance.recordError(
+      errorAndStacktrace.first,
+      errorAndStacktrace.last,
+    );
+  }).sendPort);
+}
+
+void main() async {
+  runZonedGuarded<Future<void>>(() async {
+    WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+    await _initializeFirebase();
+    await dotenv.load();
+    //TODO: improve how we initialize these singletons (get_it package?)
+    await NotificationManager.instance.plugin;
+    await DBProvider.db.database;
+    await _addTrustedCert(Assets.letsEncryptCert);
+
+    runApp(const MyApp());
+    BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+  }, (error, stack) => FirebaseCrashlytics.instance.recordError(error, stack));
 }
 
 class MyApp extends StatelessWidget {

@@ -14,6 +14,7 @@ enum Prefs {
   lastSelectedDate,
   news,
   lastNewsFetch,
+  crashlyticsEnabled,
 }
 
 class PrefsProvider {
@@ -63,9 +64,9 @@ class PrefsProvider {
     return prefs.getBool(key.name);
   }
 
-  Future<bool> getBoolean(Prefs key, {bool? defaultValue}) async {
+  Future<bool?> getBoolean(Prefs key, {bool? defaultValue = false}) async {
     SharedPreferences prefs = await preferences;
     bool? result = prefs.getBool(key.name);
-    return result ?? defaultValue ?? false;
+    return result ?? defaultValue;
   }
 }

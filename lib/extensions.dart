@@ -153,6 +153,8 @@ extension PrefsExt on Prefs {
         return 'news';
       case Prefs.lastNewsFetch:
         return 'last_news_fetch';
+      case Prefs.crashlyticsEnabled:
+        return 'crashlytics_enabled';
     }
   }
 }

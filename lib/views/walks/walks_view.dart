@@ -50,9 +50,10 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    WidgetsBinding.instance!.addObserver(this);
     initializeDateFormatting("fr_BE");
     _retrieveData();
-    WidgetsBinding.instance!.addObserver(this);
+
     super.initState();
   }
 
@@ -211,7 +212,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   void _firstLaunch() async {
     bool firstLaunch = await PrefsProvider.prefs
-        .getBoolean(Prefs.firstLaunch, defaultValue: true);
+            .getBoolean(Prefs.firstLaunch, defaultValue: true) ==
+        true;
     if (firstLaunch) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       final snackBar = SnackBar(
