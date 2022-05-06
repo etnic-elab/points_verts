@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:points_verts/environment.dart';
-import 'package:points_verts/firebase_options.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/models/website_walk.dart';

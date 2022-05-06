@@ -9,7 +9,16 @@ import 'prefs.dart';
 const String tag = "dev.alpagaga.points_verts.Crashlytics";
 
 class Crashlytics {
-  static Future<bool?> crashlyticsPrompt(BuildContext context) async {
+  static Future<void> initialize(BuildContext context) async {
+    bool? enabled = await PrefsProvider.prefs
+        .getBoolean(Prefs.crashlyticsEnabled, defaultValue: null);
+
+    enabled == null
+        ? crashlyticsPrompt(context)
+        : setCollectionEnabled(enabled);
+  }
+
+  static Future<void> crashlyticsPrompt(BuildContext context) async {
     bool? result = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
@@ -34,15 +43,6 @@ class Crashlytics {
               ]);
         });
     if (result != null) toggleCollectionEnabled(result);
-  }
-
-  static Future<void> initialize(BuildContext context) async {
-    bool? enabled = await PrefsProvider.prefs
-        .getBoolean(Prefs.crashlyticsEnabled, defaultValue: null);
-
-    enabled == null
-        ? crashlyticsPrompt(context)
-        : setCollectionEnabled(enabled);
   }
 
   static void toggleCollectionEnabled(bool value) {

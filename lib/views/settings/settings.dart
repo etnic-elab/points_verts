@@ -185,7 +185,7 @@ class _SettingsState extends State<Settings> {
                 style: Theme.of(context).textTheme.caption),
           ),
           SwitchListTile(
-            secondary: TileIcon(Icon(Icons.bug_report)),
+            secondary: const TileIcon(Icon(Icons.bug_report)),
             title: const Text("Envoi de rapports  "),
             value: _crashlyticsEnabled,
             onChanged: (bool value) {
