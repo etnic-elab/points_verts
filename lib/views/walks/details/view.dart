@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/gpx_point.dart';
+import 'package:points_verts/models/view_type.dart';
+import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/services/gpx.dart';
 import 'package:points_verts/services/positioning.dart';
-import 'package:points_verts/views/walks/walk_details_info_view.dart';
-import 'package:points_verts/views/walks/walk_details_map_view.dart';
-
-import '../../models/walk.dart';
-
-enum _ViewType { detail, map }
+import 'package:points_verts/views/walks/details/list_view.dart';
+import 'package:points_verts/views/walks/details/map_view.dart';
 
 class WalkDetailsView extends StatefulWidget {
   const WalkDetailsView(this.walk, {Key? key}) : super(key: key);
@@ -22,7 +20,7 @@ class WalkDetailsView extends StatefulWidget {
 
 class _WalkDetailsViewState extends State<WalkDetailsView> {
   final scaffoldState = GlobalKey<ScaffoldState>();
-  _ViewType _viewType = _ViewType.detail;
+  ViewType _currentView = ViewType.detailList;
   bool _sheetOpen = false;
   PersistentBottomSheetController? _sheetController;
   Future<List>? _paths;
@@ -61,14 +59,14 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
     return Scaffold(
       key: scaffoldState,
       appBar: AppBar(
-        leading: _viewType == _ViewType.detail
+        leading: _currentView == ViewType.detailList
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.maybePop(context),
               )
             : IconButton(
                 icon: const Icon(Icons.close),
-                onPressed: () => _toggleView(_ViewType.detail),
+                onPressed: () => _toggleView(ViewType.detailList),
               ),
         title: FittedBox(
             fit: BoxFit.fitWidth,
@@ -85,15 +83,15 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
       body: FutureBuilder(
         future: _paths,
         builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-          return _viewType == _ViewType.detail
-              ? WalkDetailsInfoView(widget.walk, () {
-                  _toggleView(_ViewType.map);
+          return _currentView == ViewType.detailList
+              ? WalkDetailsListView(widget.walk, () {
+                  _toggleView(ViewType.detailMap);
                 }, snapshot.hasData)
               : WalkDetailsMapView(widget.walk, closeSheet, location);
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _viewType == _ViewType.map
+      floatingActionButton: _currentView == ViewType.detailMap
           ? FloatingActionButton(
               child:
                   Icon(_sheetOpen ? Icons.expand_less : Icons.layers_outlined),
@@ -103,8 +101,8 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
     );
   }
 
-  void _toggleView(_ViewType type) {
-    setState(() => _viewType = type);
+  void _toggleView(ViewType type) {
+    setState(() => _currentView = type);
     closeSheet();
   }
 

@@ -1,31 +1,23 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:points_verts/abstractions/environment.dart';
-import 'package:points_verts/abstractions/service_locator.dart';
-import 'package:points_verts/services/map/map_interface.dart';
+import 'package:points_verts/services/home.dart';
+import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/models/address_suggestion.dart';
 
-import '../loading.dart';
+import '../widgets/loading.dart';
 
 const countryCodes = ['BE', 'FR', 'LU'];
 const countryLabels = ['Belgique', 'France', 'Luxembourg'];
 
-class SettingsHomeSelect extends StatefulWidget {
-  const SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback,
-      {Key? key})
-      : super(key: key);
-
-  final Function(AddressSuggestion) setHomeCallback;
-  final Function removeHomeCallback;
+class HomeSelect extends StatefulWidget {
+  const HomeSelect({Key? key}) : super(key: key);
 
   @override
-  _SettingsHomeSelectState createState() => _SettingsHomeSelectState();
+  _HomeSelectState createState() => _HomeSelectState();
 }
 
-class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
-  final MapInterface map = locator<Environment>().map;
-
+class _HomeSelectState extends State<HomeSelect> {
   final _homeSearchController = TextEditingController();
   Timer? _debounce;
   int _countryIndex = 0;
@@ -34,7 +26,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   @override
   void initState() {
     super.initState();
-    _homeSearchController.addListener(_onSearchChanged);
+    _homeSearchController.addListener(_onQueryChanged);
   }
 
   @override
@@ -43,34 +35,26 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
     super.dispose();
   }
 
-  _onSearchChanged() {
+  _onQueryChanged() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
-      setState(() {
-        _suggestions = map.retrieveSuggestions(
-            countryCodes[_countryIndex], _homeSearchController.text);
-      });
+    _debounce = Timer(const Duration(milliseconds: 500), () => _search());
+  }
+
+  _search() {
+    if (!mounted) return;
+    setState(() {
+      _suggestions = env.map.retrieveSuggestions(
+          countryCodes[_countryIndex], _homeSearchController.text);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          actions: <Widget>[
-            IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () {
-                  widget.removeHomeCallback();
-                  _homeSearchController.removeListener(_onSearchChanged);
-                  Navigator.of(context).pop();
-                })
-          ],
-          title: const Text("Recherche du domicile"),
-        ),
-        body: _pageContent(context));
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(title: const Text("Recherche du domicile")),
+      body: _pageContent(context),
+    );
   }
 
   Widget _pageContent(BuildContext context) {
@@ -109,9 +93,8 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                       subtitle: Text(suggestion.address,
                           overflow: TextOverflow.ellipsis),
                       onTap: () {
-                        widget.setHomeCallback(suggestion);
-                        _homeSearchController.removeListener(_onSearchChanged);
-                        Navigator.of(context).pop();
+                        Home.service.addHome(suggestion);
+                        Navigator.pop(context, suggestion);
                       });
                 });
           }
@@ -124,10 +107,12 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                     padding: const EdgeInsets.all(5.0),
                     child: Row(children: const [
                       Expanded(
-                          child: Center(
-                              child: Text(
-                                  "Une erreur est survenue lors de la récupération des données. Merci de réessayer plus tard.",
-                                  textAlign: TextAlign.center)))
+                        child: Center(
+                          child: Text(
+                              "Une erreur est survenue lors de la récupération des données. Merci de réessayer plus tard.",
+                              textAlign: TextAlign.center),
+                        ),
+                      )
                     ]))
               ],
             );
@@ -145,9 +130,8 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
               children: generateOptions(context));
         });
     if (index != null) {
-      setState(() {
-        _countryIndex = index;
-      });
+      setState(() => _countryIndex = index);
+      _search();
     }
   }
 
@@ -155,9 +139,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
     List<SimpleDialogOption> results = [];
     for (int i = 0; i < countryCodes.length; i++) {
       results.add(SimpleDialogOption(
-          onPressed: () {
-            Navigator.pop(context, i);
-          },
+          onPressed: () => Navigator.pop(context, i),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(countryLabels[i]),

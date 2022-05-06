@@ -1,17 +1,72 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/abstractions/company_data.dart';
-import 'package:points_verts/abstractions/extended_value.dart';
+import 'package:points_verts/abstractions/layout_extension.dart';
 import 'package:points_verts/models/walk.dart';
+import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/openweather.dart';
-import 'package:points_verts/views/walks/outline_icon_button.dart';
+import 'package:points_verts/views/widgets/loading.dart';
+import 'package:collection/collection.dart';
+import 'package:points_verts/views/widgets/outline_icon_button.dart';
+import 'package:points_verts/views/walks/utils.dart';
+import 'package:points_verts/views/widgets/centered_tile_icon.dart';
 
-import '../centered_tile_icon.dart';
-import 'walk_utils.dart';
+class WalkDetailsListView extends StatelessWidget {
+  const WalkDetailsListView(this.walk, this.onTapMap, this.pathsLoaded,
+      {Key? key})
+      : super(key: key);
 
-class WalkDetailsInfo extends StatelessWidget {
-  WalkDetailsInfo(this.walk, {Key? key}) : super(key: key);
+  final Walk walk;
+  final Function onTapMap;
+  final bool pathsLoaded;
+
+  @override
+  Widget build(BuildContext context) {
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (orientation == Orientation.portrait) {
+          return Column(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[_buildMap(context, false), _Infos(walk)]);
+        }
+        return Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[_buildMap(context, true), _Infos(walk)]);
+      },
+    );
+  }
+
+  Widget _buildMap(BuildContext context, bool landscape) {
+    bool hasPaths =
+        walk.paths.firstWhereOrNull((_path) => _path.gpxPoints.isNotEmpty) !=
+            null;
+    Brightness brightness = Theme.of(context).brightness;
+    Size size = MediaQuery.of(context).size;
+
+    double height = landscape
+        ? size.height
+        : hasPaths
+            ? max(200, size.height * 0.35)
+            : max(200, size.height * 0.25);
+    double width = landscape ? size.width / 2 : size.width;
+
+    return SizedBox(
+      width: width.roundToDouble(),
+      height: height.roundToDouble(),
+      child: pathsLoaded
+          ? env.map.retrieveStaticImage(
+              walk, width.round(), height.round(), brightness,
+              onTap: hasPaths ? onTapMap : null)
+          : const Loading(),
+    );
+  }
+}
+
+class _Infos extends StatelessWidget {
+  _Infos(this.walk, {Key? key}) : super(key: key);
 
   final Walk walk;
   final DateFormat fullDate = DateFormat.yMMMMEEEEd("fr_BE");
@@ -29,34 +84,30 @@ class WalkDetailsInfo extends StatelessWidget {
     //weather, cancelled, date, range, ign, meetingpoint, train/bus, contact, remaining
     List<Widget> tiles = [
       _WeatherSection(walk),
-      _ExtendedValueTile(ExtendedValue<bool>(walk.isCancelled,
-          layout: LayoutExtension.cancelled()
-              .colored(CompanyColors.of(context).getRed()))),
+      _LayoutExtensionTile(LayoutExtension(
+          walk.isCancelled,
+          Layout.cancelled()
+              .colored(CompanyColors.of(Theme.of(context).brightness).red))),
       _DateTile(walk),
       _RangeTile(walk),
-      _ExtendedValueTile(ExtendedValue<String?>(walk.ign,
-          layout:
-              LayoutExtension.ign().copyWith(description: 'IGN ${walk.ign}'))),
+      _LayoutExtensionTile(LayoutExtension(
+          walk.ign, Layout.ign().copyWith(description: 'IGN ${walk.ign}'))),
       _MeetingPointTile(walk),
-      _ExtendedValueTile(ExtendedValue<String?>(walk.transport,
-          layout: LayoutExtension.transport()
-              .copyWith(description: walk.transport))),
+      _LayoutExtensionTile(LayoutExtension<String?>(walk.transport,
+          Layout.transport().copyWith(description: walk.transport))),
       _OrganizerTile(walk),
     ];
 
     tiles.addAll([
-      ExtendedValue<bool>(walk.wheelchair,
-          layout: LayoutExtension.wheelchair()),
-      ExtendedValue<bool>(walk.stroller, layout: LayoutExtension.stroller()),
-      ExtendedValue<bool>(walk.bike, layout: LayoutExtension.bike()),
-      ExtendedValue<bool>(walk.mountainBike,
-          layout: LayoutExtension.mountainBike()),
-      ExtendedValue<bool>(walk.guided, layout: LayoutExtension.guided()),
-      ExtendedValue<bool>(walk.beWapp, layout: LayoutExtension.beWapp()),
-      ExtendedValue<bool>(walk.adepSante, layout: LayoutExtension.adepSante()),
-      ExtendedValue<bool>(walk.waterSupply,
-          layout: LayoutExtension.waterSupply()),
-    ].map((ExtendedValue value) => _ExtendedValueTile(value)));
+      LayoutExtension<bool>(walk.wheelchair, Layout.wheelchair()),
+      LayoutExtension<bool>(walk.stroller, Layout.stroller()),
+      LayoutExtension<bool>(walk.bike, Layout.bike()),
+      LayoutExtension<bool>(walk.mountainBike, Layout.mountainBike()),
+      LayoutExtension<bool>(walk.guided, Layout.guided()),
+      LayoutExtension<bool>(walk.beWapp, Layout.beWapp()),
+      LayoutExtension<bool>(walk.adepSante, Layout.adepSante()),
+      LayoutExtension<bool>(walk.waterSupply, Layout.waterSupply()),
+    ].map((LayoutExtension value) => _LayoutExtensionTile(value)));
 
     return tiles;
   }
@@ -73,18 +124,18 @@ class _WeatherSection extends StatelessWidget {
         ? ListTile(
             title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _widgets))
+                children: widgets(context)))
         : const SizedBox.shrink();
   }
 
-  List<Widget> get _widgets {
+  List<Widget> widgets(BuildContext context) {
     List<Widget> widgets = [];
     for (Weather weather in walk.weathers) {
       widgets.add(Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text("${weather.timestamp.hour}h", textScaleFactor: 0.8),
-          getWeatherIcon(weather),
+          getWeatherIcon(weather, Theme.of(context).brightness),
           Text("${weather.temperature.round()}°", textScaleFactor: 0.8),
           Text("${weather.windSpeed.round()} km/h", textScaleFactor: 0.8)
         ],
@@ -131,10 +182,10 @@ class _RangeTile extends StatelessWidget {
   String? get _subtitle {
     if (walk.isWalk) {
       return walk.extraOrientation
-          ? LayoutExtension.extraOrientation().description
+          ? Layout.extraOrientation().description
           : null;
     }
-    return walk.extraWalk ? LayoutExtension.extraWalk().description : null;
+    return walk.extraWalk ? Layout.extraWalk().description : null;
   }
 }
 
@@ -200,23 +251,23 @@ class _OrganizerTile extends StatelessWidget {
   }
 }
 
-class _ExtendedValueTile extends StatelessWidget {
-  const _ExtendedValueTile(this.item, {Key? key}) : super(key: key);
+class _LayoutExtensionTile extends StatelessWidget {
+  const _LayoutExtensionTile(this.item, {Key? key}) : super(key: key);
 
-  final ExtendedValue item;
+  final LayoutExtension item;
 
   @override
   Widget build(BuildContext context) {
     return item.hasValue
         ? ListTile(
-            iconColor: item.layout!.iconColor,
-            leading: item.layout!.icon != null
-                ? CenteredTileWidget(Icon(item.layout!.icon))
+            iconColor: item.layout.iconColor,
+            leading: item.layout.icon != null
+                ? CenteredTileWidget(Icon(item.layout.icon))
                 : null,
-            textColor: item.layout!.descriptionColor,
-            title: Text(item.layout!.description),
-            onTap: item.layout!.url != null
-                ? () => launchURL(item.layout!.url)
+            textColor: item.layout.descriptionColor,
+            title: Text(item.layout.description!),
+            onTap: item.layout.url != null
+                ? () => launchURL(item.layout.url)
                 : null,
           )
         : const SizedBox.shrink();

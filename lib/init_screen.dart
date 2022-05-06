@@ -2,14 +2,13 @@ import 'dart:convert';
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
-import 'package:points_verts/abstractions/service_locator.dart';
+import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/navigation.dart';
-import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/walks/walk_list_error.dart';
-import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:points_verts/views/widgets/loading.dart';
+import 'package:points_verts/views/walks/data_error.dart';
+import 'package:points_verts/views/walks/utils.dart';
 
 class InitScreen extends StatefulWidget {
   const InitScreen({Key? key}) : super(key: key);
@@ -38,7 +37,7 @@ class _InitScreenState extends State<InitScreen> {
       await updateWalks();
       await _resetDates();
       _scheduleNotifications();
-      locator<NavigationService>().navigate.pushReplacementNamed(calendarRoute);
+      navigator.pushReplacementNamed(calendarRoute);
     } catch (err) {
       setState(() => error = true);
       print("error init State, $err");
@@ -58,17 +57,15 @@ class _InitScreenState extends State<InitScreen> {
       BackgroundFetch.finish(taskId);
     });
 
-    // If the wid-get was removed from the tree while the asynchronous platform
+    // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our nonexistent appearance.
     if (!mounted) return;
   }
 
   void _scheduleNotifications() {
-    locator<NotificationManager>()
-        .scheduleNextNearestWalkNotifications()
-        .catchError((err) =>
-            print("Cannot schedule next nearest walk notification: $err"));
+    notification.scheduleNextNearestWalkNotifications().catchError(
+        (err) => print("Cannot schedule next nearest walk notification: $err"));
   }
 
   Future _resetDates() {
@@ -79,19 +76,19 @@ class _InitScreenState extends State<InitScreen> {
   }
 
   Future _resetDate(Prefs filterKey) async {
-    String? _filterString = await locator<PrefsProvider>().getString(filterKey);
+    String? _filterString = await prefs.getString(filterKey);
     if (_filterString == null) return;
 
     WalkFilter? _filter = WalkFilter.fromJson(jsonDecode(_filterString));
     _filter.date = null;
 
-    return locator<PrefsProvider>().setString(filterKey, jsonEncode(_filter));
+    return prefs.setString(filterKey, jsonEncode(_filter));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: error ? WalkListError(initializeData) : const LoadingScreen(),
+      body: error ? DataError(initializeData) : const LoadingScreen(),
     );
   }
 }

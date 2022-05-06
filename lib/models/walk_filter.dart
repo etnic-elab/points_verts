@@ -1,11 +1,12 @@
-import 'package:points_verts/abstractions/extended_value.dart';
+import 'package:points_verts/abstractions/layout_extension.dart';
 
 class WalkFilter {
   WalkFilter();
   WalkFilter.date(this.date);
 
-  var cancelledWalks = ExtendedValue(true,
-      layout: LayoutExtension.cancelled()
+  var cancelledWalks = LayoutExtension(
+      true,
+      Layout.cancelled()
           .copyWith(description: 'Afficher les marches annulées'));
 
   var brabantWallon = initProvince('Brabant Wallon');
@@ -16,21 +17,21 @@ class WalkFilter {
   var luxembourg = initProvince('Luxembourg');
   var namur = initProvince('Namur');
 
-  var fifteenKm = initCriteria(LayoutExtension.fifteenKm());
-  var wheelchair = initCriteria(LayoutExtension.wheelchair());
-  var stroller = initCriteria(LayoutExtension.stroller());
-  var extraOrientation = initCriteria(LayoutExtension.extraOrientation());
-  var extraWalk = initCriteria(LayoutExtension.extraWalk());
-  var guided = initCriteria(LayoutExtension.guided());
-  var bike = initCriteria(LayoutExtension.bike());
-  var mountainBike = initCriteria(LayoutExtension.mountainBike());
-  var waterSupply = initCriteria(LayoutExtension.waterSupply());
-  var beWapp = initCriteria(LayoutExtension.beWapp());
-  var transport = initCriteria(LayoutExtension.transport());
-  var adepSante = initCriteria(LayoutExtension.adepSante());
+  var fifteenKm = initCriteria(Layout.fifteenKm());
+  var wheelchair = initCriteria(Layout.wheelchair());
+  var stroller = initCriteria(Layout.stroller());
+  var extraOrientation = initCriteria(Layout.extraOrientation());
+  var extraWalk = initCriteria(Layout.extraWalk());
+  var guided = initCriteria(Layout.guided());
+  var bike = initCriteria(Layout.bike());
+  var mountainBike = initCriteria(Layout.mountainBike());
+  var waterSupply = initCriteria(Layout.waterSupply());
+  var beWapp = initCriteria(Layout.beWapp());
+  var transport = initCriteria(Layout.transport());
+  var adepSante = initCriteria(Layout.adepSante());
   DateTime? date;
 
-  List<ExtendedValue<bool>> get provinces {
+  List<LayoutExtension> get provinces {
     return [
       brabantWallon,
       bruxelles,
@@ -42,7 +43,7 @@ class WalkFilter {
     ];
   }
 
-  List<ExtendedValue<bool>> get criterias {
+  List<LayoutExtension> get criterias {
     return [
       fifteenKm,
       wheelchair,
@@ -59,19 +60,19 @@ class WalkFilter {
     ];
   }
 
-  static ExtendedValue<bool> initProvince(String labelName) {
-    return ExtendedValue(true, layout: LayoutExtension.of(label: labelName));
+  static LayoutExtension initProvince(String labelName) {
+    return LayoutExtension(true, Layout(label: labelName));
   }
 
-  static ExtendedValue<bool> initCriteria(LayoutExtension extension) {
-    return ExtendedValue(false, layout: extension);
+  static LayoutExtension initCriteria(Layout extension) {
+    return LayoutExtension(false, extension);
   }
 
   bool get filterByProvince => provinceFilter.length != provinces.length;
 
   Iterable<String> get provinceFilter {
     return provinces
-        .map((province) => province.hasValue ? province.layout!.label : null)
+        .map((province) => province.hasValue ? province.layout.label : null)
         .whereType<String>();
   }
 

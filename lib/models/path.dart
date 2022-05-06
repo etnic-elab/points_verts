@@ -23,23 +23,16 @@ class Path extends Comparable<Path> {
         'couleur': type,
       };
 
-  // 1=Bleu (Parcours 5km)
-// 2=Jaune (Parcours 10km)
-// 3=Rouge (Parcours 20km)
-// 4=Vert (Parcours commun)
-// 5=Violet (Parcours 15km)
-// 6=Orange (Parcours 5km poussettes/PMR)
+  // 1=Bleu (Parcours 5km), 2=Jaune (Parcours 10km), 3=Rouge (Parcours 20km), 4=Vert (Parcours commun), 5=Violet (Parcours 15km), 6=Orange (Parcours 5km poussettes/PMR)
 
   Color getColor(Brightness brightness) {
-    bool _isLight = brightness == Brightness.light;
-
     switch (type) {
       case '1':
-        return _isLight ? CompanyColors.darkBlue : CompanyColors.blue;
+        return CompanyColors.of(brightness).blue;
       case '2':
         return CompanyColors.yellow;
       case '3':
-        return _isLight ? CompanyColors.red : CompanyColors.lightRed;
+        return CompanyColors.of(brightness).red;
       case '4':
         return CompanyColors.greenPrimary;
       case '5':
@@ -47,7 +40,7 @@ class Path extends Comparable<Path> {
       case '6':
         return CompanyColors.orange;
       default:
-        return _isLight ? CompanyColors.darkBrown : CompanyColors.brown;
+        return CompanyColors.of(brightness).brown;
     }
   }
 

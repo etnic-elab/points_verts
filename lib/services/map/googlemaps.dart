@@ -1,16 +1,14 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:points_verts/models/path.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:points_verts/abstractions/company_data.dart';
-import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/views/maps/google_map.dart';
 import 'package:points_verts/abstractions/extensions.dart';
+import 'package:points_verts/views/maps/google_static_map.dart';
 import 'package:points_verts/views/maps/markers/marker_interface.dart';
 
 import '../../models/address_suggestion.dart';
@@ -71,7 +69,13 @@ class GoogleMaps extends MapInterface {
   Future<List<AddressSuggestion>> retrieveSuggestions(
       String country, String search) async {
     if (search.isNotEmpty) {
-      var body = {"query": search, "key": apiKey};
+      var body = {
+        "query": search,
+        "language": "fr",
+        "region": country,
+        "key": apiKey
+      };
+      print('body: $body');
       Uri url = Uri.https(
           "maps.googleapis.com", "/maps/api/place/textsearch/json", body);
       http.Response response = await http.get(url);
@@ -128,7 +132,6 @@ class GoogleMaps extends MapInterface {
       paths: paths,
       markers: markers,
       onTapMap: onTapMap,
-      // onTapPath: onTapPath,
     );
   }
 
@@ -146,49 +149,7 @@ class GoogleMaps extends MapInterface {
 
       Uri url = Uri.https("maps.googleapis.com", "/maps/api/staticmap", body);
 
-      return FutureBuilder(
-        future: Assets.asset.string(brightness, Assets.googleMapStaticStyle),
-        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          if (snapshot.hasData) {
-            return CachedNetworkImage(
-              imageUrl: url.toString() + snapshot.data!,
-              imageBuilder: onTap == null
-                  ? null
-                  : (context, imageProvider) {
-                      return Ink.image(
-                        image: imageProvider,
-                        fit: BoxFit.cover,
-                        child: Stack(
-                          children: [
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 10, bottom: 15),
-                                  child: FloatingActionButton.small(
-                                    child: const Icon(Icons.open_in_full),
-                                    onPressed: () {},
-                                  )),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                onTap();
-                              },
-                            )
-                          ],
-                        ),
-                      );
-                    },
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  Center(
-                      child: CircularProgressIndicator(
-                          value: downloadProgress.progress)),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      );
+      return GoogleStaticMap(url.toString(), onTap);
     }
   }
 

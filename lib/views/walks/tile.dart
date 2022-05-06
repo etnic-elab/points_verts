@@ -2,11 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:points_verts/abstractions/extended_value.dart';
+import 'package:points_verts/abstractions/layout_extension.dart';
+import 'package:points_verts/services/service_locator.dart';
+import 'package:points_verts/services/navigation.dart';
 
 import '../../models/walk.dart';
 import 'geo_button.dart';
-import 'walk_details_view.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
@@ -29,7 +30,7 @@ class WalkTile extends StatelessWidget {
       child: ListTile(
         minVerticalPadding: 16.0,
         shape: _shape,
-        onTap: () => Navigator.push(context, _pageRoute()),
+        onTap: () => navigator.pushNamed(walkDetailRoute, arguments: walk),
         title: _title,
         textColor: walk.isCancelled ? Theme.of(context).disabledColor : null,
         isThreeLine: true,
@@ -87,27 +88,23 @@ class WalkTile extends StatelessWidget {
     info.add(
         _ChipLabel(walk.rangeLabel(compact: true), disabled: walk.isCancelled));
     info.addAll([
-      ExtendedValue(walk.transport?.isNotEmpty ?? false,
-          layout: LayoutExtension.transport()),
-      ExtendedValue(walk.wheelchair, layout: LayoutExtension.wheelchair()),
-      ExtendedValue(walk.stroller, layout: LayoutExtension.stroller()),
-      ExtendedValue(walk.bike, layout: LayoutExtension.bike()),
-      ExtendedValue(walk.mountainBike, layout: LayoutExtension.mountainBike()),
-      ExtendedValue(walk.guided, layout: LayoutExtension.guided()),
-      ExtendedValue(walk.beWapp, layout: LayoutExtension.beWapp()),
-      ExtendedValue(walk.adepSante, layout: LayoutExtension.adepSante()),
-      ExtendedValue(walk.waterSupply, layout: LayoutExtension.waterSupply()),
+      LayoutExtension(walk.transport?.isNotEmpty ?? false, Layout.transport()),
+      LayoutExtension(walk.wheelchair, Layout.wheelchair()),
+      LayoutExtension(walk.stroller, Layout.stroller()),
+      LayoutExtension(walk.bike, Layout.bike()),
+      LayoutExtension(walk.mountainBike, Layout.mountainBike()),
+      LayoutExtension(walk.guided, Layout.guided()),
+      LayoutExtension(walk.beWapp, Layout.beWapp()),
+      LayoutExtension(walk.adepSante, Layout.adepSante()),
+      LayoutExtension(walk.waterSupply, Layout.waterSupply()),
     ]
-        .map((ExtendedValue extended) => extended.value == true
-            ? _ChipIcon(extended.layout!.icon!, disabled: walk.isCancelled)
+        .map((LayoutExtension layoutExtension) => layoutExtension.value == true
+            ? _ChipIcon(layoutExtension.layout.icon!,
+                disabled: walk.isCancelled)
             : null)
         .whereType<Widget>()
         .toList());
     return info;
-  }
-
-  PageRoute _pageRoute() {
-    return MaterialPageRoute(builder: (context) => WalkDetailsView(walk));
   }
 }
 
@@ -121,7 +118,7 @@ class _WeatherChip extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: Chip(
-        avatar: getWeatherIcon(weather,
+        avatar: getWeatherIcon(weather, Theme.of(context).brightness,
             iconSize: 15.0,
             iconColor: Theme.of(context).textTheme.bodyText1?.color),
         label: Text("${weather.temperature.round()}°"),

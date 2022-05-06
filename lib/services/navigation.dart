@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:points_verts/init_screen.dart';
 import 'package:points_verts/models/walk.dart';
-import 'package:points_verts/views/directory/walk_directory_view.dart';
-import 'package:points_verts/views/walks/walk_details_view.dart';
+import 'package:points_verts/views/settings/home_select.dart';
+import 'package:points_verts/views/settings/settings.dart';
+import 'package:points_verts/views/walks/details/view.dart';
+import 'package:points_verts/views/walks/directory_view.dart';
 import 'package:points_verts/views/walks/calendar_view.dart';
 
 const String initScreenRoute = '/';
 const String calendarRoute = '/calendar';
 const String directoryRoute = '/directory';
 const String walkDetailRoute = '/walk_detail';
+const String homeSelectRoute = '/home_select';
+const String settingsRoute = '/settings';
+const String debugRoute = '/debug';
 
 class NavigationRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -22,6 +27,10 @@ class NavigationRouter {
       case walkDetailRoute:
         Walk walk = settings.arguments as Walk;
         return MaterialPageRoute(builder: (_) => WalkDetailsView(walk));
+      case homeSelectRoute:
+        return MaterialPageRoute(builder: (_) => const HomeSelect());
+      case settingsRoute:
+        return MaterialPageRoute(builder: (_) => const Settings());
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(

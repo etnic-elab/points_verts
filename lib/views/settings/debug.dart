@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:points_verts/abstractions/service_locator.dart';
-import 'package:points_verts/services/notification.dart';
+import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/services/prefs.dart';
 
 class Debug extends StatelessWidget {
@@ -32,7 +31,7 @@ class _LastWalkUpdateTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: locator<PrefsProvider>().getString(Prefs.lastWalkUpdate),
+      future: prefs.getString(Prefs.lastWalkUpdate),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           return ListTile(
@@ -50,7 +49,7 @@ class _GeoPosTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: locator<PrefsProvider>().getString(Prefs.homeCoords),
+      future: prefs.getString(Prefs.homeCoords),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.hasData) {
           return ListTile(
@@ -65,11 +64,10 @@ class _GeoPosTile extends StatelessWidget {
 }
 
 class _PendingNotificationsTile extends StatelessWidget {
-  final NotificationManager notifManager = locator<NotificationManager>();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: notifManager.pendingNotifications(),
+        future: notification.pendingNotifications(),
         builder: (BuildContext context,
             AsyncSnapshot<List<PendingNotificationRequest>> snapshot) {
           if (snapshot.hasData) {
@@ -94,7 +92,7 @@ class _PendingNotificationsTile extends StatelessWidget {
 
   _testNotification(List<PendingNotificationRequest> requests) {
     PendingNotificationRequest request = requests[0];
-    notifManager.displayNotification(
+    notification.displayNotification(
         -1, "[TEST] ${request.title}", request.body);
   }
 
@@ -116,7 +114,7 @@ class _LastBackgroundFetch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: locator<PrefsProvider>().getString(Prefs.lastBackgroundFetch),
+        future: prefs.getString(Prefs.lastBackgroundFetch),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
             return ListTile(

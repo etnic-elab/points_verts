@@ -2,16 +2,15 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:points_verts/services/database.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/abstractions/company_data.dart';
 import 'package:points_verts/models/walk.dart';
-import 'package:points_verts/abstractions/service_locator.dart';
+import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/services/navigation.dart';
-import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:points_verts/views/walks/utils.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -54,11 +53,9 @@ class NotificationManager {
   }
 
   void _redirectToWalkDetails(int walkId) async {
-    Walk? walk = await locator<DBProvider>().getWalk(walkId);
+    Walk? walk = await db.getWalk(walkId);
     if (walk != null) {
-      locator<NavigationService>()
-          .navigate
-          .pushNamed(walkDetailRoute, arguments: walk);
+      navigator.pushNamed(walkDetailRoute, arguments: walk);
     }
   }
 
@@ -146,13 +143,16 @@ class NotificationManager {
   }
 
   Future<void> scheduleNextNearestWalkNotifications() async {
-    bool showNotification = await locator<PrefsProvider>()
-        .getBoolean(Prefs.showNotification, defaultValue: false);
-    if (!showNotification) return;
-    LatLng? home = await retrieveHomePosition();
-    if (home == null) return;
-    List<DateTime> dates = await retrieveNearestDates();
+    List futures = await Future.wait([
+      prefs.getBoolean(Prefs.showNotification, defaultValue: false),
+      retrieveHomePosition()
+    ]);
+    bool showNotification = futures[0];
+    LatLng? home = futures[1];
+    if (showNotification == false || home == null) return;
+
     cancelNextNearestWalkNotifications();
+    List<DateTime> dates = await retrieveNearestDates();
     for (DateTime date in dates) {
       List<Walk> walks = await retrieveSortedWalks(
           filter: WalkFilter.date(date), position: home);

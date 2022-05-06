@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/models/view_type.dart';
 import 'package:points_verts/models/walk_filter.dart';
-import 'package:points_verts/abstractions/service_locator.dart';
-import 'package:points_verts/services/database.dart';
+import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/loading.dart';
-import 'package:points_verts/views/walks/walk_list_error.dart';
-import 'package:points_verts/views/walks/walk_tile.dart';
+import 'package:points_verts/views/widgets/app_drawer.dart';
+import 'package:points_verts/views/widgets/loading.dart';
+import 'package:points_verts/views/walks/data_error.dart';
+import 'package:points_verts/views/walks/tile.dart';
 import '../../models/walk.dart';
 
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
@@ -21,8 +22,6 @@ class WalkDirectoryView extends StatefulWidget {
 }
 
 class _WalkDirectoryViewState extends State<WalkDirectoryView> {
-  final db = locator<DBProvider>();
-  final prefs = locator<PrefsProvider>();
   Future<List<Walk>>? _walks;
   WalkFilter _filter = WalkFilter();
 
@@ -57,6 +56,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
           if (snapshot.connectionState == ConnectionState.done) {
             List<Walk>? walks = snapshot.data;
             return Scaffold(
+              drawer: const AppDrawer(ViewType.directory),
               appBar: AppBar(
                 title: const Text("Annuaire"),
                 actions: <Widget>[
@@ -112,7 +112,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                         Expanded(child: _DirectoryList(walks)),
                       ],
                     )
-                  : WalkListError(init),
+                  : DataError(init),
             );
           } else {
             return Scaffold(

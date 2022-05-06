@@ -1,6 +1,7 @@
 class PositionNotFoundException implements Exception {
-  String cause;
-  PositionNotFoundException(this.cause);
+  String message;
+  Object? error;
+  PositionNotFoundException(this.message, {this.error});
 }
 
 class DatesNotFoundException implements Exception {

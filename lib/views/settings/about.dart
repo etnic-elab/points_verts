@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:points_verts/abstractions/company_data.dart';
-import 'package:points_verts/abstractions/environment.dart';
-import 'package:points_verts/abstractions/service_locator.dart';
+import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/services/assets.dart';
-import 'package:points_verts/views/centered_tile_icon.dart';
-import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:points_verts/views/widgets/centered_tile_icon.dart';
+import 'package:points_verts/views/walks/utils.dart';
 
 class About extends StatelessWidget {
-  About({Key? key}) : super(key: key);
-
-  final env = locator<Environment>();
+  const About({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

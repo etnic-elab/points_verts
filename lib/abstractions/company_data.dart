@@ -15,33 +15,34 @@ const String publicLogoCancelledDark =
     "$_publicUrl/logo_cancelled_dark_64x64.png";
 
 class CompanyColors {
-  CompanyColors._(this.context);
+  final Brightness brightness;
+  CompanyColors.of(this.brightness);
 
-  final BuildContext context;
-  factory CompanyColors.of(BuildContext context) {
-    return CompanyColors._(context);
-  }
   static const greenPrimary = Color(0xFF6CB233);
   static const greenSecondary = Color(0xFF5B9434);
   static const lightGreen = Color.fromARGB(255, 10, 68, 12);
   static const lightestGreen = Color(0xFF7ECC2F);
   static const darkGreen = Color(0xFF246739);
   static const darkestGreen = Color(0xFF466025);
-  static const brown = Color(0xFFAD7158);
-  static const darkBrown = Color(0xFF5D2D14);
-  static const blue = Color(0xFF52ABE4);
-  static const darkBlue = Color(0xFF5B97C3);
+  static const _brown = Color(0xFFAD7158);
+  static const _darkBrown = Color(0xFF5D2D14);
+  static const _blue = Color(0xFF52ABE4);
+  static const _darkBlue = Color(0xFF5B97C3);
   static const black = Color(0xFF191718);
   static const pink = Color(0xFFED0D8E);
   static const yellow = Color(0xFFC3C83A);
   static const purple = Color(0xFF84547A);
   static const orange = Color(0xFFF3612B);
-  static const red = Color(0xFFD7272E);
+  static const _red = Color(0xFFD7272E);
   static const lightRed = Color(0xFFF03B33);
   static const darkRed = Color(0xFF811620);
+  static const lightBrown = Color(0xFFF2F1EB);
 
-  Color getRed() =>
-      Theme.of(context).brightness == Brightness.dark ? lightRed : red;
+  bool get _isLight => brightness == Brightness.light;
+  Color get splashBackground => _isLight ? lightBrown : Colors.black;
+  Color get red => _isLight ? _red : lightRed;
+  Color get blue => _isLight ? _darkBlue : _blue;
+  Color get brown => _isLight ? _darkBrown : _brown;
 }
 
 class CompanyTheme {

@@ -6,13 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:points_verts/abstractions/service_locator.dart';
+import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/services/assets.dart';
 
 import 'package:points_verts/services/navigation.dart';
-import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:points_verts/views/walks/utils.dart';
 
 import 'package:points_verts/abstractions/company_data.dart';
 
@@ -42,8 +41,8 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     print("[BackgroundFetch] Headless task: $taskId");
     await _initialize(addCert: false);
     await updateWalks();
-    await locator<NotificationManager>().scheduleNextNearestWalkNotifications();
-    await locator<PrefsProvider>().setString(
+    await notification.scheduleNextNearestWalkNotifications();
+    await prefs.setString(
         Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
   } catch (err) {
     print("Cannot schedule next nearest walk notification: $err");

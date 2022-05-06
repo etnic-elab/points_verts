@@ -10,6 +10,7 @@ class Assets {
 
   static const String logo = 'logo.png';
   static const String logoAnnule = 'logo-annule.png';
+  static const String splash = 'splash.png';
   static const String googleMapStyle = 'google_map_style.json';
   static const String googleMapStaticStyle = 'google_map_style_static.txt';
   static const String letsEncryptCert = 'assets/raw/isrgrootx1.pem';

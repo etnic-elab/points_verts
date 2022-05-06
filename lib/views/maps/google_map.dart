@@ -8,7 +8,7 @@ import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/map/marker_generator.dart';
 import 'package:points_verts/views/maps/markers/marker_interface.dart';
-import 'package:points_verts/views/places.dart';
+import 'package:points_verts/models/places.dart';
 
 class GoogleMap extends StatefulWidget {
   const GoogleMap({

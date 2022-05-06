@@ -7,7 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:points_verts/abstractions/company_data.dart';
 import 'package:points_verts/views/maps/google_map.dart';
 import 'package:points_verts/views/maps/markers/marker_interface.dart';
-import 'package:points_verts/views/walks/walk_icon.dart';
+import 'package:points_verts/views/walks/icon.dart';
 import 'package:points_verts/models/walk.dart';
 
 class WalkMarker implements MarkerInterface {

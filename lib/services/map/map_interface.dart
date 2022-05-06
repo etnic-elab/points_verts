@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:points_verts/abstractions/environment.dart';
 import 'package:points_verts/models/path.dart';
-import 'package:points_verts/abstractions/service_locator.dart';
 import 'package:points_verts/views/maps/markers/marker_interface.dart';
 
 import '../../models/address_suggestion.dart';
@@ -11,8 +9,8 @@ import '../../models/walk.dart';
 
 abstract class MapInterface {
   static const double defaultLat = 50.3155646;
-  static const double defaultLong = 5.009682;
-  static const double defaultZoom = 7.5;
+  static const double defaultLong = 4.6;
+  static const double defaultZoom = 7.35;
 
   String get website;
   String get key;
