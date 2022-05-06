@@ -12,6 +12,8 @@ import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/walk_details_view.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'package:points_verts/walks_home_screen.dart';
 import 'package:points_verts/company_data.dart';
@@ -29,6 +31,9 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   try {
     print("[BackgroundFetch] Headless task: $taskId");
     await dotenv.load();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     await updateWalks();
     await scheduleNextNearestWalkNotifications();
     await PrefsProvider.prefs.setString(
@@ -54,6 +59,9 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await dotenv.load();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
   await DBProvider.db.database;
