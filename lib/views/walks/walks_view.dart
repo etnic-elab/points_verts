@@ -46,13 +46,14 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   LatLng? _homePosition;
   _ViewType _viewType = _ViewType.list;
   WalkFilter? _filter;
-  Future? _newsRunning;
 
   @override
   void initState() {
+    WidgetsBinding.instance!.addObserver(this);
     initializeDateFormatting("fr_BE");
     _retrieveData();
-    WidgetsBinding.instance!.addObserver(this);
+    _news();
+    _firstLaunch();
     super.initState();
   }
 
@@ -110,9 +111,11 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       _retrieveWalks();
     }).catchError((err) {
       print("Cannot retrieve dates: $err");
-      setState(() {
-        _currentWalks = Future.error(err);
-      });
+      if (mounted) {
+        setState(() {
+          _currentWalks = Future.error(err);
+        });
+      }
     });
   }
 
@@ -171,9 +174,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         _currentWalks = newList;
       });
     }
-
-    _firstLaunch();
-    _news();
   }
 
   Future<void> _retrieveCurrentPosition() async {
@@ -254,19 +254,16 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   void _news() async {
-    var completer = Completer();
+    DateTime now = DateTime.now();
     try {
-      if (_newsRunning != null) return;
-
-      DateTime now = DateTime.now();
-      _newsRunning = completer.future;
-
       String? lastFetch =
           await PrefsProvider.prefs.getString(Prefs.lastNewsFetch);
       if (DateTime.tryParse(lastFetch ?? '')
               ?.add(const Duration(days: 1))
               .isBefore(now) ??
           true) {
+        await PrefsProvider.prefs
+            .setString(Prefs.lastNewsFetch, now.toIso8601String());
         List<dynamic> futures = await Future.wait(
             [PrefsProvider.prefs.getString(Prefs.news), retrieveNews()]);
 
@@ -289,7 +286,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
           }
         }
 
-        if (mounted && toShow.isNotEmpty) {
+        if (toShow.isNotEmpty) {
           await showNews(context, toShow);
 
           for (News shown in toShow) {
@@ -301,16 +298,10 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
           }
           await PrefsProvider.prefs.setString(Prefs.news, jsonEncode(oldNews));
         }
-
-        await PrefsProvider.prefs
-            .setString(Prefs.lastNewsFetch, now.toIso8601String());
       }
     } catch (err) {
       print('Unable to show news: $err');
     }
-
-    completer.complete();
-    _newsRunning = null;
   }
 
   LatLng? get selectedPosition {
