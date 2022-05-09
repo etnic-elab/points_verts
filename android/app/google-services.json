@@ -21,6 +21,48 @@
       "api_key": [
         {
           "current_key": "AIzaSyAFVjm4H0-JCNuwMg5EILd6nqbUtINyHVA"
+        },
+        {
+          "current_key": "AIzaSyAquiPHoXCWJa8tVOBmeGB938jEAjb6Pgs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1002305900075-b0le2o6qjpb3s0djaos42lm7tq6cmnqk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1002305900075-9ur2idsnunh35i9gtnd2a8h950gv0vlf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "dev.alpagaga.pointsverts"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002305900075:android:2b46cadfb4d2306c6fa46e",
+        "android_client_info": {
+          "package_name": "dev.alpagaga.points_verts.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1002305900075-b0le2o6qjpb3s0djaos42lm7tq6cmnqk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFVjm4H0-JCNuwMg5EILd6nqbUtINyHVA"
+        },
+        {
+          "current_key": "AIzaSyAquiPHoXCWJa8tVOBmeGB938jEAjb6Pgs"
         }
       ],
       "services": {

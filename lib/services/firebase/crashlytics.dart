@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
-import 'prefs.dart';
+import '../prefs.dart';
 
 const String tag = "dev.alpagaga.points_verts.Crashlytics";
 

@@ -1,9 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/main.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
+import 'package:points_verts/views/settings/crashlytics_test.dart';
 
 class Debug extends StatelessWidget {
   const Debug({Key? key}) : super(key: key);
@@ -136,8 +139,13 @@ class _FirebaseTile extends StatelessWidget {
     return ListTile(
       title: const Text("Firebase Project ID"),
       subtitle: Text(Firebase.app().options.projectId),
-      trailing: OutlinedButton(
-          onPressed: () => throw Exception(), child: const Text("Test")),
+      trailing: kReleaseMode
+          ? null
+          : OutlinedButton(
+              onPressed: () => MyApp.navigatorKey.currentState!.push(
+                  MaterialPageRoute(
+                      builder: (context) => const CrashlyticsTest())),
+              child: const Text("Test")),
     );
   }
 }

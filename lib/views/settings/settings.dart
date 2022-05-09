@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/company_data.dart';
-import 'package:points_verts/services/crashlytics.dart';
+import 'package:points_verts/services/firebase/crashlytics.dart';
 import 'package:points_verts/services/location.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';

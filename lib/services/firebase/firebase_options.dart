@@ -2,7 +2,7 @@
 // ignore_for_file: lines_longer_than_80_chars, avoid_classes_with_only_static_members
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+    show defaultTargetPlatform, kIsWeb, TargetPlatform, kReleaseMode;
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -41,7 +41,9 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAFVjm4H0-JCNuwMg5EILd6nqbUtINyHVA',
-    appId: '1:1002305900075:android:b3f38eb30d5ec7dc6fa46e',
+    appId: kReleaseMode
+        ? '1:1002305900075:android:b3f38eb30d5ec7dc6fa46e'
+        : '1:1002305900075:android:2b46cadfb4d2306c6fa46e',
     messagingSenderId: '1002305900075',
     projectId: 'points-verts-328310',
     storageBucket: 'points-verts-328310.appspot.com',
