@@ -77,7 +77,12 @@ Future _deleteData() async {
 
     if (packageInfo.buildNumber != lastDataDeleteBuild) {
       await Future.wait([
-        PrefsProvider.prefs.removeAll(),
+        PrefsProvider.prefs.removeAll(remove: [
+          Prefs.lastWalkUpdate,
+          Prefs.news,
+          Prefs.lastNewsFetch,
+          Prefs.lastSelectedDate
+        ]),
         PrefsProvider.prefs
             .setString(Prefs.lastDataDeleteBuild, packageInfo.buildNumber)
       ]);

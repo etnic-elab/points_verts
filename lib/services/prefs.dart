@@ -36,8 +36,9 @@ class PrefsProvider {
     return prefs.remove(key.name);
   }
 
-  Future<List<bool>> removeAll() async {
-    return Future.wait(Prefs.values.map((Prefs pref) => prefs.remove(pref)));
+  Future<List<bool>> removeAll({List<Prefs>? remove}) async {
+    remove = remove ?? Prefs.values;
+    return Future.wait(remove.map((Prefs pref) => prefs.remove(pref)));
   }
 
   Future<String?> setString(Prefs key, String value) async {
