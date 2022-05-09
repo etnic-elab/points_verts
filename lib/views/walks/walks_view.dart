@@ -53,7 +53,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     initializeDateFormatting("fr_BE");
     _retrieveData();
     _news();
-    _firstLaunch();
     super.initState();
   }
 
@@ -174,6 +173,8 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         _currentWalks = newList;
       });
     }
+
+    _firstLaunch();
   }
 
   Future<void> _retrieveCurrentPosition() async {
