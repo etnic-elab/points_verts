@@ -2,21 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:points_verts/models/news.dart';
-import 'package:points_verts/models/news_seen.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/news.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/news.dart';
 import 'package:points_verts/views/walks/filter_page.dart';
 
 import 'dates_dropdown.dart';
@@ -265,6 +261,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
     showNews(context, mounted);
 
+    completer.complete();
     setState(() {
       _newsRunning = null;
     });

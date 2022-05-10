@@ -45,7 +45,7 @@ Future<void> showNews(BuildContext context, bool mounted) async {
           oldNewsJson.map<NewsSeen>((json) => NewsSeen.fromJson(json)).toList();
 
       List<News> news = futures[1];
-      List<News> toShow = [];
+      List<News> newsToShow = [];
       for (News _news in news) {
         NewsSeen? seen = oldNews
             .firstWhereOrNull((NewsSeen seen) => _news.name == seen.name);
@@ -55,13 +55,13 @@ Future<void> showNews(BuildContext context, bool mounted) async {
                     .add(Duration(hours: _news.intervalHours!))
                     .isBefore(now));
 
-        if (showNews) toShow.add(_news);
+        if (showNews) newsToShow.add(_news);
       }
 
-      if (toShow.isNotEmpty && mounted) {
-        await showNewsDialog(context, toShow);
+      if (newsToShow.isNotEmpty && mounted) {
+        await showNewsDialog(context, newsToShow);
 
-        for (News shown in toShow) {
+        for (News shown in newsToShow) {
           NewsSeen? seen = oldNews
               .firstWhereOrNull((NewsSeen seen) => shown.name == seen.name);
           seen == null
