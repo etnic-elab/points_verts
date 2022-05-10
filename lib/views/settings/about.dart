@@ -16,7 +16,7 @@ class About extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
           if (snapshot.hasData) {
             return ListTile(
-                leading: const CenteredTileWidget(Icon(Icons.info)),
+                leading: const CenteredTileWidget(child: Icon(Icons.info)),
                 title: const Text("À propos"),
                 onTap: () {
                   showAboutDialog(

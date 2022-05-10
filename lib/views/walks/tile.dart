@@ -2,9 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/abstractions/company_data.dart';
 import 'package:points_verts/abstractions/layout_extension.dart';
 import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/services/navigation.dart';
+import 'package:points_verts/views/widgets/centered_tile_icon.dart';
 
 import '../../models/walk.dart';
 import 'geo_button.dart';
@@ -24,64 +26,104 @@ class WalkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      shape: _shape,
-      elevation: tileType == TileType.map ? 6.0 : 0.0,
-      child: ListTile(
-        minVerticalPadding: 16.0,
+    return Card(
+        margin: _margin,
+        elevation: 0.0,
         shape: _shape,
-        onTap: () => navigator.pushNamed(walkDetailRoute, arguments: walk),
-        title: _title,
-        textColor: walk.isCancelled ? Theme.of(context).disabledColor : null,
-        isThreeLine: true,
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _subtitle,
-            Wrap(
-              children: _infoRow(walk),
-            )
-          ],
-        ),
-        trailing: tileType == TileType.directory
-            ? Text(fullDate.format(walk.date))
-            : GeoButton(walk),
-      ),
-    );
+        child: InkWell(
+          borderRadius: _borderRadius,
+          onTap: () => navigator.pushNamed(walkDetailRoute, arguments: walk),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                textColor:
+                    walk.isCancelled ? Theme.of(context).disabledColor : null,
+                title: _title,
+                subtitle: _subtitle,
+                trailing: _trailing(Theme.of(context).brightness),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  primary: true,
+                  child: Row(children: _infoRow),
+                ),
+              ),
+              const SizedBox(height: 10.0),
+            ],
+          ),
+        ));
+  }
+
+  EdgeInsets? get _margin {
+    switch (tileType) {
+      case TileType.map:
+        return const EdgeInsets.all(0);
+      default:
+        return const EdgeInsets.all(4.0);
+    }
+  }
+
+  BorderRadius? get _borderRadius {
+    switch (tileType) {
+      case TileType.map:
+        return const BorderRadius.vertical(
+            top: Radius.circular(20), bottom: Radius.zero);
+      default:
+        return null;
+    }
   }
 
   ShapeBorder? get _shape {
     switch (tileType) {
       case TileType.map:
-        return const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-                top: Radius.circular(20), bottom: Radius.zero));
+        return RoundedRectangleBorder(borderRadius: _borderRadius!);
       default:
         return null;
     }
   }
 
   Widget get _title {
-    if (tileType == TileType.directory) {
-      return Text("${walk.city} (${walk.entity})",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-          overflow: TextOverflow.ellipsis);
-    } else {
-      return Text(walk.city,
-          style: const TextStyle(fontWeight: FontWeight.bold));
+    switch (tileType) {
+      case TileType.directory:
+        return Text("${walk.city} (${walk.entity})",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+            overflow: TextOverflow.ellipsis);
+      default:
+        return Text(walk.city,
+            style: const TextStyle(fontWeight: FontWeight.bold));
     }
   }
 
   Widget get _subtitle {
-    if (tileType == TileType.directory) {
-      return Text(walk.contactLabel);
-    } else {
-      return Text("${walk.type} - ${walk.province}");
+    switch (tileType) {
+      case TileType.directory:
+        return Text(walk.contactLabel);
+      default:
+        return Text("${walk.type} - ${walk.province}");
     }
   }
 
-  List<Widget> _infoRow(Walk walk) {
+  Widget _trailing(Brightness brightness) {
+    if (walk.isCancelled) {
+      return CenteredTileWidget(
+        child: Text("Annulé",
+            style: TextStyle(color: CompanyColors.of(brightness).red)),
+      );
+    }
+
+    switch (tileType) {
+      case TileType.directory:
+        return CenteredTileWidget(child: Text(fullDate.format(walk.date)));
+      default:
+        return GeoButton(walk);
+    }
+  }
+
+  List<Widget> get _infoRow {
     List<Widget> info = [];
 
     if (walk.weathers.isNotEmpty) info.add(_WeatherChip(walk.weathers[0]));

@@ -109,7 +109,7 @@ class _SettingsState extends State<Settings> {
                   "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
                   style: Theme.of(context).textTheme.caption)),
           ListTile(
-            leading: const CenteredTileWidget(Icon(Icons.home)),
+            leading: const CenteredTileWidget(child: Icon(Icons.home)),
             title: const Text('Mon domicile'),
             subtitle: _homeLabel,
             onTap: () async {
@@ -130,7 +130,8 @@ class _SettingsState extends State<Settings> {
                 : null,
           ),
           SwitchListTile(
-            secondary: const CenteredTileWidget(Icon(Icons.notifications)),
+            secondary:
+                const CenteredTileWidget(child: Icon(Icons.notifications)),
             title: const Text("Notifier la veille (vers 20h)"),
             value: _showNotification,
             onChanged: _home != null
@@ -140,12 +141,12 @@ class _SettingsState extends State<Settings> {
           const Divider(thickness: 2, height: 40),
           const ListHeader("Liens"),
           ListTile(
-            leading: const CenteredTileWidget(Icon(Icons.help)),
+            leading: const CenteredTileWidget(child: Icon(Icons.help)),
             title: const Text("Assistance"),
             onTap: () => launchURL(assistanceUrl),
           ),
           ListTile(
-            leading: const CenteredTileWidget(Icon(Icons.security)),
+            leading: const CenteredTileWidget(child: Icon(Icons.security)),
             title: const Text("Charte de la vie privée"),
             onTap: () => launchURL(privacyUrl),
           ),

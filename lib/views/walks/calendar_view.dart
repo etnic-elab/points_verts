@@ -15,6 +15,7 @@ import 'package:points_verts/services/navigation.dart';
 import 'package:points_verts/views/widgets/app_drawer.dart';
 import 'package:points_verts/views/walks/filter.dart';
 import 'package:points_verts/views/walks/sort_sheet.dart';
+import 'package:points_verts/views/widgets/bottom_navigation_bar.dart';
 import 'package:points_verts/views/widgets/loading.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/models/walk_sort.dart';
@@ -38,6 +39,9 @@ class CalendarView extends StatefulWidget {
 
 //TODO: make annuaire
 //TODO: add news
+//TODO: add firebase (crashlytics + in_app_messaging)
+//TODO: change walkTile
+//TODO: add bottom navigation
 
 class _CalendarViewState extends State<CalendarView> {
   final ScrollController _scrollController = ScrollController();
@@ -281,22 +285,20 @@ class _CalendarViewState extends State<CalendarView> {
       builder: (BuildContext context, AsyncSnapshot future) {
         if (future.hasError) {
           return Scaffold(
-              drawer: const AppDrawer(ViewType.calendarList),
-              appBar: AppBar(),
+              bottomNavigationBar: const AppBottomNavigationBar(),
               body: DataError(() => refreshData(force: true)));
         }
 
         List<DateTime>? dates = future.data?[0];
         List<Walk>? walks = future.data?[1];
         if (dates == null || walks == null) {
-          return Scaffold(
-              drawer: const AppDrawer(ViewType.calendarList),
-              appBar: AppBar(),
-              body: const LoadingText("Récupération des données..."));
+          return const Scaffold(
+              bottomNavigationBar: AppBottomNavigationBar(),
+              body: LoadingText("Récupération des données..."));
         }
 
         return Scaffold(
-          drawer: const AppDrawer(ViewType.calendarList),
+          bottomNavigationBar: const AppBottomNavigationBar(),
           endDrawer: FilterDrawer(_filter, walks.length, filterUpdate),
           body: _currentView == ViewType.calendarList
               ? CalendarListView(
@@ -311,8 +313,8 @@ class _CalendarViewState extends State<CalendarView> {
                 )
               : CalendarMapView(
                   appBar: appBar(dates),
-                  onTapMap: onTapMap,
-                  onWalkSelect: onWalkSelect,
+                  unselectWalk: unselectWalk,
+                  selectWalk: selectWalk,
                   place: _place,
                   position: _position,
                   searching: _searching,
@@ -367,9 +369,13 @@ class _CalendarViewState extends State<CalendarView> {
         : ViewType.calendarList);
   }
 
-  void onWalkSelect(Walk newValue) => setState(() => _selectedWalk = newValue);
+  void selectWalk(Walk newValue) {
+    if (mounted) setState(() => _selectedWalk = newValue);
+  }
 
-  void onTapMap() => setState(() => _selectedWalk = null);
+  void unselectWalk() {
+    if (mounted) setState(() => _selectedWalk = null);
+  }
 }
 
 class _AppBar extends StatelessWidget {
@@ -391,17 +397,10 @@ class _AppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      elevation: 6.0,
+      automaticallyImplyLeading: false,
+      centerTitle: true,
+      elevation: 8.0,
       pinned: true,
-      leading: Opacity(
-        opacity: 0.8,
-        child: IconButton(
-          icon: const Icon(Icons.menu),
-          splashRadius: Material.defaultSplashRadius / 1.5,
-          tooltip: 'Ouvrir le menu de navigation',
-          onPressed: () => Scaffold.of(context).openDrawer(),
-        ),
-      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.calendar_today),

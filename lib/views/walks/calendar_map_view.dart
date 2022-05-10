@@ -12,7 +12,7 @@ import 'package:points_verts/views/maps/markers/walk_marker.dart';
 import 'package:points_verts/models/places.dart';
 import 'package:points_verts/views/walks/tile.dart';
 
-class CalendarMapView extends StatelessWidget {
+class CalendarMapView extends StatefulWidget {
   const CalendarMapView(
       {required this.appBar,
       required this.walks,
@@ -21,8 +21,8 @@ class CalendarMapView extends StatelessWidget {
       required this.position,
       required this.place,
       required this.selectedWalk,
-      required this.onTapMap,
-      required this.onWalkSelect,
+      required this.selectWalk,
+      required this.unselectWalk,
       Key? key})
       : super(key: key);
 
@@ -33,8 +33,21 @@ class CalendarMapView extends StatelessWidget {
   final LatLng? position;
   final Places? place;
   final Walk? selectedWalk;
-  final Function(Walk) onWalkSelect;
-  final Function onTapMap;
+  final Function(Walk) selectWalk;
+  final Function unselectWalk;
+
+  @override
+  State<CalendarMapView> createState() => _CalendarMapViewState();
+}
+
+class _CalendarMapViewState extends State<CalendarMapView> {
+  late bool selectedWalkVisible;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedWalkVisible = widget.selectedWalk != null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,25 +57,37 @@ class CalendarMapView extends StatelessWidget {
         CustomScrollView(
           controller: ScrollController(),
           slivers: [
-            appBar,
+            widget.appBar,
             SliverFillRemaining(
               hasScrollBody: false,
               child: _Map(
-                  walks, position, place, selectedWalk, onWalkSelect, onTapMap),
+                  walks: widget.walks,
+                  position: widget.position,
+                  place: widget.place,
+                  selectedWalk: widget.selectedWalk,
+                  onWalkSelect: _onWalkSelect,
+                  onTapMap: _onTapMap),
             ),
           ],
         ),
-        if (searching == null)
+        if (widget.searching == null)
           Container(
               alignment: Alignment.bottomCenter,
               margin: const EdgeInsets.only(bottom: 15.0),
-              child: FilterFAB(sortSheet)),
-        if (selectedWalk != null)
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: WalkTile(selectedWalk!, TileType.map),
+              child: FilterFAB(widget.sortSheet)),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: AnimatedSlide(
+            onEnd: onEndAnimation,
+            duration: const Duration(milliseconds: 310),
+            offset: selectedWalkVisible ? Offset.zero : const Offset(0, 3),
+            curve: Curves.linear,
+            child: widget.selectedWalk != null
+                ? WalkTile(widget.selectedWalk!, TileType.map)
+                : Container(),
           ),
-        if (searching != null)
+        ),
+        if (widget.searching != null)
           SimpleDialog(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0)),
@@ -71,12 +96,30 @@ class CalendarMapView extends StatelessWidget {
       ],
     );
   }
+
+  onEndAnimation() {
+    if (selectedWalkVisible == false) widget.unselectWalk();
+  }
+
+  _onTapMap() {
+    setState(() => selectedWalkVisible = false);
+  }
+
+  _onWalkSelect(Walk walk) {
+    widget.selectWalk(walk);
+    if (mounted) setState(() => selectedWalkVisible = true);
+  }
 }
 
 class _Map extends StatelessWidget {
-  _Map(this.walks, this.position, this.place, this.selectedWalk,
-      this.onWalkSelect, this.onTapMap,
-      {Key? key})
+  _Map(
+      {required this.walks,
+      required this.position,
+      required this.place,
+      required this.selectedWalk,
+      required this.onWalkSelect,
+      required this.onTapMap,
+      Key? key})
       : super(key: key);
 
   final List<Walk> walks;

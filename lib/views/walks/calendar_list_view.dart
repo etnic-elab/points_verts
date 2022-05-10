@@ -120,7 +120,7 @@ class _SliverList extends StatelessWidget {
         return const Divider(
           indent: 10,
           endIndent: 10,
-          thickness: 1,
+          thickness: 2,
         );
       },
       semanticIndexCallback: (Widget widget, int localIndex) {

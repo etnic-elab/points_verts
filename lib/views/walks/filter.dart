@@ -134,7 +134,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.9,
       child: Drawer(
-        elevation: 6.0,
+        elevation: 8.0,
         child: Column(
           children: [
             AppBar(
@@ -305,7 +305,7 @@ class _PaddedChip extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: FilterChip(
-        elevation: 6.0,
+        elevation: 8.0,
         avatar: layoutExtension.layout.icon != null
             ? Icon(
                 layoutExtension.layout.icon,

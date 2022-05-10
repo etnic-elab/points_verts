@@ -14,7 +14,7 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     Brightness brightness = Theme.of(context).brightness;
     return Drawer(
-      elevation: 6.0,
+      elevation: 8.0,
       child: ListView(
         padding: const EdgeInsets.only(right: 8.0),
         children: <Widget>[

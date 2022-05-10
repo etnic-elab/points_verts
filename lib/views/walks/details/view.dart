@@ -114,7 +114,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   void _openSheet() {
     _sheetController = scaffoldState.currentState?.showBottomSheet(
       (context) => _BottomSheet(widget.walk, togglePathVisibility),
-      elevation: 6.0,
+      elevation: 8.0,
       enableDrag: false,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),

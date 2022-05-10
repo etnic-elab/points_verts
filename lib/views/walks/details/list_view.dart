@@ -153,7 +153,7 @@ class _DateTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const CenteredTileWidget(Icon(Icons.calendar_today)),
+      leading: const CenteredTileWidget(child: Icon(Icons.calendar_today)),
       title: Text(toBeginningOfSentenceCase(
           DateFormat.yMMMMEEEEd("fr_BE").format(walk.date))!),
       subtitle: const Text('Secrétariat ouvert de 8h à 18h'),
@@ -173,7 +173,7 @@ class _RangeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const CenteredTileWidget(Icon(Icons.route)),
+      leading: const CenteredTileWidget(child: Icon(Icons.route)),
       title: Text(walk.rangeLabel(compact: false)),
       subtitle: _subtitle != null ? Text(_subtitle!) : null,
     );
@@ -198,7 +198,7 @@ class _MeetingPointTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return walk.meetingPoint != null
         ? ListTile(
-            leading: const CenteredTileWidget(Icon(Icons.location_on)),
+            leading: const CenteredTileWidget(child: Icon(Icons.location_on)),
             title: Text(walk.meetingPoint!),
             subtitle: _subtitle.isNotEmpty ? Text(_subtitle) : null,
             isThreeLine: _isThreeLine,
@@ -237,7 +237,7 @@ class _OrganizerTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const CenteredTileWidget(Icon(Icons.group)),
+      leading: const CenteredTileWidget(child: Icon(Icons.group)),
       title: Text(walk.organizer),
       subtitle: Text(walk.contactLabel),
       trailing: OutlineIconButton(
@@ -262,7 +262,7 @@ class _LayoutExtensionTile extends StatelessWidget {
         ? ListTile(
             iconColor: item.layout.iconColor,
             leading: item.layout.icon != null
-                ? CenteredTileWidget(Icon(item.layout.icon))
+                ? CenteredTileWidget(child: Icon(item.layout.icon))
                 : null,
             textColor: item.layout.descriptionColor,
             title: Text(item.layout.description!),

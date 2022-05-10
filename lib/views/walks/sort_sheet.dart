@@ -53,7 +53,7 @@ class SortSheet {
 
   Future<void> show(BuildContext context) async {
     SortBy? newValue = await showModalBottomSheet(
-        elevation: 6.0,
+        elevation: 8.0,
         isScrollControlled: true,
         isDismissible: true,
         enableDrag: true,

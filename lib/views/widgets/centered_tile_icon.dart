@@ -1,12 +1,13 @@
 import 'package:flutter/widgets.dart';
 
 class CenteredTileWidget extends StatelessWidget {
-  const CenteredTileWidget(this.widget, {Key? key}) : super(key: key);
+  const CenteredTileWidget({required this.child, Key? key}) : super(key: key);
 
-  final Widget widget;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(height: double.infinity, child: widget);
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[child]);
   }
 }
