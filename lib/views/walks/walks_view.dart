@@ -46,6 +46,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   LatLng? _homePosition;
   _ViewType _viewType = _ViewType.list;
   WalkFilter? _filter;
+  Future? _newsRunning;
 
   @override
   void initState() {
@@ -255,54 +256,18 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   void _news() async {
-    DateTime now = DateTime.now();
-    try {
-      String? lastFetch =
-          await PrefsProvider.prefs.getString(Prefs.lastNewsFetch);
-      if (DateTime.tryParse(lastFetch ?? '')
-              ?.add(const Duration(days: 1))
-              .isBefore(now) ??
-          true) {
-        await PrefsProvider.prefs
-            .setString(Prefs.lastNewsFetch, now.toIso8601String());
-        List<dynamic> futures = await Future.wait(
-            [PrefsProvider.prefs.getString(Prefs.news), retrieveNews()]);
+    if (_newsRunning != null) return;
 
-        List<NewsSeen> oldNews = [];
-        List list = jsonDecode(futures[0] ?? '[]');
-        oldNews =
-            list.map<NewsSeen>((json) => NewsSeen.fromJson(json)).toList();
+    Completer completer = Completer();
+    setState(() {
+      _newsRunning = completer.future;
+    });
 
-        List<News> news = futures[1];
-        List<News> toShow = [];
-        for (News _news in news) {
-          NewsSeen? seen = oldNews
-              .firstWhereOrNull((NewsSeen seen) => _news.name == seen.name);
-          if (seen == null ||
-              (_news.intervalHours != null &&
-                  seen.at
-                      .add(Duration(hours: _news.intervalHours!))
-                      .isBefore(now))) {
-            toShow.add(_news);
-          }
-        }
+    showNews(context, mounted);
 
-        if (toShow.isNotEmpty) {
-          await showNews(context, toShow);
-
-          for (News shown in toShow) {
-            NewsSeen? seen = oldNews
-                .firstWhereOrNull((NewsSeen seen) => shown.name == seen.name);
-            seen == null
-                ? oldNews.add(NewsSeen.fromNews(shown, now))
-                : seen.at = now;
-          }
-          await PrefsProvider.prefs.setString(Prefs.news, jsonEncode(oldNews));
-        }
-      }
-    } catch (err) {
-      print('Unable to show news: $err');
-    }
+    setState(() {
+      _newsRunning = null;
+    });
   }
 
   LatLng? get selectedPosition {

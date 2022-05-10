@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:points_verts/models/news.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
-Future showNews(BuildContext context, List<News> news) {
+Future showNewsDialog(BuildContext context, List<News> news) {
   return showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: 'news_dialog',
