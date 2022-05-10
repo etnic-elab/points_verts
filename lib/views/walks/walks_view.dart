@@ -42,7 +42,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   LatLng? _homePosition;
   _ViewType _viewType = _ViewType.list;
   WalkFilter? _filter;
-  Future? _newsRunning;
+  bool _newsRunning = false;
 
   @override
   void initState() {
@@ -252,19 +252,10 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   void _news() async {
-    if (_newsRunning != null) return;
-
-    Completer completer = Completer();
-    setState(() {
-      _newsRunning = completer.future;
-    });
-
+    if (_newsRunning) return;
+    setState(() => _newsRunning = true);
     showNews(context, mounted);
-
-    completer.complete();
-    setState(() {
-      _newsRunning = null;
-    });
+    setState(() => _newsRunning = false);
   }
 
   LatLng? get selectedPosition {
