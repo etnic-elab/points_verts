@@ -120,7 +120,7 @@ Future<void> updateWalks() async {
   if (lastUpdateIso8601Utc == null) {
     List<Walk> newWalks = await fetchAllWalks(fromDateLocal: nowDateLocal);
     if (newWalks.isNotEmpty) {
-      await DBProvider.db.insertWalks(newWalks);
+      await DBProvider.db.insertWalks(newWalks, empty: true);
       PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
       await _fixNextWalks();
     }
