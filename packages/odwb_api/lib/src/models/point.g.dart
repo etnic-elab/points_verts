@@ -13,7 +13,7 @@ Point _$PointFromJson(Map<String, dynamic> json) => $checkedCreate(
       json,
       ($checkedConvert) {
         final val = Point(
-          id: $checkedConvert('id', (v) => v as String),
+          id: $checkedConvert('id', (v) => v as int),
           code: $checkedConvert('ndeg_pv', (v) => v as String),
           ign: $checkedConvert('ign', (v) => v as String),
           status: $checkedConvert(
@@ -26,9 +26,15 @@ Point _$PointFromJson(Map<String, dynamic> json) => $checkedCreate(
                   unknownValue: Activity.unknown)),
           date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           location: $checkedConvert(
-              'location', (v) => Location.fromJson(v as Map<String, dynamic>)),
-          organizer: $checkedConvert('organizer',
-              (v) => Organizer.fromJson(v as Map<String, dynamic>)),
+            'location',
+            (v) => Location.fromJson(v as Map<String, dynamic>),
+            readValue: Point._readLocation,
+          ),
+          organizer: $checkedConvert(
+            'organizer',
+            (v) => Organizer.fromJson(v as Map<String, dynamic>),
+            readValue: Point._readOrganizer,
+          ),
           gpxs: $checkedConvert('traces_gpx',
               (v) => const GpxListConverter().fromJson(v as String)),
           eightKm: $checkedConvert('orientation',
@@ -53,7 +59,7 @@ Point _$PointFromJson(Map<String, dynamic> json) => $checkedCreate(
               'bewapp', (v) => const BoolConverter().fromJson(v as String)),
           provision: $checkedConvert('ravitaillement',
               (v) => const BoolConverter().fromJson(v as String)),
-          publicTransport: $checkedConvert('gare', (v) => v as String? ?? ''),
+          publicTransport: $checkedConvert('gare', (v) => v as String?),
         );
         return val;
       },
@@ -121,7 +127,7 @@ Location _$LocationFromJson(Map<String, dynamic> json) => $checkedCreate(
           latLng: $checkedConvert(
               'geopoint', (v) => const LatLngConverter().fromJson(v as List)),
           additionalInfo:
-              $checkedConvert('infos_rendez_vous', (v) => v as String),
+              $checkedConvert('infos_rendez_vous', (v) => v as String?),
         );
         return val;
       },

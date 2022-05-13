@@ -13,9 +13,9 @@ class PointVertNotFoundFailure implements Exception {}
 /// {@template meta_points_verts_adeps_api_client}
 /// Dart API Client which wraps the [ODWB API](https://www.odwb.be/api/).
 /// {@endtemplate}
-class ODWBApiClient {
+class OdwbApiClient {
   /// {@macro odwb_api_client}
-  ODWBApiClient({http.Client? httpClient})
+  OdwbApiClient({http.Client? httpClient})
       : _httpClient = httpClient ?? http.Client();
 
   static const _baseUrl = 'https://www.odwb.be';
@@ -39,10 +39,8 @@ class ODWBApiClient {
       if (start != null) 'start': start,
       if (refine != null) ...refine,
       if (exclude != null) ...exclude,
-      if (geofilterDistance != null)
-        'geofilter.distance': geofilterDistance.stringify(),
-      if (geofilterPolygon != null)
-        'geofilter.polygon': geofilterPolygon.stringify(),
+      if (geofilterDistance != null) 'geofilter.distance': '$geofilterDistance',
+      if (geofilterPolygon != null) 'geofilter.polygon': '$geofilterPolygon',
     };
 
     final odwbRequest = Uri.https(

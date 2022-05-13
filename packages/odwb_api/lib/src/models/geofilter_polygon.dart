@@ -11,7 +11,6 @@ class GeofilterPolygon {
   final LatLng latLngTwo;
   final LatLng latLngThree;
 
-  String stringify() {
-    return '(${latLngOne.stringify()}),(${latLngTwo.stringify()}),(${latLngThree.stringify()})';
-  }
+  @override
+  String toString() => '($latLngOne),($latLngTwo),($latLngThree)';
 }

@@ -9,7 +9,6 @@ class GeofilterDistance {
   final LatLng latLng;
   final int distance;
 
-  String stringify() {
-    return '${latLng.stringify()},$distance';
-  }
+  @override
+  String toString() => '$latLng,$distance';
 }

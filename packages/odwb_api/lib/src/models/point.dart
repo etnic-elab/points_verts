@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta_points_verts_adeps_api/odwb_api.dart';
 
@@ -23,7 +24,7 @@ enum Activity {
   unknown,
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class Point {
   const Point({
     required this.id,
@@ -50,8 +51,27 @@ class Point {
   });
 
   factory Point.fromJson(Map<String, dynamic> json) => _$PointFromJson(json);
+  static _readLocation(Map map, _) {
+    return {
+      'lieu_de_rendez_vous': map['lieu_de_rendez_vous'],
+      'localite': map['localite'],
+      'entite': map['entite'],
+      'geopoint': map['geopoint'],
+      'infos_rendez_vous': map['infos_rendez_vous'],
+      'province': map['province'],
+    };
+  }
 
-  final String id;
+  static _readOrganizer(Map map, _) {
+    return {
+      'groupement': map['groupement'],
+      'nom': map['nom'],
+      'prenom': map['prenom'],
+      'gsm': map['gsm'],
+    };
+  }
+
+  final int id;
   @JsonKey(name: 'ndeg_pv')
   final String code;
   final String ign;
@@ -60,8 +80,9 @@ class Point {
   @JsonKey(name: 'activite', unknownEnumValue: Activity.unknown)
   final Activity activity;
   final DateTime date;
-
+  @JsonKey(readValue: _readLocation)
   final Location location;
+  @JsonKey(readValue: _readOrganizer)
   final Organizer organizer;
   @JsonKey(name: 'traces_gpx')
   @GpxListConverter()
@@ -97,8 +118,8 @@ class Point {
   @JsonKey(name: 'ravitaillement')
   @BoolConverter()
   final bool provision;
-  @JsonKey(name: 'gare', defaultValue: '')
-  final String publicTransport;
+  @JsonKey(name: 'gare')
+  final String? publicTransport;
 }
 
 @JsonSerializable()
@@ -148,7 +169,7 @@ class Location {
   @LatLngConverter()
   final LatLng latLng;
   @JsonKey(name: 'infos_rendez_vous')
-  final String additionalInfo;
+  final String? additionalInfo;
 }
 
 class LatLngConverter implements JsonConverter<LatLng, List> {
