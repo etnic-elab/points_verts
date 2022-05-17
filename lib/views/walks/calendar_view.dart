@@ -12,7 +12,6 @@ import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/service_locator.dart';
 import 'package:points_verts/services/exceptions.dart';
 import 'package:points_verts/services/navigation.dart';
-import 'package:points_verts/views/widgets/app_drawer.dart';
 import 'package:points_verts/views/walks/filter.dart';
 import 'package:points_verts/views/walks/sort_sheet.dart';
 import 'package:points_verts/views/widgets/bottom_navigation_bar.dart';

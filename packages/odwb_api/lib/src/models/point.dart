@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta_points_verts_adeps_api/odwb_api.dart';
 
@@ -24,7 +25,7 @@ enum Activity {
 }
 
 @JsonSerializable(explicitToJson: true)
-class Point {
+class Point extends Equatable {
   const Point({
     required this.id,
     required this.code,
@@ -119,10 +120,13 @@ class Point {
   final bool provision;
   @JsonKey(name: 'gare')
   final String? publicTransport;
+
+  @override
+  List<Object?> get props => [id];
 }
 
 @JsonSerializable()
-class Organizer {
+class Organizer extends Equatable {
   const Organizer({
     required this.group,
     required this.name,
@@ -141,10 +145,13 @@ class Organizer {
   final String surname;
   @JsonKey(name: 'gsm')
   final String phoneNumber;
+
+  @override
+  List<Object?> get props => [group, name, surname, phoneNumber];
 }
 
 @JsonSerializable()
-class Location {
+class Location extends Equatable {
   const Location({
     required this.address,
     required this.city,
@@ -169,6 +176,9 @@ class Location {
   final LatLng latLng;
   @JsonKey(name: 'infos_rendez_vous')
   final String? additionalInfo;
+
+  @override
+  List<Object?> get props => [latLng];
 }
 
 class LatLngConverter implements JsonConverter<LatLng, List> {
@@ -193,7 +203,7 @@ enum Availability {
 }
 
 @JsonSerializable()
-class Gpx {
+class Gpx extends Equatable {
   const Gpx(
       {required this.name,
       required this.url,
@@ -210,6 +220,9 @@ class Gpx {
   final Availability availability;
   @JsonKey(name: 'couleur')
   final String color;
+
+  @override
+  List<Object?> get props => [name, url];
 }
 
 class GpxListConverter implements JsonConverter<List<Gpx>, String> {

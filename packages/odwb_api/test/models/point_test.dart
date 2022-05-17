@@ -6,7 +6,7 @@ void main() {
     group('fromJson', () {
       test('returns Enum.unknown for unsupported enums', () {
         expect(
-            Point.fromJson(<String, dynamic>{
+            Point.fromJson(const <String, dynamic>{
               "statut": "-",
               "activite": "-",
               "vtt": "Non",

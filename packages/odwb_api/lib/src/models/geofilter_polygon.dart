@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:meta_points_verts_adeps_api/odwb_api.dart';
 
-class GeofilterPolygon {
+class GeofilterPolygon extends Equatable {
   const GeofilterPolygon({
     required this.latLngOne,
     required this.latLngTwo,
@@ -13,4 +14,7 @@ class GeofilterPolygon {
 
   @override
   String toString() => '($latLngOne),($latLngTwo),($latLngThree)';
+
+  @override
+  List<Object?> get props => [latLngOne, latLngTwo, latLngThree];
 }
