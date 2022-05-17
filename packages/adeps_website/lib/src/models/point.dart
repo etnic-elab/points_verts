@@ -1,6 +1,8 @@
 // 16944;CLABECQ;M;50.6870931;4.2250955;Brabant Wallon;15-05-2022;Dimanche 15 Mai 2022;Tubize;ptvert_annule;
 
 import 'package:adeps_website/adeps_website.dart';
+import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 
 enum Activity { walk, orientation, unknown }
 const activityEnumMap = {Activity.walk: 'M', Activity.orientation: 'O'};
@@ -12,7 +14,7 @@ const statusEnumMap = {
   Status.ok: 'ptvert'
 };
 
-class Point {
+class Point extends Equatable {
   const Point({
     required this.id,
     required this.activity,
@@ -26,7 +28,7 @@ class Point {
       activity: activityEnumMap.keys.firstWhere(
           (k) => activityEnumMap[k] == list[2],
           orElse: () => Activity.unknown),
-      date: DateTime.parse(list[6]),
+      date: DateFormat('dd-MM-yyyy').parse(list[6]),
       location: Location.fromList(list),
       status: statusEnumMap.keys.firstWhere((k) => statusEnumMap[k] == list[9],
           orElse: () => Status.unknown));
@@ -36,9 +38,12 @@ class Point {
   final Status status;
   final Location location;
   final DateTime date;
+
+  @override
+  List<Object?> get props => [id];
 }
 
-class Location {
+class Location extends Equatable {
   const Location(
       {required this.province,
       required this.municipality,
@@ -55,4 +60,7 @@ class Location {
   final String municipality;
   final String city;
   final LatLng latLng;
+
+  @override
+  List<Object?> get props => [latLng];
 }

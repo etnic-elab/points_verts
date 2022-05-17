@@ -19,7 +19,7 @@ class AdepsWebsiteClient {
   AdepsWebsiteClient({http.Client? httpClient})
       : _httpClient = httpClient ?? http.Client();
 
-  static const _baseUrl = 'https://www.am-sport.cfwb.be';
+  static const _baseUrl = 'www.am-sport.cfwb.be';
   final http.Client _httpClient;
 
   /// Finds a [Point] `https://www.am-sport.cfwb.be/adeps/pv_data.asp`.
