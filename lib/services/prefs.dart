@@ -14,6 +14,7 @@ enum Prefs {
   lastSelectedDate,
   news,
   lastNewsFetch,
+  lastDataDeleteBuild,
 }
 
 class PrefsProvider {
@@ -33,6 +34,11 @@ class PrefsProvider {
   Future<bool> remove(Prefs key) async {
     SharedPreferences prefs = await preferences;
     return prefs.remove(key.name);
+  }
+
+  Future<List<bool>> removeAll({List<Prefs>? remove}) async {
+    remove = remove ?? Prefs.values;
+    return Future.wait(remove.map((Prefs pref) => prefs.remove(pref)));
   }
 
   Future<String?> setString(Prefs key, String value) async {

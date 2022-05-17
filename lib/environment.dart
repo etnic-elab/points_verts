@@ -8,6 +8,8 @@ const String tag = "dev.alpagaga.points_verts.Environment";
 
 class Environment {
   static final String? openWeatherToken = dotenv.env['OPENWEATHER_TOKEN'];
+  static final bool deleteData =
+      (int.tryParse(dotenv.env['DELETE_DATA'] ?? '') ?? 0) == 1;
   static Maps? map;
   //TODO: initialize as singleton
   static MapInterface? _mapInstance;
