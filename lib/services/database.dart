@@ -62,10 +62,11 @@ class DBProvider {
     });
   }
 
-  Future<void> insertWalks(List<Walk> walks) async {
+  Future<void> insertWalks(List<Walk> walks, {bool empty = false}) async {
     log("Inserting ${walks.length} walks in database", name: tag);
     final Database db = await database;
     final Batch batch = db.batch();
+    if (empty) await db.delete('walks');
     for (Walk walk in walks) {
       batch.insert("walks", walk.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);

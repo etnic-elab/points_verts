@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:package_info/package_info.dart';
+import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
@@ -54,12 +57,38 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await dotenv.load();
+  await _deleteData();
   //TODO: improve how we initialize these singletons (get_it package?)
   await NotificationManager.instance.plugin;
   await DBProvider.db.database;
   await _addTrustedCert(Assets.letsEncryptCert);
   runApp(const MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+}
+
+Future _deleteData() async {
+  if (Environment.deleteData) {
+    List futures = await Future.wait([
+      PackageInfo.fromPlatform(),
+      PrefsProvider.prefs.getString(Prefs.lastDataDeleteBuild)
+    ]);
+    PackageInfo packageInfo = futures[0];
+    String? lastDataDeleteBuild = futures[1];
+
+    if (packageInfo.buildNumber != lastDataDeleteBuild) {
+      await Future.wait([
+        PrefsProvider.prefs.removeAll(remove: [
+          Prefs.lastWalkUpdate,
+          Prefs.news,
+          Prefs.lastNewsFetch,
+          Prefs.lastSelectedDate
+        ]),
+        PrefsProvider.prefs
+            .setString(Prefs.lastDataDeleteBuild, packageInfo.buildNumber)
+      ]);
+      log("Local data deleted for buildNumber: ${packageInfo.buildNumber}");
+    }
+  }
 }
 
 class MyApp extends StatelessWidget {
