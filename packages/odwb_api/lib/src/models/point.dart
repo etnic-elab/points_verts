@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta_points_verts_adeps_api/odwb_api.dart';
 
@@ -197,7 +196,7 @@ enum Availability {
 class Gpx {
   const Gpx(
       {required this.name,
-      required this.file,
+      required this.url,
       required this.availability,
       required this.color});
 
@@ -206,7 +205,7 @@ class Gpx {
   @JsonKey(name: 'titre')
   final String name;
   @JsonKey(name: 'fichier')
-  final String file;
+  final String url;
   @JsonKey(name: 'jourdemarche', unknownEnumValue: Availability.sameDay)
   final Availability availability;
   @JsonKey(name: 'couleur')

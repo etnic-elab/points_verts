@@ -146,7 +146,7 @@ Gpx _$GpxFromJson(Map<String, dynamic> json) => $checkedCreate(
       ($checkedConvert) {
         final val = Gpx(
           name: $checkedConvert('titre', (v) => v as String),
-          file: $checkedConvert('fichier', (v) => v as String),
+          url: $checkedConvert('fichier', (v) => v as String),
           availability: $checkedConvert(
               'jourdemarche',
               (v) => $enumDecode(_$AvailabilityEnumMap, v,
@@ -157,7 +157,7 @@ Gpx _$GpxFromJson(Map<String, dynamic> json) => $checkedCreate(
       },
       fieldKeyMap: const {
         'name': 'titre',
-        'file': 'fichier',
+        'url': 'fichier',
         'availability': 'jourdemarche',
         'color': 'couleur'
       },

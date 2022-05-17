@@ -1,19 +1,9 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:meta_points_verts_adeps_api/odwb_api.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('Point', () {
     group('fromJson', () {
-      test(
-          'throws CheckedFromJsonException when non-null annotated field is null',
-          () {
-        expect(
-          () => Point.fromJson(<String, dynamic>{}),
-          throwsA(isA<CheckedFromJsonException>()),
-        );
-      });
-
       test('returns Enum.unknown for unsupported enums', () {
         expect(
             Point.fromJson(<String, dynamic>{

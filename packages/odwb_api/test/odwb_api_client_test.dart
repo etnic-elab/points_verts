@@ -1,264 +1,239 @@
-// // ignore_for_file: prefer_const_constructors
-// import 'package:http/http.dart' as http;
-// import 'package:meta_points_verts_adeps_api/odwb_api.dart';
-// import 'package:mocktail/mocktail.dart';
-// import 'package:test/test.dart';
+// ignore_for_file: prefer_const_constructors
+import 'package:http/http.dart' as http;
+import 'package:meta_points_verts_adeps_api/odwb_api.dart';
+import 'package:test/test.dart';
+import 'package:mocktail/mocktail.dart';
 
-// class MockHttpClient extends Mock implements http.Client {}
+class MockHttpClient extends Mock implements http.Client {}
 
-// class MockResponse extends Mock implements http.Response {}
+class MockResponse extends Mock implements http.Response {}
 
-// class FakeUri extends Fake implements Uri {}
+class MockGeofilterDistance extends Mock implements GeofilterDistance {}
 
-// void main() {
-//   group('OdwbApiClient', () {
-//     late http.Client httpClient;
-//     late OdwbApiClient odwbApiClient;
+class MockGeofilterPolygon extends Mock implements GeofilterPolygon {}
 
-//     setUpAll(() {
-//       registerFallbackValue(FakeUri());
-//     });
+class FakeUri extends Fake implements Uri {}
 
-//     setUp(() {
-//       httpClient = MockHttpClient();
-//       odwbApiClient = OdwbApiClient(httpClient: httpClient);
-//     });
+void main() {
+  group('OdwbApiClient', () {
+    late http.Client httpClient;
+    late OdwbApiClient odwbApiClient;
 
-//     group('constructor', () {
-//       test('does not require an httpClient', () {
-//         expect(OdwbApiClient(), isNotNull);
-//       });
-//     });
+    setUpAll(() {
+      registerFallbackValue(FakeUri());
+    });
 
-//     group('locationSearch', () {
-//       const query = 'mock-query';
-//       test('makes correct http request', () async {
-//         final response = MockResponse();
-//         when(() => response.statusCode).thenReturn(200);
-//         when(() => response.body).thenReturn('[]');
-//         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-//         try {
-//           await odwbApiClient.pointVertSearch(query);
-//         } catch (_) {}
-//         verify(
-//           () => httpClient.get(
-//             Uri.https(
-//               'www.metaweather.com',
-//               '/api/location/search',
-//               <String, String>{'query': query},
-//             ),
-//           ),
-//         ).called(1);
-//       });
+    setUp(() {
+      httpClient = MockHttpClient();
+      odwbApiClient = OdwbApiClient(httpClient: httpClient);
+    });
 
-//       test('throws PointVertRequestFailure on non-200 response', () async {
-//         final response = MockResponse();
-//         when(() => response.statusCode).thenReturn(400);
-//         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-//         expect(
-//           () async => await odwbApiClient.pointVertSearch(query),
-//           throwsA(isA<PointVertRequestFailure>()),
-//         );
-//       });
+    group('constructor', () {
+      test('does not require an httpClient', () {
+        expect(OdwbApiClient(), isNotNull);
+      });
+    });
 
-//       test('throws PointVertNotFoundFailure on empty response', () async {
-//         final response = MockResponse();
-//         when(() => response.statusCode).thenReturn(200);
-//         when(() => response.body).thenReturn('[]');
-//         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-//         await expectLater(
-//           odwbApiClient.pointVertSearch(query),
-//           throwsA(isA<PointVertNotFoundFailure>()),
-//         );
-//       });
+    group('pointVertSearch', () {
+      Set<String>? query = {'mock-query'};
+      Map<String, dynamic> refine = {'mock': 'query'};
+      Map<String, dynamic> exclude = {'mock': 'query'};
+      MockGeofilterDistance geofilterDistance = MockGeofilterDistance();
+      MockGeofilterPolygon geofilterPolygon = MockGeofilterPolygon();
+      test('makes correct http request', () async {
+        final response = MockResponse();
+        when(() => response.statusCode).thenReturn(200);
+        when(() => response.body).thenReturn('{}');
+        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        try {
+          await odwbApiClient.pointVertSearch(
+              query: query,
+              refine: refine,
+              exclude: exclude,
+              geofilterDistance: geofilterDistance,
+              geofilterPolygon: geofilterPolygon);
+        } catch (_) {}
+        verify(
+          () => httpClient.get(
+            Uri.https(
+              'www.odwb.be',
+              '/api/records/1.0/search/',
+              <String, dynamic>{
+                'dataset': 'points-verts-de-ladeps',
+                'q': query.join(' AND'),
+                ...refine,
+                ...exclude,
+                'geofilter.distance': '$geofilterDistance',
+                'geofilter.polygon': '$geofilterPolygon',
+              },
+            ),
+          ),
+        ).called(1);
+      });
 
-//       test('returns Location on valid response', () async {
-//         final response = MockResponse();
-//         when(() => response.statusCode).thenReturn(200);
-//         when(() => response.body).thenReturn(
-//           '''[{
-//             "title": "mock-title",
-//             "location_type": "City",
-//             "latt_long": "-34.75,83.28",
-//             "woeid": 42
-//           }]''',
-//         );
-//         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-//         final actual = await odwbApiClient.pointVertSearch(query);
-//         expect(
-//           actual,
-//           isA<Location>()
-//               .having((l) => l.title, 'title', 'mock-title')
-//               .having((l) => l.locationType, 'type', LocationType.city)
-//               .having(
-//                 (l) => l.latLng,
-//                 'latLng',
-//                 isA<LatLng>()
-//                     .having((c) => c.latitude, 'latitude', -34.75)
-//                     .having((c) => c.longitude, 'longitude', 83.28),
-//               )
-//               .having((l) => l.woeid, 'woeid', 42),
-//         );
-//       });
-//     });
+      test('throws PointVertRequestFailure on non-200 response', () async {
+        final response = MockResponse();
+        when(() => response.statusCode).thenReturn(400);
+        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        expect(
+          () async => await odwbApiClient.pointVertSearch(),
+          throwsA(isA<PointVertRequestFailure>()),
+        );
+      });
 
-//     group('getWeather', () {
-//       const locationId = 42;
+      test('throws PointVertNotFoundFailure on empty response', () async {
+        final response = MockResponse();
+        when(() => response.statusCode).thenReturn(200);
+        when(() => response.body).thenReturn('{}');
+        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        await expectLater(
+          odwbApiClient.pointVertSearch(),
+          throwsA(isA<PointVertNotFoundFailure>()),
+        );
+      });
 
-//       test('makes correct http request', () async {
-//         final response = MockResponse();
-//         when(() => response.statusCode).thenReturn(200);
-//         when(() => response.body).thenReturn('{}');
-//         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-//         try {
-//           await odwbApiClient.getWeather(locationId);
-//         } catch (_) {}
-//         verify(
-//           () => httpClient.get(
-//             Uri.https('www.metaweather.com', '/api/location/$locationId'),
-//           ),
-//         ).called(1);
-//       });
+      test('throws PointVertNotFoundFailure on empty records', () async {
+        final response = MockResponse();
+        when(() => response.statusCode).thenReturn(200);
+        when(() => response.body).thenReturn('{"records": []}');
+        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        expect(
+          () async => await odwbApiClient.pointVertSearch(),
+          throwsA(isA<PointVertNotFoundFailure>()),
+        );
+      });
 
-//       test('throws WeatherRequestFailure on non-200 response', () async {
-//         final response = MockResponse();
-//         when(() => response.statusCode).thenReturn(400);
-//         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-//         expect(
-//           () async => await odwbApiClient.getWeather(locationId),
-//           throwsA(isA<WeatherRequestFailure>()),
-//         );
-//       });
-
-//       test('throws WeatherNotFoundFailure on empty response', () async {
-//         final response = MockResponse();
-//         when(() => response.statusCode).thenReturn(200);
-//         when(() => response.body).thenReturn('{}');
-//         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-//         expect(
-//           () async => await odwbApiClient.getWeather(locationId),
-//           throwsA(isA<WeatherNotFoundFailure>()),
-//         );
-//       });
-
-//       test('throws WeatherNotFoundFailure on empty consolidated weather',
-//           () async {
-//         final response = MockResponse();
-//         when(() => response.statusCode).thenReturn(200);
-//         when(() => response.body).thenReturn('{"consolidated_weather": []}');
-//         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-//         expect(
-//           () async => await odwbApiClient.getWeather(locationId),
-//           throwsA(isA<WeatherNotFoundFailure>()),
-//         );
-//       });
-
-//       test('returns weather on valid response', () async {
-//         final response = MockResponse();
-//         when(() => response.statusCode).thenReturn(200);
-//         when(() => response.body).thenReturn('''
-//           {"consolidated_weather":[{
-//             "id":4907479830888448,
-//             "weather_state_name":"Showers",
-//             "weather_state_abbr":"s",
-//             "wind_direction_compass":"SW",
-//             "created":"2020-10-26T00:20:01.840132Z",
-//             "applicable_date":"2020-10-26",
-//             "min_temp":7.9399999999999995,
-//             "max_temp":13.239999999999998,
-//             "the_temp":12.825,
-//             "wind_speed":7.876886316914553,
-//             "wind_direction":246.17046093256732,
-//             "air_pressure":997.0,
-//             "humidity":73,
-//             "visibility":11.037727173307882,
-//             "predictability":73
-//           }]}
-//         ''');
-//         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-//         final actual = await odwbApiClient.getWeather(locationId);
-//         expect(
-//           actual,
-//           isA<Weather>()
-//               .having((w) => w.id, 'id', 4907479830888448)
-//               .having((w) => w.weatherStateName, 'state', 'Showers')
-//               .having((w) => w.weatherStateAbbr, 'abbr', WeatherState.showers)
-//               .having((w) => w.windDirectionCompass, 'wind',
-//                   WindDirectionCompass.southWest)
-//               .having((w) => w.created, 'created',
-//                   DateTime.parse('2020-10-26T00:20:01.840132Z'))
-//               .having((w) => w.applicableDate, 'applicableDate',
-//                   DateTime.parse('2020-10-26'))
-//               .having((w) => w.minTemp, 'minTemp', 7.9399999999999995)
-//               .having((w) => w.maxTemp, 'maxTemp', 13.239999999999998)
-//               .having((w) => w.theTemp, 'theTemp', 12.825)
-//               .having((w) => w.windSpeed, 'windSpeed', 7.876886316914553)
-//               .having(
-//                   (w) => w.windDirection, 'windDirection', 246.17046093256732)
-//               .having((w) => w.airPressure, 'airPressure', 997.0)
-//               .having((w) => w.humidity, 'humidity', 73)
-//               .having((w) => w.visibility, 'visibility', 11.037727173307882)
-//               .having((w) => w.predictability, 'predictability', 73),
-//         );
-//       });
-//     });
-//   });
-// }
-
-
-//         // isA<Point>()
-//         //       .having(
-//         //         (p) => p.status,
-//         //         'status',
-//         //         Status.cancelled,
-//         //       )
-//         //       .having(
-//         //         (p) => p.activity,
-//         //         'activity',
-//         //         Activity.unknown,
-//         //       )
-//         //       .having(
-//         //         (p) => p.buggy,
-//         //         'buggy',
-//         //         false,
-//         //       )
-//         //       .having(
-//         //         (p) => p.eightKm,
-//         //         'eightKm',
-//         //         true,
-//         //       )
-//         //       .having(
-//         //         (p) => p.organizer.surname,
-//         //         'organizer.surname',
-//         //         'Géraldine',
-//         //       )
-//         //       .having(
-//         //         (p) => p.location.latLng,
-//         //         'location.latLng',
-//         //         const LatLng(latitude: 50.2731, longitude: 4.43281),
-//         //       )
-//         //       .having(
-//         //         (p) => p.gpxs.first.availability,
-//         //         'gpxs.first.availability',
-//         //         Availability.always,
-//         //       )
-//         //       .having(
-//         //         (p) => p.gpxs.length,
-//         //         'gpxs.length',
-//         //         4,
-//         //       )
-//         //       .having(
-//         //         (p) => p.date,
-//         //         'date',
-//         //         DateTime.parse('2021-01-03'),
-//         //       )
-//         //       .having(
-//         //         (p) => p.code,
-//         //         'code',
-//         //         'N146',
-//         //       )
-//         //       .having(
-//         //         (p) => p.publicTransport,
-//         //         'public_transport',
-//         //         null,
-//         //       ),
+      test('returns List<Point> on valid response', () async {
+        final response = MockResponse();
+        when(() => response.statusCode).thenReturn(200);
+        when(() => response.body).thenReturn(
+          '''
+{
+   "records":[
+      {
+         "datasetid":"points-verts-de-ladeps",
+         "recordid":"80d0e62b9ec651f841f2ed9387c9a2eefc22d50f",
+         "fields":{
+            "statut":"Annulé",
+            "activite":"Marche",
+            "vtt":"Non",
+            "adep_sante":"Non",
+            "15km":"Oui",
+            "ign":"40/8",
+            "infos_rendez_vous":"Locaux scouts.",
+            "balade_guidee":"Non",
+            "velo":"Non",
+            "ndeg_pv":"N055",
+            "nom":"Danheux",
+            "10km":"Non",
+            "entite":"Fernelmont",
+            "traces_gpx":"[{\\"titre\\": \\"Parcours 5 kms\\", \\"fichier\\": \\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx\\", \\"jourdemarche\\": \\"0\\", \\"couleur\\": \\"1\\"}, {\\"titre\\": \\"Parcours 10 kms\\", \\"fichier\\": \\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=271&fichier=Parcours+10kms+%2Egpx\\", \\"jourdemarche\\": \\"0\\", \\"couleur\\": \\"2\\"}, {\\"titre\\": \\"Parcours 15 kms\\", \\"fichier\\": \\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=272&fichier=Parcours+15kms+%2Egpx\\", \\"jourdemarche\\": \\"0\\", \\"couleur\\": \\"5\\"}, {\\"titre\\": \\"Parcours 20 kms\\", \\"fichier\\": \\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=273&fichier=Parcours+20kms+%2Egpx\\", \\"jourdemarche\\": \\"0\\", \\"couleur\\": \\"3\\"}]",
+            "groupement":"Prêt à servir asbl",
+            "province":"Namur",
+            "poussettes":"Oui",
+            "bewapp":"Oui",
+            "orientation":"Non",
+            "pmr":"Oui",
+            "geopoint":[
+               50.5570713,
+               4.983708
+            ],
+            "lieu_de_rendez_vous":"Rue de la Victoire 7-9",
+            "gsm":"0473 693 535",
+            "prenom":"Jérémie",
+            "ravitaillement":"Non",
+            "latitude":"50.5570713",
+            "longitude":"4.983708",
+            "date":"2021-01-03",
+            "id":15115,
+            "localite":"NOVILLE-LES-BOIS"
+         },
+         "geometry":{
+            "type":"Point",
+            "coordinates":[
+               4.983708,
+               50.5570713
+            ]
+         },
+         "record_timestamp":"2022-03-08T16:28:21.623Z"
+      }
+   ]
+}
+''',
+        );
+        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        final actual = await odwbApiClient.pointVertSearch();
+        expect(
+            actual,
+            isA<List<Point>>().having(
+              (l) => l.first,
+              'first_point',
+              isA<Point>()
+                  .having((p) => p.date, 'date', DateTime.parse('2021-01-03'))
+                  .having((p) => p.code, 'code', 'N055')
+                  .having((p) => p.publicTransport, 'public_transport', null)
+                  .having((p) => p.status, 'status', Status.cancelled)
+                  .having((p) => p.activity, 'activity', Activity.walk)
+                  .having((p) => p.provision, 'provision', false)
+                  .having((p) => p.reducedMobility, 'reduced_mobility', true)
+                  .having((p) => p.buggy, 'buggy', true)
+                  .having((p) => p.bewapp, 'bewapp', true)
+                  .having((p) => p.mountainBike, 'mountain_bike', false)
+                  .having((p) => p.bike, 'bike', false)
+                  .having((p) => p.eightKm, 'eightKm', false)
+                  .having((p) => p.tenKm, 'ten_km', false)
+                  .having((p) => p.fifteenKm, 'fifteen_km', true)
+                  .having((p) => p.guided, 'guided', false)
+                  .having((p) => p.id, 'id', 15115)
+                  .having(
+                    (p) => p.organizer,
+                    'organizer',
+                    isA<Organizer>()
+                        .having((o) => o.group, 'group', 'Prêt à servir asbl')
+                        .having((o) => o.name, 'name', 'Danheux')
+                        .having((o) => o.phoneNumber, 'phone_number',
+                            '0473 693 535')
+                        .having((o) => o.surname, 'surname', 'Jérémie'),
+                  )
+                  .having(
+                    (p) => p.location,
+                    'location',
+                    isA<Location>()
+                        .having((l) => l.additionalInfo, 'additional_info',
+                            'Locaux scouts.')
+                        .having((l) => l.address, 'address',
+                            'Rue de la Victoire 7-9')
+                        .having((l) => l.city, 'city', 'NOVILLE-LES-BOIS')
+                        .having(
+                            (l) => l.municipality, 'municipality', 'Fernelmont')
+                        .having((l) => l.province, 'province', 'Namur')
+                        .having(
+                          (l) => l.latLng,
+                          'latLng',
+                          isA<LatLng>()
+                              .having(
+                                  (ll) => ll.latitude, 'latitude', 50.5570713)
+                              .having(
+                                  (ll) => ll.longitude, 'longitude', 4.983708),
+                        ),
+                  )
+                  .having(
+                    (p) => p.gpxs,
+                    'gpxs',
+                    isA<List>().having((l) => l.length, 'length', 4).having(
+                          (l) => l.first,
+                          'gpx',
+                          isA<Gpx>()
+                              .having((g) => g.availability, 'availability',
+                                  Availability.always)
+                              .having((g) => g.color, 'color', '1')
+                              .having((g) => g.url, 'url',
+                                  'https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx')
+                              .having((g) => g.name, 'name', 'Parcours 5 kms'),
+                        ),
+                  ),
+            ));
+      });
+    });
+  });
+}

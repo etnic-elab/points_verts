@@ -18,12 +18,11 @@ class OdwbApiClient {
   OdwbApiClient({http.Client? httpClient})
       : _httpClient = httpClient ?? http.Client();
 
-  static const _baseUrl = 'https://www.odwb.be';
+  static const _baseUrl = 'www.odwb.be';
   final http.Client _httpClient;
 
   /// Finds a [Point] `https://www.odwb.be/api/records/1.0/search/`.
   Future<List<Point>> pointVertSearch({
-    String dataset = 'points-verts-de-ladeps',
     Set<String>? query,
     int? rows,
     int? start,
@@ -54,9 +53,13 @@ class OdwbApiClient {
       throw PointVertRequestFailure();
     }
 
-    final odwbJson = jsonDecode(
-      odwbResponse.body,
-    )['records'] as List;
+    final bodyJson = jsonDecode(odwbResponse.body) as Map<String, dynamic>;
+
+    if (bodyJson.isEmpty) {
+      throw PointVertNotFoundFailure();
+    }
+
+    final odwbJson = bodyJson['records'] as List;
 
     if (odwbJson.isEmpty) {
       throw PointVertNotFoundFailure();
