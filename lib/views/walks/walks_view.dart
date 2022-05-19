@@ -22,6 +22,7 @@ import 'walk_results_map_view.dart';
 import 'walk_utils.dart';
 
 enum Places { home, current }
+
 enum _ViewType { list, map }
 
 const String tag = "dev.alpagaga.points_verts.WalkList";
@@ -46,7 +47,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     initializeDateFormatting("fr_BE");
     _retrieveData();
     _news();
@@ -55,7 +56,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
