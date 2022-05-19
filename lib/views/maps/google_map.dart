@@ -49,7 +49,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     _loadMapStyles();
     Future.delayed(Duration.zero, () {
       _loadMapIcons();
@@ -63,7 +63,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -118,7 +118,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   //Update the mapstyle after a theme (light/dark) change
   Future<void> _setMapStyle() async {
     final controller = await _completer.future;
-    final theme = WidgetsBinding.instance!.window.platformBrightness;
+    final theme = WidgetsBinding.instance.window.platformBrightness;
     controller.setMapStyle(_mapStyles[theme]);
   }
 
