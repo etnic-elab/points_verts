@@ -93,7 +93,7 @@ String _fixCsv(String csv) {
     if (tokens == 0) {
       current = token;
     } else {
-      current = current + ";" + token;
+      current = "$current;$token";
     }
     tokens++;
     if (tokens == 10) {

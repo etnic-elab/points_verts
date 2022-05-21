@@ -159,5 +159,6 @@ Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
     default:
       return const Icon(Icons.cancel, color: CompanyColors.red);
   }
-  return BoxedIcon(icon, color: iconColor ?? CompanyColors.blue, size: iconSize);
+  return BoxedIcon(icon,
+      color: iconColor ?? CompanyColors.blue, size: iconSize);
 }

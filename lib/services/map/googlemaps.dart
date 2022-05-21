@@ -93,10 +93,7 @@ class GoogleMaps implements MapInterface {
 
   @override
   Future<String?> retrieveAddress(double long, double lat) async {
-    var body = {
-      "latlng": lat.toString() + "," + long.toString(),
-      "key": _apiKey
-    };
+    var body = {"latlng": "$lat,$long", "key": _apiKey};
     Uri url = Uri.https("maps.googleapis.com", "/maps/api/geocode/json", body);
     http.Response response = await http.get(url);
     var decoded = json.decode(response.body);
@@ -118,11 +115,11 @@ class GoogleMaps implements MapInterface {
     Function? onTapMap,
     Function(Path)? onTapPath,
   }) {
-    google.CameraPosition _initialLocation = google.CameraPosition(
+    google.CameraPosition initialLocation = google.CameraPosition(
         target: google.LatLng(centerLat, centerLong), zoom: zoom);
 
     return GoogleMap(
-      initialLocation: _initialLocation,
+      initialLocation: initialLocation,
       locationEnabled: locationEnabled,
       paths: paths,
       markers: markers,
@@ -151,14 +148,14 @@ class GoogleMaps implements MapInterface {
 
   List<String> _getPaths(List<Path> paths, Brightness brightness) {
     return paths
-        .map((Path _path) {
-          List<List<num>> _encodable = _path.encodablePoints;
+        .map((Path path) {
+          List<List<num>> encodable = path.encodablePoints;
 
-          return _encodable.isNotEmpty
+          return encodable.isNotEmpty
               ? [
-                  'color:${_path.getColor(brightness).toHex(transparancy: true)}',
+                  'color:${path.getColor(brightness).toHex(transparancy: true)}',
                   'weight:2',
-                  'enc:${encodePolyline(_encodable)}'
+                  'enc:${encodePolyline(encodable)}'
                 ].join('|')
               : null;
         })

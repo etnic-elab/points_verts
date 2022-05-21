@@ -17,7 +17,7 @@ class WalkDirectoryView extends StatefulWidget {
   const WalkDirectoryView({Key? key}) : super(key: key);
 
   @override
-  _WalkDirectoryViewState createState() => _WalkDirectoryViewState();
+  State createState() => _WalkDirectoryViewState();
 }
 
 class _WalkDirectoryViewState extends State<WalkDirectoryView> {

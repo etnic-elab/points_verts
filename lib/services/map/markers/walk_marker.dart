@@ -28,7 +28,6 @@ class WalkMarker implements MarkerInterface {
       height: 25,
       point: LatLng(walk.lat!, walk.long!),
       builder: (ctx) => RawMaterialButton(
-        child: WalkIcon(walk, size: 21),
         shape: const CircleBorder(),
         elevation: selectedWalk == walk ? 5.0 : 2.0,
         fillColor: selectedWalk == walk
@@ -39,6 +38,7 @@ class WalkMarker implements MarkerInterface {
             onWalkSelect!(walk);
           }
         },
+        child: WalkIcon(walk, size: 21),
       ),
     );
   }

@@ -39,9 +39,9 @@ class Environment {
 
   static void _initMapConfiguration() {
     if (map == null) {
-      final String? _mapApi = dotenv.env['MAP_API'];
+      final String? mapApi = dotenv.env['MAP_API'];
       map = Maps.values
-          .firstWhere((map) => map.api == _mapApi, orElse: () => Maps.mapbox);
+          .firstWhere((map) => map.api == mapApi, orElse: () => Maps.mapbox);
       _mapInstance = map!.instance;
     }
   }
