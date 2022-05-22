@@ -70,7 +70,12 @@ class GoogleMaps implements MapInterface {
   Future<List<AddressSuggestion>> retrieveSuggestions(
       String country, String search) async {
     if (search.isNotEmpty) {
-      var body = {"query": search, "key": _apiKey};
+      var body = {
+        "query": search,
+        "key": _apiKey,
+        "region": country,
+        "language": "fr_BE"
+      };
       Uri url = Uri.https(
           "maps.googleapis.com", "/maps/api/place/textsearch/json", body);
       http.Response response = await http.get(url);
