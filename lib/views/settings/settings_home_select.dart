@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/models/address_suggestion.dart';
+import 'package:points_verts/models/address.dart';
 
 import '../loading.dart';
 
@@ -12,11 +12,12 @@ const countryLabels = ['Belgique', 'France', 'Luxembourg'];
 
 class SettingsHomeSelect extends StatefulWidget {
   const SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback,
-      {Key? key})
+      {this.sessionToken, Key? key})
       : super(key: key);
 
   final Function(AddressSuggestion) setHomeCallback;
   final Function removeHomeCallback;
+  final String? sessionToken;
 
   @override
   _SettingsHomeSelectState createState() => _SettingsHomeSelectState();
@@ -47,8 +48,11 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       if (!mounted) return;
       setState(() {
-        _suggestions = map.retrieveSuggestions(
-            countryCodes[_countryIndex], _homeSearchController.text);
+        _suggestions = _homeSearchController.text.isEmpty
+            ? Future.value([])
+            : map.retrieveSuggestions(
+                _homeSearchController.text, countryCodes[_countryIndex],
+                sessionToken: widget.sessionToken);
       });
     });
   }
@@ -104,8 +108,8 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                 itemBuilder: (context, i) {
                   AddressSuggestion suggestion = suggestions[i];
                   return ListTile(
-                      title: Text(suggestion.text),
-                      subtitle: Text(suggestion.address,
+                      title: Text(suggestion.name),
+                      subtitle: Text(suggestion.description,
                           overflow: TextOverflow.ellipsis),
                       onTap: () {
                         widget.setHomeCallback(suggestion);
@@ -144,9 +148,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
               children: generateOptions(context));
         });
     if (index != null) {
-      setState(() {
-        _countryIndex = index;
-      });
+      setState(() => _countryIndex = index);
     }
   }
 

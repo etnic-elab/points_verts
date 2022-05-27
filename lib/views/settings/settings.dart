@@ -5,8 +5,9 @@ import 'package:points_verts/services/location.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:uuid/uuid.dart';
 
-import '../../models/address_suggestion.dart';
+import '../../models/address.dart';
 import '../../services/notification.dart';
 import '../../services/prefs.dart';
 import '../tile_icon.dart';
@@ -52,14 +53,14 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _setHome(AddressSuggestion suggestion) async {
-    await PrefsProvider.prefs.setString(
-        Prefs.homeCoords, "${suggestion.latitude},${suggestion.longitude}");
-    String? label = await PrefsProvider.prefs
-        .setString(Prefs.homeLabel, suggestion.address);
-    setState(() {
-      _home = label;
-    });
-    if (_showNotification == true) {
+    Address? address = await map.retrievePlaceDetailFromId(suggestion.placeId);
+    if (address != null) {
+      final futures = await Future.wait([
+        PrefsProvider.prefs.setString(
+            Prefs.homeCoords, "${address.latitude},${address.longitude}"),
+        PrefsProvider.prefs.setString(Prefs.homeLabel, address.address)
+      ]);
+      if (mounted) setState(() => _home = futures[1]);
       scheduleNextNearestWalkNotifications();
     }
   }
@@ -67,9 +68,7 @@ class _SettingsState extends State<Settings> {
   Future<void> _removeHome() async {
     await PrefsProvider.prefs.remove(Prefs.homeCoords);
     await PrefsProvider.prefs.remove(Prefs.homeLabel);
-    setState(() {
-      _home = null;
-    });
+    setState(() => _home = null);
     NotificationManager.instance.cancelNextNearestWalkNotifications();
   }
 
@@ -137,9 +136,11 @@ class _SettingsState extends State<Settings> {
             title: const Text('Mon domicile'),
             subtitle: getHomeLabel(),
             onTap: () {
+              final sessionToken = const Uuid().v4();
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>
-                      SettingsHomeSelect(_setHome, _removeHome)));
+                  builder: (context) => SettingsHomeSelect(
+                      _setHome, _removeHome,
+                      sessionToken: sessionToken)));
             },
             trailing: _home != null
                 ? IconButton(

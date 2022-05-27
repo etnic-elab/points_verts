@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 
-import '../../models/address_suggestion.dart';
+import '../../models/address.dart';
 
 import '../../models/walk.dart';
 
@@ -14,9 +14,10 @@ abstract class MapInterface {
   Future<void> retrieveTrips(double fromLong, double fromLat, List<Walk> walks);
 
   Future<List<AddressSuggestion>> retrieveSuggestions(
-      String country, String search);
+      String search, String country,
+      {String? sessionToken});
 
-  Future<String?> retrieveAddress(double long, double lat);
+  Future<Address?> retrievePlaceDetailFromId(String placeId);
 
   /// Returns a Widget with a map displaying the markers
   /// and a zoom on a specific location (lat/lng)

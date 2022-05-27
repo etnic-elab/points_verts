@@ -12,7 +12,7 @@ import 'package:points_verts/views/maps/google_map.dart';
 import 'package:points_verts/extensions.dart';
 import 'package:points_verts/views/maps/google_static_map.dart';
 
-import '../../models/address_suggestion.dart';
+import '../../models/address.dart';
 import '../../models/trip.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -68,48 +68,59 @@ class GoogleMaps implements MapInterface {
 
   @override
   Future<List<AddressSuggestion>> retrieveSuggestions(
-      String country, String search) async {
-    if (search.isNotEmpty) {
-      var body = {
-        "query": search,
-        "key": _apiKey,
-        "region": country,
-        "language": "fr_BE"
-      };
-      Uri url = Uri.https(
-          "maps.googleapis.com", "/maps/api/place/textsearch/json", body);
-      http.Response response = await http.get(url);
-      var decoded = json.decode(response.body);
-      List<AddressSuggestion> results = [];
-      if (decoded['results'] != null) {
-        for (var prediction in decoded['results']) {
-          results.add(AddressSuggestion(
-              text: prediction['name'],
-              address: prediction['formatted_address'],
-              longitude: prediction['geometry']['location']['lng'],
-              latitude: prediction['geometry']['location']['lat']));
-        }
+      String search, String country,
+      {String? sessionToken}) async {
+    var body = {
+      "input": search,
+      "types": "address",
+      "components": "country:$country",
+      "language": "fr",
+      "key": _apiKey,
+      if (sessionToken != null) "sessiontoken": sessionToken,
+    };
+    final request = Uri.https(
+        "maps.googleapis.com", "/maps/api/place/autocomplete/json", body);
+    final response = await http.get(request);
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['status'] == 'OK') {
+        // compose suggestions in a list
+        return result['predictions']
+            .map<AddressSuggestion>((p) => AddressSuggestion(p['place_id'],
+                p['structured_formatting']['main_text'], p['description']))
+            .toList();
       }
-      return results;
-    } else {
-      return [];
     }
+
+    return [];
   }
 
   @override
-  Future<String?> retrieveAddress(double long, double lat) async {
+  Future<Address?> retrievePlaceDetailFromId(String placeId,
+      {String? sessionToken}) async {
     var body = {
-      "latlng": lat.toString() + "," + long.toString(),
-      "key": _apiKey
+      "place_id": placeId,
+      "fields": ["formatted_address", "geometry.location"],
+      "language": "fr",
+      "key": _apiKey,
+      if (sessionToken != null) "sessiontoken": sessionToken,
     };
-    Uri url = Uri.https("maps.googleapis.com", "/maps/api/geocode/json", body);
-    http.Response response = await http.get(url);
-    var decoded = json.decode(response.body);
-    if (decoded['results'].length > 0) {
-      return decoded['results'][0]['formatted_address'];
-    } else {
-      return null;
+    final request =
+        Uri.https("maps.googleapis.com", "/maps/api/place/details/json", body);
+    final response = await http.get(request);
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['status'] == 'OK') {
+        return Address(
+            address: result['formatted_address'],
+            latitude: result['geometry']['location']['lat'],
+            longitude: result['geometry']['location']['long']);
+      }
     }
+
+    return null;
   }
 
   @override
