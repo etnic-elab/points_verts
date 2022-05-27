@@ -127,14 +127,14 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     Brightness brightness = Theme.of(context).brightness;
 
     for (int i = 0; i < widget.paths.length; i++) {
-      Path _path = widget.paths[i];
+      Path path = widget.paths[i];
 
       google.Polyline polyline = google.Polyline(
         polylineId: google.PolylineId('polylineId_$i'),
-        color: _path.getColor(brightness),
+        color: path.getColor(brightness),
         width: 4,
-        visible: _path.visible,
-        points: _path.gpxPoints.map((GpxPoint point) => point.latLng).toList(),
+        visible: path.visible,
+        points: path.gpxPoints.map((GpxPoint point) => point.latLng).toList(),
       );
 
       polylines.add(polyline);

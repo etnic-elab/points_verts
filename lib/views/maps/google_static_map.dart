@@ -30,8 +30,8 @@ class GoogleStaticMap extends StatelessWidget {
                             bottom: 15.0,
                             right: 10.0,
                             child: FloatingActionButton.small(
-                              child: Icon(Icons.open_in_full),
                               onPressed: null,
+                              child: Icon(Icons.open_in_full),
                             ),
                           ),
                           InkWell(onTap: () => onTap!())

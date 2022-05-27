@@ -19,7 +19,7 @@ class SettingsHomeSelect extends StatefulWidget {
   final Function removeHomeCallback;
 
   @override
-  _SettingsHomeSelectState createState() => _SettingsHomeSelectState();
+  State createState() => _SettingsHomeSelectState();
 }
 
 class _SettingsHomeSelectState extends State<SettingsHomeSelect> {

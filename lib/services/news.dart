@@ -46,16 +46,16 @@ Future<void> showNews(BuildContext context, bool mounted) async {
 
       List<News> news = futures[1];
       List<News> newsToShow = [];
-      for (News _news in news) {
-        NewsSeen? seen = oldNews
-            .firstWhereOrNull((NewsSeen seen) => _news.name == seen.name);
+      for (News news in news) {
+        NewsSeen? seen =
+            oldNews.firstWhereOrNull((NewsSeen seen) => news.name == seen.name);
         bool showNews = seen == null ||
-            (_news.intervalHours != null &&
+            (news.intervalHours != null &&
                 seen.at
-                    .add(Duration(hours: _news.intervalHours!))
+                    .add(Duration(hours: news.intervalHours!))
                     .isBefore(now));
 
-        if (showNews) newsToShow.add(_news);
+        if (showNews) newsToShow.add(news);
       }
 
       if (newsToShow.isNotEmpty && mounted) {

@@ -31,7 +31,7 @@ class WalksView extends StatefulWidget {
   const WalksView({Key? key}) : super(key: key);
 
   @override
-  _WalksViewState createState() => _WalksViewState();
+  State createState() => _WalksViewState();
 }
 
 class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
@@ -211,7 +211,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   void _firstLaunch() async {
     bool firstLaunch = await PrefsProvider.prefs
         .getBoolean(Prefs.firstLaunch, defaultValue: true);
-    if (firstLaunch) {
+    if (firstLaunch && mounted) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       final snackBar = SnackBar(
           duration: const Duration(days: 1),
@@ -344,6 +344,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   void onFilterPressed() async {
     bool useLocation =
         await PrefsProvider.prefs.getBoolean(Prefs.useLocation) == true;
+    if (!mounted) return;
     WalkFilter? newFilter = await Navigator.of(context).push<WalkFilter>(
         MaterialPageRoute(
             builder: (context) =>

@@ -31,15 +31,15 @@ class Path extends Comparable<Path> {
 // 6=Orange (Parcours 5km poussettes/PMR)
 
   Color getColor(Brightness brightness) {
-    bool _isLight = brightness == Brightness.light;
+    bool isLight = brightness == Brightness.light;
 
     switch (type) {
       case '1':
-        return _isLight ? CompanyColors.darkBlue : CompanyColors.blue;
+        return isLight ? CompanyColors.darkBlue : CompanyColors.blue;
       case '2':
         return CompanyColors.yellow;
       case '3':
-        return _isLight ? CompanyColors.red : CompanyColors.lightRed;
+        return isLight ? CompanyColors.red : CompanyColors.lightRed;
       case '4':
         return CompanyColors.greenPrimary;
       case '5':
@@ -47,7 +47,7 @@ class Path extends Comparable<Path> {
       case '6':
         return CompanyColors.orange;
       default:
-        return _isLight ? CompanyColors.darkBrown : CompanyColors.brown;
+        return isLight ? CompanyColors.darkBrown : CompanyColors.brown;
     }
   }
 
@@ -71,15 +71,15 @@ class Path extends Comparable<Path> {
   }
 
   List<List<num>> get encodablePoints => gpxPoints
-      .map((GpxPoint _gpxPoint) =>
-          [_gpxPoint.latLng.latitude, _gpxPoint.latLng.longitude])
+      .map((GpxPoint gpxPoint) =>
+          [gpxPoint.latLng.latitude, gpxPoint.latLng.longitude])
       .toList();
 
   @override
   int compareTo(Path other) {
-    List _sortList = ['4', '6', '1', '2', '5', '3'];
-    int indexThis = _sortList.indexOf(type);
-    int indexOther = _sortList.indexOf(other.type);
+    List sortList = ['4', '6', '1', '2', '5', '3'];
+    int indexThis = sortList.indexOf(type);
+    int indexOther = sortList.indexOf(other.type);
 
     if (indexThis > indexOther) return -1;
     if (indexThis < indexOther) return 1;
