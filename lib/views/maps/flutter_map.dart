@@ -17,9 +17,9 @@ class FlutterMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<flutter.Marker> _flutterMarkers = [];
+    final List<flutter.Marker> flutterMarkers = [];
     for (MarkerInterface marker in markers) {
-      _flutterMarkers.add(marker.buildFlutterMarker());
+      flutterMarkers.add(marker.buildFlutterMarker());
     }
     return flutter.FlutterMap(
       options:
@@ -38,7 +38,7 @@ class FlutterMap extends StatelessWidget {
                 : 'light-v10',
           },
         ),
-        flutter.MarkerLayerOptions(markers: _flutterMarkers),
+        flutter.MarkerLayerOptions(markers: flutterMarkers),
       ],
     );
   }

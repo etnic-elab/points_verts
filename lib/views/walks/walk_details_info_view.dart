@@ -38,7 +38,7 @@ class WalkDetailsInfoView extends StatelessWidget {
 
   Widget _buildMap(BuildContext context, bool landscape) {
     bool hasPaths =
-        walk.paths.firstWhereOrNull((_path) => _path.gpxPoints.isNotEmpty) !=
+        walk.paths.firstWhereOrNull((path) => path.gpxPoints.isNotEmpty) !=
             null;
     Brightness brightness = Theme.of(context).brightness;
     Size size = MediaQuery.of(context).size;

@@ -13,7 +13,7 @@ class FilterPage extends StatefulWidget {
   final bool showPlaces;
 
   @override
-  _FilterPageState createState() => _FilterPageState();
+  State createState() => _FilterPageState();
 }
 
 class _FilterPageState extends State<FilterPage> {

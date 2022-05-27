@@ -45,7 +45,7 @@ class WalkTile extends StatelessWidget {
   }
 
   List<Widget> get _children {
-    List<Widget> _list = [
+    List<Widget> list = [
       ListTile(
         leading: TileIcon(WalkIcon(walk)),
         title: _title(),
@@ -61,19 +61,19 @@ class WalkTile extends StatelessWidget {
       )
     ];
 
-    List<Widget> _info = _infoRow(walk);
-    if (!walk.isCancelled && _info.isNotEmpty) {
-      _list.add(const Divider(height: 0));
-      _list.add(Padding(
+    List<Widget> info = _infoRow(walk);
+    if (!walk.isCancelled && info.isNotEmpty) {
+      list.add(const Divider(height: 0));
+      list.add(Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
         child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             primary: true,
-            child: Row(children: _info)),
+            child: Row(children: info)),
       ));
     }
 
-    return _list;
+    return list;
   }
 
   Widget _title() {
@@ -103,11 +103,11 @@ class WalkTile extends StatelessWidget {
     }
 
     info.addAll(WalkInfo.values
-        .map((WalkInfo _info) {
-          bool _value = _info.walkValue(walk);
+        .map((WalkInfo info) {
+          bool value = info.walkValue(walk);
 
-          if (WalkInfo.fifteenKm == _info) {
-            if (!_value) {
+          if (WalkInfo.fifteenKm == info) {
+            if (!value) {
               if (walk.isOrientation) {
                 return const _ChipLabel('4-8-12 km');
               } else {
@@ -118,10 +118,10 @@ class WalkTile extends StatelessWidget {
             }
           }
 
-          if (!_value) {
+          if (!value) {
             return null;
           } else {
-            return _ChipIcon(_info.icon);
+            return _ChipIcon(info.icon);
           }
         })
         .whereType<Widget>()
@@ -173,22 +173,15 @@ class _ChipIcon extends StatelessWidget {
 }
 
 class _ChipLabel extends StatelessWidget {
-  const _ChipLabel(this.text, {this.icon});
+  const _ChipLabel(this.text);
 
   final String text;
-  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: Chip(
-          avatar: icon != null
-              ? Icon(
-                  icon,
-                  size: 15.0,
-                )
-              : null,
           label: Text(text, style: const TextStyle(fontSize: 12.0)),
           visualDensity: VisualDensity.compact),
     );

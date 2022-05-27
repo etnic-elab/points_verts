@@ -100,10 +100,12 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
   return walks;
 }
 
-Future<void> launchURL(url) async {
-  if (await canLaunch(url)) {
+Future<void> launchURL(String? url) async {
+  if (url == null) return;
+  Uri uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
     try {
-      await launch(url);
+      await launchUrl(uri);
     } catch (err) {
       print("Cannot launch URL: $err");
     }
