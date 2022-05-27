@@ -76,7 +76,7 @@ class WalkDetailsInfo extends StatelessWidget {
   }
 
   Widget _infoRow() {
-    List<Widget> _infos = [
+    List<Widget> infos = [
       WalkInfo.wheelchair,
       WalkInfo.stroller,
       WalkInfo.guided,
@@ -87,7 +87,7 @@ class WalkDetailsInfo extends StatelessWidget {
       WalkInfo.adepSante
     ].map((WalkInfo info) => _infoTile(info)).toList();
 
-    return Wrap(alignment: WrapAlignment.center, children: _infos);
+    return Wrap(alignment: WrapAlignment.center, children: infos);
   }
 
   Widget _infoTile(WalkInfo info) {
@@ -155,15 +155,15 @@ class _RangesTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (walk.isWalk || walk.isOrientation) {
-      String _title = Range.label(walk);
-      WalkInfo? _subtitle =
+      String title = Range.label(walk);
+      WalkInfo? subtitle =
           walk.isWalk ? WalkInfo.extraOrientation : WalkInfo.extraWalk;
 
       return ListTile(
           leading: TileIcon(Icon(Range.icon)),
-          title: Text(_title),
+          title: Text(title),
           subtitle:
-              _subtitle.walkValue(walk) ? Text(_subtitle.description) : null);
+              subtitle.walkValue(walk) ? Text(subtitle.description) : null);
     }
 
     return const SizedBox.shrink();

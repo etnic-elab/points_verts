@@ -29,7 +29,7 @@ class MapBox implements MapInterface {
     for (int i = 0; i < min(walks.length, 5); i++) {
       Walk walk = walks[i];
       if (walk.isPositionable) {
-        destinations = destinations + ";${walk.long},${walk.lat}";
+        destinations = "$destinations;${walk.long},${walk.lat}";
       }
     }
     if (destinations.isEmpty) {
@@ -93,10 +93,10 @@ class MapBox implements MapInterface {
 
   String _getEncodedPath(List<Path> paths, Brightness brightness) {
     return paths
-        .map((_path) {
-          List<List<num>> _encodable = _path.encodablePoints;
-          return _encodable.isNotEmpty
-              ? "path-2+${_path.getColor(brightness).toHex()}-1(${Uri.encodeComponent(encodePolyline(_encodable))})"
+        .map((path) {
+          List<List<num>> encodable = path.encodablePoints;
+          return encodable.isNotEmpty
+              ? "path-2+${path.getColor(brightness).toHex()}-1(${Uri.encodeComponent(encodePolyline(encodable))})"
               : null;
         })
         .whereType<String>()

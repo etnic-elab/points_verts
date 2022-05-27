@@ -46,9 +46,9 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
       for (Path path in widget.walk.paths) {
         if ((path.url?.isNotEmpty ?? false) && path.gpxPoints.isEmpty) {
           Future<List<GpxPoint>> future = retrieveGpxPoints(path.url!);
-          future.then((List<GpxPoint> _gpxPoints) {
-            path.gpxPoints = _gpxPoints;
-            path.visible = _gpxPoints.isNotEmpty;
+          future.then((List<GpxPoint> gpxPoints) {
+            path.gpxPoints = gpxPoints;
+            path.visible = gpxPoints.isNotEmpty;
           });
           paths.add(future);
         }
@@ -159,8 +159,8 @@ class __BottomSheet extends State<_BottomSheet> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListView(
-        children: _children,
         shrinkWrap: true,
+        children: _children,
       ),
     );
   }
@@ -171,7 +171,7 @@ class __BottomSheet extends State<_BottomSheet> {
       leading: Icon(Icons.route),
       title: Text('Les parcours'),
     );
-    List<Widget> _paths = widget.walk.paths.reversed
+    List<Widget> paths = widget.walk.paths.reversed
         .map((path) => path.gpxPoints.isNotEmpty
             ? SwitchListTile(
                 title: Text(
@@ -190,6 +190,6 @@ class __BottomSheet extends State<_BottomSheet> {
         .whereType<Widget>()
         .toList();
 
-    return [header, const Divider(), ..._paths];
+    return [header, const Divider(), ...paths];
   }
 }

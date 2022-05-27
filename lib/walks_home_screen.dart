@@ -15,7 +15,7 @@ class WalksHomeScreen extends StatefulWidget {
   const WalksHomeScreen({Key? key}) : super(key: key);
 
   @override
-  _WalksHomeScreenState createState() => _WalksHomeScreenState();
+  State createState() => _WalksHomeScreenState();
 }
 
 class _WalksHomeScreenState extends State<WalksHomeScreen>

@@ -8,12 +8,12 @@ class ListHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.all(15.0),
       child: Text(title,
           style: TextStyle(
               color: Theme.of(context).colorScheme.secondary,
               fontWeight: FontWeight.bold,
               fontSize: 15.0)),
-      padding: const EdgeInsets.all(15.0),
     );
   }
 }

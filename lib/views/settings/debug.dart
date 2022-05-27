@@ -101,9 +101,9 @@ class _PendingNotificationsTile extends StatelessWidget {
     String result = "";
     for (int i = 0; i < requests.length; i++) {
       PendingNotificationRequest request = requests[i];
-      result = result + request.title! + '\n' + request.body!;
+      result = '$result${request.title!}\n${request.body!}';
       if (i != requests.length - 1) {
-        result = result + "\n\n";
+        result = "$result\n\n";
       }
     }
     return result;
