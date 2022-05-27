@@ -31,13 +31,9 @@ Future<List<Walk>> readAllWalksFromJson() async {
   final DateTime now = DateTime.now();
   final DateTime today = DateTime(now.year, now.month, now.day);
   for (Map<String, dynamic> walkJson in data) {
-    try {
-      Walk walk = Walk.fromJson(walkJson);
-      if (!walk.date.isBefore(today)) {
-        walks.add(walk);
-      }
-    } catch (e) {
-      log("Cannot parse walk: $e");
+    Walk walk = Walk.fromJson(walkJson);
+    if (!walk.date.isBefore(today)) {
+      walks.add(walk);
     }
   }
   return walks;
