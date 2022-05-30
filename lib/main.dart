@@ -15,6 +15,8 @@ import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/walk_details_view.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'package:points_verts/walks_home_screen.dart';
 import 'package:points_verts/company_data.dart';
@@ -56,6 +58,9 @@ Future<void> _addTrustedCert(String certPath) async {
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await dotenv.load();
   await _deleteData();
   //TODO: improve how we initialize these singletons (get_it package?)
