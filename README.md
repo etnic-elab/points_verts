@@ -70,7 +70,10 @@ MAPBOX_TOKEN=token
 OPENWEATHER_TOKEN=token
 ```
 
-4. Information about the keystore should be set in the `android/key.properties`:
+4. Configure firebase
+   https://firebase.google.com/docs/flutter/setup
+
+5. Information about the keystore should be set in the `android/key.properties`:
 
 ```properties
 storePassword=<password>
