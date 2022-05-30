@@ -8,6 +8,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:package_info/package_info.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/database.dart';
@@ -55,12 +56,20 @@ Future<void> _addTrustedCert(String certPath) async {
   }
 }
 
+Future<void> _initFirebase() async {
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (err) {
+    print('Could not initialize firebase: $err');
+  }
+}
+
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await _initFirebase();
   await dotenv.load();
   await _deleteData();
   //TODO: improve how we initialize these singletons (get_it package?)
