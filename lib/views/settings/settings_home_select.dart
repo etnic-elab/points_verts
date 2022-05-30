@@ -27,7 +27,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   final MapInterface map = Environment.mapInterface;
 
   final _homeSearchController = TextEditingController();
-  Timer? _debounce;
+  // Timer? _debounce;
   int _countryIndex = 0;
   Future<List<AddressSuggestion>> _suggestions = Future.value([]);
 
@@ -44,17 +44,16 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   }
 
   _onSearchChanged() {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
-      setState(() {
-        _suggestions = _homeSearchController.text.isEmpty
-            ? Future.value([])
-            : map.retrieveSuggestions(
-                _homeSearchController.text, countryCodes[_countryIndex],
-                sessionToken: widget.sessionToken);
-      });
+    if (!mounted) return;
+    setState(() {
+      _suggestions = _homeSearchController.text.isEmpty
+          ? Future.value([])
+          : map.retrieveSuggestions(
+              _homeSearchController.text, countryCodes[_countryIndex],
+              sessionToken: widget.sessionToken);
     });
+    // if (_debounce?.isActive ?? false) _debounce!.cancel();
+    // _debounce = Timer(const Duration(milliseconds: 500), () {});
   }
 
   @override
