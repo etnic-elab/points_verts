@@ -101,7 +101,7 @@ class GoogleMaps implements MapInterface {
       {String? sessionToken}) async {
     var body = {
       "place_id": placeId,
-      "fields": ["formatted_address", "geometry.location"],
+      "fields": "formatted_address,geometry/location",
       "language": "fr",
       "key": _apiKey,
       if (sessionToken != null) "sessiontoken": sessionToken,
@@ -114,9 +114,9 @@ class GoogleMaps implements MapInterface {
       final result = json.decode(response.body);
       if (result['status'] == 'OK') {
         return Address(
-            address: result['formatted_address'],
-            latitude: result['geometry']['location']['lat'],
-            longitude: result['geometry']['location']['long']);
+            address: result['result']['formatted_address'],
+            latitude: result['result']['geometry']['location']['lat'],
+            longitude: result['result']['geometry']['location']['lng']);
       }
     }
 

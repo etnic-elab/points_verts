@@ -65,6 +65,7 @@ class MapBox implements MapInterface {
     List<AddressSuggestion> results = [];
     if (decoded['features'] != null) {
       for (var result in decoded['features']) {
+        print(results);
         results.add(AddressSuggestion(
             result['id'], result['test'], result['place_name']));
       }
@@ -73,7 +74,8 @@ class MapBox implements MapInterface {
   }
 
   @override
-  Future<Address?> retrievePlaceDetailFromId(String placeId) {
+  Future<Address?> retrievePlaceDetailFromId(String placeId,
+      {String? sessionToken}) {
     throw UnsupportedError;
   }
 

@@ -15,7 +15,7 @@ class SettingsHomeSelect extends StatefulWidget {
       {this.sessionToken, Key? key})
       : super(key: key);
 
-  final Function(AddressSuggestion) setHomeCallback;
+  final Function(AddressSuggestion, String?) setHomeCallback;
   final Function removeHomeCallback;
   final String? sessionToken;
 
@@ -111,7 +111,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                       subtitle: Text(suggestion.description,
                           overflow: TextOverflow.ellipsis),
                       onTap: () {
-                        widget.setHomeCallback(suggestion);
+                        widget.setHomeCallback(suggestion, widget.sessionToken);
                         _homeSearchController.removeListener(_onSearchChanged);
                         Navigator.of(context).pop();
                       });

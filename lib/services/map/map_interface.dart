@@ -17,7 +17,8 @@ abstract class MapInterface {
       String search, String country,
       {String? sessionToken});
 
-  Future<Address?> retrievePlaceDetailFromId(String placeId);
+  Future<Address?> retrievePlaceDetailFromId(String placeId,
+      {String? sessionToken});
 
   /// Returns a Widget with a map displaying the markers
   /// and a zoom on a specific location (lat/lng)

@@ -52,8 +52,10 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  Future<void> _setHome(AddressSuggestion suggestion) async {
-    Address? address = await map.retrievePlaceDetailFromId(suggestion.placeId);
+  Future<void> _setHome(
+      AddressSuggestion suggestion, String? sessionToken) async {
+    Address? address = await map.retrievePlaceDetailFromId(suggestion.placeId,
+        sessionToken: sessionToken);
     if (address != null) {
       final futures = await Future.wait([
         PrefsProvider.prefs.setString(
