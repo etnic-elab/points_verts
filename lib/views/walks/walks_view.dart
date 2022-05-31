@@ -10,7 +10,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/services/news.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/filter_page.dart';
@@ -43,14 +42,12 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   LatLng? _homePosition;
   _ViewType _viewType = _ViewType.list;
   WalkFilter? _filter;
-  bool _newsRunning = false;
 
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     initializeDateFormatting("fr_BE");
     _retrieveData();
-    _news();
     super.initState();
   }
 
@@ -248,13 +245,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       ],
     ));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  void _news() async {
-    if (_newsRunning) return;
-    setState(() => _newsRunning = true);
-    showNews(context, mounted);
-    setState(() => _newsRunning = false);
   }
 
   LatLng? get selectedPosition {
