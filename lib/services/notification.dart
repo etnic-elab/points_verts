@@ -138,8 +138,8 @@ class NotificationManager {
 }
 
 Future<void> scheduleNextNearestWalkNotifications() async {
-  bool showNotification = await PrefsProvider.prefs
-      .getBoolean(Prefs.showNotification, defaultValue: false);
+  bool showNotification =
+      await PrefsProvider.prefs.getBoolean(Prefs.showNotification);
   if (!showNotification) return;
   LatLng? home = await retrieveHomePosition();
   if (home == null) return;

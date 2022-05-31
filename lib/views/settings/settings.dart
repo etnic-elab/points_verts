@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/location.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
@@ -25,6 +26,7 @@ class _SettingsState extends State<Settings> {
   String? _home;
   bool _useLocation = false;
   bool _showNotification = false;
+  bool _crashlyticsEnabled = false;
 
   _SettingsState();
 
@@ -40,14 +42,17 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _retrievePrefs() async {
-    String? home = await PrefsProvider.prefs.getString(Prefs.homeLabel);
-    bool useLocation = await PrefsProvider.prefs.getBoolean(Prefs.useLocation);
-    bool showNotification = await PrefsProvider.prefs
-        .getBoolean(Prefs.showNotification, defaultValue: false);
+    final futures = await Future.wait([
+      PrefsProvider.prefs.getString(Prefs.homeLabel),
+      PrefsProvider.prefs.getBoolean(Prefs.useLocation),
+      PrefsProvider.prefs.getBoolean(Prefs.showNotification),
+      PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled)
+    ]);
     setState(() {
-      _home = home;
-      _useLocation = useLocation;
-      _showNotification = showNotification;
+      _home = futures[0] as String?;
+      _useLocation = futures[1] as bool;
+      _showNotification = futures[2] as bool;
+      _crashlyticsEnabled = futures[3] as bool;
     });
   }
 
@@ -108,6 +113,19 @@ class _SettingsState extends State<Settings> {
     });
   }
 
+  void _setCrashlyticsEnabled(bool isEnabled) async {
+    bool wasEnabled = _crashlyticsEnabled;
+    bool valueToggled =
+        await CrashlyticsLocalService.toggleCrashlyticsEnabled(isEnabled);
+
+    if (valueToggled) {
+      setState(() => _crashlyticsEnabled = isEnabled);
+      if (wasEnabled && !isEnabled) {
+        crashlyticsNewOptOutDialog();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,6 +180,22 @@ class _SettingsState extends State<Settings> {
             },
           ),
           const Divider(),
+          const ListHeader("Diagnostic"),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+            child: Text(
+                "L'envoi automatique de données de diagnostic nous permet d'améliorer l'application.",
+                style: Theme.of(context).textTheme.caption),
+          ),
+          SwitchListTile(
+            secondary: const TileIcon(Icon(Icons.bug_report)),
+            title: const Text("Envoi de rapports"),
+            value: _crashlyticsEnabled,
+            onChanged: (bool value) {
+              _setCrashlyticsEnabled(value);
+            },
+          ),
+          const Divider(),
           ListTile(
             leading: const TileIcon(Icon(Icons.help)),
             title: const Text("Assistance"),
@@ -184,5 +218,24 @@ class _SettingsState extends State<Settings> {
     } else {
       return Text(_home!, style: const TextStyle(fontSize: 12.0));
     }
+  }
+
+  Future<void> crashlyticsNewOptOutDialog() {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Diagnostic'),
+              content: const Text(
+                  "L'envoi automatique de données de diagnostic sera désactivé dès la prochaine fermeture de l'application."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ]);
+        });
   }
 }

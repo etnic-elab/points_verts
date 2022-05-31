@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
-import 'package:points_verts/environment.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
@@ -18,8 +17,13 @@ import 'dart:convert';
 import '../../models/walk.dart';
 import '../cache_managers/trip_cache_manager.dart';
 
-class MapBox implements MapInterface {
-  final String? _token = Environment.mapApiKey;
+class MapBox extends MapInterface {
+  @override
+  String get name => "MapBox";
+  @override
+  String get apiName => "MAPBOX_TOKEN";
+  @override
+  String get website => "https://www.mapbox.com";
 
   @override
   Future<void> retrieveTrips(
@@ -36,7 +40,7 @@ class MapBox implements MapInterface {
       return;
     }
     final String url =
-        "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/$origin$destinations?sources=0&annotations=distance,duration&access_token=$_token";
+        "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/$origin$destinations?sources=0&annotations=distance,duration&access_token=$apiKey";
     final http.Response response = await TripCacheManager.trip.getData(url);
     final decoded = json.decode(response.body);
     final distances =
@@ -59,7 +63,7 @@ class MapBox implements MapInterface {
       String country, String search) async {
     if (search.isNotEmpty) {
       final String url =
-          "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token&country=$country&language=fr_BE&limit=10&types=address,poi";
+          "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$apiKey&country=$country&language=fr_BE&limit=10&types=address,poi";
       final http.Response response = await http.get(Uri.parse(url));
       var decoded = json.decode(response.body);
       List<AddressSuggestion> results = [];
@@ -81,7 +85,7 @@ class MapBox implements MapInterface {
   @override
   Future<String?> retrieveAddress(double long, double lat) async {
     final String url =
-        "https://api.mapbox.com/geocoding/v5/mapbox.places/$long,$lat.json?access_token=$_token";
+        "https://api.mapbox.com/geocoding/v5/mapbox.places/$long,$lat.json?access_token=$apiKey";
     final http.Response response = await http.get(Uri.parse(url));
     var decoded = json.decode(response.body);
     if (decoded['features'].length > 0) {
@@ -102,7 +106,7 @@ class MapBox implements MapInterface {
     Function? onTapMap,
     Function(Path)? onTapPath,
   }) {
-    return FlutterMap(markers, _token!, centerLat, centerLong, zoom);
+    return FlutterMap(markers, apiKey!, centerLat, centerLong, zoom);
   }
 
   String _getEncodedPath(List<Path> paths, Brightness brightness) {
@@ -126,7 +130,7 @@ class MapBox implements MapInterface {
         brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
     final String path = _getEncodedPath(walk.paths, brightness);
     Uri url = Uri.parse(
-        "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l(${walk.long},${walk.lat})$path/auto/${width}x$height@2x?access_token=$_token");
+        "https://api.mapbox.com/styles/v1/mapbox/$style/static/pin-l(${walk.long},${walk.lat})$path/auto/${width}x$height@2x?access_token=$apiKey");
     return CachedNetworkImage(
       imageUrl: url.toString(),
       progressIndicatorBuilder: (context, url, downloadProgress) => Center(

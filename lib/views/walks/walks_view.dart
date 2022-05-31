@@ -117,8 +117,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   _retrievePosition() async {
-    bool useLocation =
-        await PrefsProvider.prefs.getBoolean(Prefs.useLocation) == true;
+    bool useLocation = await PrefsProvider.prefs.getBoolean(Prefs.useLocation);
     _homePosition = await retrieveHomePosition();
 
     if (_filter!.selectedPlace == null) {
@@ -209,8 +208,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   void _firstLaunch() async {
-    bool firstLaunch = await PrefsProvider.prefs
-        .getBoolean(Prefs.firstLaunch, defaultValue: true);
+    bool firstLaunch = await PrefsProvider.prefs.getBoolean(Prefs.firstLaunch);
     if (firstLaunch && mounted) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       final snackBar = SnackBar(
@@ -342,8 +340,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   }
 
   void onFilterPressed() async {
-    bool useLocation =
-        await PrefsProvider.prefs.getBoolean(Prefs.useLocation) == true;
+    bool useLocation = await PrefsProvider.prefs.getBoolean(Prefs.useLocation);
     if (!mounted) return;
     WalkFilter? newFilter = await Navigator.of(context).push<WalkFilter>(
         MaterialPageRoute(

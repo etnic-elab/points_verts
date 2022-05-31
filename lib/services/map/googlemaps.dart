@@ -5,7 +5,6 @@ import 'package:points_verts/models/path.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:points_verts/company_data.dart';
-import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/google_map.dart';
@@ -20,8 +19,13 @@ import 'dart:convert';
 import '../../models/walk.dart';
 import '../cache_managers/trip_cache_manager.dart';
 
-class GoogleMaps implements MapInterface {
-  final String? _apiKey = Environment.mapApiKey;
+class GoogleMaps extends MapInterface {
+  @override
+  String get name => "Google";
+  @override
+  String get apiName => "GOOGLEMAPS_API_KEY";
+  @override
+  String get website => "https://mapsplatform.google.com";
 
   @override
   Future<void> retrieveTrips(
@@ -43,7 +47,7 @@ class GoogleMaps implements MapInterface {
     var body = {
       "origins": origin,
       "destinations": destinationsList.join("|"),
-      "key": _apiKey
+      "key": apiKey
     };
 
     final String url =
@@ -72,7 +76,7 @@ class GoogleMaps implements MapInterface {
     if (search.isNotEmpty) {
       var body = {
         "query": search,
-        "key": _apiKey,
+        "key": apiKey,
         "region": country,
         "language": "fr_BE"
       };
@@ -98,7 +102,7 @@ class GoogleMaps implements MapInterface {
 
   @override
   Future<String?> retrieveAddress(double long, double lat) async {
-    var body = {"latlng": "$lat,$long", "key": _apiKey};
+    var body = {"latlng": "$lat,$long", "key": apiKey};
     Uri url = Uri.https("maps.googleapis.com", "/maps/api/geocode/json", body);
     http.Response response = await http.get(url);
     var decoded = json.decode(response.body);
@@ -141,7 +145,7 @@ class GoogleMaps implements MapInterface {
       Map<String, dynamic> body = {};
       body['size'] = '${width}x$height';
       body['scale'] = '2';
-      body['key'] = _apiKey;
+      body['key'] = apiKey;
       body['path'] = _getPaths(walk.paths, brightness);
       body = _addMarkers(body, walk, brightness);
 

@@ -1,7 +1,7 @@
-import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:points_verts/services/notification.dart';
+import 'package:points_verts/services/background_fetch.dart';
+import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
@@ -31,12 +31,11 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
 
   @override
   void initState() {
-    fetchData().then((_) {
-      _initPlatformState();
-    }).catchError((err) {
-      print("error init state");
-      FlutterNativeSplash.remove();
+    FlutterNativeSplash.remove();
+    _crashlyticsOptIn().then((_) {
+      _fetchData().then((_) => BackgroundFetchProvider.task(mounted));
     });
+
     PrefsProvider.prefs.remove(Prefs.lastSelectedDate);
     WidgetsBinding.instance.addObserver(this);
     super.initState();
@@ -48,12 +47,12 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
     super.dispose();
   }
 
-  Future<void> fetchData() async {
+  Future _fetchData() {
     setState(() {
       _error = false;
       _loading = true;
     });
-    updateWalks().then((_) {
+    return updateWalks().then((_) {
       setState(() {
         _loading = false;
       });
@@ -66,45 +65,20 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
     });
   }
 
+  Future<void> _crashlyticsOptIn() async {
+    bool? crashlyticsEnabled =
+        await PrefsProvider.prefs.getBooleanNullable(Prefs.crashlyticsEnabled);
+    if (crashlyticsEnabled != null) return;
+
+    bool optIn = await _crashlyticsOptInDialog() ?? false;
+    await CrashlyticsLocalService.toggleCrashlyticsEnabled(optIn);
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      fetchData();
+      _fetchData();
     }
-  }
-
-  Future<void> _initPlatformState() async {
-    FlutterNativeSplash.remove();
-    BackgroundFetch.configure(
-        BackgroundFetchConfig(
-            minimumFetchInterval: 60 * 6,
-            // four times per day
-            stopOnTerminate: false,
-            enableHeadless: true,
-            requiredNetworkType: NetworkType.ANY,
-            startOnBoot: true), (String taskId) async {
-      print("[BackgroundFetch] taskId: $taskId");
-      try {
-        await scheduleNextNearestWalkNotifications();
-        await PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
-            DateTime.now().toUtc().toIso8601String());
-      } catch (err) {
-        print("Cannot schedule next nearest walk notification: $err");
-      }
-      BackgroundFetch.finish(taskId);
-    }, (String taskId) async {
-      print("[BackgroundFetch] TIMEOUT taskId: $taskId");
-      BackgroundFetch.finish(taskId);
-    }).then((int status) {
-      print('[BackgroundFetch] configure success: $status');
-    }).catchError((e) {
-      print('[BackgroundFetch] configure ERROR: $e');
-    });
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
   }
 
   @override
@@ -123,7 +97,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
         ],
       ),
       body: _error
-          ? WalkListError(fetchData)
+          ? WalkListError(_fetchData)
           : _loading
               ? const Loading()
               : _pages[_selectedIndex],
@@ -134,5 +108,31 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  Future<bool?> _crashlyticsOptInDialog() {
+    return showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Diagnostic'),
+              content: const Text(
+                  "L'envoi automatique de données de diagnostic nous permet d'améliorer l'application."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Autoriser'),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+                TextButton(
+                  child: const Text('Refuser'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                ),
+              ]);
+        });
   }
 }

@@ -3,21 +3,19 @@ import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/constants.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
+import 'package:points_verts/services/map/map_interface.dart';
 
 import '../../models/walk.dart';
-
-final MapInterface map = Environment.mapInterface;
 
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
@@ -89,7 +87,7 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
   }
   walks.sort((a, b) => sortWalks(a, b));
   try {
-    await map
+    await kMap.instance
         .retrieveTrips(position.longitude, position.latitude, walks)
         .then((_) {
       walks.sort((a, b) => sortWalks(a, b));
