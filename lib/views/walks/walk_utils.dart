@@ -142,6 +142,10 @@ Future<void> updateWalks() async {
     } catch (err) {
       print("Cannot refresh walks list: $err");
     }
+
+    if (await DBProvider.db.isWalkTableEmpty()) {
+      throw Exception('walk table is empty');
+    }
   } else {
     log("Not refreshing walks list since it has been done less than an hour ago",
         name: tag);
