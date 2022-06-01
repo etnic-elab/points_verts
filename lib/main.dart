@@ -33,7 +33,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     print("[BackgroundFetch] Headless task: $taskId");
     await dotenv.load();
     await updateWalks();
-    await scheduleNextNearestWalkNotifications();
+    await NotificationManager.instance.scheduleNextNearestWalkNotifications();
     await PrefsProvider.prefs.setString(
         Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
   } catch (err) {
@@ -95,14 +95,6 @@ class MyApp extends StatelessWidget {
   static final navigatorKey = GlobalKey<NavigatorState>();
 
   const MyApp({Key? key}) : super(key: key);
-
-  static redirectToWalkDetails(int walkId) async {
-    Walk? walk = await DBProvider.db.getWalk(walkId);
-    if (walk != null) {
-      MyApp.navigatorKey.currentState!
-          .push(MaterialPageRoute(builder: (context) => WalkDetailsView(walk)));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

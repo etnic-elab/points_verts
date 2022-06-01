@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/company_data.dart';
@@ -60,7 +62,7 @@ class _SettingsState extends State<Settings> {
       _home = label;
     });
     if (_showNotification == true) {
-      scheduleNextNearestWalkNotifications();
+      NotificationManager.instance.scheduleNextNearestWalkNotifications();
     }
   }
 
@@ -91,21 +93,38 @@ class _SettingsState extends State<Settings> {
 
   Future<void> _setShowNotification(bool newValue) async {
     await PrefsProvider.prefs.setBoolean(Prefs.showNotification, newValue);
-    if (newValue == true) {
+    if (newValue == false) {
+      NotificationManager.instance.cancelNextNearestWalkNotifications();
+    } else {
       bool? notificationsAllowed =
           await NotificationManager.instance.requestNotificationPermissions();
-      if (notificationsAllowed == true) {
-        scheduleNextNearestWalkNotifications();
-      } else {
-        _setShowNotification(false);
-        return;
-      }
-    } else {
-      NotificationManager.instance.cancelNextNearestWalkNotifications();
+      if (notificationsAllowed == false) return _setShowNotification(false);
+
+      NotificationManager.instance.scheduleNextNearestWalkNotifications();
+      if (Platform.isIOS && mounted) _showIOSNotificationAlert;
     }
     setState(() {
       _showNotification = newValue;
     });
+  }
+
+  void _showIOSNotificationAlert() {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Attention'),
+          content: const Text(
+              'Pour continuer à recevoir les notifications, ouvrez l\'application au moins une fois par semaine'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
