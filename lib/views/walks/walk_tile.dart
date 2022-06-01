@@ -11,6 +11,7 @@ import 'walk_details_view.dart';
 import 'walk_icon.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
+import 'package:collection/collection.dart';
 
 bool smallScreen = window.physicalSize.width <= 640;
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
@@ -98,9 +99,8 @@ class WalkTile extends StatelessWidget {
   List<Widget> _infoRow(Walk walk) {
     List<Widget> info = [];
 
-    if (walk.weathers.isNotEmpty) {
-      info.add(_WeatherChip(walk.weathers[0]));
-    }
+    if (walk.weathers.isNotEmpty) info.add(_WeatherChip(walk.weathers.first));
+    if (walk.paths.isNotEmpty) info.add(const _ChipIcon(Icons.near_me));
 
     info.addAll(WalkInfo.values
         .map((WalkInfo info) {
