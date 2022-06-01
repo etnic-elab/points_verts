@@ -11,7 +11,6 @@ import 'walk_details_view.dart';
 import 'walk_icon.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
-import 'package:collection/collection.dart';
 
 bool smallScreen = window.physicalSize.width <= 640;
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
