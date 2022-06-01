@@ -13,13 +13,10 @@ import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/walks/walk_details_view.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 import 'package:points_verts/walks_home_screen.dart';
 import 'package:points_verts/company_data.dart';
-
-import 'models/walk.dart';
 
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
   String taskId = task.taskId;
