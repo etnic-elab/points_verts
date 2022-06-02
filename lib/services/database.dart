@@ -11,13 +11,9 @@ class DBProvider {
   DBProvider._();
 
   static final DBProvider db = DBProvider._();
-  Database? _database;
+  Future<Database>? _database;
 
-  Future<Database> get database async {
-    if (_database != null) return _database as Database;
-    _database = await getDatabaseInstance();
-    return _database as Database;
-  }
+  Future<Database> get database => _database ??= getDatabaseInstance();
 
   Future<Database> getDatabaseInstance() async {
     log("Creating new database client", name: tag);

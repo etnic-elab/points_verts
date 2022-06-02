@@ -10,38 +10,12 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:package_info/package_info.dart';
 import 'package:points_verts/environment.dart';
 import 'package:points_verts/services/assets.dart';
-import 'package:points_verts/services/database.dart';
-import 'package:points_verts/services/notification.dart';
+import 'package:points_verts/services/background_fetch.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/walks/walk_details_view.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 import 'package:points_verts/walks_home_screen.dart';
 import 'package:points_verts/company_data.dart';
-
-import 'models/walk.dart';
-
-void backgroundFetchHeadlessTask(HeadlessTask task) async {
-  String taskId = task.taskId;
-  bool isTimeout = task.timeout;
-  if (isTimeout) {
-    print("[BackgroundFetch] Headless TIMEOUT: $taskId");
-    BackgroundFetch.finish(taskId);
-    return;
-  }
-  try {
-    print("[BackgroundFetch] Headless task: $taskId");
-    await dotenv.load();
-    await updateWalks();
-    await scheduleNextNearestWalkNotifications();
-    await PrefsProvider.prefs.setString(
-        Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
-  } catch (err) {
-    print("Cannot schedule next nearest walk notification: $err");
-  } finally {
-    BackgroundFetch.finish(taskId);
-  }
-}
 
 Future<void> _addTrustedCert(String certPath) async {
   ByteData data = await Assets.asset.load(certPath);
@@ -58,12 +32,9 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await dotenv.load();
   await _deleteData();
-  //TODO: improve how we initialize these singletons (get_it package?)
-  await NotificationManager.instance.plugin;
-  await DBProvider.db.database;
   await _addTrustedCert(Assets.letsEncryptCert);
   runApp(const MyApp());
-  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+  BackgroundFetch.registerHeadlessTask(BackgroundFetchProvider.headlessTask);
 }
 
 Future _deleteData() async {
@@ -91,16 +62,32 @@ Future _deleteData() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   static final navigatorKey = GlobalKey<NavigatorState>();
 
   const MyApp({Key? key}) : super(key: key);
 
-  static redirectToWalkDetails(int walkId) async {
-    Walk? walk = await DBProvider.db.getWalk(walkId);
-    if (walk != null) {
-      MyApp.navigatorKey.currentState!
-          .push(MaterialPageRoute(builder: (context) => WalkDetailsView(walk)));
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      updateWalks();
     }
   }
 

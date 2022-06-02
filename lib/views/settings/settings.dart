@@ -56,11 +56,9 @@ class _SettingsState extends State<Settings> {
         Prefs.homeCoords, "${suggestion.latitude},${suggestion.longitude}");
     String? label = await PrefsProvider.prefs
         .setString(Prefs.homeLabel, suggestion.address);
-    setState(() {
-      _home = label;
-    });
+    setState(() => _home = label);
     if (_showNotification == true) {
-      scheduleNextNearestWalkNotifications();
+      NotificationManager.instance.scheduleNextNearestWalkNotifications();
     }
   }
 
@@ -95,7 +93,7 @@ class _SettingsState extends State<Settings> {
       bool? notificationsAllowed =
           await NotificationManager.instance.requestNotificationPermissions();
       if (notificationsAllowed == true) {
-        scheduleNextNearestWalkNotifications();
+        NotificationManager.instance.scheduleNextNearestWalkNotifications();
       } else {
         _setShowNotification(false);
         return;

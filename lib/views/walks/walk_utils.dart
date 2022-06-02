@@ -112,7 +112,7 @@ Future<void> launchURL(String? url) async {
   }
 }
 
-Future<void> updateWalks() async {
+Future<bool> updateWalks() async {
   log("Updating walks", name: tag);
   String? lastUpdateIso8601Utc =
       await PrefsProvider.prefs.getString(Prefs.lastWalkUpdate);
@@ -125,6 +125,7 @@ Future<void> updateWalks() async {
       await DBProvider.db.insertWalks(newWalks, empty: true);
       PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
       await _fixNextWalks();
+      return true;
     }
   } else {
     if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
@@ -138,6 +139,7 @@ Future<void> updateWalks() async {
         PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
         await _fixNextWalks();
         await DBProvider.db.deleteOldWalks();
+        return true;
       } catch (err) {
         print("Cannot refresh walks list: $err");
       }
@@ -146,6 +148,8 @@ Future<void> updateWalks() async {
           name: tag);
     }
   }
+
+  return false;
 }
 
 Future<List<DateTime>> retrieveNearestDates() async {
