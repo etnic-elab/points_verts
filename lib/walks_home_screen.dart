@@ -77,8 +77,8 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
     FlutterNativeSplash.remove();
     BackgroundFetch.configure(
         BackgroundFetchConfig(
-            minimumFetchInterval: 60 * 6,
-            // four times per day
+            minimumFetchInterval: 60 * 18,
+            // 1.3 times per day
             stopOnTerminate: false,
             enableHeadless: true,
             requiredNetworkType: NetworkType.ANY,
