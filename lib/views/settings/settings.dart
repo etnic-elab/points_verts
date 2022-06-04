@@ -181,9 +181,8 @@ class _SettingsState extends State<Settings> {
           ),
           const Divider(),
           const ListHeader("Diagnostic"),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-            child: Text(
+          ListTile(
+            title: Text(
                 "L'envoi automatique de données de diagnostic nous permet d'améliorer l'application.",
                 style: Theme.of(context).textTheme.caption),
           ),
