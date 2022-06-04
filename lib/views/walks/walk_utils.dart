@@ -157,8 +157,8 @@ DateTime getLastUpdateTimestamp(List<Walk> walks) {
   // ago, so that updateWalks will retrieve them all
   DateTime lastUpdate = DateTime.now().subtract(const Duration(days: 365));
   for (Walk walk in walks) {
-    if (walk.date.isAfter(lastUpdate)) {
-      lastUpdate = walk.date;
+    if (walk.lastUpdated.isAfter(lastUpdate)) {
+      lastUpdate = walk.lastUpdated;
     }
   }
   return lastUpdate;
