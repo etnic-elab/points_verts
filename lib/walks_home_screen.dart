@@ -36,11 +36,12 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
   void initState() {
     super.initState();
     BackgroundFetchProvider.task(mounted);
-    initializeData();
-    FlutterNativeSplash.remove();
+    initializeData().then((_) {
+      FlutterNativeSplash.remove();
+    });
   }
 
-  initializeData() async {
+  Future<void> initializeData() async {
     setState(() => _loading = true);
     try {
       bool didUpdate = await updateWalks();
