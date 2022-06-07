@@ -114,8 +114,10 @@ class _SettingsState extends State<Settings> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Attention'),
-          content: const Text(
-              'Pour continuer à recevoir les notifications, ouvrez l\'application au moins une fois par semaine'),
+          content: const Text('''
+iOS empêche les applications peu utilisées d'exécuter des tâches en arrière-plan régulièrement, ce dont l'application a besoin pour planifier les notifications.
+Nous vous conseillons d'ouvrir l'application au moins une fois par semaine pour contourner cette restriction.
+'''),
           actions: [
             TextButton(
               child: const Text('OK'),
