@@ -26,7 +26,6 @@ jobs:
           cp assets/dummy.png assets/dark/splash.png
           cp assets/dummy_icon.png assets/launcher_icons/icon_812x812.png
           cp assets/dummy_icon.png assets/launcher_icons/icon_432x432.png
-          touch lib/firebase_options.dart
           touch ios/Runner/GoogleMaps.plist
           echo "" >> ios/Runner/GoogleMaps.plist
       - name: Generate splash screens
