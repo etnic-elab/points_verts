@@ -99,33 +99,25 @@ class WalkTile extends StatelessWidget {
     List<Widget> info = [];
 
     if (walk.weathers.isNotEmpty) info.add(_WeatherChip(walk.weathers.first));
-    if (walk.paths.isNotEmpty) info.add(const _ChipIcon(Icons.near_me));
 
     info.addAll(WalkInfo.values
         .map((WalkInfo info) {
           bool value = info.walkValue(walk);
 
           if (WalkInfo.fifteenKm == info) {
-            if (!value) {
-              if (walk.isOrientation) {
-                return const _ChipLabel('4-8-12 km');
-              } else {
-                return const _ChipLabel('5-10-20 km');
-              }
-            } else {
-              return const _ChipLabel('5-10-15-20 km');
-            }
+            return value
+                ? const _ChipLabel('5-10-15-20 km')
+                : walk.isOrientation
+                    ? const _ChipLabel('4-8-12 km')
+                    : const _ChipLabel('5-10-20 km');
           }
 
-          if (!value) {
-            return null;
-          } else {
-            return _ChipIcon(info.icon);
-          }
+          return value ? _ChipIcon(info.icon) : null;
         })
         .whereType<Widget>()
         .toList());
 
+    if (walk.paths.isNotEmpty) info.add(const _ChipIcon(Icons.near_me));
     return info;
   }
 
