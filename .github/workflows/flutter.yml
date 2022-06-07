@@ -27,6 +27,8 @@ jobs:
           cp assets/dummy_icon.png assets/launcher_icons/icon_812x812.png
           cp assets/dummy_icon.png assets/launcher_icons/icon_432x432.png
           touch ios/Runner/GoogleMaps.plist
+          touch ios/firebase_app_id_file.json
+          touch android/app/google-services.json
           echo "" >> ios/Runner/GoogleMaps.plist
       - name: Generate splash screens
         run: flutter pub run flutter_native_splash:create
