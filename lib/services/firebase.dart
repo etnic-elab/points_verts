@@ -68,19 +68,21 @@ class CrashlyticsLocalService {
   }
 
   static Future<bool> toggleCrashlyticsEnabled(bool newValue) async {
+    bool? enabled;
     if ((debugEnabled || kReleaseMode) == false && newValue == true) {
       log('Could not enable Crashlytics because you run in debug mode. To enable in debug mode, set kDebugCrashlytics to true',
           name: _crashlyticsTag);
-      return false;
+      enabled = false;
+    } else {
+      enabled = newValue && debugEnabled || kReleaseMode;
     }
 
-    bool enabled = newValue && debugEnabled || kReleaseMode;
     FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(enabled);
     await PrefsProvider.prefs.setBoolean(Prefs.crashlyticsEnabled, enabled);
 
     log('Crashlytics is now ${enabled ? 'enabled' : 'disabled'}. debugEnabled: $debugEnabled, kReleaseMode: $kReleaseMode',
         name: _crashlyticsTag);
 
-    return true;
+    return enabled;
   }
 }

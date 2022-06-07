@@ -115,14 +115,12 @@ class _SettingsState extends State<Settings> {
 
   void _setCrashlyticsEnabled(bool isEnabled) async {
     bool wasEnabled = _crashlyticsEnabled;
-    bool valueToggled =
+    isEnabled =
         await CrashlyticsLocalService.toggleCrashlyticsEnabled(isEnabled);
 
-    if (valueToggled) {
-      setState(() => _crashlyticsEnabled = isEnabled);
-      if (wasEnabled && !isEnabled) {
-        crashlyticsNewOptOutDialog();
-      }
+    setState(() => _crashlyticsEnabled = isEnabled);
+    if (wasEnabled && !isEnabled) {
+      crashlyticsNewOptOutDialog();
     }
   }
 

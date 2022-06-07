@@ -54,9 +54,9 @@ class BackgroundFetchProvider {
         return;
       }
       try {
+        await dotenv.load();
         print("[BackgroundFetch] Headless task: $taskId");
         await FirebaseLocalService.initialize(isForeground: false);
-        await dotenv.load();
         await updateWalks();
         await scheduleNextNearestWalkNotifications();
         await PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
