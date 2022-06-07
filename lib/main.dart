@@ -38,8 +38,8 @@ void main() async {
   runZonedGuarded<Future<void>>(() async {
     WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-    await FirebaseLocalService.initialize(isForeground: true);
     await dotenv.load();
+    await FirebaseLocalService.initialize(isForeground: true);
     await _deleteData();
     //TODO: improve how we initialize these singletons (get_it package?)
     await NotificationManager.instance.plugin;
