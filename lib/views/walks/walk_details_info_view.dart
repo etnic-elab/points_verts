@@ -1,21 +1,21 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/constants.dart';
 import 'package:points_verts/models/walk.dart';
-import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/walk_details_info.dart';
 import 'package:collection/collection.dart';
+import 'package:points_verts/services/map/map_interface.dart';
 
 class WalkDetailsInfoView extends StatelessWidget {
-  WalkDetailsInfoView(this.walk, this.onTapMap, this.pathsLoaded, {Key? key})
+  const WalkDetailsInfoView(this.walk, this.onTapMap, this.pathsLoaded,
+      {Key? key})
       : super(key: key);
 
   final Walk walk;
   final Function onTapMap;
   final bool pathsLoaded;
-  final MapInterface map = Environment.mapInterface;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class WalkDetailsInfoView extends StatelessWidget {
       width: width.roundToDouble(),
       height: height.roundToDouble(),
       child: pathsLoaded
-          ? map.retrieveStaticImage(
+          ? kMap.instance.retrieveStaticImage(
               walk, width.round(), height.round(), brightness,
               onTap: hasPaths ? onTapMap : null)
           : const Loading(),

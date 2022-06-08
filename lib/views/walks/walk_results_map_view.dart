@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 
@@ -28,7 +28,6 @@ class WalkResultsMapView extends StatelessWidget {
   final Function refreshWalks;
   final List<MarkerInterface> markers = [];
   final List<Map> rawMarkers = [];
-  final MapInterface map = Environment.mapInterface;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +40,7 @@ class WalkResultsMapView extends StatelessWidget {
 
             return Stack(
               children: <Widget>[
-                map.retrieveMap(markers: markers, onTapMap: onTapMap),
+                kMap.instance.retrieveMap(markers: markers, onTapMap: onTapMap),
                 _buildWalkInfo(),
               ],
             );

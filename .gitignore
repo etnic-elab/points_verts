@@ -42,6 +42,10 @@ lib/generated_plugin_registrant.dart
 key.jks
 .env
 /app_icons/
+/ios/firebase_app_id_file.json
+/android/app/google-services.json
+pubspec.lock
+ 
 
 # assets
 /assets/walk_data.json
