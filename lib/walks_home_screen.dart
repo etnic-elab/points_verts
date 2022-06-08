@@ -1,5 +1,6 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:points_verts/services/background_fetch.dart';
 import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -11,6 +12,8 @@ import 'views/directory/walk_directory_view.dart';
 import 'views/settings/settings.dart';
 import 'views/walks/walks_view.dart';
 
+const String tag = "dev.alpagaga.points_verts.WalksHomeScreen";
+
 class WalksHomeScreen extends StatefulWidget {
   const WalksHomeScreen({Key? key}) : super(key: key);
 
@@ -18,8 +21,7 @@ class WalksHomeScreen extends StatefulWidget {
   State createState() => _WalksHomeScreenState();
 }
 
-class _WalksHomeScreenState extends State<WalksHomeScreen>
-    with WidgetsBindingObserver {
+class _WalksHomeScreenState extends State<WalksHomeScreen> {
   final List<Widget> _pages = [
     const WalksView(),
     const WalkDirectoryView(),
@@ -31,83 +33,58 @@ class _WalksHomeScreenState extends State<WalksHomeScreen>
 
   @override
   void initState() {
-    FlutterNativeSplash.remove();
-    _crashlyticsOptIn().then((_) {
-      _fetchData().then((_) => BackgroundFetchProvider.task(mounted));
-    });
-
-    PrefsProvider.prefs.remove(Prefs.lastSelectedDate);
-    WidgetsBinding.instance.addObserver(this);
     super.initState();
+    BackgroundFetchProvider.task(mounted);
+    _crashlyticsOptIn().then((_) {
+      initializeData();
+    });
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  Future _fetchData() {
-    setState(() {
+  Future<void> initializeData() async {
+    setState(() => _loading = true);
+    try {
+      await Future.wait(
+          [updateWalks(), PrefsProvider.prefs.remove(Prefs.lastSelectedDate)]);
       _error = false;
-      _loading = true;
-    });
-    return updateWalks().then((_) {
-      setState(() {
-        _loading = false;
-      });
-    }).catchError((err) {
-      print("error fetch data");
-      setState(() {
-        _loading = false;
-        _error = true;
-      });
-    });
+    } catch (err) {
+      log("error init State, $err", name: tag);
+      _error = true;
+    }
+    setState(() => _loading = false);
   }
 
-  Future<void> _crashlyticsOptIn() async {
+  Future<dynamic> _crashlyticsOptIn() async {
     bool? crashlyticsEnabled =
         await PrefsProvider.prefs.getBooleanNullable(Prefs.crashlyticsEnabled);
     if (crashlyticsEnabled != null) return;
 
     bool optIn = await _crashlyticsOptInDialog() ?? false;
-    await CrashlyticsLocalService.toggleCrashlyticsEnabled(optIn);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _fetchData();
-    }
+    return CrashlyticsLocalService.toggleCrashlyticsEnabled(optIn);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), label: "Calendrier"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.import_contacts), label: "Annuaire"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: "Paramètres"),
-        ],
-      ),
-      body: _error
-          ? WalkListError(_fetchData)
-          : _loading
-              ? const Loading()
+      bottomNavigationBar: _error
+          ? null
+          : BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              onTap: (index) => setState(() => _selectedIndex = index),
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.calendar_today), label: "Calendrier"),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.import_contacts), label: "Annuaire"),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.settings), label: "Paramètres"),
+              ],
+            ),
+      body: _loading
+          ? const Loading()
+          : _error
+              ? WalkListError(initializeData)
               : _pages[_selectedIndex],
     );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   Future<bool?> _crashlyticsOptInDialog() {

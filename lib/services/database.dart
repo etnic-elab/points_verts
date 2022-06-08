@@ -11,13 +11,9 @@ class DBProvider {
   DBProvider._();
 
   static final DBProvider db = DBProvider._();
-  Database? _database;
+  Future<Database>? _database;
 
-  Future<Database> get database async {
-    if (_database != null) return _database as Database;
-    _database = await getDatabaseInstance();
-    return _database as Database;
-  }
+  Future<Database> get database => _database ??= getDatabaseInstance();
 
   Future<Database> getDatabaseInstance() async {
     log("Creating new database client", name: tag);
@@ -48,7 +44,7 @@ class DBProvider {
   }
 
   Future<List<DateTime>> getWalkDates() async {
-    final Database db = await database;
+    final db = await database;
     final now = DateTime.now();
     final lastMidnight = DateTime(now.year, now.month, now.day);
     final List<Map<String, dynamic>> maps = await db.query('walks',
@@ -57,34 +53,37 @@ class DBProvider {
         orderBy: "date ASC",
         where: 'date >= ?',
         whereArgs: [lastMidnight.toIso8601String()]);
-    return List.generate(maps.length, (i) {
-      return DateTime.parse(maps[i]['date']);
-    });
+    return List.generate(maps.length, (i) => DateTime.parse(maps[i]['date']));
   }
 
-  Future<void> insertWalks(List<Walk> walks, {bool empty = false}) async {
+  Future<List> insertWalks(List<Walk> walks) async {
     log("Inserting ${walks.length} walks in database", name: tag);
-    final Database db = await database;
-    final Batch batch = db.batch();
-    if (empty) await db.delete('walks');
+    final db = await database;
+    final batch = db.batch();
     for (Walk walk in walks) {
       batch.insert("walks", walk.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
-    await batch.commit();
+    return batch.commit();
   }
 
-  Future<int> deleteOldWalks() async {
-    final now = DateTime.now();
+  Future<int> deleteWalks() async {
+    final db = await database;
+    return db.delete('walks');
+  }
+
+  Future<int> deleteOldWalks(DateTime now) async {
     final lastMidnight = DateTime(now.year, now.month, now.day);
-    log("Deleting old walks before $lastMidnight", name: tag);
-    final Database db = await database;
-    return await db.delete("walks",
+    final db = await database;
+    int deleted = await db.delete("walks",
         where: 'date < ?', whereArgs: [lastMidnight.toIso8601String()]);
+
+    log("Deleted $deleted old walks before $lastMidnight", name: tag);
+    return deleted;
   }
 
   Future<List<Walk>> getSortedWalks({WalkFilter? filter}) async {
-    final Database db = await database;
+    final db = await database;
     List<Map<String, dynamic>> maps;
     if (filter != null) {
       maps = await db.query('walks',
@@ -94,9 +93,7 @@ class DBProvider {
     } else {
       maps = await db.query('walks', orderBy: "city ASC");
     }
-    return List.generate(maps.length, (i) {
-      return Walk.fromDb(maps, i);
-    });
+    return List.generate(maps.length, (i) => Walk.fromDb(maps, i));
   }
 
   String _generateWhereFromFilter(WalkFilter filter) {
@@ -138,7 +135,7 @@ class DBProvider {
   Future<List<Walk>> getWalks(DateTime? date, {WalkFilter? filter}) async {
     log("Retrieving walks from database for $date", name: tag);
     if (date == null) return [];
-    final Database db = await database;
+    final db = await database;
     List<Map<String, dynamic>> maps;
     if (filter != null) {
       String where = "date = ?${_generateWhereFromFilter(filter)}";
@@ -149,24 +146,19 @@ class DBProvider {
       maps = await db.query('walks',
           where: 'date = ?', whereArgs: [date.toIso8601String()]);
     }
-    return List.generate(maps.length, (i) {
-      return Walk.fromDb(maps, i);
-    });
+    return List.generate(maps.length, (i) => Walk.fromDb(maps, i));
   }
 
   Future<Walk?> getWalk(int id) async {
-    final Database db = await database;
+    final db = await database;
     final List<Map<String, dynamic>> maps =
         await db.query('walks', where: 'id = ?', whereArgs: [id]);
-    if (maps.length == 1) {
-      return Walk.fromDb(maps, 0);
-    } else {
-      return null;
-    }
+
+    return maps.length == 1 ? Walk.fromDb(maps, 0) : null;
   }
 
   Future<bool> isWalkTableEmpty() async {
-    final Database db = await database;
+    final db = await database;
     List results = await db.query('walks');
     return results.isEmpty;
   }

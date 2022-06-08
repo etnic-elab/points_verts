@@ -9,6 +9,7 @@ import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
+import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -112,41 +113,55 @@ Future<void> launchURL(String? url) async {
 
 Future<void> updateWalks() async {
   log("Updating walks", name: tag);
+
+  bool didUpdate = false;
   String? lastUpdateIso8601Utc =
       await PrefsProvider.prefs.getString(Prefs.lastWalkUpdate);
   DateTime nowDateLocal = DateTime.now();
   DateTime nowDateUtc = nowDateLocal.toUtc();
-  String nowIso8601Utc = nowDateUtc.toIso8601String();
+
   if (lastUpdateIso8601Utc == null) {
-    List<Walk> newWalks = await fetchAllWalks(fromDateLocal: nowDateLocal);
-    // JSON might be out of date
+    final futures = await Future.wait([
+      fetchJsonWalks(fromDateLocal: nowDateLocal),
+      DBProvider.db.deleteWalks()
+    ]);
+
+    List<Walk> newWalks = futures[0] as List<Walk>;
     lastUpdateIso8601Utc = getLastUpdateTimestamp(newWalks).toIso8601String();
-    if (newWalks.isNotEmpty) {
-      await DBProvider.db.insertWalks(newWalks, empty: true);
-      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, lastUpdateIso8601Utc);
-    }
+    await Future.wait([
+      DBProvider.db.insertWalks(newWalks),
+      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, lastUpdateIso8601Utc)
+    ]);
+    didUpdate = true;
   }
+
   if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
       const Duration(hours: 1)) {
     try {
-      List<Walk> updatedWalks = await refreshAllWalks(lastUpdateIso8601Utc,
+      List<Walk> updatedWalks = await fetchApiWalks(lastUpdateIso8601Utc,
           fromDateLocal: nowDateLocal);
-      if (updatedWalks.isNotEmpty) {
-        await DBProvider.db.insertWalks(updatedWalks);
-      }
-      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
-      await _fixNextWalks();
-      await DBProvider.db.deleteOldWalks();
+      await Future.wait([
+        DBProvider.db.insertWalks(updatedWalks),
+        PrefsProvider.prefs
+            .setString(Prefs.lastWalkUpdate, nowDateUtc.toIso8601String())
+      ]);
+      didUpdate = true;
     } catch (err) {
       print("Cannot refresh walks list: $err");
     }
+  }
 
-    if (await DBProvider.db.isWalkTableEmpty()) {
-      throw Exception('walk table is empty');
-    }
-  } else {
-    log("Not refreshing walks list since it has been done less than an hour ago",
-        name: tag);
+  if (await DBProvider.db.isWalkTableEmpty()) {
+    return Future.error(Exception('walk table is empty'));
+  }
+
+  if (didUpdate) {
+    await _fixNextWalks();
+    DBProvider.db.deleteOldWalks(nowDateLocal);
+    NotificationManager.instance
+        .scheduleNextNearestWalkNotifications()
+        .catchError((err) =>
+            print("Cannot schedule next nearest walk notification: $err"));
   }
 }
 

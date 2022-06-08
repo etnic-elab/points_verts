@@ -12,25 +12,13 @@ class BackgroundFetchProvider {
   static Future<void> task(bool mounted) async {
     BackgroundFetch.configure(
         BackgroundFetchConfig(
-            minimumFetchInterval: 60 * 6,
-            // four times per day
+            // 1.3 times per day
+            minimumFetchInterval: 60 * 18,
             stopOnTerminate: false,
             enableHeadless: true,
             requiredNetworkType: NetworkType.ANY,
             startOnBoot: true), (String taskId) async {
       print("[BackgroundFetch] taskId: $taskId");
-      FirebaseCrashlytics.instance.setCustomKey('foreground', false);
-      try {
-        await NotificationManager.instance
-            .scheduleNextNearestWalkNotifications();
-        await PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
-            DateTime.now().toUtc().toIso8601String());
-      } catch (err) {
-        print("Cannot schedule next nearest walk notification: $err");
-      } finally {
-        FirebaseCrashlytics.instance.setCustomKey('foreground', true);
-        BackgroundFetch.finish(taskId);
-      }
     }, (String taskId) async {
       print("[BackgroundFetch] TIMEOUT taskId: $taskId");
       BackgroundFetch.finish(taskId);
@@ -56,12 +44,14 @@ class BackgroundFetchProvider {
       }
       try {
         print("[BackgroundFetch] Headless task: $taskId");
-        await dotenv.load();
-        await FirebaseLocalService.initialize(isForeground: false);
-        await updateWalks();
-        await NotificationManager.instance
-            .scheduleNextNearestWalkNotifications();
-        await PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
+        FirebaseCrashlytics.instance.setCustomKey('foreground', false);
+        if (await NotificationManager.instance
+            .isScheduleNextNearestWalkNotifications()) {
+          await dotenv.load();
+          await FirebaseLocalService.initialize(isForeground: false);
+          await updateWalks();
+        }
+        PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
             DateTime.now().toUtc().toIso8601String());
       } catch (err) {
         print("Cannot schedule next nearest walk notification: $err");
