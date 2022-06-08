@@ -30,6 +30,13 @@ jobs:
           touch ios/firebase_app_id_file.json
           touch android/app/google-services.json
           echo "" >> ios/Runner/GoogleMaps.plist
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "firebase_app_id_file.json"
+          json: "{}"
+          dir: "ios/"
       - name: Generate splash screens
         run: flutter pub run flutter_native_splash:create
       - name: Generate launcher icons
