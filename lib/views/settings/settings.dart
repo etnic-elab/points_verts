@@ -180,9 +180,11 @@ class _SettingsState extends State<Settings> {
             secondary: const TileIcon(Icon(Icons.notifications)),
             title: const Text("Notifier la veille (vers 20h)"),
             value: _showNotification,
-            onChanged: (bool value) {
-              _setShowNotification(value);
-            },
+            onChanged: _home?.isEmpty ?? true
+                ? null
+                : (bool value) {
+                    _setShowNotification(value);
+                  },
           ),
           const Divider(),
           const ListHeader("Diagnostic"),

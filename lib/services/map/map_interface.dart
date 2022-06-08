@@ -24,8 +24,8 @@ extension MapsX on Maps {
 
 abstract class MapInterface {
   static const double defaultLat = 50.3155646;
-  static const double defaultLong = 5.009682;
-  static const double defaultZoom = 7.5;
+  static const double defaultLong = 4.6;
+  static const double defaultZoom = 7.35;
 
   String get name;
   String get apiName;

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/models/address.dart';
 
 import '../loading.dart';
