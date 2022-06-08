@@ -34,7 +34,7 @@ jobs:
         uses: jsdaniell/create-json@1.1.2
         with:
           name: "firebase_app_id_file.json"
-          json: "{}"
+          json: '{"file_generated_by": "FlutterFire CLI","purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory","GOOGLE_APP_ID": "1:1111111111111:ios:5b796ce177d1c60e6fa46e","FIREBASE_PROJECT_ID": "project_id","GCM_SENDER_ID": "1111111111111"}'
           dir: "ios/"
       - name: Generate splash screens
         run: flutter pub run flutter_native_splash:create
