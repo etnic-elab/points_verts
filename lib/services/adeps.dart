@@ -48,7 +48,7 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
       start = start + pageSize;
       finished = data['nhits'] <= start;
     } else {
-      throw Exception('Failed to load walks');
+      return Future.error(Exception('Failed to load walks'));
     }
   }
   return walks;

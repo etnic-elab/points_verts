@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:points_verts/company_data.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/views/tile_icon.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:points_verts/services/map/map_interface.dart';
 
 class About extends StatelessWidget {
   const About({Key? key}) : super(key: key);
@@ -35,8 +36,8 @@ class About extends StatelessWidget {
                             "mailto:$companyMail?subject=Points Verts"),
                         const _AboutRow("Données des Points Verts",
                             "Open Data Wallonie-Bruxelles", opendataUrl),
-                        _AboutRow("Données de navigation", Environment.mapApi,
-                            Environment.mapWebsite),
+                        _AboutRow("Données de navigation", kMap.instance.name,
+                            kMap.instance.website),
                         const _AboutRow("Données météorologiques",
                             "OpenWeather", "https://openweathermap.org")
                       ]);

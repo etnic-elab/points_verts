@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/models/address.dart';
 
@@ -24,8 +24,6 @@ class SettingsHomeSelect extends StatefulWidget {
 }
 
 class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
-  final MapInterface map = Environment.mapInterface;
-
   final _homeSearchController = TextEditingController();
   // Timer? _debounce;
   int _countryIndex = 0;
@@ -48,7 +46,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
     setState(() {
       _suggestions = _homeSearchController.text.isEmpty
           ? Future.value([])
-          : map.retrieveSuggestions(
+          : kMap.instance.retrieveSuggestions(
               _homeSearchController.text, countryCodes[_countryIndex],
               sessionToken: widget.sessionToken);
     });

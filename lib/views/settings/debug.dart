@@ -1,8 +1,10 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
+import 'package:points_verts/views/settings/fire_crashlytics_test.dart';
 
 class Debug extends StatelessWidget {
   const Debug({Key? key}) : super(key: key);
@@ -21,7 +23,9 @@ class Debug extends StatelessWidget {
             const Divider(height: 0.5),
             _PendingNotificationsTile(),
             const Divider(height: 0.5),
-            _LastBackgroundFetch()
+            _LastBackgroundFetch(),
+            const Divider(height: 0.5),
+            _FirebaseTile(),
           ],
         ));
   }
@@ -124,6 +128,20 @@ class _LastBackgroundFetch extends StatelessWidget {
           }
           return const SizedBox.shrink();
         });
+  }
+}
+
+class _FirebaseTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: const Text("Firebase Project ID"),
+      subtitle: Text(Firebase.app().options.projectId),
+      trailing: OutlinedButton(
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const FireCrashlyticsTest())),
+          child: const Text("Crashlytics TestPage")),
+    );
   }
 }
 
