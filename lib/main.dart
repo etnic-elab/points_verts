@@ -13,13 +13,10 @@ import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/walks/walk_details_view.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 
 import 'package:points_verts/walks_home_screen.dart';
 import 'package:points_verts/company_data.dart';
-
-import 'models/walk.dart';
 
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
   String taskId = task.taskId;
@@ -33,7 +30,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     print("[BackgroundFetch] Headless task: $taskId");
     await dotenv.load();
     await updateWalks();
-    await scheduleNextNearestWalkNotifications();
+    await NotificationManager.instance.scheduleNextNearestWalkNotifications();
     await PrefsProvider.prefs.setString(
         Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
   } catch (err) {
@@ -95,14 +92,6 @@ class MyApp extends StatelessWidget {
   static final navigatorKey = GlobalKey<NavigatorState>();
 
   const MyApp({Key? key}) : super(key: key);
-
-  static redirectToWalkDetails(int walkId) async {
-    Walk? walk = await DBProvider.db.getWalk(walkId);
-    if (walk != null) {
-      MyApp.navigatorKey.currentState!
-          .push(MaterialPageRoute(builder: (context) => WalkDetailsView(walk)));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
