@@ -21,7 +21,8 @@ class BackgroundFetchProvider {
       print("[BackgroundFetch] taskId: $taskId");
       FirebaseCrashlytics.instance.setCustomKey('foreground', false);
       try {
-        await scheduleNextNearestWalkNotifications();
+        await NotificationManager.instance
+            .scheduleNextNearestWalkNotifications();
         await PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
             DateTime.now().toUtc().toIso8601String());
       } catch (err) {
@@ -58,7 +59,8 @@ class BackgroundFetchProvider {
         await dotenv.load();
         await FirebaseLocalService.initialize(isForeground: false);
         await updateWalks();
-        await scheduleNextNearestWalkNotifications();
+        await NotificationManager.instance
+            .scheduleNextNearestWalkNotifications();
         await PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
             DateTime.now().toUtc().toIso8601String());
       } catch (err) {

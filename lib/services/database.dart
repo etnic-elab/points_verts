@@ -164,4 +164,10 @@ class DBProvider {
       return null;
     }
   }
+
+  Future<bool> isWalkTableEmpty() async {
+    final Database db = await database;
+    List results = await db.query('walks');
+    return results.isEmpty;
+  }
 }

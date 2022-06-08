@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -9,11 +10,14 @@ import 'package:intl/intl.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/main.dart';
 import 'package:points_verts/models/walk.dart';
+import 'package:points_verts/services/database.dart';
+import 'package:points_verts/views/walks/walk_details_view.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'prefs.dart';
+import 'package:collection/collection.dart';
 
 const String tag = "dev.alpagaga.points_verts.NotificationManager";
 const String defaultIcon = 'ic_notification';
@@ -27,9 +31,9 @@ class NotificationManager {
 
   Future<FlutterLocalNotificationsPlugin> get plugin async {
     if (_flutterLocalNotificationsPlugin != null) {
-      return _flutterLocalNotificationsPlugin
-          as FlutterLocalNotificationsPlugin;
+      return Future.value(_flutterLocalNotificationsPlugin);
     }
+
     log("creating a new plugin instance", name: tag);
     var initializationSettingsAndroid =
         const AndroidInitializationSettings(defaultIcon);
@@ -44,21 +48,26 @@ class NotificationManager {
     await _flutterLocalNotificationsPlugin!.initialize(initializationSettings,
         onSelectNotification: (String? payload) async {
       int? walkId = int.tryParse(payload!);
-      if (walkId != null) {
-        MyApp.redirectToWalkDetails(walkId);
-      }
+      if (walkId != null) _redirectToWalkDetails(walkId);
     });
     tz.initializeTimeZones();
     return _flutterLocalNotificationsPlugin as FlutterLocalNotificationsPlugin;
   }
 
-  scheduleNextNearestWalk(Walk walk) async {
+  _redirectToWalkDetails(int walkId) async {
+    Walk? walk = await DBProvider.db.getWalk(walkId);
+    if (walk != null) {
+      MyApp.navigatorKey.currentState!
+          .push(MaterialPageRoute(builder: (context) => WalkDetailsView(walk)));
+    }
+  }
+
+  Future<void> _scheduleNextNearestWalk(Walk walk) async {
     tz.initializeTimeZones();
     tz.TZDateTime scheduledAt = tz.TZDateTime.from(walk.date, tz.local)
         .subtract(const Duration(hours: 4));
-    if (scheduledAt.isBefore(DateTime.now())) {
-      return;
-    }
+    if (scheduledAt.isBefore(DateTime.now())) return;
+
     try {
       initializeDateFormatting("fr_BE");
       DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
@@ -105,51 +114,54 @@ class NotificationManager {
         iOS: iOSPlatformChannelSpecifics);
   }
 
-  displayNotification(int id, String? title, String? body) async {
+  Future<void> displayNotification(int id, String? title, String? body) async {
     FlutterLocalNotificationsPlugin instance = await plugin;
-
-    await instance.show(id, title, body, _generateNotificationDetails());
+    return instance.show(id, title, body, _generateNotificationDetails());
   }
 
   Future<void> cancelNextNearestWalkNotifications() async {
     FlutterLocalNotificationsPlugin instance = await plugin;
-    log('Cancelling all next nearest walk notifications', name: tag);
     await instance.cancelAll();
+    log('Cancelled all next nearest walk notifications', name: tag);
   }
 
   Future<bool?> requestNotificationPermissions() async {
     if (Platform.isIOS) {
       FlutterLocalNotificationsPlugin instance = await plugin;
-      return await instance
+      return instance
           .resolvePlatformSpecificImplementation<
               IOSFlutterLocalNotificationsPlugin>()!
           .requestPermissions(
             alert: true,
           );
-    } else {
-      return true;
     }
+    return true;
   }
 
   Future<List<PendingNotificationRequest>> pendingNotifications() async {
     FlutterLocalNotificationsPlugin instance = await plugin;
     return instance.pendingNotificationRequests();
   }
-}
 
-Future<void> scheduleNextNearestWalkNotifications() async {
-  bool showNotification =
-      await PrefsProvider.prefs.getBoolean(Prefs.showNotification);
-  if (!showNotification) return;
-  LatLng? home = await retrieveHomePosition();
-  if (home == null) return;
-  List<DateTime> dates = await retrieveNearestDates();
-  NotificationManager.instance.cancelNextNearestWalkNotifications();
-  for (DateTime date in dates) {
-    List<Walk> walks = await retrieveSortedWalks(date, position: home);
-    if (walks.isNotEmpty && !walks[0].isCancelled) {
-      walks[0].weathers = await retrieveWeather(walks[0]);
-      await NotificationManager.instance.scheduleNextNearestWalk(walks[0]);
+  Future<void> scheduleNextNearestWalkNotifications() async {
+    List futures = await Future.wait([
+      PrefsProvider.prefs
+          .getBoolean(Prefs.showNotification, defaultValue: false),
+      retrieveHomePosition()
+    ]);
+
+    LatLng? home = futures[1];
+    if (futures[0] == false || home == null) return;
+
+    cancelNextNearestWalkNotifications();
+    List<DateTime> dates = await retrieveNearestDates();
+    for (DateTime date in dates) {
+      List<Walk> walks = await retrieveSortedWalks(date, position: home);
+      Walk? nearestWalk = walks.firstOrNull;
+      if (nearestWalk != null) {
+        nearestWalk.weathers = await retrieveWeather(nearestWalk);
+        return _scheduleNextNearestWalk(nearestWalk);
+      }
     }
   }
 }

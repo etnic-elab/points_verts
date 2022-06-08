@@ -73,6 +73,7 @@ flutter:
   #  - images/a_dot_ham.jpeg
   assets:
     - .env
+    - assets/walk_data.json
     - assets/light/
     - assets/dark/
     - assets/raw/

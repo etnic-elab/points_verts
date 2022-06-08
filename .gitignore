@@ -48,6 +48,7 @@ pubspec.lock
  
 
 # assets
+/assets/walk_data.json
 /assets/light/*.png
 /assets/dark/*.png
 /assets/google_static_markers/

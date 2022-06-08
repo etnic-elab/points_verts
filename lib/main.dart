@@ -17,12 +17,9 @@ import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
-import 'package:points_verts/views/walks/walk_details_view.dart';
 
 import 'package:points_verts/walks_home_screen.dart';
 import 'package:points_verts/company_data.dart';
-
-import 'models/walk.dart';
 
 Future<void> _addTrustedCert(String certPath) async {
   ByteData data = await Assets.asset.load(certPath);
@@ -81,14 +78,6 @@ class MyApp extends StatelessWidget {
   static final navigatorKey = GlobalKey<NavigatorState>();
 
   const MyApp({Key? key}) : super(key: key);
-
-  static redirectToWalkDetails(int walkId) async {
-    Walk? walk = await DBProvider.db.getWalk(walkId);
-    if (walk != null) {
-      MyApp.navigatorKey.currentState!
-          .push(MaterialPageRoute(builder: (context) => WalkDetailsView(walk)));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

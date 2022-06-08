@@ -70,9 +70,9 @@ class CrashlyticsLocalService {
   static Future<bool> toggleCrashlyticsEnabled(bool newValue) async {
     bool? enabled;
     if ((debugEnabled || kReleaseMode) == false && newValue == true) {
+      enabled = false;
       log('Could not enable Crashlytics because you run in debug mode. To enable in debug mode, set kDebugCrashlytics to true',
           name: _crashlyticsTag);
-      enabled = false;
     } else {
       enabled = newValue && debugEnabled || kReleaseMode;
     }
