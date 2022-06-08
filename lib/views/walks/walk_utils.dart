@@ -121,31 +121,47 @@ Future<void> updateWalks() async {
   String nowIso8601Utc = nowDateUtc.toIso8601String();
   if (lastUpdateIso8601Utc == null) {
     List<Walk> newWalks = await fetchAllWalks(fromDateLocal: nowDateLocal);
+    // JSON might be out of date
+    lastUpdateIso8601Utc = getLastUpdateTimestamp(newWalks).toIso8601String();
     if (newWalks.isNotEmpty) {
       await DBProvider.db.insertWalks(newWalks, empty: true);
-      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
-      await _fixNextWalks();
-    }
-  } else {
-    if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
-        const Duration(hours: 1)) {
-      try {
-        List<Walk> updatedWalks = await refreshAllWalks(lastUpdateIso8601Utc,
-            fromDateLocal: nowDateLocal);
-        if (updatedWalks.isNotEmpty) {
-          await DBProvider.db.insertWalks(updatedWalks);
-        }
-        PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
-        await _fixNextWalks();
-        await DBProvider.db.deleteOldWalks();
-      } catch (err) {
-        print("Cannot refresh walks list: $err");
-      }
-    } else {
-      log("Not refreshing walks list since it has been done less than an hour ago",
-          name: tag);
+      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, lastUpdateIso8601Utc);
     }
   }
+  if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
+      const Duration(hours: 1)) {
+    try {
+      List<Walk> updatedWalks = await refreshAllWalks(lastUpdateIso8601Utc,
+          fromDateLocal: nowDateLocal);
+      if (updatedWalks.isNotEmpty) {
+        await DBProvider.db.insertWalks(updatedWalks);
+      }
+      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
+      await _fixNextWalks();
+      await DBProvider.db.deleteOldWalks();
+    } catch (err) {
+      print("Cannot refresh walks list: $err");
+    }
+
+    if (await DBProvider.db.isWalkTableEmpty()) {
+      throw Exception('walk table is empty');
+    }
+  } else {
+    log("Not refreshing walks list since it has been done less than an hour ago",
+        name: tag);
+  }
+}
+
+DateTime getLastUpdateTimestamp(List<Walk> walks) {
+  // in case we have no walks (JSON too old), then set by default to a year
+  // ago, so that updateWalks will retrieve them all
+  DateTime lastUpdate = DateTime.now().subtract(const Duration(days: 365));
+  for (Walk walk in walks) {
+    if (walk.lastUpdated.isAfter(lastUpdate)) {
+      lastUpdate = walk.lastUpdated;
+    }
+  }
+  return lastUpdate;
 }
 
 Future<List<DateTime>> retrieveNearestDates() async {

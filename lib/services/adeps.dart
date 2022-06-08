@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:csv/csv.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:points_verts/models/website_walk.dart';
@@ -14,11 +15,15 @@ const String baseUrl =
 const int pageSize = 500;
 
 Future<List<Walk>> fetchAllWalks({DateTime? fromDateLocal}) async {
-  log("Fetching all future walks", name: tag);
-  fromDateLocal ??= DateTime.now();
-  DateFormat dateFormat = DateFormat("yyyy/MM/dd");
-  return _retrieveWalks(
-      "$baseUrl&q=date+>%3D+${dateFormat.format(fromDateLocal)}");
+  try {
+    final String response =
+        await rootBundle.loadString('assets/walk_data.json');
+    Map<String, dynamic> data = await json.decode(response);
+    return _convertWalks(data);
+  } catch (e) {
+    log("Cannot retrieve walks from JSON file: $e");
+    return [];
+  }
 }
 
 Future<List<Walk>> refreshAllWalks(String lastUpdateIso8601Utc,
@@ -64,12 +69,17 @@ Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
 }
 
 List<Walk> _convertWalks(Map<String, dynamic> data) {
-  List<Walk> newList = [];
-  List<dynamic> list = data['records'];
-  for (Map<String, dynamic> walkJson in list) {
-    newList.add(Walk.fromJson(walkJson));
+  final DateTime now = DateTime.now();
+  final DateTime today = DateTime(now.year, now.month, now.day);
+
+  List<Walk> walks = [];
+  for (Map<String, dynamic> walkJson in data['records']) {
+    Walk walk = Walk.fromJson(walkJson);
+    if (!walk.date.isBefore(today)) {
+      walks.add(walk);
+    }
   }
-  return newList;
+  return walks;
 }
 
 String? _convertStatus(String webSiteStatus) {

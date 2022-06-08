@@ -97,6 +97,11 @@ flutter pub run flutter_launcher_icons:main
 flutter build appbundle
 ```
 
+# Initial walk dataset
+
+If you want the app to load an initial dataset without connecting to the internet, place a JSON
+file called `walk_data.json` in `assets` folder. This JSON must follows the schema of ODWB.
+
 # App assets and icons
 
 Due to copyright issues => below assets, files and folders are not included:
