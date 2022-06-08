@@ -14,7 +14,7 @@ const String baseUrl =
     "https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps";
 const int pageSize = 500;
 
-Future<List<Walk>> fetchAllWalks({DateTime? fromDateLocal}) async {
+Future<List<Walk>> fetchJsonWalks({DateTime? fromDateLocal}) async {
   try {
     final String response =
         await rootBundle.loadString('assets/walk_data.json');
@@ -26,7 +26,7 @@ Future<List<Walk>> fetchAllWalks({DateTime? fromDateLocal}) async {
   }
 }
 
-Future<List<Walk>> refreshAllWalks(String lastUpdateIso8601Utc,
+Future<List<Walk>> fetchApiWalks(String lastUpdateIso8601Utc,
     {DateTime? fromDateLocal}) async {
   log("Refreshing future walks list since $lastUpdateIso8601Utc", name: tag);
   fromDateLocal ??= DateTime.now();
@@ -59,25 +59,26 @@ Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
   List<WebsiteWalk> newList = [];
   var response = await http.get(Uri.parse(
       "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O"));
-  var fixed = _fixCsv(response.body);
-  List<List<dynamic>> rowsAsListOfValues =
-      const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-  for (List<dynamic> walk in rowsAsListOfValues) {
-    newList.add(WebsiteWalk(id: walk[0], status: _convertStatus(walk[9])));
+  if (response.statusCode == 200) {
+    var fixed = _fixCsv(response.body);
+    List<List<dynamic>> rowsAsListOfValues =
+        const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
+    for (List<dynamic> walk in rowsAsListOfValues) {
+      newList.add(WebsiteWalk(id: walk[0], status: _convertStatus(walk[9])));
+    }
   }
+
   return newList;
 }
 
 List<Walk> _convertWalks(Map<String, dynamic> data) {
-  final DateTime now = DateTime.now();
-  final DateTime today = DateTime(now.year, now.month, now.day);
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
 
   List<Walk> walks = [];
   for (Map<String, dynamic> walkJson in data['records']) {
     Walk walk = Walk.fromJson(walkJson);
-    if (!walk.date.isBefore(today)) {
-      walks.add(walk);
-    }
+    if (!walk.date.isBefore(today)) walks.add(walk);
   }
   return walks;
 }

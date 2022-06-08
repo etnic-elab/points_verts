@@ -56,15 +56,10 @@ class PrefsProvider {
   PrefsProvider._();
 
   static final PrefsProvider prefs = PrefsProvider._();
-  SharedPreferences? _sharedPreferences;
+  Future<SharedPreferences>? _sharedPreferences;
 
-  Future<SharedPreferences> get preferences async {
-    if (_sharedPreferences != null) {
-      return _sharedPreferences as SharedPreferences;
-    }
-    _sharedPreferences = await SharedPreferences.getInstance();
-    return _sharedPreferences as SharedPreferences;
-  }
+  Future<SharedPreferences> get preferences =>
+      _sharedPreferences ??= SharedPreferences.getInstance();
 
   Future<bool> remove(Prefs key) async {
     SharedPreferences prefs = await preferences;
