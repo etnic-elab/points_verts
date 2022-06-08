@@ -1,9 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:points_verts/services/background_fetch.dart';
-import 'package:points_verts/services/notification.dart';
+import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
@@ -36,17 +35,16 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
   void initState() {
     super.initState();
     BackgroundFetchProvider.task(mounted);
-    initializeData().then((_) {
-      FlutterNativeSplash.remove();
+    _crashlyticsOptIn().then((_) {
+      initializeData();
     });
   }
 
   Future<void> initializeData() async {
     setState(() => _loading = true);
     try {
-      bool didUpdate = await updateWalks();
-      if (didUpdate) _scheduleNotifications();
-      await PrefsProvider.prefs.remove(Prefs.lastSelectedDate);
+      await Future.wait(
+          [updateWalks(), PrefsProvider.prefs.remove(Prefs.lastSelectedDate)]);
       _error = false;
     } catch (err) {
       log("error init State, $err", name: tag);
@@ -55,11 +53,13 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
     setState(() => _loading = false);
   }
 
-  void _scheduleNotifications() {
-    NotificationManager.instance
-        .scheduleNextNearestWalkNotifications()
-        .catchError((err) =>
-            print("Cannot schedule next nearest walk notification: $err"));
+  Future<dynamic> _crashlyticsOptIn() async {
+    bool? crashlyticsEnabled =
+        await PrefsProvider.prefs.getBooleanNullable(Prefs.crashlyticsEnabled);
+    if (crashlyticsEnabled != null) return;
+
+    bool optIn = await _crashlyticsOptInDialog() ?? false;
+    return CrashlyticsLocalService.toggleCrashlyticsEnabled(optIn);
   }
 
   @override
@@ -85,5 +85,31 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
               ? WalkListError(initializeData)
               : _pages[_selectedIndex],
     );
+  }
+
+  Future<bool?> _crashlyticsOptInDialog() {
+    return showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Diagnostic'),
+              content: const Text(
+                  "L'envoi automatique de données de diagnostic nous permet d'améliorer l'application."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Autoriser'),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+                TextButton(
+                  child: const Text('Refuser'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                ),
+              ]);
+        });
   }
 }

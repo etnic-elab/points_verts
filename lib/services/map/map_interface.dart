@@ -1,22 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:points_verts/models/path.dart';
+import 'package:points_verts/services/map/googlemaps.dart';
+import 'package:points_verts/services/map/mapbox.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 
-import '../../models/address_suggestion.dart';
+import '../../models/address.dart';
 
 import '../../models/walk.dart';
 
+enum Maps { google, mapbox }
+
+extension MapsX on Maps {
+  MapInterface get instance {
+    switch (this) {
+      case Maps.google:
+        return GoogleMaps();
+      case Maps.mapbox:
+        return MapBox();
+    }
+  }
+}
+
 abstract class MapInterface {
   static const double defaultLat = 50.3155646;
-  static const double defaultLong = 5.009682;
-  static const double defaultZoom = 7.5;
+  static const double defaultLong = 4.6;
+  static const double defaultZoom = 7.35;
+
+  String get name;
+  String get apiName;
+  String get website;
+
+  String? get apiKey => dotenv.env[apiName];
 
   Future<void> retrieveTrips(double fromLong, double fromLat, List<Walk> walks);
 
   Future<List<AddressSuggestion>> retrieveSuggestions(
-      String country, String search);
+      String search, String country,
+      {String? sessionToken});
 
-  Future<String?> retrieveAddress(double long, double lat);
+  Future<Address?> retrievePlaceDetailFromId(String placeId,
+      {String? sessionToken});
 
   /// Returns a Widget with a map displaying the markers
   /// and a zoom on a specific location (lat/lng)

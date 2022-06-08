@@ -70,7 +70,24 @@ MAPBOX_TOKEN=token
 OPENWEATHER_TOKEN=token
 ```
 
-4. Information about the keystore should be set in the `android/key.properties`:
+4. Configure Firebase:
+
+   Follow this guide: https://firebase.google.com/docs/flutter/setup
+   Define following keys in `.env` file in root folder:
+
+   ```properties
+   FIREBASE_ANDROID_APP_ID=android_app_id
+   FIREBASE_ANDROID_API_KEY=android_api_key
+   FIREBASE_IOS_APP_ID=ios_app_id
+   FIREBASE_IOS_API_KEY=ios_api_key
+   FIREBASE_IOS_CLIENT_ID=ios_client_id
+   FIREBASE_IOS_BUNDLE_ID=ios_bundle_id
+   FIREBASE_PROJECT_ID=project_id
+   FIREBASE_SENDER_ID=sender_id
+   FIREBASE_STORAGE_BUCKET=storage_bucket
+   ```
+
+5. Information about the keystore should be set in the `android/key.properties`:
 
 ```properties
 storePassword=<password>
@@ -96,6 +113,11 @@ flutter pub run flutter_launcher_icons:main
 ```bash
 flutter build appbundle
 ```
+
+# Initial walk dataset
+
+If you want the app to load an initial dataset without connecting to the internet, place a JSON
+file called `walk_data.json` in `assets` folder. This JSON must follows the schema of ODWB.
 
 # App assets and icons
 

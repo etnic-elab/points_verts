@@ -1,12 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/constants.dart';
+import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/location.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:uuid/uuid.dart';
+import 'package:points_verts/services/map/map_interface.dart';
 
-import '../../models/address_suggestion.dart';
+import '../../models/address.dart';
 import '../../services/notification.dart';
 import '../../services/prefs.dart';
 import '../tile_icon.dart';
@@ -25,6 +31,7 @@ class _SettingsState extends State<Settings> {
   String? _home;
   bool _useLocation = false;
   bool _showNotification = false;
+  bool _crashlyticsEnabled = false;
 
   _SettingsState();
 
@@ -40,24 +47,32 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _retrievePrefs() async {
-    String? home = await PrefsProvider.prefs.getString(Prefs.homeLabel);
-    bool useLocation = await PrefsProvider.prefs.getBoolean(Prefs.useLocation);
-    bool showNotification = await PrefsProvider.prefs
-        .getBoolean(Prefs.showNotification, defaultValue: false);
+    final futures = await Future.wait([
+      PrefsProvider.prefs.getString(Prefs.homeLabel),
+      PrefsProvider.prefs.getBoolean(Prefs.useLocation),
+      PrefsProvider.prefs.getBoolean(Prefs.showNotification),
+      PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled)
+    ]);
     setState(() {
-      _home = home;
-      _useLocation = useLocation;
-      _showNotification = showNotification;
+      _home = futures[0] as String?;
+      _useLocation = futures[1] as bool;
+      _showNotification = futures[2] as bool;
+      _crashlyticsEnabled = futures[3] as bool;
     });
   }
 
-  Future<void> _setHome(AddressSuggestion suggestion) async {
-    await PrefsProvider.prefs.setString(
-        Prefs.homeCoords, "${suggestion.latitude},${suggestion.longitude}");
-    String? label = await PrefsProvider.prefs
-        .setString(Prefs.homeLabel, suggestion.address);
-    setState(() => _home = label);
-    if (_showNotification == true) {
+  Future<void> _setHome(
+      AddressSuggestion suggestion, String? sessionToken) async {
+    Address? address = await kMap.instance.retrievePlaceDetailFromId(
+        suggestion.placeId,
+        sessionToken: sessionToken);
+    if (address != null) {
+      final futures = await Future.wait([
+        PrefsProvider.prefs.setString(
+            Prefs.homeCoords, "${address.latitude},${address.longitude}"),
+        PrefsProvider.prefs.setString(Prefs.homeLabel, address.address)
+      ]);
+      if (mounted) setState(() => _home = futures[1]);
       NotificationManager.instance.scheduleNextNearestWalkNotifications();
     }
   }
@@ -65,9 +80,7 @@ class _SettingsState extends State<Settings> {
   Future<void> _removeHome() async {
     await PrefsProvider.prefs.remove(Prefs.homeCoords);
     await PrefsProvider.prefs.remove(Prefs.homeLabel);
-    setState(() {
-      _home = null;
-    });
+    setState(() => _home = null);
     NotificationManager.instance.cancelNextNearestWalkNotifications();
   }
 
@@ -87,20 +100,30 @@ class _SettingsState extends State<Settings> {
     }
   }
 
+  void _setCrashlyticsEnabled(bool isEnabled) async {
+    bool wasEnabled = _crashlyticsEnabled;
+    isEnabled =
+        await CrashlyticsLocalService.toggleCrashlyticsEnabled(isEnabled);
+
+    setState(() => _crashlyticsEnabled = isEnabled);
+    if (wasEnabled && !isEnabled) {
+      crashlyticsNewOptOutDialog();
+    }
+  }
+
   Future<void> _setShowNotification(bool newValue) async {
     await PrefsProvider.prefs.setBoolean(Prefs.showNotification, newValue);
-    if (newValue == true) {
+    if (newValue == false) {
+      NotificationManager.instance.cancelNextNearestWalkNotifications();
+    } else {
       bool? notificationsAllowed =
           await NotificationManager.instance.requestNotificationPermissions();
-      if (notificationsAllowed == true) {
-        NotificationManager.instance.scheduleNextNearestWalkNotifications();
-      } else {
-        _setShowNotification(false);
-        return;
-      }
-    } else {
-      NotificationManager.instance.cancelNextNearestWalkNotifications();
+      if (notificationsAllowed == false) return _setShowNotification(false);
+
+      NotificationManager.instance.scheduleNextNearestWalkNotifications();
+      if (Platform.isIOS && mounted) _showIOSNotificationAlert();
     }
+    if (!mounted) return;
     setState(() {
       _showNotification = newValue;
     });
@@ -135,9 +158,11 @@ class _SettingsState extends State<Settings> {
             title: const Text('Mon domicile'),
             subtitle: getHomeLabel(),
             onTap: () {
+              final sessionToken = const Uuid().v4();
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>
-                      SettingsHomeSelect(_setHome, _removeHome)));
+                  builder: (context) => SettingsHomeSelect(
+                      _setHome, _removeHome,
+                      sessionToken: sessionToken)));
             },
             trailing: _home != null
                 ? IconButton(
@@ -155,8 +180,25 @@ class _SettingsState extends State<Settings> {
             secondary: const TileIcon(Icon(Icons.notifications)),
             title: const Text("Notifier la veille (vers 20h)"),
             value: _showNotification,
+            onChanged: _home?.isEmpty ?? true
+                ? null
+                : (bool value) {
+                    _setShowNotification(value);
+                  },
+          ),
+          const Divider(),
+          const ListHeader("Diagnostic"),
+          ListTile(
+            title: Text(
+                "L'envoi automatique de données de diagnostic nous permet d'améliorer l'application.",
+                style: Theme.of(context).textTheme.caption),
+          ),
+          SwitchListTile(
+            secondary: const TileIcon(Icon(Icons.bug_report)),
+            title: const Text("Envoi de rapports"),
+            value: _crashlyticsEnabled,
             onChanged: (bool value) {
-              _setShowNotification(value);
+              _setCrashlyticsEnabled(value);
             },
           ),
           const Divider(),
@@ -182,5 +224,45 @@ class _SettingsState extends State<Settings> {
     } else {
       return Text(_home!, style: const TextStyle(fontSize: 12.0));
     }
+  }
+
+  Future<void> crashlyticsNewOptOutDialog() {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Diagnostic'),
+              content: const Text(
+                  "L'envoi automatique de données de diagnostic sera désactivé dès la prochaine fermeture de l'application."),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ]);
+        });
+  }
+
+  void _showIOSNotificationAlert() {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Attention'),
+          content: const Text('''
+iOS empêche les applications peu utilisées d'exécuter des tâches en arrière-plan régulièrement, ce dont l'application a besoin pour planifier les notifications.
+Nous vous conseillons d'ouvrir l'application au moins une fois par semaine pour contourner cette restriction.
+'''),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

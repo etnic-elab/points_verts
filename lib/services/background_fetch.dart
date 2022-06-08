@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:background_fetch/background_fetch.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -10,8 +12,8 @@ class BackgroundFetchProvider {
   static Future<void> task(bool mounted) async {
     BackgroundFetch.configure(
         BackgroundFetchConfig(
-            minimumFetchInterval: 60 * 18,
             // 1.3 times per day
+            minimumFetchInterval: 60 * 18,
             stopOnTerminate: false,
             enableHeadless: true,
             requiredNetworkType: NetworkType.ANY,
@@ -32,30 +34,33 @@ class BackgroundFetchProvider {
   }
 
   static headlessTask(HeadlessTask task) async {
-    String taskId = task.taskId;
-    bool isTimeout = task.timeout;
-    if (isTimeout) {
-      print("[BackgroundFetch] Headless TIMEOUT: $taskId");
-      BackgroundFetch.finish(taskId);
-      return;
-    }
-    try {
-      print("[BackgroundFetch] Headless task: $taskId");
-      if (await NotificationManager.instance
-          .isScheduleNextNearestWalkNotifications()) {
-        await dotenv.load();
-        bool didUpdate = await updateWalks();
-        if (didUpdate) {
-          NotificationManager.instance.scheduleNextNearestWalkNotifications();
-        }
+    runZonedGuarded<Future<void>>(() async {
+      String taskId = task.taskId;
+      bool isTimeout = task.timeout;
+      if (isTimeout) {
+        print("[BackgroundFetch] Headless TIMEOUT: $taskId");
+        BackgroundFetch.finish(taskId);
+        return;
       }
-
-      PrefsProvider.prefs.setString(
-          Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
-    } catch (err) {
-      print("Cannot schedule next nearest walk notification: $err");
-    } finally {
-      BackgroundFetch.finish(taskId);
-    }
+      try {
+        print("[BackgroundFetch] Headless task: $taskId");
+        FirebaseCrashlytics.instance.setCustomKey('foreground', false);
+        if (await NotificationManager.instance
+            .isScheduleNextNearestWalkNotifications()) {
+          await dotenv.load();
+          await FirebaseLocalService.initialize(isForeground: false);
+          await updateWalks();
+        }
+        PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
+            DateTime.now().toUtc().toIso8601String());
+      } catch (err) {
+        print("Cannot schedule next nearest walk notification: $err");
+      } finally {
+        FirebaseCrashlytics.instance.setCustomKey('foreground', true);
+        BackgroundFetch.finish(taskId);
+      }
+    },
+        (error, stack) => FirebaseCrashlytics.instance
+            .recordError(error, stack, fatal: true));
   }
 }

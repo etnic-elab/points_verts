@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:csv/csv.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:points_verts/models/website_walk.dart';
@@ -13,15 +14,19 @@ const String baseUrl =
     "https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps";
 const int pageSize = 500;
 
-Future<List<Walk>> fetchAllWalks({DateTime? fromDateLocal}) async {
-  log("Fetching all future walks", name: tag);
-  fromDateLocal ??= DateTime.now();
-  DateFormat dateFormat = DateFormat("yyyy/MM/dd");
-  return _retrieveWalks(
-      "$baseUrl&q=date+>%3D+${dateFormat.format(fromDateLocal)}");
+Future<List<Walk>> fetchJsonWalks({DateTime? fromDateLocal}) async {
+  try {
+    final String response =
+        await rootBundle.loadString('assets/walk_data.json');
+    Map<String, dynamic> data = await json.decode(response);
+    return _convertWalks(data);
+  } catch (e) {
+    log("Cannot retrieve walks from JSON file: $e");
+    return [];
+  }
 }
 
-Future<List<Walk>> refreshAllWalks(String lastUpdateIso8601Utc,
+Future<List<Walk>> fetchApiWalks(String lastUpdateIso8601Utc,
     {DateTime? fromDateLocal}) async {
   log("Refreshing future walks list since $lastUpdateIso8601Utc", name: tag);
   fromDateLocal ??= DateTime.now();
@@ -43,7 +48,7 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
       start = start + pageSize;
       finished = data['nhits'] <= start;
     } else {
-      throw Exception('Failed to load walks');
+      return Future.error(Exception('Failed to load walks'));
     }
   }
   return walks;
@@ -54,22 +59,28 @@ Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
   List<WebsiteWalk> newList = [];
   var response = await http.get(Uri.parse(
       "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O"));
-  var fixed = _fixCsv(response.body);
-  List<List<dynamic>> rowsAsListOfValues =
-      const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-  for (List<dynamic> walk in rowsAsListOfValues) {
-    newList.add(WebsiteWalk(id: walk[0], status: _convertStatus(walk[9])));
+  if (response.statusCode == 200) {
+    var fixed = _fixCsv(response.body);
+    List<List<dynamic>> rowsAsListOfValues =
+        const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
+    for (List<dynamic> walk in rowsAsListOfValues) {
+      newList.add(WebsiteWalk(id: walk[0], status: _convertStatus(walk[9])));
+    }
   }
+
   return newList;
 }
 
 List<Walk> _convertWalks(Map<String, dynamic> data) {
-  List<Walk> newList = [];
-  List<dynamic> list = data['records'];
-  for (Map<String, dynamic> walkJson in list) {
-    newList.add(Walk.fromJson(walkJson));
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+
+  List<Walk> walks = [];
+  for (Map<String, dynamic> walkJson in data['records']) {
+    Walk walk = Walk.fromJson(walkJson);
+    if (!walk.date.isBefore(today)) walks.add(walk);
   }
-  return newList;
+  return walks;
 }
 
 String? _convertStatus(String webSiteStatus) {

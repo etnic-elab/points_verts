@@ -3,21 +3,20 @@ import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/constants.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/services/map/map_interface.dart';
+import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
+import 'package:points_verts/services/map/map_interface.dart';
 
 import '../../models/walk.dart';
-
-final MapInterface map = Environment.mapInterface;
 
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
@@ -89,7 +88,7 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
   }
   walks.sort((a, b) => sortWalks(a, b));
   try {
-    await map
+    await kMap.instance
         .retrieveTrips(position.longitude, position.latitude, walks)
         .then((_) {
       walks.sort((a, b) => sortWalks(a, b));
@@ -112,44 +111,70 @@ Future<void> launchURL(String? url) async {
   }
 }
 
-Future<bool> updateWalks() async {
+Future<void> updateWalks() async {
   log("Updating walks", name: tag);
+
+  bool didUpdate = false;
   String? lastUpdateIso8601Utc =
       await PrefsProvider.prefs.getString(Prefs.lastWalkUpdate);
   DateTime nowDateLocal = DateTime.now();
   DateTime nowDateUtc = nowDateLocal.toUtc();
-  String nowIso8601Utc = nowDateUtc.toIso8601String();
+
   if (lastUpdateIso8601Utc == null) {
-    List<Walk> newWalks = await fetchAllWalks(fromDateLocal: nowDateLocal);
-    if (newWalks.isNotEmpty) {
-      await DBProvider.db.insertWalks(newWalks, empty: true);
-      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
-      await _fixNextWalks();
-      return true;
-    }
-  } else {
-    if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
-        const Duration(hours: 1)) {
-      try {
-        List<Walk> updatedWalks = await refreshAllWalks(lastUpdateIso8601Utc,
-            fromDateLocal: nowDateLocal);
-        if (updatedWalks.isNotEmpty) {
-          await DBProvider.db.insertWalks(updatedWalks);
-        }
-        PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, nowIso8601Utc);
-        await _fixNextWalks();
-        await DBProvider.db.deleteOldWalks();
-        return true;
-      } catch (err) {
-        print("Cannot refresh walks list: $err");
-      }
-    } else {
-      log("Not refreshing walks list since it has been done less than an hour ago",
-          name: tag);
+    final futures = await Future.wait([
+      fetchJsonWalks(fromDateLocal: nowDateLocal),
+      DBProvider.db.deleteWalks()
+    ]);
+
+    List<Walk> newWalks = futures[0] as List<Walk>;
+    lastUpdateIso8601Utc = getLastUpdateTimestamp(newWalks).toIso8601String();
+    await Future.wait([
+      DBProvider.db.insertWalks(newWalks),
+      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, lastUpdateIso8601Utc)
+    ]);
+    didUpdate = true;
+  }
+
+  if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
+      const Duration(hours: 1)) {
+    try {
+      List<Walk> updatedWalks = await fetchApiWalks(lastUpdateIso8601Utc,
+          fromDateLocal: nowDateLocal);
+      await Future.wait([
+        DBProvider.db.insertWalks(updatedWalks),
+        PrefsProvider.prefs
+            .setString(Prefs.lastWalkUpdate, nowDateUtc.toIso8601String())
+      ]);
+      didUpdate = true;
+    } catch (err) {
+      print("Cannot refresh walks list: $err");
     }
   }
 
-  return false;
+  if (await DBProvider.db.isWalkTableEmpty()) {
+    return Future.error(Exception('walk table is empty'));
+  }
+
+  if (didUpdate) {
+    await _fixNextWalks();
+    DBProvider.db.deleteOldWalks(nowDateLocal);
+    NotificationManager.instance
+        .scheduleNextNearestWalkNotifications()
+        .catchError((err) =>
+            print("Cannot schedule next nearest walk notification: $err"));
+  }
+}
+
+DateTime getLastUpdateTimestamp(List<Walk> walks) {
+  // in case we have no walks (JSON too old), then set by default to a year
+  // ago, so that updateWalks will retrieve them all
+  DateTime lastUpdate = DateTime.now().subtract(const Duration(days: 365));
+  for (Walk walk in walks) {
+    if (walk.lastUpdated.isAfter(lastUpdate)) {
+      lastUpdate = walk.lastUpdated;
+    }
+  }
+  return lastUpdate;
 }
 
 Future<List<DateTime>> retrieveNearestDates() async {

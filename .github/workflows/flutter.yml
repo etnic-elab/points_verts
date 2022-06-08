@@ -22,12 +22,21 @@ jobs:
       - name: Touch placeholder files
         run: |
           touch .env
+          touch assets/walk_data.json
           cp assets/dummy.png assets/light/splash.png
           cp assets/dummy.png assets/dark/splash.png
           cp assets/dummy_icon.png assets/launcher_icons/icon_812x812.png
           cp assets/dummy_icon.png assets/launcher_icons/icon_432x432.png
           touch ios/Runner/GoogleMaps.plist
+          touch android/app/google-services.json
           echo "" >> ios/Runner/GoogleMaps.plist
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "firebase_app_id_file.json"
+          json: '{"file_generated_by": "FlutterFire CLI","purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory","GOOGLE_APP_ID": "1:1111111111111:ios:5b796ce177d1c60e6fa46e","FIREBASE_PROJECT_ID": "project_id","GCM_SENDER_ID": "1111111111111"}'
+          dir: "ios/"
       - name: Generate splash screens
         run: flutter pub run flutter_native_splash:create
       - name: Generate launcher icons

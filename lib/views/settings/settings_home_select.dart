@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:points_verts/environment.dart';
+import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/models/address_suggestion.dart';
+import 'package:points_verts/models/address.dart';
 
 import '../loading.dart';
 
@@ -12,21 +12,20 @@ const countryLabels = ['Belgique', 'France', 'Luxembourg'];
 
 class SettingsHomeSelect extends StatefulWidget {
   const SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback,
-      {Key? key})
+      {this.sessionToken, Key? key})
       : super(key: key);
 
-  final Function(AddressSuggestion) setHomeCallback;
+  final Function(AddressSuggestion, String?) setHomeCallback;
   final Function removeHomeCallback;
+  final String? sessionToken;
 
   @override
   State createState() => _SettingsHomeSelectState();
 }
 
 class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
-  final MapInterface map = Environment.mapInterface;
-
   final _homeSearchController = TextEditingController();
-  Timer? _debounce;
+  // Timer? _debounce;
   int _countryIndex = 0;
   Future<List<AddressSuggestion>> _suggestions = Future.value([]);
 
@@ -43,14 +42,16 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
   }
 
   _onSearchChanged() {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
-      setState(() {
-        _suggestions = map.retrieveSuggestions(
-            countryCodes[_countryIndex], _homeSearchController.text);
-      });
+    if (!mounted) return;
+    setState(() {
+      _suggestions = _homeSearchController.text.isEmpty
+          ? Future.value([])
+          : kMap.instance.retrieveSuggestions(
+              _homeSearchController.text, countryCodes[_countryIndex],
+              sessionToken: widget.sessionToken);
     });
+    // if (_debounce?.isActive ?? false) _debounce!.cancel();
+    // _debounce = Timer(const Duration(milliseconds: 500), () {});
   }
 
   @override
@@ -104,11 +105,11 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                 itemBuilder: (context, i) {
                   AddressSuggestion suggestion = suggestions[i];
                   return ListTile(
-                      title: Text(suggestion.text),
-                      subtitle: Text(suggestion.address,
+                      title: Text(suggestion.name),
+                      subtitle: Text(suggestion.description,
                           overflow: TextOverflow.ellipsis),
                       onTap: () {
-                        widget.setHomeCallback(suggestion);
+                        widget.setHomeCallback(suggestion, widget.sessionToken);
                         _homeSearchController.removeListener(_onSearchChanged);
                         Navigator.of(context).pop();
                       });
@@ -144,9 +145,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
               children: generateOptions(context));
         });
     if (index != null) {
-      setState(() {
-        _countryIndex = index;
-      });
+      setState(() => _countryIndex = index);
     }
   }
 

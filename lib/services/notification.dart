@@ -150,7 +150,6 @@ class NotificationManager {
         retrieveHomePosition()
       ]);
       List<DateTime> dates = futures[1];
-      log('dates, $dates', name: tag);
       LatLng home = futures[2];
 
       for (DateTime date in dates) {
