@@ -10,7 +10,7 @@ import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/flutter_map.dart';
 import 'package:points_verts/extensions.dart';
 
-import '../../models/address_suggestion.dart';
+import '../../models/address.dart';
 import '../../models/trip.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -56,39 +56,27 @@ class MapBox implements MapInterface {
 
   @override
   Future<List<AddressSuggestion>> retrieveSuggestions(
-      String country, String search) async {
-    if (search.isNotEmpty) {
-      final String url =
-          "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token&country=$country&language=fr_BE&limit=10&types=address,poi";
-      final http.Response response = await http.get(Uri.parse(url));
-      var decoded = json.decode(response.body);
-      List<AddressSuggestion> results = [];
-      if (decoded['features'] != null) {
-        for (var result in decoded['features']) {
-          results.add(AddressSuggestion(
-              text: result['text'],
-              address: result['place_name'],
-              longitude: result['center'][0],
-              latitude: result['center'][1]));
-        }
+      String search, String country,
+      {String? sessionToken}) async {
+    final String url =
+        "https://api.mapbox.com/geocoding/v5/mapbox.places/$search.json?access_token=$_token&country=$country&language=fr_BE&limit=10&types=address,poi";
+    final http.Response response = await http.get(Uri.parse(url));
+    var decoded = json.decode(response.body);
+    List<AddressSuggestion> results = [];
+    if (decoded['features'] != null) {
+      for (var result in decoded['features']) {
+        print(results);
+        results.add(AddressSuggestion(
+            result['id'], result['test'], result['place_name']));
       }
-      return results;
-    } else {
-      return [];
     }
+    return results;
   }
 
   @override
-  Future<String?> retrieveAddress(double long, double lat) async {
-    final String url =
-        "https://api.mapbox.com/geocoding/v5/mapbox.places/$long,$lat.json?access_token=$_token";
-    final http.Response response = await http.get(Uri.parse(url));
-    var decoded = json.decode(response.body);
-    if (decoded['features'].length > 0) {
-      return decoded['features'][0]['place_name'];
-    } else {
-      return null;
-    }
+  Future<Address?> retrievePlaceDetailFromId(String placeId,
+      {String? sessionToken}) {
+    throw UnsupportedError;
   }
 
   @override
