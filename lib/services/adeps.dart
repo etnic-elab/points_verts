@@ -37,20 +37,25 @@ Future<List<Walk>> fetchApiWalks(String lastUpdateIso8601Utc,
 
 Future<List<Walk>> _retrieveWalks(String baseUrl) async {
   List<Walk> walks = [];
-  bool finished = false;
-  int start = 0;
-  while (!finished) {
-    String url = "$baseUrl&rows=$pageSize&start=$start";
-    var response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      Map<String, dynamic> data = json.decode(response.body);
-      walks.addAll(_convertWalks(data));
-      start = start + pageSize;
-      finished = data['nhits'] <= start;
-    } else {
-      return Future.error(Exception('Failed to load walks'));
+  try {
+    bool finished = false;
+    int start = 0;
+    while (!finished) {
+      String url = "$baseUrl&rows=$pageSize&start=$start";
+      var response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = json.decode(response.body);
+        walks.addAll(_convertWalks(data));
+        start = start + pageSize;
+        finished = data['nhits'] <= start;
+      } else {
+        return Future.error(Exception('Failed to load walks'));
+      }
     }
+  } catch (err) {
+    return Future.error(Exception('Failed to load walks'));
   }
+
   return walks;
 }
 
