@@ -34,7 +34,7 @@ class CrashlyticsLocalService {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     FirebaseCrashlytics.instance.setCustomKey('foreground', isForeground);
     FirebaseCrashlytics.instance.setCustomKey('test', false);
-    FirebaseCrashlytics.instance.setCustomKey('debug', !kReleaseMode);
+    FirebaseCrashlytics.instance.setCustomKey('debug', kDebugMode);
     _initializeOptIn();
     Isolate.current.addErrorListener(RawReceivePort((pair) async {
       final List<dynamic> errorAndStacktrace = pair;
