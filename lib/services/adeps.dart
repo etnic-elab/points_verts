@@ -57,15 +57,19 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
 Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
   DateFormat dateFormat = DateFormat("dd-MM-yyyy");
   List<WebsiteWalk> newList = [];
-  var response = await http.get(Uri.parse(
-      "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O"));
-  if (response.statusCode == 200) {
-    var fixed = _fixCsv(response.body);
-    List<List<dynamic>> rowsAsListOfValues =
-        const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-    for (List<dynamic> walk in rowsAsListOfValues) {
-      newList.add(WebsiteWalk(id: walk[0], status: _convertStatus(walk[9])));
+  try {
+    var response = await http.get(Uri.parse(
+        "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O"));
+    if (response.statusCode == 200) {
+      var fixed = _fixCsv(response.body);
+      List<List<dynamic>> rowsAsListOfValues =
+          const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
+      for (List<dynamic> walk in rowsAsListOfValues) {
+        newList.add(WebsiteWalk(id: walk[0], status: _convertStatus(walk[9])));
+      }
     }
+  } catch (err) {
+    print("Couldn't retrieve walks from website, $err");
   }
 
   return newList;
