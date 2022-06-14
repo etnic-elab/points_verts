@@ -53,7 +53,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
     setState(() => _loading = false);
   }
 
-  Future<dynamic> _crashlyticsOptIn() async {
+  Future<void> _crashlyticsOptIn() async {
     bool? crashlyticsEnabled =
         await PrefsProvider.prefs.getBooleanNullable(Prefs.crashlyticsEnabled);
     if (crashlyticsEnabled != null) return;
