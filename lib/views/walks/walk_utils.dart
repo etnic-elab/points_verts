@@ -208,24 +208,27 @@ Future<void> _fixNextWalks() async {
   List<DateTime> nextDates = await retrieveNearestDates();
   for (DateTime walkDate in nextDates) {
     List<WebsiteWalk> fromWebsite = await retrieveWalksFromWebSite(walkDate);
-    List<Walk> fromDb = await DBProvider.db.getWalks(walkDate);
-    List<Walk> fromDbUpdated = [];
-    for (Walk walk in fromDb) {
-      WebsiteWalk? website;
-      for (WebsiteWalk websiteWalk in fromWebsite) {
-        if (walk.id == websiteWalk.id) {
-          website = websiteWalk;
-          break;
+    if (fromWebsite.isNotEmpty) {
+      List<Walk> fromDb = await DBProvider.db.getWalks(walkDate);
+      List<Walk> fromDbUpdated = [];
+
+      for (Walk walk in fromDb) {
+        WebsiteWalk? website;
+        for (WebsiteWalk websiteWalk in fromWebsite) {
+          if (walk.id == websiteWalk.id) {
+            website = websiteWalk;
+            break;
+          }
+        }
+        if (website == null) {
+          walk.status = "Annulé";
+          fromDbUpdated.add(walk);
+        } else if (website.status != null && website.status != walk.status) {
+          walk.status = website.status!;
+          fromDbUpdated.add(walk);
         }
       }
-      if (website == null) {
-        walk.status = "Annulé";
-        fromDbUpdated.add(walk);
-      } else if (website.status != null && website.status != walk.status) {
-        walk.status = website.status!;
-        fromDbUpdated.add(walk);
-      }
+      await DBProvider.db.insertWalks(fromDbUpdated);
     }
-    await DBProvider.db.insertWalks(fromDbUpdated);
   }
 }
