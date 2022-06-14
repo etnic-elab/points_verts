@@ -75,6 +75,7 @@ Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
     }
   } catch (err) {
     print("Couldn't retrieve walks from website, $err");
+    newList = [];
   }
 
   return newList;
