@@ -3,6 +3,7 @@
 *.log
 *.pyc
 *.swp
+*.lock
 .DS_Store
 .atom/
 .buildlog/
@@ -44,7 +45,6 @@ key.jks
 /app_icons/
 /ios/firebase_app_id_file.json
 /android/app/google-services.json
-pubspec.lock
  
 
 # assets

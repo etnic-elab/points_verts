@@ -205,10 +205,10 @@ Future<List<Weather>> retrieveWeather(Walk walk) {
 // To fix that until it is resolved, retrieve the statuses from the website
 // for the walks of the next walk date when we refresh data from the API.
 Future<void> _fixNextWalks() async {
-  List<DateTime> nextDates = await retrieveNearestDates();
-  for (DateTime walkDate in nextDates) {
-    List<WebsiteWalk> fromWebsite = await retrieveWalksFromWebSite(walkDate);
-    if (fromWebsite.isNotEmpty) {
+  try {
+    List<DateTime> nextDates = await retrieveNearestDates();
+    for (DateTime walkDate in nextDates) {
+      List<WebsiteWalk> fromWebsite = await retrieveWalksFromWebSite(walkDate);
       List<Walk> fromDb = await DBProvider.db.getWalks(walkDate);
       List<Walk> fromDbUpdated = [];
 
@@ -230,5 +230,7 @@ Future<void> _fixNextWalks() async {
       }
       await DBProvider.db.insertWalks(fromDbUpdated);
     }
+  } catch (err) {
+    print("Couldn't fix next walks, $err");
   }
 }
