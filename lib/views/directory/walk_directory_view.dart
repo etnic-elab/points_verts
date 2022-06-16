@@ -192,8 +192,8 @@ class _DataSearch extends SearchDelegate<String?> {
         ? walks
         : walks
             .where((p) =>
-                p.city.contains(RegExp(query, caseSensitive: false)) ||
-                p.entity.contains(RegExp(query, caseSensitive: false)))
+                p.city.toLowerCase().contains(query.toLowerCase()) ||
+                p.entity.toLowerCase().contains(query.toLowerCase()))
             .toList();
 
     return _DirectoryList(suggestionList);
