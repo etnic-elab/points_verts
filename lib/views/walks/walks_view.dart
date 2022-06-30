@@ -206,24 +206,24 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
 
   void _firstLaunch() async {
     bool firstLaunch = await PrefsProvider.prefs.getBoolean(Prefs.firstLaunch);
-    if (firstLaunch && mounted) {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      final snackBar = SnackBar(
-          duration: const Duration(days: 1),
-          action: SnackBarAction(
-            onPressed: () {
-              PrefsProvider.prefs.setBoolean(Prefs.firstLaunch, false);
-            },
-            label: "OK",
-          ),
-          content: const Text(
-              "Pour voir en un coup d'œil les marches les plus proches de chez vous, n'hésitez pas à indiquer votre adresse dans les Paramètres !",
-              textAlign: TextAlign.justify));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
+    if (!mounted || !firstLaunch) return;
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    final snackBar = SnackBar(
+        duration: const Duration(days: 1),
+        action: SnackBarAction(
+          onPressed: () {
+            PrefsProvider.prefs.setBoolean(Prefs.firstLaunch, false);
+          },
+          label: "OK",
+        ),
+        content: const Text(
+            "Pour voir en un coup d'œil les marches les plus proches de chez vous, n'hésitez pas à indiquer votre adresse dans les Paramètres !",
+            textAlign: TextAlign.justify));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void _locationExceptionMessage() {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     final snackBar = SnackBar(
         content: Row(
