@@ -188,7 +188,7 @@ class Walk {
       // if (json['fields']['localite'] == 'BINCHE') {
       //   return _pathsFromJson(jsonDecode(TRACES_GPX));
       // }
-      return _pathsFromJson(jsonDecode(json['fields']['traces_gpx']));
+      return _pathsFromJson(json['fields']['traces_gpx']);
     } catch (err) {
       print("Cannot decode paths for walk '${json['fields']['id']}': $err");
       return [];
@@ -196,7 +196,7 @@ class Walk {
   }
 
   static List<Path> _pathsFromJson(dynamic json) {
-    if (json is List && json.isNotEmpty) {
+    if (json is List) {
       List<Path> paths =
           (json).map<Path>((json) => Path.fromJson(json)).toList();
       paths.sort();
