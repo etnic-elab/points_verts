@@ -9,11 +9,10 @@ import 'package:points_verts/services/cache_managers/gpx_cache_manager.dart';
 enum GpxCourse { track, route, waypoints }
 
 Future<List<GpxPoint>> retrieveGpxPoints(String url) async {
-  try {
-    final http.Response response = await GpxCacheManager.gpx.getData(url);
-    if (response.statusCode == 200) {
-      XmlDocument xmlFile;
-
+  final http.Response response = await GpxCacheManager.gpx.getData(url);
+  if (response.statusCode == 200) {
+    XmlDocument xmlFile;
+    try {
       xmlFile = XmlDocument.parse(response.body);
 
       Iterable<XmlElement> course;
@@ -37,11 +36,11 @@ Future<List<GpxPoint>> retrieveGpxPoints(String url) async {
       }
 
       return gpxPoints;
-    } else {
-      print('Failed to load gpx-file: $response');
+    } catch (err) {
+      print("A problem occured parsing gpx file: $err");
     }
-  } catch (err) {
-    print("A problem occured parsing gpx file: $err");
+  } else {
+    print('Failed to load gpx-file: $response');
   }
 
   return [];
