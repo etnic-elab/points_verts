@@ -30,8 +30,8 @@ dependencies:
   flutter_native_splash: ^2.0.2
   flutter_localizations:
     sdk: flutter
-  flutter_map: ^0.14.0
-  geolocator: ^8.1.1
+  flutter_map: ^1.1.1
+  geolocator: ^9.0.0
   google_maps_flutter: ^2.0.11
   http: ^0.13.0
   intl: ^0.17.0
@@ -45,7 +45,7 @@ dependencies:
   carousel_slider: ^4.0.0
   package_info_plus: ^1.4.2
   timezone: ^0.8.0
-  xml: ^5.4.0
+  xml: ^6.1.0
   latlong2: ^0.8.0
   path: ^1.8.0
   firebase_core: ^1.17.1
