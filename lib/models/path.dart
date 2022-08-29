@@ -3,6 +3,17 @@ import 'package:points_verts/company_data.dart';
 
 import 'gpx_point.dart';
 
+class Elevation {
+  Elevation({required this.positive, required this.negative});
+  int? positive;
+  int? negative;
+
+  @override
+  String toString() {
+    return 'Dénivelés: + ${positive}m, - ${negative}m';
+  }
+}
+
 class Path extends Comparable<Path> {
   Path({required this.url, required this.title, required this.type});
 
@@ -49,6 +60,34 @@ class Path extends Comparable<Path> {
       default:
         return isLight ? CompanyColors.darkBrown : CompanyColors.brown;
     }
+  }
+
+  Elevation get elevation {
+    double? previous;
+    double positive = 0;
+    double negative = 0;
+
+    for (GpxPoint point in gpxPoints) {
+      double? current = point.elevation;
+      if (previous == null) {
+        previous = current;
+        continue;
+      }
+
+      if (current == null) {
+        continue;
+      }
+
+      double difference = current - previous;
+      print('difference: $difference');
+
+      if (difference > 0) positive += difference.abs();
+      if (difference < 0) negative += difference.abs();
+
+      previous = current;
+    }
+
+    return Elevation(positive: positive.toInt(), negative: negative.toInt());
   }
 
   String? get description {
