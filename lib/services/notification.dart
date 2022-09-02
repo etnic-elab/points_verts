@@ -125,16 +125,20 @@ class NotificationManager {
   }
 
   Future<bool?> requestNotificationPermissions() async {
+    FlutterLocalNotificationsPlugin instance = await plugin;
     if (Platform.isIOS) {
-      FlutterLocalNotificationsPlugin instance = await plugin;
       return instance
           .resolvePlatformSpecificImplementation<
               IOSFlutterLocalNotificationsPlugin>()!
           .requestPermissions(
             alert: true,
           );
+    } else {
+      return instance
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()!
+          .requestPermission();
     }
-    return true;
   }
 
   Future<List<PendingNotificationRequest>> pendingNotifications() async {
