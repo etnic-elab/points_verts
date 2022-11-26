@@ -24,8 +24,8 @@ class FlutterMap extends StatelessWidget {
     return flutter.FlutterMap(
       options:
           flutter.MapOptions(center: LatLng(centerLat, centerLong), zoom: zoom),
-      layers: [
-        flutter.TileLayerOptions(
+      children: [
+        flutter.TileLayer(
           urlTemplate:
               "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}@2x?access_token={accessToken}",
           tileSize: 512,
@@ -38,7 +38,7 @@ class FlutterMap extends StatelessWidget {
                 : 'light-v10',
           },
         ),
-        flutter.MarkerLayerOptions(markers: flutterMarkers),
+        flutter.MarkerLayer(markers: flutterMarkers),
       ],
     );
   }
