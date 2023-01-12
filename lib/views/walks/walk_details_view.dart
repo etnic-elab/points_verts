@@ -41,7 +41,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   }
 
   Future<List> _retrievePaths() {
-    List<Future> paths = [];
+    List<Future> futures = [];
     if (!widget.walk.isCancelled) {
       for (Path path in widget.walk.paths) {
         if ((path.url?.isNotEmpty ?? false) && path.gpxPoints.isEmpty) {
@@ -50,11 +50,11 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
             path.gpxPoints = gpxPoints;
             path.visible = gpxPoints.isNotEmpty;
           });
-          paths.add(future);
+          futures.add(future);
         }
       }
     }
-    return Future.wait(paths);
+    return Future.wait(futures);
   }
 
   @override
@@ -175,10 +175,8 @@ class __BottomSheet extends State<_BottomSheet> {
         .map((path) => path.gpxPoints.isNotEmpty
             ? SwitchListTile(
                 title: Text(
-                  path.title,
-                ),
-                subtitle:
-                    path.description != null ? Text(path.description!) : null,
+                    path.description != null ? path.description! : path.title),
+                subtitle: Text('${path.elevation}'),
                 value: path.visible,
                 onChanged: (bool newValue) {
                   widget.togglePathVisibility(path, newValue);
