@@ -20,6 +20,8 @@ jobs:
           architecture: x64
       - name: Install dependencies
         run: flutter pub get
+      - name: Update Cocoapods
+        run: pod repo update
       - name: Touch placeholder files
         run: |
           touch .env
@@ -50,6 +52,4 @@ jobs:
       - name: Build APKs
         run: flutter build apk --debug --target-platform android-arm,android-arm64,android-x64 --split-per-abi
       - name: Build IPA
-        run: |
-          pod repo update
-          flutter build ios --debug --no-codesign --simulator
+        run: flutter build ios --debug --no-codesign --simulator
