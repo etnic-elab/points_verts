@@ -50,4 +50,6 @@ jobs:
       - name: Build APKs
         run: flutter build apk --debug --target-platform android-arm,android-arm64,android-x64 --split-per-abi
       - name: Build IPA
-        run: flutter build ios --debug --no-codesign --simulator
+        run: |
+          pod repo update
+          flutter build ios --debug --no-codesign --simulator
