@@ -16,7 +16,7 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
+          flutter-version: '3.0.x'
           architecture: x64
       - name: Install dependencies
         run: flutter pub get
@@ -58,7 +58,7 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
+          flutter-version: '3.0.x'
           architecture: x64
       - name: Install dependencies
         run: flutter pub get
