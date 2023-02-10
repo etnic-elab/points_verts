@@ -17,7 +17,7 @@ class OutlineIconButton extends StatelessWidget {
             onPressed: onPressed,
             style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.all(0.0),
-                primary: Theme.of(context).textTheme.bodyText1!.color),
+                foregroundColor: Theme.of(context).textTheme.bodyText1!.color),
             child: Icon(iconData)));
   }
 }
