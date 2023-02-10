@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Update Cocoapods
-        run: cd ios && pod install --repo-update
+        run: cd ios && pod repo update
       - name: Touch placeholder files
         run: |
           touch .env
