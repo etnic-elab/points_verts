@@ -21,8 +21,6 @@ jobs:
           architecture: x64
       - name: Install dependencies
         run: flutter pub get
-      - name: Install Cocoapods dependencies
-        run: cd ios && pod cache clean --all && pod install --verbose --repo-update
       - name: Touch placeholder files
         run: |
           touch .env
