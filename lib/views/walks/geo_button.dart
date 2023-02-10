@@ -23,7 +23,7 @@ class GeoButton extends StatelessWidget {
         return OutlinedButton.icon(
             onPressed: () => launchGeoApp(walk),
             style: OutlinedButton.styleFrom(
-                primary: Theme.of(context).textTheme.bodyText1!.color),
+                foregroundColor: Theme.of(context).textTheme.bodyText1!.color),
             icon: const Icon(Icons.directions_car, size: 15.0),
             label: Text(label));
       } else {

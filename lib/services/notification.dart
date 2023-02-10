@@ -36,7 +36,7 @@ class NotificationManager {
     log("creating a new plugin instance", name: tag);
     var initializationSettingsAndroid =
         const AndroidInitializationSettings(defaultIcon);
-    var initializationSettingsIOS = const IOSInitializationSettings(
+    var initializationSettingsIOS = const DarwinInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: false,
@@ -45,8 +45,8 @@ class NotificationManager {
         android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     final plugin = FlutterLocalNotificationsPlugin();
     await plugin.initialize(initializationSettings,
-        onSelectNotification: (String? payload) async {
-      int? walkId = int.tryParse(payload!);
+        onDidReceiveNotificationResponse: (NotificationResponse details) {
+      int? walkId = int.tryParse(details.payload!);
       if (walkId != null) _redirectToWalkDetails(walkId);
     });
     tz.initializeTimeZones();
@@ -107,7 +107,7 @@ class NotificationManager {
         priority: Priority.high,
         color: CompanyColors.greenPrimary,
         ticker: 'ticker');
-    var iOSPlatformChannelSpecifics = const IOSNotificationDetails();
+    var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
     return NotificationDetails(
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
@@ -125,16 +125,20 @@ class NotificationManager {
   }
 
   Future<bool?> requestNotificationPermissions() async {
+    FlutterLocalNotificationsPlugin instance = await plugin;
     if (Platform.isIOS) {
-      FlutterLocalNotificationsPlugin instance = await plugin;
       return instance
           .resolvePlatformSpecificImplementation<
               IOSFlutterLocalNotificationsPlugin>()!
           .requestPermissions(
             alert: true,
           );
+    } else {
+      return instance
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()!
+          .requestPermission();
     }
-    return true;
   }
 
   Future<List<PendingNotificationRequest>> pendingNotifications() async {
