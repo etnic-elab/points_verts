@@ -33,34 +33,30 @@ class BackgroundFetchProvider {
     if (!mounted) return;
   }
 
+  @pragma('vm:entry-point')
   static headlessTask(HeadlessTask task) async {
-    runZonedGuarded<Future<void>>(() async {
-      String taskId = task.taskId;
-      bool isTimeout = task.timeout;
-      if (isTimeout) {
-        print("[BackgroundFetch] Headless TIMEOUT: $taskId");
-        BackgroundFetch.finish(taskId);
-        return;
+    String taskId = task.taskId;
+    bool isTimeout = task.timeout;
+    if (isTimeout) {
+      print("[BackgroundFetch] Headless TIMEOUT: $taskId");
+      BackgroundFetch.finish(taskId);
+      return;
+    }
+    try {
+      print("[BackgroundFetch] Headless task: $taskId");
+      if (await NotificationManager.instance
+          .isScheduleNextNearestWalkNotifications()) {
+        await dotenv.load();
+        await updateWalks();
       }
-      try {
-        print("[BackgroundFetch] Headless task: $taskId");
-        FirebaseCrashlytics.instance.setCustomKey('foreground', false);
-        if (await NotificationManager.instance
-            .isScheduleNextNearestWalkNotifications()) {
-          await dotenv.load();
-          await FirebaseLocalService.initialize(isForeground: false);
-          await updateWalks();
-        }
-        PrefsProvider.prefs.setString(Prefs.lastBackgroundFetch,
-            DateTime.now().toUtc().toIso8601String());
-      } catch (err) {
-        print("Cannot schedule next nearest walk notification: $err");
-      } finally {
-        FirebaseCrashlytics.instance.setCustomKey('foreground', true);
-        BackgroundFetch.finish(taskId);
-      }
-    },
-        (error, stack) => FirebaseCrashlytics.instance
-            .recordError(error, stack, fatal: true));
+      PrefsProvider.prefs.setString(
+          Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
+    } catch (error, stack) {
+      print("Cannot schedule next nearest walk notification: $error");
+      await FirebaseLocalService.initialize(isForeground: false);
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    } finally {
+      BackgroundFetch.finish(taskId);
+    }
   }
 }
