@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 class OutlineIconButton extends StatelessWidget {
-  const OutlineIconButton({this.onPressed, this.iconData, Key? key})
+  const OutlineIconButton(
+      {this.onPressed, this.iconData, this.semanticLabel, Key? key})
       : super(key: key);
 
   @required
   final VoidCallback? onPressed;
   @required
   final IconData? iconData;
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +20,6 @@ class OutlineIconButton extends StatelessWidget {
             style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.all(0.0),
                 foregroundColor: Theme.of(context).textTheme.bodyText1!.color),
-            child: Icon(iconData)));
+            child: Icon(iconData, semanticLabel: semanticLabel)));
   }
 }

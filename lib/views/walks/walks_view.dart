@@ -265,6 +265,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         actions: <Widget>[
           IconButton(
             icon: Icon(_viewType == _ViewType.list ? Icons.map : Icons.list),
+            tooltip: _viewType == _ViewType.list
+                ? "Passer à la vue carte"
+                : "Passer à la vue liste",
             onPressed: () {
               setState(() {
                 _viewType = _viewType == _ViewType.list

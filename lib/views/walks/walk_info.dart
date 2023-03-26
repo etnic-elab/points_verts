@@ -8,13 +8,13 @@ class Range {
     if (walk.isWalk) {
       return walk.fifteenKm
           ? compact
-              ? "5-10-15-20 km"
+              ? "5 - 10 - 15 - 20 km"
               : 'Parcours de 5 - 10 - 15 - 20 km'
           : compact
-              ? '5-10-20 km'
+              ? '5 - 10 - 20 km'
               : 'Parcours de 5 - 10 - 20 km';
     } else if (walk.isOrientation) {
-      return compact ? "4-8-16 km" : "Parcours de 4 - 8 - 16 km";
+      return compact ? "4 - 8 - 16 km" : "Parcours de 4 - 8 - 16 km";
     }
 
     return '';

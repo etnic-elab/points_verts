@@ -24,50 +24,64 @@ class WalkDetailsInfo extends StatelessWidget {
           _WeatherSection(walk),
           ListTile(
               leading: const TileIcon(Icon(Icons.calendar_today)),
-              title:
+              title: const Text("Date de l'activité"),
+              subtitle:
                   Text(toBeginningOfSentenceCase(fullDate.format(walk.date))!),
-              subtitle: const Text('Secrétariat ouvert de 8h à 18h'),
               trailing: OutlineIconButton(
                 onPressed: () => addToCalendar(walk),
+                semanticLabel: "Ajouter cette activité à votre calendrier",
                 iconData: Icons.edit_calendar,
               )),
           _StatusTile(walk),
           _RangesTile(walk),
           ListTile(
             leading: const TileIcon(Icon(Icons.location_on)),
-            title: Text(walk.meetingPoint ?? ""),
-            subtitle: _getGeoText(),
+            title: const Text("Lieu de rendez-vous"),
+            subtitle: Text(walk.meetingPoint ?? ""),
             trailing: OutlineIconButton(
                 onPressed: () => launchGeoApp(walk),
+                semanticLabel:
+                    "Lancer la navigation vers le lieu de rendez-vous",
                 iconData: Icons.directions),
           ),
           walk.ign != null
               ? ListTile(
                   leading: const TileIcon(Icon(Icons.map)),
-                  title: Text("IGN ${walk.ign}"))
+                  title: const Text("Carte topographique"),
+                  subtitle: Text("IGN ${walk.ign}"))
               : const SizedBox.shrink(),
           walk.meetingPointInfo != null
               ? ListTile(
                   leading: const TileIcon(Icon(Icons.info)),
-                  title: Text(walk.meetingPointInfo!))
+                  title: const Text("Remarques"),
+                  subtitle: Text(walk.meetingPointInfo!))
               : const SizedBox.shrink(),
           ListTile(
             leading: const TileIcon(Icon(Icons.group)),
-            title: Text(walk.organizer),
-            subtitle: Text(walk.contactLabel),
-            trailing: OutlineIconButton(
-                onPressed: () {
-                  if (walk.contactPhoneNumber != null) {
-                    launchURL(
-                        "tel:${walk.contactPhoneNumber!.replaceAll(' ', '')}");
-                  }
-                },
-                iconData: Icons.call),
+            title: const Text("Groupement organisateur"),
+            subtitle: Text(walk.organizer),
           ),
+          walk.contactPhoneNumber != null
+              ? ListTile(
+                  leading: const TileIcon(Icon(Icons.person)),
+                  title: const Text("Personne de contact"),
+                  subtitle: Text(walk.contactLabel),
+                  trailing: OutlineIconButton(
+                      onPressed: () {
+                        if (walk.contactPhoneNumber != null) {
+                          launchURL(
+                              "tel:${walk.contactPhoneNumber!.replaceAll(' ', '')}");
+                        }
+                      },
+                      semanticLabel: "Appeler la personne de contact",
+                      iconData: Icons.call),
+                )
+              : const SizedBox.shrink(),
           walk.transport != null
               ? ListTile(
                   leading: const TileIcon(Icon(Icons.train)),
-                  title: Text(walk.transport!))
+                  title: const Text("Gare/Transport en commun"),
+                  subtitle: Text(walk.transport!))
               : const SizedBox.shrink(),
           _infoRow(),
         ],
@@ -77,6 +91,8 @@ class WalkDetailsInfo extends StatelessWidget {
 
   Widget _infoRow() {
     List<Widget> infos = [
+      WalkInfo.extraOrientation,
+      WalkInfo.extraWalk,
       WalkInfo.wheelchair,
       WalkInfo.stroller,
       WalkInfo.guided,
@@ -102,17 +118,6 @@ class WalkDetailsInfo extends StatelessWidget {
               : null);
     } else {
       return const SizedBox.shrink();
-    }
-  }
-
-  Widget? _getGeoText() {
-    if (walk.trip != null) {
-      return Text(
-          "À ${walk.formattedDistance}, ~${Duration(seconds: walk.trip!.duration!.round()).inMinutes} min. en voiture");
-    } else if (walk.distance != null && walk.distance != double.maxFinite) {
-      return Text("À ${walk.formattedDistance} (à vol d'oiseau)");
-    } else {
-      return null;
     }
   }
 }
@@ -155,15 +160,13 @@ class _RangesTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (walk.isWalk || walk.isOrientation) {
-      String title = Range.label(walk);
-      WalkInfo? subtitle =
-          walk.isWalk ? WalkInfo.extraOrientation : WalkInfo.extraWalk;
+      String description = Range.label(walk, compact: true);
 
       return ListTile(
           leading: TileIcon(Icon(Range.icon)),
-          title: Text(title),
-          subtitle:
-              subtitle.walkValue(walk) ? Text(subtitle.description) : null);
+          title: const Text("Activité principale"),
+          subtitle: Text(
+              (walk.isWalk ? "Marche : " : "Orientation : ") + description));
     }
 
     return const SizedBox.shrink();
