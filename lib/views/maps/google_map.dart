@@ -170,9 +170,6 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
         onTap: (_) {
           if (widget.onTapMap != null) {
             widget.onTapMap!();
-            // setState(() {
-            //   _selectedPath = null;
-            // });
           }
         },
         markers: _markers);

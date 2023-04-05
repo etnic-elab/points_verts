@@ -264,7 +264,15 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         title: const Text('Calendrier'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(_viewType == _ViewType.list ? Icons.map : Icons.list),
+            icon: _viewType == _ViewType.list
+                ? const Icon(
+                    Icons.map,
+                    semanticLabel: 'Visualiser les marches sur une carte',
+                  )
+                : const Icon(
+                    Icons.list,
+                    semanticLabel: 'Visualiser les marches dans une liste',
+                  ),
             onPressed: () {
               setState(() {
                 _viewType = _viewType == _ViewType.list

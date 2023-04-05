@@ -68,6 +68,7 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
       bottomNavigationBar: _error
           ? null
           : BottomNavigationBar(
+              selectedItemColor: Theme.of(context).colorScheme.secondary,
               currentIndex: _selectedIndex,
               onTap: (index) => setState(() => _selectedIndex = index),
               items: const <BottomNavigationBarItem>[

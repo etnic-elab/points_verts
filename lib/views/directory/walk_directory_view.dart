@@ -61,7 +61,10 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                 actions: <Widget>[
                   walks != null
                       ? IconButton(
-                          icon: const Icon(Icons.search),
+                          icon: const Icon(
+                            Icons.search,
+                            semanticLabel: "Rechercher par texte",
+                          ),
                           onPressed: () {
                             showSearch(
                                 context: context, delegate: _DataSearch(walks));

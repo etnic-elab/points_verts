@@ -25,20 +25,48 @@ class WalkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: tileType == TileType.map
-          ? const EdgeInsets.all(0)
-          : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-      shape: tileType == TileType.map
-          ? const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)))
-          : null,
-      child: InkWell(
-        onTap: () => Navigator.push(context, _pageRoute()),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: _children,
+    return Semantics(
+      header: true,
+      label: walk.city,
+      child: Card(
+        semanticContainer: false,
+        margin: tileType == TileType.map
+            ? const EdgeInsets.all(0)
+            : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+        shape: tileType == TileType.map
+            ? const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)))
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: MergeSemantics(
+                  child: Semantics(
+                    button: true,
+                    hint: "Ouvrir la page de détail de l'évènement",
+                    child: InkWell(
+                      onTap: () => Navigator.push(context, _pageRoute()),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: _children,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 18.0, left: 8.0),
+                child: tileType == TileType.directory
+                    ? Text(fullDate.format(walk.date))
+                    : GeoButton(walk),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -48,17 +76,9 @@ class WalkTile extends StatelessWidget {
     List<Widget> list = [
       ListTile(
         leading: TileIcon(WalkIcon(walk)),
-        title: _title(),
-        subtitle: _subtitle(),
-        trailing: tileType == TileType.calendar
-            ? GeoButton(walk)
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(fullDate.format(walk.date)),
-                ],
-              ),
-      )
+        title: _title,
+        subtitle: _subtitle,
+      ),
     ];
 
     List<Widget> info = _infoRow(walk);
@@ -76,23 +96,16 @@ class WalkTile extends StatelessWidget {
     return list;
   }
 
-  Widget _title() {
-    if (tileType == TileType.directory) {
-      return Text("${walk.city} (${walk.entity})",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-          overflow: TextOverflow.ellipsis);
-    } else {
-      return Text(walk.city,
-          style: const TextStyle(fontWeight: FontWeight.bold));
-    }
+  Widget get _title {
+    return Text(
+      walk.city,
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    );
   }
 
-  Widget _subtitle() {
-    if (tileType == TileType.directory) {
-      return Text(walk.contactLabel);
-    } else {
-      return Text("${walk.type} - ${walk.province}");
-    }
+  Widget get _subtitle {
+    String text = "${walk.type} - ${walk.province}";
+    return Text(text);
   }
 
   List<Widget> _infoRow(Walk walk) {
@@ -112,12 +125,15 @@ class WalkTile extends StatelessWidget {
                     : const _ChipLabel('5-10-20 km');
           }
 
-          return value ? _ChipIcon(info.icon) : null;
+          return value ? _ChipIcon(info.icon, info.description) : null;
         })
         .whereType<Widget>()
         .toList());
 
-    if (walk.paths.isNotEmpty) info.add(const _ChipIcon(Icons.near_me));
+    if (walk.paths.isNotEmpty) {
+      info.add(const _ChipIcon(Icons.near_me, 'Tracé GPX disponible'));
+    }
+
     return info;
   }
 
@@ -147,16 +163,17 @@ class _WeatherChip extends StatelessWidget {
 }
 
 class _ChipIcon extends StatelessWidget {
-  const _ChipIcon(this.icon);
+  const _ChipIcon(this.icon, this.semanticLabel);
 
   final IconData icon;
+  final String semanticLabel;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: Chip(
-        label: Icon(icon, size: 15.0),
+        label: Icon(icon, size: 15.0, semanticLabel: semanticLabel),
         visualDensity: VisualDensity.compact,
       ),
     );
@@ -173,7 +190,11 @@ class _ChipLabel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: Chip(
-          label: Text(text, style: const TextStyle(fontSize: 12.0)),
+          label: Text(
+            text,
+            style: const TextStyle(fontSize: 12.0),
+            semanticsLabel: text.replaceAll(r'-', ', '),
+          ),
           visualDensity: VisualDensity.compact),
     );
   }

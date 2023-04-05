@@ -191,17 +191,24 @@ class _FilterPageState extends State<FilterPage> {
 }
 
 _infoPaddedChip(WalkFilter filter, WalkInfo walkInfo, Function(bool) callback) {
-  return _PaddedChip(walkInfo.filterValue(filter), walkInfo.label, callback,
-      icon: walkInfo.icon);
+  return _PaddedChip(
+    walkInfo.filterValue(filter),
+    walkInfo.label,
+    callback,
+    icon: walkInfo.icon,
+    semanticsLabel: walkInfo.description,
+  );
 }
 
 class _PaddedChip extends StatelessWidget {
-  const _PaddedChip(this.value, this.label, this.callback, {this.icon});
+  const _PaddedChip(this.value, this.label, this.callback,
+      {this.icon, this.semanticsLabel});
 
   final bool value;
   final String label;
   final Function(bool) callback;
   final IconData? icon;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +221,10 @@ class _PaddedChip extends StatelessWidget {
                 size: 15.0,
               )
             : null,
-        label: Text(label),
+        label: Text(
+          label,
+          semanticsLabel: semanticsLabel ?? label,
+        ),
         selected: value,
         onSelected: callback,
       ),

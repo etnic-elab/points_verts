@@ -15,20 +15,44 @@ class GeoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (walk.isCancelled) {
-      return Text("Annulé",
-          style: TextStyle(color: CompanyColors.contextualRed(context)));
+      return ExcludeSemantics(
+        child: Text("Annulé",
+            style: TextStyle(color: CompanyColors.contextualRed(context))),
+      );
     } else {
       String? label = walk.navigationLabel;
       if (label != null) {
-        return OutlinedButton.icon(
+        return Semantics(
+          button: true,
+          excludeSemantics: true,
+          label:
+              "Point de rendez-vous ${walk.city} est à ${label.replaceAll(r'min', 'minutes')} en voiture. Ouvrir dans une application de cartes externe",
+          child: OutlinedButton(
             onPressed: () => launchGeoApp(walk),
             style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).textTheme.bodyText1!.color),
-            icon: const Icon(Icons.directions_car, size: 15.0),
-            label: Text(label));
+                foregroundColor: Theme.of(context).textTheme.bodyText1!.color,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                textStyle: const TextStyle(fontSize: 13.0)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.directions_car, size: 20.0),
+                const SizedBox(height: 5),
+                Text(label),
+              ],
+            ),
+          ),
+        );
       } else {
-        return OutlineIconButton(
-            onPressed: () => launchGeoApp(walk), iconData: Icons.directions);
+        return Semantics(
+          button: true,
+          label:
+              'Ouvrir point de rendez-vous ${walk.city} dans une application de cartes externe',
+          excludeSemantics: true,
+          child: OutlineIconButton(
+              onPressed: () => launchGeoApp(walk), iconData: Icons.directions),
+        );
       }
     }
   }

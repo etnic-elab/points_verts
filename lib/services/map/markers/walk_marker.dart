@@ -14,12 +14,8 @@ class WalkMarker implements MarkerInterface {
   final Walk walk;
   final Walk? selectedWalk;
   final Function(Walk)? onWalkSelect;
-  final String infoWindowText;
 
-  WalkMarker(this.walk,
-      {this.selectedWalk,
-      this.onWalkSelect,
-      this.infoWindowText = 'Point de rendez-vous'});
+  WalkMarker(this.walk, {this.selectedWalk, this.onWalkSelect});
 
   @override
   flutter.Marker buildFlutterMarker() {
@@ -63,7 +59,7 @@ class WalkMarker implements MarkerInterface {
       position: google.LatLng(walk.lat!, walk.long!),
       icon: icon,
       consumeTapEvents: onWalkSelect != null,
-      infoWindow: google.InfoWindow(title: infoWindowText),
+      infoWindow: google.InfoWindow(title: walk.city),
       onTap: () {
         if (onWalkSelect != null) {
           onWalkSelect!(walk);

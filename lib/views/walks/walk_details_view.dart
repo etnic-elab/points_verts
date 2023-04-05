@@ -65,11 +65,15 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
       appBar: AppBar(
         leading: _viewType == _ViewType.detail
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back,
+                    semanticLabel: "Retour à la page précédente"),
                 onPressed: () => Navigator.maybePop(context),
               )
             : IconButton(
-                icon: const Icon(Icons.close),
+                icon: const Icon(
+                  Icons.close,
+                  semanticLabel: "Fermer la fenêtre",
+                ),
                 onPressed: () => _toggleView(_ViewType.detail),
               ),
         title: FittedBox(

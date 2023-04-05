@@ -130,6 +130,7 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
+            excludeFromSemantics: true,
             child: const Text("Paramètres"),
             onLongPress: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (context) => const Debug()))),
@@ -162,7 +163,10 @@ class _SettingsState extends State<Settings> {
             },
             trailing: _home != null
                 ? IconButton(
-                    icon: const Icon(Icons.delete),
+                    icon: const Icon(
+                      Icons.delete,
+                      semanticLabel: "Supprimer l'adresse",
+                    ),
                     onPressed: () => _removeHome())
                 : null,
           ),
@@ -218,7 +222,11 @@ class _SettingsState extends State<Settings> {
     if (_home == null) {
       return const Text("Aucun - appuyez ici pour le définir");
     } else {
-      return Text(_home!, style: const TextStyle(fontSize: 12.0));
+      return Text(
+        _home!,
+        style: const TextStyle(fontSize: 12.0),
+        semanticsLabel: "${_home!}. Changer l'adresse",
+      );
     }
   }
 
