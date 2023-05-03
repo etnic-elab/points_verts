@@ -73,11 +73,17 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
               onTap: (index) => setState(() => _selectedIndex = index),
               items: const <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.calendar_today), label: "Calendrier"),
+                    icon: Icon(Icons.calendar_today),
+                    activeIcon: Icon(Icons.calendar_today_outlined),
+                    label: "Calendrier"),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.import_contacts), label: "Annuaire"),
+                    icon: Icon(Icons.auto_stories),
+                    activeIcon: Icon(Icons.auto_stories_outlined),
+                    label: "Annuaire"),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.settings), label: "Paramètres"),
+                    icon: Icon(Icons.settings),
+                    activeIcon: Icon(Icons.settings_outlined),
+                    label: "Paramètres"),
               ],
             ),
       body: _loading
