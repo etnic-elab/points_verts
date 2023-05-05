@@ -212,6 +212,11 @@ class _SettingsState extends State<Settings> {
             title: const Text("Charte de la vie privée"),
             onTap: () => launchURL(privacyUrl),
           ),
+          ListTile(
+            leading: const TileIcon(Icon(Icons.accessibility)),
+            title: const Text("Déclaration d'accessibilité"),
+            onTap: () => launchURL(accessibilityUrl),
+          ),
           const About()
         ],
       ),

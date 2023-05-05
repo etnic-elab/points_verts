@@ -8,6 +8,7 @@ const String opendataUrl =
 const String _publicUrl = "https://adeps-points-verts.innovation-etnic.be";
 const String assistanceUrl = "$_publicUrl/assistance.html";
 const String privacyUrl = "$_publicUrl/privacy.html";
+const String accessibilityUrl = "$_publicUrl/accessibilite.html";
 const String publicLogo = "$_publicUrl/logo_64x64.png";
 const String publicLogoCancelledLight =
     "$_publicUrl/logo_cancelled_light_64x64.png";
