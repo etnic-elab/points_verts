@@ -41,27 +41,21 @@ class CompanyColors {
 }
 
 class CompanyTheme {
-  static final greenPrimaryMatCol =
-      _createMaterialColor(CompanyColors.greenPrimary);
+  static final greenSecondaryMatCol =
+      _createMaterialColor(CompanyColors.greenSecondary);
 
-  static final companyLight =
-      ThemeData(primarySwatch: _createMaterialColor(greenPrimaryMatCol));
+  static final companyLight = ThemeData(primarySwatch: greenSecondaryMatCol);
 
   static final ThemeData companyDark = ThemeData(
-    brightness: Brightness.dark,
-    primarySwatch: _createMaterialColor(greenPrimaryMatCol),
-    toggleableActiveColor: greenPrimaryMatCol[400],
-    textSelectionTheme:
-        TextSelectionThemeData(selectionHandleColor: greenPrimaryMatCol[400]),
-  );
+      brightness: Brightness.dark, primarySwatch: greenSecondaryMatCol);
 
   static ThemeData companyLightTheme() => companyLight.copyWith(
       colorScheme: companyLight.colorScheme
-          .copyWith(secondary: greenPrimaryMatCol[700]));
+          .copyWith(secondary: greenSecondaryMatCol[800]));
 
   static ThemeData companyDarkTheme() => companyDark.copyWith(
-      colorScheme:
-          companyDark.colorScheme.copyWith(secondary: greenPrimaryMatCol[400]));
+      colorScheme: companyDark.colorScheme
+          .copyWith(secondary: greenSecondaryMatCol[400]));
 
   static MaterialColor _createMaterialColor(Color color) {
     List strengths = <double>[.05];
