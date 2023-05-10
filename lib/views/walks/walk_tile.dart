@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:points_verts/company_data.dart';
 import 'package:points_verts/views/walks/walk_info.dart';
 
 import '../tile_icon.dart';
@@ -28,56 +29,66 @@ class WalkTile extends StatelessWidget {
     return Semantics(
       header: true,
       label: walk.city,
-      child: Card(
-        semanticContainer: false,
-        margin: tileType == TileType.map
-            ? const EdgeInsets.all(0)
-            : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-        shape: tileType == TileType.map
-            ? const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)))
-            : null,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: MergeSemantics(
-                  child: Semantics(
-                    button: true,
-                    hint: "Ouvrir la page de détail de l'évènement",
-                    child: InkWell(
-                      onTap: () => Navigator.push(context, _pageRoute()),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: _children,
-                      ),
+      explicitChildNodes: true,
+      child: Stack(
+        children: [
+          Card(
+            semanticContainer: false,
+            margin: tileType == TileType.map
+                ? const EdgeInsets.all(0)
+                : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+            shape: tileType == TileType.map
+                ? const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20)))
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              child: MergeSemantics(
+                child: Semantics(
+                  button: true,
+                  hint: "Ouvrir la page de détail de l'évènement",
+                  child: InkWell(
+                    onTap: () => Navigator.push(context, _pageRoute()),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: getChildren(context),
                     ),
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 18.0, left: 8.0),
-                child: tileType == TileType.directory
-                    ? Text(fullDate.format(walk.date))
-                    : GeoButton(walk),
-              ),
-            ],
+            ),
           ),
-        ),
+          tileType == TileType.directory || walk.isCancelled
+              ? const SizedBox.shrink()
+              : Positioned(
+                  right: 30,
+                  top: 20,
+                  child: GeoButton(walk),
+                ),
+        ],
       ),
     );
   }
 
-  List<Widget> get _children {
+  List<Widget> getChildren(BuildContext context) {
     List<Widget> list = [
       ListTile(
         leading: TileIcon(WalkIcon(walk)),
         title: _title,
         subtitle: _subtitle,
+        trailing: tileType == TileType.directory
+            ? Text(fullDate.format(walk.date))
+            : walk.isCancelled
+                ? ExcludeSemantics(
+                    child: Text(
+                      "Annulé",
+                      style: TextStyle(
+                          color: CompanyColors.contextualRed(context)),
+                    ),
+                  )
+                : const SizedBox.shrink(),
       ),
     ];
 

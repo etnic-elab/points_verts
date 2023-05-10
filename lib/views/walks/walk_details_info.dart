@@ -29,7 +29,7 @@ class WalkDetailsInfo extends StatelessWidget {
           _DateTile(walk),
           _GeoTile(walk),
           _TransportTile(walk),
-          const _Header("Informations sur le parcours"),
+          const _Header("Informations sur les parcours"),
           _RangesTile(walk),
           _IgnTile(walk),
           _infoRow(),
@@ -215,7 +215,7 @@ class _GeoTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _Header("Point de départ"),
+        const _Header("Lieu de rendez-vous"),
         Semantics(
           explicitChildNodes: true,
           child: Column(
@@ -301,7 +301,7 @@ class _OrganizerTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _Header("Organisateurs"),
+        const _Header("Groupement organisateur"),
         Semantics(
           explicitChildNodes: true,
           child: MergeSemantics(
