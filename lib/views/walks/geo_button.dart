@@ -23,8 +23,9 @@ class GeoButton extends StatelessWidget {
         child: OutlinedButton(
           onPressed: () => launchGeoApp(walk),
           style: OutlinedButton.styleFrom(
+              elevation: 3.0,
               foregroundColor: Theme.of(context).textTheme.bodyText1!.color,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               textStyle: const TextStyle(fontSize: 13.0)),
           child: Column(
             mainAxisSize: MainAxisSize.min,

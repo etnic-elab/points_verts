@@ -19,6 +19,7 @@ class OutlineIconButton extends StatelessWidget {
         child: OutlinedButton(
             onPressed: onPressed,
             style: OutlinedButton.styleFrom(
+                elevation: 4.0,
                 padding: const EdgeInsets.all(8.0),
                 foregroundColor: Theme.of(context).textTheme.bodyText1!.color),
             child: Icon(
