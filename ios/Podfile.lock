@@ -1,7 +1,7 @@
 PODS:
   - add_2_calendar (0.0.1):
     - Flutter
-  - background_fetch (1.1.0):
+  - background_fetch (1.1.4):
     - Flutter
   - Firebase/CoreOnly (10.2.0):
     - FirebaseCore (= 10.2.0)
@@ -162,7 +162,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   add_2_calendar: e9d68636aed37fb18e12f5a3d74c2e0589487af0
-  background_fetch: 3795af8a49054dc526477cc2f60d2ed41de60587
+  background_fetch: bd64e544b303ee4cd4cf2fe8cb2187b72aecf9ca
   Firebase: a3ea7eba4382afd83808376edb99acdaff078dcf
   firebase_core: db1432de826785171029b7c1a26e5b22ce1dd477
   firebase_crashlytics: 70150805355d1e11e2fbbfa379fc9e776d05e5ad
@@ -190,6 +190,6 @@ SPEC CHECKSUMS:
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
 
-PODFILE CHECKSUM: 7368163408c647b7eb699d0d788ba6718e18fb8d
+PODFILE CHECKSUM: 52bf05b3d6b5cc10293e1015a427bb8715d5acaa
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1
