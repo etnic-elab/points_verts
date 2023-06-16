@@ -33,6 +33,10 @@
 			<string>comgooglemaps</string>
 			<string>waze</string>
 		</array>
+		<key>NSBonjourServices</key>
+		<array>
+			<string>_dartobservatory._tcp</string>
+		</array>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>NSLocationAlwaysUsageDescription</key>

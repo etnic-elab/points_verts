@@ -7,6 +7,8 @@ import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/services/map/markers/walk_marker.dart';
 import 'package:collection/collection.dart';
 
+import 'dart:io' show Platform;
+
 class WalkDetailsMapView extends StatelessWidget {
   const WalkDetailsMapView(this.walk, this.onTapMap, this.location, {Key? key})
       : super(key: key);
@@ -40,14 +42,28 @@ class WalkDetailsMapView extends StatelessWidget {
       builder:
           (BuildContext context, AsyncSnapshot<LocationPermission> snapshot) {
         if (snapshot.hasData) {
-          return kMap.instance.retrieveMap(
-              centerLat: _centerLat,
-              centerLong: _centerLong,
-              zoom: 11.5,
-              locationEnabled: true,
-              markers: _markers,
-              paths: walk.paths,
-              onTapMap: onTapMap);
+          return Platform.isIOS
+              ? Semantics(
+                  label: 'La carte visualisant les parcours',
+                  excludeSemantics: true,
+                  child: kMap.instance.retrieveMap(
+                    centerLat: _centerLat,
+                    centerLong: _centerLong,
+                    zoom: 11.5,
+                    locationEnabled: true,
+                    markers: _markers,
+                    paths: walk.paths,
+                    onTapMap: onTapMap,
+                  ))
+              : kMap.instance.retrieveMap(
+                  centerLat: _centerLat,
+                  centerLong: _centerLong,
+                  zoom: 11.5,
+                  locationEnabled: true,
+                  markers: _markers,
+                  paths: walk.paths,
+                  onTapMap: onTapMap,
+                );
         }
         return const SizedBox.shrink();
       },

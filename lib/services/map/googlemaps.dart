@@ -159,6 +159,7 @@ class GoogleMaps extends MapInterface {
       Map<String, dynamic> body = {};
       body['size'] = '${width}x$height';
       body['scale'] = '2';
+      body['language'] = 'fr';
       body['key'] = apiKey;
       body['path'] = _getPaths(walk.paths, brightness);
       body = _addMarkers(body, walk, brightness);

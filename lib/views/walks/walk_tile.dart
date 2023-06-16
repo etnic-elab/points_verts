@@ -43,7 +43,7 @@ class WalkTile extends StatelessWidget {
                         BorderRadius.vertical(top: Radius.circular(20)))
                 : null,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              padding: const EdgeInsets.fromLTRB(0, 8.0, 18.0, 8.0),
               child: MergeSemantics(
                 child: Semantics(
                   button: true,
@@ -63,8 +63,8 @@ class WalkTile extends StatelessWidget {
           tileType == TileType.directory || walk.isCancelled
               ? const SizedBox.shrink()
               : Positioned(
-                  right: 30,
-                  top: 15,
+                  right: 20,
+                  top: 20,
                   child: GeoButton(walk),
                 ),
         ],

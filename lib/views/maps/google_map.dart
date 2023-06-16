@@ -156,22 +156,23 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     Brightness brightness = Theme.of(context).brightness;
     return google.GoogleMap(
-        mapType: google
-            .MapType.normal, // none, normal, hybrid, satellite and terrain
-        initialCameraPosition: widget.initialLocation,
-        myLocationButtonEnabled: false,
-        zoomControlsEnabled: false,
-        myLocationEnabled: widget.locationEnabled,
-        onMapCreated: (google.GoogleMapController controller) {
-          controller.setMapStyle(_mapStyles[brightness]);
-          _completer.complete(controller);
-        },
-        polylines: _polylines,
-        onTap: (_) {
-          if (widget.onTapMap != null) {
-            widget.onTapMap!();
-          }
-        },
-        markers: _markers);
+      mapType:
+          google.MapType.normal, // none, normal, hybrid, satellite and terrain
+      initialCameraPosition: widget.initialLocation,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
+      myLocationEnabled: widget.locationEnabled,
+      onMapCreated: (google.GoogleMapController controller) {
+        controller.setMapStyle(_mapStyles[brightness]);
+        _completer.complete(controller);
+      },
+      polylines: _polylines,
+      onTap: (_) {
+        if (widget.onTapMap != null) {
+          widget.onTapMap!();
+        }
+      },
+      markers: _markers,
+    );
   }
 }
