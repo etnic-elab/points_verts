@@ -11,9 +11,6 @@ import 'walk_icon.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
-bool smallScreen =
-    WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.width <=
-        640;
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
 enum TileType { calendar, directory, map }

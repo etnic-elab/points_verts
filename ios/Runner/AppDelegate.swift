@@ -1,6 +1,7 @@
 import UIKit
 import Flutter
 import GoogleMaps
+import Firebase
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -14,6 +15,12 @@ import GoogleMaps
     GeneratedPluginRegistrant.register(with: self)
     UNUserNotificationCenter.current().delegate = self
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  override init() {
+   super.init()
+   FirebaseApp.configure()
+   // not really needed unless you really need it FIRDatabase.database().persistenceEnabled = true
   }
 
   func getPlist(withName name: String) -> NSDictionary?
