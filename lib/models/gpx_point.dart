@@ -11,7 +11,7 @@ class GpxPoint {
     double? latitude = double.parse(element.getAttribute('lat')!);
     double? longitude = double.parse(element.getAttribute('lon')!);
     double? elevation =
-        double.tryParse(element.getElement('ele')?.text ?? '-0xFF');
+        double.tryParse(element.getElement('ele')?.value ?? '-0xFF');
 
     return GpxPoint(latLng: LatLng(latitude, longitude), elevation: elevation);
   }

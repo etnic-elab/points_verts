@@ -118,7 +118,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   //Update the mapstyle after a theme (light/dark) change
   Future<void> _setMapStyle() async {
     final controller = await _completer.future;
-    final theme = WidgetsBinding.instance.window.platformBrightness;
+    final theme = WidgetsBinding.instance.platformDispatcher.platformBrightness;
     controller.setMapStyle(_mapStyles[theme]);
   }
 

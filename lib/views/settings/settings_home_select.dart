@@ -125,7 +125,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                 const Icon(Icons.warning),
                 Container(
                     padding: const EdgeInsets.all(5.0),
-                    child: Row(children: const [
+                    child: const Row(children: [
                       Expanded(
                           child: Center(
                               child: Text(

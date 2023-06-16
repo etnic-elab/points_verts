@@ -141,7 +141,7 @@ class _SettingsState extends State<Settings> {
           ListTile(
               title: Text(
                   "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",
-                  style: Theme.of(context).textTheme.caption)),
+                  style: Theme.of(context).textTheme.bodySmall)),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.location_on)),
             title: const Text("Ma position actuelle"),
@@ -175,7 +175,7 @@ class _SettingsState extends State<Settings> {
           ListTile(
               title: Text(
                   "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
-                  style: Theme.of(context).textTheme.caption)),
+                  style: Theme.of(context).textTheme.bodySmall)),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.notifications)),
             title: const Text("Notifier la veille (vers 20h)"),
@@ -191,7 +191,7 @@ class _SettingsState extends State<Settings> {
           ListTile(
             title: Text(
                 "L'envoi automatique de données de diagnostic nous permet d'améliorer l'application.",
-                style: Theme.of(context).textTheme.caption),
+                style: Theme.of(context).textTheme.bodySmall),
           ),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.bug_report)),

@@ -225,9 +225,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   void _locationExceptionMessage() {
     if (!mounted) return;
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
         content: Row(
-      children: const [
+      children: [
         Padding(
           padding: EdgeInsets.only(right: 16.0),
           child: Icon(
@@ -394,8 +394,8 @@ class _SearchPanel extends StatelessWidget {
                   selectedDate: selectedDate,
                   onChanged: onDateChanged),
               ActionChip(
-                label: Row(
-                  children: const <Widget>[
+                label: const Row(
+                  children: <Widget>[
                     Padding(
                       padding: EdgeInsets.only(right: 4.0),
                       child: Icon(Icons.tune, size: 16.0),

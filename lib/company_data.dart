@@ -57,7 +57,6 @@ class CompanyTheme {
   static ThemeData companyDarkTheme() => companyDark.copyWith(
         colorScheme: companyDark.colorScheme
             .copyWith(secondary: greenSecondaryMatCol[400]),
-        toggleableActiveColor: greenSecondaryMatCol[300],
       );
 
   static MaterialColor _createMaterialColor(Color color) {

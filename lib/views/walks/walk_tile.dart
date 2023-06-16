@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:points_verts/company_data.dart';
@@ -13,7 +11,9 @@ import 'walk_icon.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
-bool smallScreen = window.physicalSize.width <= 640;
+bool smallScreen =
+    WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.width <=
+        640;
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
 enum TileType { calendar, directory, map }
@@ -165,7 +165,7 @@ class _WeatherChip extends StatelessWidget {
       child: Chip(
         avatar: getWeatherIcon(weather,
             iconSize: 15.0,
-            iconColor: Theme.of(context).textTheme.bodyText1?.color),
+            iconColor: Theme.of(context).textTheme.bodyLarge?.color),
         label: Text("${weather.temperature.round()}°"),
         visualDensity: VisualDensity.compact,
       ),

@@ -81,9 +81,9 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                           child: Padding(
                             padding: const EdgeInsets.only(right: 10.0),
                             child: ActionChip(
-                              label: Row(
+                              label: const Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: const <Widget>[
+                                children: <Widget>[
                                   Padding(
                                     padding: EdgeInsets.only(right: 4.0),
                                     child: Icon(Icons.tune, size: 16.0),
