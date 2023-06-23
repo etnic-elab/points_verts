@@ -165,24 +165,27 @@ class _FilterPageState extends State<FilterPage> {
               ],
             ),
           ),
-          ButtonBar(
-            children: [
-              TextButton(
-                child: const Text('Réinitialiser'),
-                onPressed: () {
-                  WalkFilter resetFilter = WalkFilter();
-                  resetFilter.selectedPlace =
-                      widget.currentFilter.selectedPlace;
-                  Navigator.of(context).pop(resetFilter);
-                },
-              ),
-              TextButton(
-                child: const Text('Filtrer'),
-                onPressed: () {
-                  Navigator.of(context).pop(editedFilter);
-                },
-              ),
-            ],
+          Semantics(
+            container: true,
+            child: ButtonBar(
+              children: [
+                TextButton(
+                  child: const Text('Réinitialiser'),
+                  onPressed: () {
+                    WalkFilter resetFilter = WalkFilter();
+                    resetFilter.selectedPlace =
+                        widget.currentFilter.selectedPlace;
+                    Navigator.of(context).pop(resetFilter);
+                  },
+                ),
+                TextButton(
+                  child: const Text('Filtrer'),
+                  onPressed: () {
+                    Navigator.of(context).pop(editedFilter);
+                  },
+                ),
+              ],
+            ),
           )
         ],
       ),
