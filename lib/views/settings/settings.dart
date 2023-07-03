@@ -130,6 +130,7 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
+            excludeFromSemantics: true,
             child: const Text("Paramètres"),
             onLongPress: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (context) => const Debug()))),
@@ -140,7 +141,7 @@ class _SettingsState extends State<Settings> {
           ListTile(
               title: Text(
                   "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",
-                  style: Theme.of(context).textTheme.caption)),
+                  style: Theme.of(context).textTheme.bodySmall)),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.location_on)),
             title: const Text("Ma position actuelle"),
@@ -162,7 +163,10 @@ class _SettingsState extends State<Settings> {
             },
             trailing: _home != null
                 ? IconButton(
-                    icon: const Icon(Icons.delete),
+                    icon: const Icon(
+                      Icons.delete,
+                      semanticLabel: "Supprimer l'adresse",
+                    ),
                     onPressed: () => _removeHome())
                 : null,
           ),
@@ -171,7 +175,7 @@ class _SettingsState extends State<Settings> {
           ListTile(
               title: Text(
                   "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
-                  style: Theme.of(context).textTheme.caption)),
+                  style: Theme.of(context).textTheme.bodySmall)),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.notifications)),
             title: const Text("Notifier la veille (vers 20h)"),
@@ -187,7 +191,7 @@ class _SettingsState extends State<Settings> {
           ListTile(
             title: Text(
                 "L'envoi automatique de données de diagnostic nous permet d'améliorer l'application.",
-                style: Theme.of(context).textTheme.caption),
+                style: Theme.of(context).textTheme.bodySmall),
           ),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.bug_report)),
@@ -208,6 +212,11 @@ class _SettingsState extends State<Settings> {
             title: const Text("Charte de la vie privée"),
             onTap: () => launchURL(privacyUrl),
           ),
+          ListTile(
+            leading: const TileIcon(Icon(Icons.accessibility)),
+            title: const Text("Déclaration d'accessibilité"),
+            onTap: () => launchURL(accessibilityUrl),
+          ),
           const About()
         ],
       ),
@@ -218,7 +227,11 @@ class _SettingsState extends State<Settings> {
     if (_home == null) {
       return const Text("Aucun - appuyez ici pour le définir");
     } else {
-      return Text(_home!, style: const TextStyle(fontSize: 12.0));
+      return Text(
+        _home!,
+        style: const TextStyle(fontSize: 12.0),
+        semanticsLabel: "${_home!}. Changer l'adresse",
+      );
     }
   }
 

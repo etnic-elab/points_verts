@@ -13,6 +13,8 @@ import 'walks_view.dart';
 import 'walk_list_error.dart';
 import 'walk_tile.dart';
 
+import 'dart:io' show Platform;
+
 class WalkResultsMapView extends StatelessWidget {
   WalkResultsMapView(this.walks, this.position, this.currentPlace,
       this.selectedWalk, this.onWalkSelect, this.onTapMap, this.refreshWalks,
@@ -40,7 +42,14 @@ class WalkResultsMapView extends StatelessWidget {
 
             return Stack(
               children: <Widget>[
-                kMap.instance.retrieveMap(markers: markers, onTapMap: onTapMap),
+                Platform.isIOS
+                    ? Semantics(
+                        label: 'La carte visualisant les Points Verts',
+                        excludeSemantics: true,
+                        child: kMap.instance
+                            .retrieveMap(markers: markers, onTapMap: onTapMap))
+                    : kMap.instance
+                        .retrieveMap(markers: markers, onTapMap: onTapMap),
                 _buildWalkInfo(),
               ],
             );
@@ -53,16 +62,14 @@ class WalkResultsMapView extends StatelessWidget {
   }
 
   Widget _buildWalkInfo() {
-    if (selectedWalk == null) {
-      return const SizedBox.shrink();
-    } else {
-      return SafeArea(
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: WalkTile(selectedWalk!, TileType.map),
-        ),
-      );
-    }
+    return selectedWalk != null
+        ? SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: WalkTile(selectedWalk!, TileType.map),
+            ),
+          )
+        : const SizedBox.shrink();
   }
 
   void _setMarkers(List<Walk> walks) {
@@ -73,8 +80,13 @@ class WalkResultsMapView extends StatelessWidget {
     }
     for (Walk walk in walks) {
       if (walk.hasPosition) {
-        markers.add(WalkMarker(walk,
-            selectedWalk: selectedWalk, onWalkSelect: onWalkSelect));
+        markers.add(
+          WalkMarker(
+            walk,
+            selectedWalk: selectedWalk,
+            onWalkSelect: onWalkSelect,
+          ),
+        );
       }
     }
   }

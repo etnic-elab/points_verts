@@ -61,7 +61,10 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
         appBar: AppBar(
           actions: <Widget>[
             IconButton(
-                icon: const Icon(Icons.delete),
+                icon: const Icon(
+                  Icons.delete,
+                  semanticLabel: "Supprimer l'adresse",
+                ),
                 onPressed: () {
                   widget.removeHomeCallback();
                   _homeSearchController.removeListener(_onSearchChanged);
@@ -122,7 +125,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                 const Icon(Icons.warning),
                 Container(
                     padding: const EdgeInsets.all(5.0),
-                    child: Row(children: const [
+                    child: const Row(children: [
                       Expanded(
                           child: Center(
                               child: Text(

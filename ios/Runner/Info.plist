@@ -33,6 +33,10 @@
 			<string>comgooglemaps</string>
 			<string>waze</string>
 		</array>
+		<key>NSBonjourServices</key>
+		<array>
+			<string>_dartobservatory._tcp</string>
+		</array>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>NSLocationAlwaysUsageDescription</key>
@@ -71,6 +75,8 @@
 		<key>io.flutter.embedded_views_preview</key>
 		<string>YES</string>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
 </plist>

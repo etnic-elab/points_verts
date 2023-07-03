@@ -18,7 +18,7 @@ class WalkListError extends StatelessWidget {
         ),
         Container(
             padding: const EdgeInsets.all(5.0),
-            child: Row(children: const [
+            child: const Row(children: [
               Expanded(
                   child: Center(
                       child: Text(

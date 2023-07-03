@@ -8,6 +8,7 @@ const String opendataUrl =
 const String _publicUrl = "https://adeps-points-verts.innovation-etnic.be";
 const String assistanceUrl = "$_publicUrl/assistance.html";
 const String privacyUrl = "$_publicUrl/privacy.html";
+const String accessibilityUrl = "$_publicUrl/accessibilite.html";
 const String publicLogo = "$_publicUrl/logo_64x64.png";
 const String publicLogoCancelledLight =
     "$_publicUrl/logo_cancelled_light_64x64.png";
@@ -40,26 +41,23 @@ class CompanyColors {
 }
 
 class CompanyTheme {
-  static final greenPrimaryMatCol =
-      _createMaterialColor(CompanyColors.greenPrimary);
+  static final greenSecondaryMatCol =
+      _createMaterialColor(CompanyColors.greenSecondary);
+
+  static final ThemeData companyLight =
+      ThemeData(primarySwatch: greenSecondaryMatCol);
 
   static final ThemeData companyDark = ThemeData(
-    brightness: Brightness.dark,
-    primarySwatch: _createMaterialColor(greenPrimaryMatCol),
-    toggleableActiveColor: greenPrimaryMatCol[400],
-    textSelectionTheme:
-        TextSelectionThemeData(selectionHandleColor: greenPrimaryMatCol[400]),
-  );
+      brightness: Brightness.dark, primarySwatch: greenSecondaryMatCol);
 
-  static ThemeData companyLightTheme() {
-    return ThemeData(primarySwatch: _createMaterialColor(greenPrimaryMatCol));
-  }
+  static ThemeData companyLightTheme() => companyLight.copyWith(
+      colorScheme: companyLight.colorScheme
+          .copyWith(secondary: greenSecondaryMatCol[800]));
 
-  static ThemeData companyDarkTheme() {
-    return companyDark.copyWith(
+  static ThemeData companyDarkTheme() => companyDark.copyWith(
         colorScheme: companyDark.colorScheme
-            .copyWith(secondary: greenPrimaryMatCol[400]));
-  }
+            .copyWith(secondary: greenSecondaryMatCol[400]),
+      );
 
   static MaterialColor _createMaterialColor(Color color) {
     List strengths = <double>[.05];

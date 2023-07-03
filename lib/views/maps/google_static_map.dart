@@ -21,21 +21,26 @@ class GoogleStaticMap extends StatelessWidget {
             imageBuilder: onTap == null
                 ? null
                 : (context, imageProvider) {
-                    return Ink.image(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                      child: Stack(
-                        children: [
-                          const Positioned(
-                            bottom: 15.0,
-                            right: 10.0,
-                            child: FloatingActionButton.small(
-                              onPressed: null,
-                              child: Icon(Icons.open_in_full),
+                    return Semantics(
+                      excludeSemantics: true,
+                      label: "Voir les parcours sur une carte",
+                      button: true,
+                      child: Ink.image(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                        child: Stack(
+                          children: [
+                            const Positioned(
+                              bottom: 15.0,
+                              right: 10.0,
+                              child: FloatingActionButton.small(
+                                onPressed: null,
+                                child: Icon(Icons.open_in_full),
+                              ),
                             ),
-                          ),
-                          InkWell(onTap: () => onTap!())
-                        ],
+                            InkWell(onTap: () => onTap!())
+                          ],
+                        ),
                       ),
                     );
                   },
