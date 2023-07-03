@@ -13,14 +13,15 @@ class WalkIcon extends StatelessWidget {
     final Brightness brightness = Theme.of(context).brightness;
     if (walk.isCancelled) {
       return Image(
-          image: Assets.asset.image(brightness, Assets.logoAnnule),
-          height: size ?? 30,
-          semanticLabel: "Point annulé");
+        image: Assets.asset.image(brightness, Assets.logoAnnule),
+        height: size ?? 30,
+        semanticLabel: "Annulé",
+      );
     } else if (walk.type == 'Marche' || walk.type == 'Orientation') {
       return Image(
-          image: Assets.asset.image(brightness, Assets.logo),
-          height: size ?? 30,
-          semanticLabel: "Marche/Orientation");
+        image: Assets.asset.image(brightness, Assets.logo),
+        height: size ?? 30,
+      );
     } else {
       return const SizedBox.shrink();
     }

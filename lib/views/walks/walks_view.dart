@@ -225,9 +225,9 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   void _locationExceptionMessage() {
     if (!mounted) return;
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
         content: Row(
-      children: const [
+      children: [
         Padding(
           padding: EdgeInsets.only(right: 16.0),
           child: Icon(
@@ -264,7 +264,15 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         title: const Text('Calendrier'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(_viewType == _ViewType.list ? Icons.map : Icons.list),
+            icon: _viewType == _ViewType.list
+                ? const Icon(
+                    Icons.map,
+                    semanticLabel: 'Visualiser les marches sur une carte',
+                  )
+                : const Icon(
+                    Icons.list,
+                    semanticLabel: 'Visualiser les marches dans une liste',
+                  ),
             onPressed: () {
               setState(() {
                 _viewType = _viewType == _ViewType.list
@@ -386,8 +394,8 @@ class _SearchPanel extends StatelessWidget {
                   selectedDate: selectedDate,
                   onChanged: onDateChanged),
               ActionChip(
-                label: Row(
-                  children: const <Widget>[
+                label: const Row(
+                  children: <Widget>[
                     Padding(
                       padding: EdgeInsets.only(right: 4.0),
                       child: Icon(Icons.tune, size: 16.0),

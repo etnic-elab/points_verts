@@ -65,11 +65,15 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
       appBar: AppBar(
         leading: _viewType == _ViewType.detail
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back,
+                    semanticLabel: "Retour à la page précédente"),
                 onPressed: () => Navigator.maybePop(context),
               )
             : IconButton(
-                icon: const Icon(Icons.close),
+                icon: const Icon(
+                  Icons.close,
+                  semanticLabel: "Fermer la fenêtre",
+                ),
                 onPressed: () => _toggleView(_ViewType.detail),
               ),
         title: FittedBox(
@@ -96,11 +100,21 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _viewType == _ViewType.map
-          ? FloatingActionButton(
-              child:
-                  Icon(_sheetOpen ? Icons.expand_less : Icons.layers_outlined),
-              onPressed: () => _onTapFAB(),
-            )
+          ? _sheetOpen
+              ? FloatingActionButton(
+                  child: const Icon(
+                    Icons.expand_less,
+                    semanticLabel: 'Fermer le panneau',
+                  ),
+                  onPressed: () => _onTapFAB(),
+                )
+              : FloatingActionButton(
+                  child: const Icon(
+                    Icons.layers_outlined,
+                    semanticLabel: 'Ouvrir le panneau',
+                  ),
+                  onPressed: () => _onTapFAB(),
+                )
           : null,
     );
   }

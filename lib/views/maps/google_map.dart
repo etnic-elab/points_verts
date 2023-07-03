@@ -118,7 +118,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   //Update the mapstyle after a theme (light/dark) change
   Future<void> _setMapStyle() async {
     final controller = await _completer.future;
-    final theme = WidgetsBinding.instance.window.platformBrightness;
+    final theme = WidgetsBinding.instance.platformDispatcher.platformBrightness;
     controller.setMapStyle(_mapStyles[theme]);
   }
 
@@ -156,25 +156,23 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     Brightness brightness = Theme.of(context).brightness;
     return google.GoogleMap(
-        mapType: google
-            .MapType.normal, // none, normal, hybrid, satellite and terrain
-        initialCameraPosition: widget.initialLocation,
-        myLocationButtonEnabled: false,
-        zoomControlsEnabled: false,
-        myLocationEnabled: widget.locationEnabled,
-        onMapCreated: (google.GoogleMapController controller) {
-          controller.setMapStyle(_mapStyles[brightness]);
-          _completer.complete(controller);
-        },
-        polylines: _polylines,
-        onTap: (_) {
-          if (widget.onTapMap != null) {
-            widget.onTapMap!();
-            // setState(() {
-            //   _selectedPath = null;
-            // });
-          }
-        },
-        markers: _markers);
+      mapType:
+          google.MapType.normal, // none, normal, hybrid, satellite and terrain
+      initialCameraPosition: widget.initialLocation,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
+      myLocationEnabled: widget.locationEnabled,
+      onMapCreated: (google.GoogleMapController controller) {
+        controller.setMapStyle(_mapStyles[brightness]);
+        _completer.complete(controller);
+      },
+      polylines: _polylines,
+      onTap: (_) {
+        if (widget.onTapMap != null) {
+          widget.onTapMap!();
+        }
+      },
+      markers: _markers,
+    );
   }
 }

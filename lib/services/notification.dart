@@ -89,7 +89,7 @@ class NotificationManager {
       await instance.zonedSchedule(
           id, title, description, scheduledAt, _generateNotificationDetails(),
           payload: walk.id.toString(),
-          androidAllowWhileIdle: true,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime);
       log('Notification scheduled for ${scheduledAt.toString()}', name: tag);
