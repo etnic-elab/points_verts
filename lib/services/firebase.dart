@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:points_verts/firebase_options.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -10,12 +11,20 @@ import 'package:points_verts/services/prefs.dart';
 const String _firebaseTag = "dev.alpagaga.points_verts.FirebaseLocalService";
 
 class FirebaseLocalService {
+  static FirebaseRemoteConfigService? firebaseRemoteConfigService;
+
   static initialize({required bool isForeground}) async {
     try {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
       CrashlyticsLocalService.initialize(isForeground);
+      if (firebaseRemoteConfigService == null) {
+        firebaseRemoteConfigService = FirebaseRemoteConfigService(
+            firebaseRemoteConfig: FirebaseRemoteConfig.instance);
+        firebaseRemoteConfigService!.init();
+      }
+
       log('Firebase initialized for isForeground: $isForeground',
           name: _firebaseTag);
     } catch (err) {
@@ -61,4 +70,29 @@ class CrashlyticsLocalService {
     log('Crashlytics is now ${enabled ? 'enabled' : 'disabled'}',
         name: _crashlyticsTag);
   }
+}
+
+class FirebaseRemoteConfigService {
+  const FirebaseRemoteConfigService({
+    required this.firebaseRemoteConfig,
+  });
+
+  final FirebaseRemoteConfig firebaseRemoteConfig;
+
+  Future<void> init() async {
+    try {
+      await firebaseRemoteConfig.ensureInitialized();
+      await firebaseRemoteConfig.setConfigSettings(
+        RemoteConfigSettings(
+          fetchTimeout: const Duration(seconds: 10),
+          minimumFetchInterval: Duration.zero,
+        ),
+      );
+      await firebaseRemoteConfig.fetchAndActivate();
+    } on FirebaseException catch (e) {
+      log('Unable to initialize Firebase Remote Config $e', name: _firebaseTag);
+    }
+  }
+
+  int getNumberOfTrips() => firebaseRemoteConfig.getInt('number_of_trips');
 }

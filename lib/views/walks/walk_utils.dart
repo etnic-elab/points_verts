@@ -12,6 +12,7 @@ import 'package:points_verts/services/database.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/services/prefs.dart';
+import 'package:points_verts/views/walks/walks_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:points_verts/services/map/map_interface.dart';
@@ -87,15 +88,18 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
     }
   }
   walks.sort((a, b) => sortWalks(a, b));
-  try {
-    await kMap.instance
-        .retrieveTrips(position.longitude, position.latitude, walks)
-        .then((_) {
-      walks.sort((a, b) => sortWalks(a, b));
-    });
-  } catch (err) {
-    print("Cannot retrieve trips: $err");
+  if (filter?.selectedPlace == Places.home) {
+    try {
+      await kMap.instance
+          .retrieveTrips(position.longitude, position.latitude, walks)
+          .then((_) {
+        walks.sort((a, b) => sortWalks(a, b));
+      });
+    } catch (err) {
+      print("Cannot retrieve trips: $err");
+    }
   }
+
   return walks;
 }
 
