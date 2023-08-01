@@ -27,14 +27,15 @@ class WalkResultsList extends StatelessWidget {
             if (i == 0) {
               return ListHeader(_defineTopHeader());
             }
-            if (i == 6) {
-              return const ListHeader("Autres Points");
-            }
-            if (i < 6) {
-              i = i - 1;
-            } else {
-              i = i - 2;
-            }
+            // if (i == 6) {
+            //   return const ListHeader("Autres Points");
+            // }
+            // if (i < 6) {
+            //   i = i - 1;
+            // } else {
+            //   i = i - 2;
+            // }
+            i = i - 1;
           }
           if (walks.length > i) {
             return WalkTile(walks[i], TileType.calendar);
