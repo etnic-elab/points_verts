@@ -19,6 +19,8 @@ import 'dart:convert';
 import '../../models/walk.dart';
 import '../cache_managers/trip_cache_manager.dart';
 
+const int numberOfTrips = 2;
+
 class GoogleMaps extends MapInterface {
   @override
   String get name => "Google";
@@ -58,7 +60,7 @@ class GoogleMaps extends MapInterface {
     final distanceDurations = decoded["rows"]?[0]?["elements"];
 
     if (!distanceDurations?.isEmpty) {
-      for (int i = 0; i < min(walks.length, 5); i++) {
+      for (int i = 0; i < min(walks.length, numberOfTrips); i++) {
         var distanceDuration = distanceDurations[i];
         Walk walk = walks[i];
         if (walk.isPositionable && distanceDuration?['status'] == 'OK') {
