@@ -35,7 +35,7 @@ class GoogleMaps extends MapInterface {
     String origin = "$fromLat,$fromLong";
     var destinationsList = [];
 
-    for (int i = 0; i < min(walks.length, 5); i++) {
+    for (int i = 0; i < min(walks.length, numberOfTrips); i++) {
       Walk walk = walks[i];
       if (walk.isPositionable) {
         destinationsList.add("${walk.lat},${walk.long}");
