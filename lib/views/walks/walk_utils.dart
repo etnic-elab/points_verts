@@ -87,16 +87,15 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
     }
   }
   walks.sort((a, b) => sortWalks(a, b));
-  // To activate trip recognition, uncomment below code.
-  // try {
-  //   await kMap.instance
-  //       .retrieveTrips(position.longitude, position.latitude, walks)
-  //       .then((_) {
-  //     walks.sort((a, b) => sortWalks(a, b));
-  //   });
-  // } catch (err) {
-  //   print("Cannot retrieve trips: $err");
-  // }
+  try {
+    await kMap.instance
+        .retrieveTrips(position.longitude, position.latitude, walks)
+        .then((_) {
+      walks.sort((a, b) => sortWalks(a, b));
+    });
+  } catch (err) {
+    print("Cannot retrieve trips: $err");
+  }
   return walks;
 }
 
