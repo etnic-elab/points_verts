@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:points_verts/firebase_options.dart';
 import 'package:points_verts/services/prefs.dart';
 
@@ -22,7 +23,7 @@ class FirebaseLocalService {
       if (firebaseRemoteConfigService == null) {
         firebaseRemoteConfigService = FirebaseRemoteConfigService(
             firebaseRemoteConfig: FirebaseRemoteConfig.instance);
-        firebaseRemoteConfigService!.init();
+        await firebaseRemoteConfigService!.init();
       }
 
       log('Firebase initialized for isForeground: $isForeground',
@@ -72,6 +73,11 @@ class CrashlyticsLocalService {
   }
 }
 
+class RemoteConfig {
+  static String get numberOfTrips => 'number_of_trips';
+  static String get walkData => 'walk_data';
+}
+
 class FirebaseRemoteConfigService {
   const FirebaseRemoteConfigService({
     required this.firebaseRemoteConfig,
@@ -84,15 +90,31 @@ class FirebaseRemoteConfigService {
       await firebaseRemoteConfig.ensureInitialized();
       await firebaseRemoteConfig.setConfigSettings(
         RemoteConfigSettings(
-          fetchTimeout: const Duration(seconds: 10),
-          minimumFetchInterval: Duration.zero,
+          fetchTimeout: const Duration(minutes: 1),
+          minimumFetchInterval: const Duration(hours: 1),
         ),
       );
+
+      await firebaseRemoteConfig.setDefaults(await _getDefaultValues());
       await firebaseRemoteConfig.fetchAndActivate();
     } on FirebaseException catch (e) {
       log('Unable to initialize Firebase Remote Config $e', name: _firebaseTag);
     }
   }
 
-  int getNumberOfTrips() => firebaseRemoteConfig.getInt('number_of_trips');
+  Future<Map<String, dynamic>> _getDefaultValues() async {
+    String walkData = await rootBundle
+        .loadString('assets/walk_data.json')
+        .catchError((e) => '');
+
+    return {
+      RemoteConfig.numberOfTrips: 5,
+      RemoteConfig.walkData: walkData,
+    };
+  }
+
+  int getNumberOfTrips() =>
+      firebaseRemoteConfig.getInt(RemoteConfig.numberOfTrips);
+  String getJsonWalks() =>
+      firebaseRemoteConfig.getString(RemoteConfig.walkData);
 }

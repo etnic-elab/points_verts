@@ -125,12 +125,9 @@ Future<void> updateWalks() async {
   DateTime nowDateUtc = nowDateLocal.toUtc();
 
   if (lastUpdateIso8601Utc == null) {
-    final futures = await Future.wait([
-      fetchJsonWalks(fromDateLocal: nowDateLocal),
-      DBProvider.db.deleteWalks()
-    ]);
+    await DBProvider.db.deleteWalks();
+    List<Walk> newWalks = fetchJsonWalks(fromDateLocal: nowDateLocal);
 
-    List<Walk> newWalks = futures[0] as List<Walk>;
     lastUpdateIso8601Utc = getLastUpdateTimestamp(newWalks).toIso8601String();
     await Future.wait([
       DBProvider.db.insertWalks(newWalks),

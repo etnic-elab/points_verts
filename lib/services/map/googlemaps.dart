@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:developer' as dev;
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +35,6 @@ class GoogleMaps extends MapInterface {
     var destinationsList = [];
     int numberOfTrips =
         FirebaseLocalService.firebaseRemoteConfigService!.getNumberOfTrips();
-    dev.log("numberOfTrips: $numberOfTrips");
 
     for (int i = 0; i < min(walks.length, numberOfTrips); i++) {
       Walk walk = walks[i];
