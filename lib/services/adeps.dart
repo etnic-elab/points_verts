@@ -19,7 +19,6 @@ List<Walk> fetchJsonWalks({DateTime? fromDateLocal}) {
 
   final String walkData =
       FirebaseLocalService.firebaseRemoteConfigService!.getJsonWalks();
-  log("walkData: $walkData");
   if (walkData.isNotEmpty) walks = _convertWalks(json.decode(walkData));
 
   return walks;
