@@ -6,6 +6,7 @@ import 'package:points_verts/company_data.dart';
 import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/location.dart';
+import 'package:points_verts/views/app_bar_logo.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -13,6 +14,7 @@ import 'package:uuid/uuid.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 
 import '../../models/address.dart';
+import '../../services/assets.dart';
 import '../../services/prefs.dart';
 import '../tile_icon.dart';
 import 'about.dart';
@@ -134,10 +136,11 @@ class _SettingsState extends State<Settings> {
             child: const Text("Paramètres"),
             onLongPress: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (context) => const Debug()))),
+        leading: const AppBarLogo(),
       ),
       body: ListView(
         children: <Widget>[
-          const ListHeader("Tri des points selon leur emplacement"),
+          const ListHeader("Tri des points"),
           ListTile(
               title: Text(
                   "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",

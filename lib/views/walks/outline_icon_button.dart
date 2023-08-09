@@ -14,17 +14,11 @@ class OutlineIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        width: 50.0,
-        child: OutlinedButton(
-            onPressed: onPressed,
-            style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.all(8.0),
-                foregroundColor: Theme.of(context).textTheme.bodyLarge!.color),
-            child: Icon(
-              iconData,
-              semanticLabel: semanticLabel,
-              size: 30.0,
-            )));
+    return IconButton.outlined(
+        onPressed: onPressed,
+        icon: Icon(
+          iconData,
+          semanticLabel: semanticLabel,
+        ));
   }
 }

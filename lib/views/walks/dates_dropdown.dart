@@ -33,15 +33,8 @@ class DatesDropdown extends StatelessWidget {
             onChanged(pickedDate);
           }
         },
-        label: Row(
-          children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.only(right: 8.0),
-              child: Icon(Icons.calendar_today, size: 16.0),
-            ),
-            Text(fullDate.format(selectedDate))
-          ],
-        ));
+        avatar: const Icon(Icons.calendar_today),
+        label: Text(fullDate.format(selectedDate)));
   }
 
   static List<DropdownMenuItem<DateTime>> generateDropdownItems(

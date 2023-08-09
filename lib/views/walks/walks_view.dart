@@ -14,6 +14,7 @@ import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/filter_page.dart';
 
+import '../app_bar_logo.dart';
 import 'dates_dropdown.dart';
 import '../../models/walk.dart';
 import 'walk_results_list_view.dart';
@@ -262,6 +263,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calendrier'),
+        leading: const AppBarLogo(),
         actions: <Widget>[
           IconButton(
             icon: _viewType == _ViewType.list
@@ -303,7 +305,6 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     return Column(
       children: <Widget>[
         _defineSearchPart(dates),
-        const Divider(height: 0.0),
         Expanded(
             child: _viewType == _ViewType.list
                 ? WalkResultsListView(_currentWalks, selectedPosition,
@@ -394,15 +395,8 @@ class _SearchPanel extends StatelessWidget {
                   selectedDate: selectedDate,
                   onChanged: onDateChanged),
               ActionChip(
-                label: const Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 4.0),
-                      child: Icon(Icons.tune, size: 16.0),
-                    ),
-                    Text("Filtres")
-                  ],
-                ),
+                avatar: const Icon(Icons.tune),
+                label: const Text("Filtres"),
                 onPressed: onFilterPressed,
               ),
             ]));

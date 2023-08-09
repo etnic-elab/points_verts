@@ -10,6 +10,7 @@ import 'package:points_verts/views/walks/filter_page.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_tile.dart';
 import '../../models/walk.dart';
+import '../app_bar_logo.dart';
 
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
@@ -58,6 +59,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
             return Scaffold(
               appBar: AppBar(
                 title: const Text("Annuaire"),
+                leading: const AppBarLogo(),
                 actions: <Widget>[
                   walks != null
                       ? IconButton(
@@ -81,16 +83,8 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                           child: Padding(
                             padding: const EdgeInsets.only(right: 10.0),
                             child: ActionChip(
-                              label: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 4.0),
-                                    child: Icon(Icons.tune, size: 16.0),
-                                  ),
-                                  Text("Filtres")
-                                ],
-                              ),
+                              avatar: const Icon(Icons.tune),
+                              label: const Text("Filtres"),
                               onPressed: () async {
                                 WalkFilter? newFilter =
                                     await Navigator.of(context)
@@ -121,6 +115,7 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
             return Scaffold(
                 appBar: AppBar(
                   title: const Text("Annuaire"),
+                  leading: const AppBarLogo(),
                 ),
                 body: const Loading());
           }

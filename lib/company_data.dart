@@ -44,11 +44,14 @@ class CompanyTheme {
   static final greenSecondaryMatCol =
       _createMaterialColor(CompanyColors.greenSecondary);
 
-  static final ThemeData companyLight =
-      ThemeData(primarySwatch: greenSecondaryMatCol);
+  static final ThemeData companyLight = ThemeData(
+      useMaterial3: true,
+      colorSchemeSeed: greenSecondaryMatCol);
 
   static final ThemeData companyDark = ThemeData(
-      brightness: Brightness.dark, primarySwatch: greenSecondaryMatCol);
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorSchemeSeed: greenSecondaryMatCol);
 
   static ThemeData companyLightTheme() => companyLight.copyWith(
       colorScheme: companyLight.colorScheme
