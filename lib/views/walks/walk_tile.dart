@@ -6,6 +6,7 @@ import 'package:points_verts/views/walks/walk_info.dart';
 import '../../models/walk.dart';
 import 'geo_button.dart';
 import 'walk_details_view.dart';
+import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
@@ -24,87 +25,55 @@ class WalkTile extends StatelessWidget {
       header: true,
       label: walk.city,
       explicitChildNodes: true,
-      child: Card(
-        elevation: 0,
-        color: Theme.of(context).colorScheme.surfaceVariant,
-        semanticContainer: false,
-        child: MergeSemantics(
-          child: Semantics(
-            button: true,
-            hint: "Ouvrir la page de détail de l'évènement",
-            child: InkWell(
-              onTap: () => Navigator.push(context, _pageRoute()),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: getChildren(context),
+      child: Stack(
+        children: [
+          Card(
+            elevation: 0,
+            color: Theme.of(context).colorScheme.surfaceVariant,
+            semanticContainer: false,
+            margin: tileType == TileType.map
+                ? const EdgeInsets.all(0)
+                : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+            shape: tileType == TileType.map
+                ? const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20)))
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8.0, 18.0, 8.0),
+              child: MergeSemantics(
+                child: Semantics(
+                  button: true,
+                  hint: "Ouvrir la page de détail de l'évènement",
+                  child: InkWell(
+                    onTap: () => Navigator.push(context, _pageRoute()),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: getChildren(context),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+          tileType == TileType.directory || walk.isCancelled
+              ? const SizedBox.shrink()
+              : Positioned(
+                  right: 20,
+                  top: 20,
+                  child: GeoButton(walk),
+                ),
+        ],
       ),
     );
-  }
-
-  Widget _generateDescription(Walk walk, BuildContext context) {
-    List<InlineSpan> elements = [];
-    elements.add(TextSpan(text: "${walk.entity} - ${walk.province}\n"));
-
-    if (walk.weathers.isNotEmpty) {
-      elements.add(WidgetSpan(
-          child: getWeatherIcon(walk.weathers.first,
-              iconSize: 11.0,
-              iconColor: Theme.of(context).textTheme.bodyLarge?.color)));
-      elements.add(
-          TextSpan(text: "${walk.weathers.first.temperature.round()}° · "));
-    }
-
-    List<InlineSpan> infos = WalkInfo.values
-        .map((WalkInfo info) {
-          bool value = info.walkValue(walk);
-
-          if (WalkInfo.transport == info) {
-            return null;
-          }
-
-          if (WalkInfo.fifteenKm == info) {
-            return value
-                ? const TextSpan(text: '5-10-15-20 km')
-                : walk.isOrientation
-                    ? const TextSpan(text: '4-8-12 km')
-                    : const TextSpan(text: '5-10-20 km');
-          }
-
-          return value
-              ? WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: Icon(info.icon, size: 13),
-                )
-              : null;
-        })
-        .whereType<InlineSpan>()
-        .toList();
-
-    for (var i = 0; i < infos.length; i++) {
-      elements.add(infos[i]);
-      if (i != infos.length - 1) {
-        elements.add(const TextSpan(text: ' · '));
-      }
-    }
-    return RichText(
-        text: TextSpan(
-            children: elements,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ));
   }
 
   List<Widget> getChildren(BuildContext context) {
     List<Widget> list = [
       ListTile(
         title: _title,
-        subtitle: _generateDescription(walk, context),
+        subtitle: _subtitle,
         trailing: tileType == TileType.directory
             ? Text(fullDate.format(walk.date))
             : walk.isCancelled
@@ -115,9 +84,21 @@ class WalkTile extends StatelessWidget {
                           color: CompanyColors.contextualRed(context)),
                     ),
                   )
-                : GeoButton(walk),
+                : const SizedBox.shrink(),
       ),
     ];
+
+    List<Widget> info = _infoRow(walk);
+    if (!walk.isCancelled && info.isNotEmpty) {
+      list.add(const Divider(height: 0));
+      list.add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+        child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            primary: true,
+            child: Row(children: info)),
+      ));
+    }
 
     return list;
   }
@@ -129,7 +110,99 @@ class WalkTile extends StatelessWidget {
     );
   }
 
+  Widget get _subtitle {
+    String text = "${walk.type} - ${walk.province}";
+    return Text(text);
+  }
+
+  List<Widget> _infoRow(Walk walk) {
+    List<Widget> info = [];
+
+    if (walk.weathers.isNotEmpty) info.add(_WeatherChip(walk.weathers.first));
+
+    info.addAll(WalkInfo.values
+        .map((WalkInfo info) {
+          bool value = info.walkValue(walk);
+
+          if (WalkInfo.fifteenKm == info) {
+            return value
+                ? const _ChipLabel('5-10-15-20 km')
+                : walk.isOrientation
+                    ? const _ChipLabel('4-8-12 km')
+                    : const _ChipLabel('5-10-20 km');
+          }
+
+          return value ? _ChipIcon(info.icon, info.description) : null;
+        })
+        .whereType<Widget>()
+        .toList());
+
+    if (walk.paths.isNotEmpty) {
+      info.add(const _ChipIcon(Icons.near_me, 'Tracé GPX disponible'));
+    }
+
+    return info;
+  }
+
   PageRoute _pageRoute() {
     return MaterialPageRoute(builder: (context) => WalkDetailsView(walk));
+  }
+}
+
+class _WeatherChip extends StatelessWidget {
+  const _WeatherChip(this.weather, {Key? key}) : super(key: key);
+
+  final Weather weather;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+        avatar: getWeatherIcon(weather,
+            iconSize: 15.0,
+            iconColor: Theme.of(context).textTheme.bodyLarge?.color),
+        label: Text("${weather.temperature.round()}°", style: Theme.of(context).textTheme.labelMedium),
+        visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+}
+
+class _ChipIcon extends StatelessWidget {
+  const _ChipIcon(this.icon, this.semanticLabel);
+
+  final IconData icon;
+  final String semanticLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+        label: Icon(icon, size: 15.0, semanticLabel: semanticLabel),
+        visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+}
+
+class _ChipLabel extends StatelessWidget {
+  const _ChipLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Chip(
+          label: Text(
+            text,
+            style: const TextStyle(fontSize: 12.0),
+            semanticsLabel: text.replaceAll(r'-', ', '),
+          ),
+          visualDensity: VisualDensity.compact),
+    );
   }
 }

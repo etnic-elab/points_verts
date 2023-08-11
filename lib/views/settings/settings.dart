@@ -14,7 +14,6 @@ import 'package:uuid/uuid.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 
 import '../../models/address.dart';
-import '../../services/assets.dart';
 import '../../services/prefs.dart';
 import '../tile_icon.dart';
 import 'about.dart';

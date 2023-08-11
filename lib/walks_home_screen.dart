@@ -67,22 +67,21 @@ class _WalksHomeScreenState extends State<WalksHomeScreen> {
     return Scaffold(
       bottomNavigationBar: _error
           ? null
-          : BottomNavigationBar(
-              selectedItemColor: Theme.of(context).colorScheme.secondary,
-              currentIndex: _selectedIndex,
-              onTap: (index) => setState(() => _selectedIndex = index),
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
+          : NavigationBar(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+              destinations: const <Widget>[
+                NavigationDestination(
                     icon: Icon(Icons.calendar_today),
-                    activeIcon: Icon(Icons.calendar_today_outlined),
+                    selectedIcon: Icon(Icons.calendar_today_outlined),
                     label: "Calendrier"),
-                BottomNavigationBarItem(
+                NavigationDestination(
                     icon: Icon(Icons.auto_stories),
-                    activeIcon: Icon(Icons.auto_stories_outlined),
+                    selectedIcon: Icon(Icons.auto_stories_outlined),
                     label: "Annuaire"),
-                BottomNavigationBarItem(
+                NavigationDestination(
                     icon: Icon(Icons.settings),
-                    activeIcon: Icon(Icons.settings_outlined),
+                    selectedIcon: Icon(Icons.settings_outlined),
                     label: "Paramètres"),
               ],
             ),

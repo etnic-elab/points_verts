@@ -20,10 +20,21 @@ class GeoButton extends StatelessWidget {
         excludeSemantics: true,
         label:
             "Lieu de rendez-vous ${walk.city} est à ${label.replaceAll(r'min', 'minutes')} en voiture. Ouvrir dans une application de cartes externe",
-        child: ActionChip(
+        child: OutlinedButton(
           onPressed: () => launchGeoApp(walk),
-          avatar: const Icon(Icons.directions_car),
-          label: Text(label),
+          style: OutlinedButton.styleFrom(
+              shape: const RoundedRectangleBorder(),
+              foregroundColor: Theme.of(context).textTheme.bodyLarge!.color,
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              textStyle: const TextStyle(fontSize: 13.0)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.directions_car, size: 20.0),
+              const SizedBox(height: 5),
+              Text(label),
+            ],
+          ),
         ),
       );
     } else {
