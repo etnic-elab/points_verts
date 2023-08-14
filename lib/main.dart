@@ -110,8 +110,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ],
       navigatorKey: MyApp.navigatorKey,
       title: applicationName,
-      theme: CompanyTheme.companyLightTheme(),
-      darkTheme: CompanyTheme.companyDarkTheme(),
+      theme: CompanyTheme.companyLight,
+      darkTheme: CompanyTheme.companyDark,
       home: const WalksHomeScreen(),
       debugShowCheckedModeBanner: false,
     );
