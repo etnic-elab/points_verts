@@ -25,65 +25,53 @@ class WalkTile extends StatelessWidget {
       header: true,
       label: walk.city,
       explicitChildNodes: true,
-      child: Stack(
-        children: [
-          Card(
-            shadowColor: Colors.transparent,
-            semanticContainer: false,
-            margin: tileType == TileType.map
-                ? const EdgeInsets.all(0)
-                : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-            shape: tileType == TileType.map
-                ? const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(20)))
-                : null,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 8.0, 18.0, 8.0),
-              child: MergeSemantics(
-                child: Semantics(
-                  button: true,
-                  hint: "Ouvrir la page de détail de l'évènement",
-                  child: InkWell(
-                    onTap: () => Navigator.push(context, _pageRoute()),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: getChildren(context),
-                    ),
-                  ),
-                ),
+      child: Card(
+        shadowColor: Colors.transparent,
+        semanticContainer: false,
+        margin: tileType == TileType.map
+            ? const EdgeInsets.all(0)
+            : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+        shape: tileType == TileType.map
+            ? const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)))
+            : null,
+        child: MergeSemantics(
+          child: Semantics(
+            button: true,
+            hint: "Ouvrir la page de détail de l'évènement",
+            child: InkWell(
+              onTap: () => Navigator.push(context, _pageRoute()),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: getChildren(context),
               ),
             ),
           ),
-          tileType == TileType.directory || walk.isCancelled
-              ? const SizedBox.shrink()
-              : Positioned(
-                  right: 20,
-                  top: 20,
-                  child: GeoButton(walk),
-                ),
-        ],
+        ),
       ),
     );
   }
 
   List<Widget> getChildren(BuildContext context) {
     List<Widget> list = [
-      ListTile(
-        title: _title,
-        subtitle: _subtitle,
-        trailing: tileType == TileType.directory
-            ? Text(fullDate.format(walk.date))
-            : walk.isCancelled
-                ? ExcludeSemantics(
-                    child: Text(
-                      "Annulé",
-                      style: TextStyle(
-                          color: CompanyColors.contextualRed(context)),
-                    ),
-                  )
-                : const SizedBox.shrink(),
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2.0),
+        child: ListTile(
+          title: _title,
+          subtitle: _subtitle,
+          trailing: tileType == TileType.directory
+              ? Text(fullDate.format(walk.date))
+              : walk.isCancelled
+                  ? ExcludeSemantics(
+                      child: Text(
+                        "Annulé",
+                        style: TextStyle(
+                            color: CompanyColors.contextualRed(context)),
+                      ),
+                    )
+                  : GeoButton(walk),
+        ),
       ),
     ];
 
@@ -161,7 +149,8 @@ class _WeatherChip extends StatelessWidget {
         avatar: getWeatherIcon(weather,
             iconSize: 15.0,
             iconColor: Theme.of(context).textTheme.bodyLarge?.color),
-        label: Text("${weather.temperature.round()}°", style: Theme.of(context).textTheme.labelMedium),
+        label: Text("${weather.temperature.round()}°",
+            style: Theme.of(context).textTheme.labelMedium),
         visualDensity: VisualDensity.compact,
       ),
     );
