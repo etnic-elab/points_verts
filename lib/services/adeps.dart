@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:csv/csv.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:points_verts/models/website_walk.dart';
+import 'package:points_verts/services/firebase.dart';
 
 import '../models/walk.dart';
 
@@ -14,16 +14,14 @@ const String baseUrl =
     "https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps";
 const int pageSize = 500;
 
-Future<List<Walk>> fetchJsonWalks({DateTime? fromDateLocal}) async {
-  try {
-    final String response =
-        await rootBundle.loadString('assets/walk_data.json');
-    Map<String, dynamic> data = await json.decode(response);
-    return _convertWalks(data);
-  } catch (e) {
-    log("Cannot retrieve walks from JSON file: $e");
-    return [];
-  }
+List<Walk> fetchJsonWalks({DateTime? fromDateLocal}) {
+  List<Walk> walks = [];
+
+  final String walkData =
+      FirebaseLocalService.firebaseRemoteConfigService!.getJsonWalks();
+  if (walkData.isNotEmpty) walks = _convertWalks(json.decode(walkData));
+
+  return walks;
 }
 
 Future<List<Walk>> fetchApiWalks(String lastUpdateIso8601Utc,
