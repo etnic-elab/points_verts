@@ -3,19 +3,29 @@ import 'dart:isolate';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:points_verts/firebase_options.dart';
 import 'package:points_verts/services/prefs.dart';
 
 const String _firebaseTag = "dev.alpagaga.points_verts.FirebaseLocalService";
 
 class FirebaseLocalService {
+  static FirebaseRemoteConfigService? firebaseRemoteConfigService;
+
   static initialize({required bool isForeground}) async {
     try {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
       CrashlyticsLocalService.initialize(isForeground);
+      if (firebaseRemoteConfigService == null) {
+        firebaseRemoteConfigService = FirebaseRemoteConfigService(
+            firebaseRemoteConfig: FirebaseRemoteConfig.instance);
+        await firebaseRemoteConfigService!.init();
+      }
+
       log('Firebase initialized for isForeground: $isForeground',
           name: _firebaseTag);
     } catch (err) {
@@ -61,4 +71,50 @@ class CrashlyticsLocalService {
     log('Crashlytics is now ${enabled ? 'enabled' : 'disabled'}',
         name: _crashlyticsTag);
   }
+}
+
+class RemoteConfig {
+  static String get numberOfTrips => 'number_of_trips';
+  static String get walkData => 'walk_data';
+}
+
+class FirebaseRemoteConfigService {
+  const FirebaseRemoteConfigService({
+    required this.firebaseRemoteConfig,
+  });
+
+  final FirebaseRemoteConfig firebaseRemoteConfig;
+
+  Future<void> init() async {
+    try {
+      await firebaseRemoteConfig.ensureInitialized();
+      await firebaseRemoteConfig.setConfigSettings(
+        RemoteConfigSettings(
+          fetchTimeout: const Duration(minutes: 1),
+          minimumFetchInterval: const Duration(hours: 1),
+        ),
+      );
+
+      await firebaseRemoteConfig.setDefaults(await _getDefaultValues());
+      await firebaseRemoteConfig.fetchAndActivate();
+    } on FirebaseException catch (e) {
+      log('Unable to initialize Firebase Remote Config $e', name: _firebaseTag);
+    }
+  }
+
+  Future<Map<String, dynamic>> _getDefaultValues() async {
+    String walkData = await rootBundle
+        .loadString('assets/walk_data.json')
+        .catchError((e) => '');
+
+    return {
+      RemoteConfig.numberOfTrips: 5,
+      RemoteConfig.walkData: walkData,
+    };
+  }
+
+  int getNumberOfTrips() =>
+      firebaseRemoteConfig.getInt(RemoteConfig.numberOfTrips);
+  String getJsonWalks() =>
+      firebaseRemoteConfig.getString(RemoteConfig.walkData);
 }

@@ -5,6 +5,7 @@ import 'package:points_verts/models/path.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:points_verts/company_data.dart';
+import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/map/map_interface.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/google_map.dart';
@@ -32,8 +33,10 @@ class GoogleMaps extends MapInterface {
       double fromLong, double fromLat, List<Walk> walks) async {
     String origin = "$fromLat,$fromLong";
     var destinationsList = [];
+    int numberOfTrips =
+        FirebaseLocalService.firebaseRemoteConfigService!.getNumberOfTrips();
 
-    for (int i = 0; i < min(walks.length, 5); i++) {
+    for (int i = 0; i < min(walks.length, numberOfTrips); i++) {
       Walk walk = walks[i];
       if (walk.isPositionable) {
         destinationsList.add("${walk.lat},${walk.long}");
@@ -58,7 +61,7 @@ class GoogleMaps extends MapInterface {
     final distanceDurations = decoded["rows"]?[0]?["elements"];
 
     if (!distanceDurations?.isEmpty) {
-      for (int i = 0; i < min(walks.length, 5); i++) {
+      for (int i = 0; i < min(walks.length, numberOfTrips); i++) {
         var distanceDuration = distanceDurations[i];
         Walk walk = walks[i];
         if (walk.isPositionable && distanceDuration?['status'] == 'OK') {

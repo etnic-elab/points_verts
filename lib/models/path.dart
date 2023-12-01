@@ -9,7 +9,8 @@ class Elevation {
   int? negative;
 
   @override
-  String toString() => 'Dénivelé : ${positive}m';
+  String toString() =>
+      'Dénivelé : ${positive == 0 ? "Inconnu" : "${positive}m"}';
 }
 
 class Path implements Comparable<Path> {
