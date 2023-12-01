@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:points_verts/company_data.dart';
 
 class WalkListError extends StatelessWidget {
-  const WalkListError(this.refreshWalks, {Key? key}) : super(key: key);
+  const WalkListError(this.refreshWalks, {super.key});
 
   final Function refreshWalks;
 

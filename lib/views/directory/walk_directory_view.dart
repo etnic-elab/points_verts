@@ -15,7 +15,7 @@ import '../app_bar_logo.dart';
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
 class WalkDirectoryView extends StatefulWidget {
-  const WalkDirectoryView({Key? key}) : super(key: key);
+  const WalkDirectoryView({super.key});
 
   @override
   State createState() => _WalkDirectoryViewState();

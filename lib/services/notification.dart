@@ -137,7 +137,7 @@ class NotificationManager {
       return instance
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()!
-          .requestPermission();
+          .requestNotificationsPermission();
     }
   }
 

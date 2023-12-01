@@ -42,11 +42,9 @@ class CompanyColors {
 
 class CompanyTheme {
   static final ThemeData companyLight = ThemeData(
-      useMaterial3: true,
       colorSchemeSeed: CompanyColors.greenSecondary);
 
   static final ThemeData companyDark = ThemeData(
-      useMaterial3: true,
       brightness: Brightness.dark,
       colorSchemeSeed: CompanyColors.greenSecondary);
 }

@@ -15,7 +15,7 @@ import 'views/walks/walks_view.dart';
 const String tag = "dev.alpagaga.points_verts.WalksHomeScreen";
 
 class WalksHomeScreen extends StatefulWidget {
-  const WalksHomeScreen({Key? key}) : super(key: key);
+  const WalksHomeScreen({super.key});
 
   @override
   State createState() => _WalksHomeScreenState();

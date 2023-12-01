@@ -21,7 +21,7 @@ import 'debug.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+  const Settings({super.key});
 
   @override
   State<StatefulWidget> createState() => _SettingsState();

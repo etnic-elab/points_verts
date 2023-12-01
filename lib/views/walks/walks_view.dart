@@ -28,7 +28,7 @@ enum _ViewType { list, map }
 const String tag = "dev.alpagaga.points_verts.WalkList";
 
 class WalksView extends StatefulWidget {
-  const WalksView({Key? key}) : super(key: key);
+  const WalksView({super.key});
 
   @override
   State createState() => _WalksViewState();

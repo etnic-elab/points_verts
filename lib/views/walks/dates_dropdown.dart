@@ -6,8 +6,7 @@ class DatesDropdown extends StatelessWidget {
       {required this.dates,
       required this.selectedDate,
       required this.onChanged,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   final List<DateTime> dates;
   final DateTime selectedDate;

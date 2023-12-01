@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:points_verts/services/assets.dart';
 
 class GoogleStaticMap extends StatelessWidget {
-  const GoogleStaticMap(this.url, this.onTap, {Key? key}) : super(key: key);
+  const GoogleStaticMap(this.url, this.onTap, {super.key});
 
   final String url;
   final Function? onTap;

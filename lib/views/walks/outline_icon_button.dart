@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 class OutlineIconButton extends StatelessWidget {
   const OutlineIconButton(
-      {this.onPressed, this.iconData, this.semanticLabel, Key? key})
-      : super(key: key);
+      {this.onPressed, this.iconData, this.semanticLabel, super.key});
 
   @required
   final VoidCallback? onPressed;

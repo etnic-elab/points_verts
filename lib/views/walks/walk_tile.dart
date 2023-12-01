@@ -14,7 +14,7 @@ DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 enum TileType { calendar, directory, map }
 
 class WalkTile extends StatelessWidget {
-  const WalkTile(this.walk, this.tileType, {Key? key}) : super(key: key);
+  const WalkTile(this.walk, this.tileType, {super.key});
 
   final Walk walk;
   final TileType tileType;
@@ -137,7 +137,7 @@ class WalkTile extends StatelessWidget {
 }
 
 class _WeatherChip extends StatelessWidget {
-  const _WeatherChip(this.weather, {Key? key}) : super(key: key);
+  const _WeatherChip(this.weather);
 
   final Weather weather;
 

@@ -5,7 +5,7 @@ import 'outline_icon_button.dart';
 import 'walk_utils.dart';
 
 class GeoButton extends StatelessWidget {
-  const GeoButton(this.walk, {Key? key}) : super(key: key);
+  const GeoButton(this.walk, {super.key});
 
   final Walk walk;
   static const Icon carIcon = Icon(Icons.directions_car);
