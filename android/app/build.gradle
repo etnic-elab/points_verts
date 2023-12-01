@@ -35,7 +35,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "dev.alpagaga.points_verts"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -53,8 +53,8 @@ android {
 
     defaultConfig {
         applicationId "dev.alpagaga.points_verts"
-        minSdkVersion 21 // we set manually minSdkVersion here or flutter_launcher_icons:main will fail
-        targetSdkVersion flutter.targetSdkVersion
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         manifestPlaceholders += [mapApiKey:googleMapsApiKey]
@@ -81,4 +81,7 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    dependencies {}
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}

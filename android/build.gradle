@@ -1,5 +1,10 @@
 buildscript {
     ext.kotlin_version = '1.7.10'
+    ext {
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        appCompatVersion = "1.6.1"
+    }
     repositories {
         google()
         mavenCentral()
