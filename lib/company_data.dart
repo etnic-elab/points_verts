@@ -41,10 +41,41 @@ class CompanyColors {
 }
 
 class CompanyTheme {
-  static final ThemeData companyLight = ThemeData(
-      colorSchemeSeed: CompanyColors.greenSecondary);
+  static final greenSecondaryMatCol =
+      _createMaterialColor(CompanyColors.greenSecondary);
+
+  static final ThemeData companyLight =
+      ThemeData(primarySwatch: greenSecondaryMatCol);
 
   static final ThemeData companyDark = ThemeData(
-      brightness: Brightness.dark,
-      colorSchemeSeed: CompanyColors.greenSecondary);
+      brightness: Brightness.dark, primarySwatch: greenSecondaryMatCol);
+
+  static ThemeData companyLightTheme() => companyLight.copyWith(
+      colorScheme: companyLight.colorScheme
+          .copyWith(secondary: greenSecondaryMatCol[800]));
+
+  static ThemeData companyDarkTheme() => companyDark.copyWith(
+        colorScheme: companyDark.colorScheme
+            .copyWith(secondary: greenSecondaryMatCol[400]),
+      );
+
+  static MaterialColor _createMaterialColor(Color color) {
+    List strengths = <double>[.05];
+    final swatch = <int, Color>{};
+    final int r = color.red, g = color.green, b = color.blue;
+
+    for (int i = 1; i < 10; i++) {
+      strengths.add(0.1 * i);
+    }
+    for (var strength in strengths) {
+      final double ds = 0.5 - strength;
+      swatch[(strength * 1000).round()] = Color.fromRGBO(
+        r + ((ds < 0 ? r : (255 - r)) * ds).round(),
+        g + ((ds < 0 ? g : (255 - g)) * ds).round(),
+        b + ((ds < 0 ? b : (255 - b)) * ds).round(),
+        1,
+      );
+    }
+    return MaterialColor(color.value, swatch);
+  }
 }
