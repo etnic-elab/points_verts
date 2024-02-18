@@ -15,7 +15,7 @@ version: 1.4.5+56
 
 environment:
   sdk: ">=3.2.2 <4.0.0"
-  flutter: ^3.16.0
+  flutter: ^3.19.0
 
 dependencies:
   background_fetch: ^1.2.0
