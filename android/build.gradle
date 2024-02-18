@@ -6,15 +6,6 @@ buildscript {
         targetSdkVersion = 34
         appCompatVersion = "1.6.1"
     }
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
 }
 
 allprojects {
