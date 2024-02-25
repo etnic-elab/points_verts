@@ -87,7 +87,6 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                           child: Padding(
                             padding: const EdgeInsets.only(right: 10.0),
                             child: ActionChip(
-                              visualDensity: VisualDensity.compact,
                               avatar: const Icon(Icons.tune),
                               label: const Text("Filtres"),
                               onPressed: () async {

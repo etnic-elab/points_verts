@@ -16,7 +16,6 @@ class DatesDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     DateFormat fullDate = DateFormat.yMMMEd("fr_BE");
     return ActionChip(
-        visualDensity: VisualDensity.compact,
         onPressed: () async {
           DateTime? pickedDate = await showDatePicker(
               context: context,

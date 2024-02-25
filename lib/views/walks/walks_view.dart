@@ -399,7 +399,6 @@ class _SearchPanel extends StatelessWidget {
                   selectedDate: selectedDate,
                   onChanged: onDateChanged),
               ActionChip(
-                visualDensity: VisualDensity.compact,
                 avatar: const Icon(Icons.tune),
                 label: const Text("Filtres"),
                 onPressed: onFilterPressed,
