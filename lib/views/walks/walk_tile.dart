@@ -3,11 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/views/walks/walk_info.dart';
 
-import '../tile_icon.dart';
 import '../../models/walk.dart';
 import 'geo_button.dart';
 import 'walk_details_view.dart';
-import 'walk_icon.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
