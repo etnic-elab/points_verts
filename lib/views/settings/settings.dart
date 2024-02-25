@@ -130,12 +130,16 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: GestureDetector(
-            excludeFromSemantics: true,
-            child: const Text("Paramètres"),
-            onLongPress: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => const Debug()))),
-        leading: const AppBarLogo(),
+        title: Row(
+          children: [
+            const AppBarLogo(),
+            GestureDetector(
+                excludeFromSemantics: true,
+                child: const Text("Paramètres"),
+                onLongPress: () => Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => const Debug()))),
+          ],
+        ),
       ),
       body: ListView(
         children: <Widget>[

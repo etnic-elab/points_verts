@@ -58,8 +58,12 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
             List<Walk>? walks = snapshot.data;
             return Scaffold(
               appBar: AppBar(
-                title: const Text("Annuaire"),
-                leading: const AppBarLogo(),
+                title: const Row(
+                  children: [
+                    AppBarLogo(),
+                    Text("Annuaire"),
+                  ],
+                ),
                 actions: <Widget>[
                   walks != null
                       ? IconButton(
@@ -114,8 +118,12 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
           } else {
             return Scaffold(
                 appBar: AppBar(
-                  title: const Text("Annuaire"),
-                  leading: const AppBarLogo(),
+                  title: const Row(
+                    children: [
+                      AppBarLogo(),
+                      Text("Annuaire"),
+                    ],
+                  ),
                 ),
                 body: const Loading());
           }

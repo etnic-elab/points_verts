@@ -262,8 +262,12 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendrier'),
-        leading: const AppBarLogo(),
+        title: const Row(
+          children: [
+            AppBarLogo(),
+            Text('Calendrier'),
+          ],
+        ),
         actions: <Widget>[
           IconButton(
             icon: _viewType == _ViewType.list

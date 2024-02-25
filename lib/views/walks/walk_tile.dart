@@ -72,7 +72,7 @@ class WalkTile extends StatelessWidget {
   List<Widget> getChildren(BuildContext context) {
     List<Widget> list = [
       ListTile(
-        leading: TileIcon(WalkIcon(walk)),
+        enabled: !walk.isCancelled,
         title: _title,
         subtitle: _subtitle,
         trailing: tileType == TileType.directory
