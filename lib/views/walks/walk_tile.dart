@@ -27,7 +27,7 @@ class WalkTile extends StatelessWidget {
       explicitChildNodes: true,
       child: Stack(
         children: [
-          Card(
+          Card.filled(
             semanticContainer: false,
             margin: tileType == TileType.map
                 ? const EdgeInsets.all(0)
