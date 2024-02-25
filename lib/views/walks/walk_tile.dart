@@ -163,7 +163,8 @@ class _WeatherChip extends StatelessWidget {
         avatar: getWeatherIcon(weather,
             iconSize: 15.0,
             iconColor: Theme.of(context).textTheme.bodyLarge?.color),
-        label: Text("${weather.temperature.round()}°"),
+        label: Text("${weather.temperature.round()}°",
+            style: const TextStyle(fontSize: 12.0)),
         visualDensity: VisualDensity.compact,
       ),
     );
