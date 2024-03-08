@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:core';
 import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:points_verts/services/prefs.dart';
 
 class FireCrashlyticsTest extends StatefulWidget {
-  const FireCrashlyticsTest({Key? key}) : super(key: key);
+  const FireCrashlyticsTest({super.key});
 
   @override
   State createState() => _FireCrashlyticsTestState();
@@ -37,16 +38,14 @@ class _FireCrashlyticsTestState extends State<FireCrashlyticsTest> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      onPopInvoked: (bool didPop) async {
         bool crashlyticsEnabled =
             await PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled);
         if (!crashlyticsEnabled) {
           _closeAppDialog();
-          return false;
+          return;
         }
-
-        return true;
       },
       child: Scaffold(
         appBar: AppBar(

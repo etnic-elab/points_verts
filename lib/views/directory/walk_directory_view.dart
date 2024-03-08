@@ -10,11 +10,12 @@ import 'package:points_verts/views/walks/filter_page.dart';
 import 'package:points_verts/views/walks/walk_list_error.dart';
 import 'package:points_verts/views/walks/walk_tile.dart';
 import '../../models/walk.dart';
+import '../app_bar_logo.dart';
 
 DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 
 class WalkDirectoryView extends StatefulWidget {
-  const WalkDirectoryView({Key? key}) : super(key: key);
+  const WalkDirectoryView({super.key});
 
   @override
   State createState() => _WalkDirectoryViewState();
@@ -57,7 +58,12 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
             List<Walk>? walks = snapshot.data;
             return Scaffold(
               appBar: AppBar(
-                title: const Text("Annuaire"),
+                title: const Row(
+                  children: [
+                    AppBarLogo(),
+                    Text("Annuaire"),
+                  ],
+                ),
                 actions: <Widget>[
                   walks != null
                       ? IconButton(
@@ -81,16 +87,8 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                           child: Padding(
                             padding: const EdgeInsets.only(right: 10.0),
                             child: ActionChip(
-                              label: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 4.0),
-                                    child: Icon(Icons.tune, size: 16.0),
-                                  ),
-                                  Text("Filtres")
-                                ],
-                              ),
+                              avatar: const Icon(Icons.tune),
+                              label: const Text("Filtres"),
                               onPressed: () async {
                                 WalkFilter? newFilter =
                                     await Navigator.of(context)
@@ -111,7 +109,6 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
                             ),
                           ),
                         ),
-                        const Divider(height: 0.0),
                         Expanded(child: _DirectoryList(walks)),
                       ],
                     )
@@ -120,7 +117,12 @@ class _WalkDirectoryViewState extends State<WalkDirectoryView> {
           } else {
             return Scaffold(
                 appBar: AppBar(
-                  title: const Text("Annuaire"),
+                  title: const Row(
+                    children: [
+                      AppBarLogo(),
+                      Text("Annuaire"),
+                    ],
+                  ),
                 ),
                 body: const Loading());
           }

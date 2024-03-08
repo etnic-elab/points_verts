@@ -13,7 +13,7 @@ class Elevation {
       'Dénivelé : ${positive == 0 ? "Inconnu" : "${positive}m"}';
 }
 
-class Path extends Comparable<Path> {
+class Path implements Comparable<Path> {
   Path({required this.url, required this.title, required this.type});
 
   final String? url;

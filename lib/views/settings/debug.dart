@@ -7,7 +7,7 @@ import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/settings/fire_crashlytics_test.dart';
 
 class Debug extends StatelessWidget {
-  const Debug({Key? key}) : super(key: key);
+  const Debug({super.key});
 
   @override
   Widget build(BuildContext context) {

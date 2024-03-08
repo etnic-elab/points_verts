@@ -69,7 +69,7 @@ void main() async {
 class MyApp extends StatefulWidget {
   static final navigatorKey = GlobalKey<NavigatorState>();
 
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -110,8 +110,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ],
       navigatorKey: MyApp.navigatorKey,
       title: applicationName,
-      theme: CompanyTheme.companyLightTheme(),
-      darkTheme: CompanyTheme.companyDarkTheme(),
+      theme: CompanyTheme.companyLight,
+      darkTheme: CompanyTheme.companyDark,
       home: const WalksHomeScreen(),
       debugShowCheckedModeBanner: false,
     );

@@ -20,14 +20,14 @@ enum GoogleMapIcons {
 
 class GoogleMap extends StatefulWidget {
   const GoogleMap({
-    Key? key,
+    super.key,
     required this.initialLocation,
     this.locationEnabled = false,
     this.markers = const <MarkerInterface>[],
     this.paths = const <Path>[],
     this.onTapMap,
     // this.onTapPath
-  }) : super(key: key);
+  });
 
   final google.CameraPosition initialLocation;
   final bool locationEnabled;

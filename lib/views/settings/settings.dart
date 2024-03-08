@@ -6,6 +6,7 @@ import 'package:points_verts/company_data.dart';
 import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/location.dart';
+import 'package:points_verts/views/app_bar_logo.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
@@ -20,7 +21,7 @@ import 'debug.dart';
 import 'settings_home_select.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+  const Settings({super.key});
 
   @override
   State<StatefulWidget> createState() => _SettingsState();
@@ -129,15 +130,20 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: GestureDetector(
-            excludeFromSemantics: true,
-            child: const Text("Paramètres"),
-            onLongPress: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => const Debug()))),
+        title: Row(
+          children: [
+            const AppBarLogo(),
+            GestureDetector(
+                excludeFromSemantics: true,
+                child: const Text("Paramètres"),
+                onLongPress: () => Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => const Debug()))),
+          ],
+        ),
       ),
       body: ListView(
         children: <Widget>[
-          const ListHeader("Tri des points selon leur emplacement"),
+          const ListHeader("Tri des points"),
           ListTile(
               title: Text(
                   "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",

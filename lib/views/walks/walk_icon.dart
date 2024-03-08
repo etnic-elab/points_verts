@@ -3,7 +3,7 @@ import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/models/walk.dart';
 
 class WalkIcon extends StatelessWidget {
-  const WalkIcon(this.walk, {this.size, Key? key}) : super(key: key);
+  const WalkIcon(this.walk, {this.size, super.key});
 
   final Walk walk;
   final double? size;

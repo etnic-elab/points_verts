@@ -89,7 +89,7 @@ class NotificationManager {
       await instance.zonedSchedule(
           id, title, description, scheduledAt, _generateNotificationDetails(),
           payload: walk.id.toString(),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime);
       log('Notification scheduled for ${scheduledAt.toString()}', name: tag);
@@ -137,7 +137,7 @@ class NotificationManager {
       return instance
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()!
-          .requestPermission();
+          .requestNotificationsPermission();
     }
   }
 

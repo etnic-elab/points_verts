@@ -12,7 +12,7 @@ import '../tile_icon.dart';
 import 'walk_utils.dart';
 
 class WalkDetailsInfo extends StatelessWidget {
-  const WalkDetailsInfo(this.walk, {Key? key}) : super(key: key);
+  const WalkDetailsInfo(this.walk, {super.key});
 
   final Walk walk;
 
@@ -90,18 +90,18 @@ class _WeatherSection extends StatelessWidget {
             Text(
               time,
               semanticsLabel: "A ${time.replaceFirst(r'h', 'heure')}",
-              textScaleFactor: 0.8,
+              textScaler: const TextScaler.linear(0.8),
             ),
             getWeatherIcon(weather),
             Text(
               temp,
               semanticsLabel: temp,
-              textScaleFactor: 0.8,
+              textScaler: const TextScaler.linear(0.8),
             ),
             Text(windSpeed,
                 semanticsLabel:
                     "Vent : ${windSpeed.replaceFirst(r'/h', ' par heure')}",
-                textScaleFactor: 0.8)
+                textScaler: const TextScaler.linear(0.8))
           ],
         ));
       }
@@ -206,7 +206,7 @@ class _StatusTile extends StatelessWidget {
 }
 
 class _GeoTile extends StatelessWidget {
-  const _GeoTile(this.walk, {Key? key}) : super(key: key);
+  const _GeoTile(this.walk);
 
   final Walk walk;
 
@@ -260,7 +260,7 @@ class _GeoTile extends StatelessWidget {
 }
 
 class _IgnTile extends StatelessWidget {
-  const _IgnTile(this.walk, {Key? key}) : super(key: key);
+  const _IgnTile(this.walk);
 
   final Walk walk;
   @override
@@ -278,7 +278,7 @@ class _IgnTile extends StatelessWidget {
 }
 
 class _MeetingPointTile extends StatelessWidget {
-  const _MeetingPointTile(this.walk, {Key? key}) : super(key: key);
+  const _MeetingPointTile(this.walk);
 
   final Walk walk;
 
@@ -293,7 +293,7 @@ class _MeetingPointTile extends StatelessWidget {
 }
 
 class _OrganizerTile extends StatelessWidget {
-  const _OrganizerTile(this.walk, {Key? key}) : super(key: key);
+  const _OrganizerTile(this.walk);
 
   final Walk walk;
   @override
@@ -335,7 +335,7 @@ class _OrganizerTile extends StatelessWidget {
 }
 
 class _TransportTile extends StatelessWidget {
-  const _TransportTile(this.walk, {Key? key}) : super(key: key);
+  const _TransportTile(this.walk);
 
   final Walk walk;
   @override
@@ -359,7 +359,7 @@ class _TransportTile extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header(this.title, {Key? key}) : super(key: key);
+  const _Header(this.title);
 
   final String title;
 
@@ -373,7 +373,7 @@ class _Header extends StatelessWidget {
 }
 
 class _Spacer extends StatelessWidget {
-  const _Spacer({Key? key, this.height = 15.0}) : super(key: key);
+  const _Spacer({this.height = 15.0});
 
   final double height;
 

@@ -13,7 +13,7 @@ import '../../models/walk.dart';
 enum _ViewType { detail, map }
 
 class WalkDetailsView extends StatefulWidget {
-  const WalkDetailsView(this.walk, {Key? key}) : super(key: key);
+  const WalkDetailsView(this.walk, {super.key});
 
   final Walk walk;
 
@@ -158,8 +158,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
 }
 
 class _BottomSheet extends StatefulWidget {
-  const _BottomSheet(this.walk, this.togglePathVisibility, {Key? key})
-      : super(key: key);
+  const _BottomSheet(this.walk, this.togglePathVisibility);
   final Walk walk;
   final Function(Path, bool) togglePathVisibility;
 
