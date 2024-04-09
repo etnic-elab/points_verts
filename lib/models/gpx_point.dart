@@ -10,8 +10,8 @@ class GpxPoint {
   factory GpxPoint.fromXmlElement(XmlElement element) {
     double? latitude = double.parse(element.getAttribute('lat')!);
     double? longitude = double.parse(element.getAttribute('lon')!);
-    double? elevation =
-        double.tryParse(element.getElement('ele')?.value ?? '-0xFF');
+    double? elevation = double.tryParse(
+        element.getElement('ele')?.firstChild?.value ?? '-0xFF');
 
     return GpxPoint(latLng: LatLng(latitude, longitude), elevation: elevation);
   }
