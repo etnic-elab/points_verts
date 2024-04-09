@@ -11,8 +11,7 @@ import 'walks_view.dart';
 class WalkResultsListView extends StatelessWidget {
   const WalkResultsListView(
       this.walks, this.position, this.currentPlace, this.refreshWalks,
-      {Key? key})
-      : super(key: key);
+      {super.key});
 
   final Future<List<Walk>>? walks;
   final LatLng? position;

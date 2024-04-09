@@ -18,8 +18,7 @@ import 'dart:io' show Platform;
 class WalkResultsMapView extends StatelessWidget {
   WalkResultsMapView(this.walks, this.position, this.currentPlace,
       this.selectedWalk, this.onWalkSelect, this.onTapMap, this.refreshWalks,
-      {Key? key})
-      : super(key: key);
+      {super.key});
 
   final Future<List<Walk>>? walks;
   final LatLng? position;

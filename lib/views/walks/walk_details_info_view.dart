@@ -10,8 +10,7 @@ import 'package:points_verts/services/map/map_interface.dart';
 
 class WalkDetailsInfoView extends StatelessWidget {
   const WalkDetailsInfoView(this.walk, this.onTapMap, this.pathsLoaded,
-      {Key? key})
-      : super(key: key);
+      {super.key});
 
   final Walk walk;
   final Function onTapMap;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ListHeader extends StatelessWidget {
-  const ListHeader(this.title, {Key? key, this.padding}) : super(key: key);
+  const ListHeader(this.title, {super.key, this.padding});
 
   final String title;
   final EdgeInsets? padding;

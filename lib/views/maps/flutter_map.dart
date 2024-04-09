@@ -6,8 +6,7 @@ import 'package:latlong2/latlong.dart';
 class FlutterMap extends StatelessWidget {
   const FlutterMap(
       this.markers, this.token, this.centerLat, this.centerLong, this.zoom,
-      {Key? key})
-      : super(key: key);
+      {super.key});
 
   final List<MarkerInterface> markers;
   final String token;
@@ -22,8 +21,8 @@ class FlutterMap extends StatelessWidget {
       flutterMarkers.add(marker.buildFlutterMarker());
     }
     return flutter.FlutterMap(
-      options:
-          flutter.MapOptions(center: LatLng(centerLat, centerLong), zoom: zoom),
+      options: flutter.MapOptions(
+          initialCenter: LatLng(centerLat, centerLong), initialZoom: zoom),
       children: [
         flutter.TileLayer(
           urlTemplate:

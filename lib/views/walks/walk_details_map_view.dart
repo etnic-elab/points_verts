@@ -10,8 +10,7 @@ import 'package:collection/collection.dart';
 import 'dart:io' show Platform;
 
 class WalkDetailsMapView extends StatelessWidget {
-  const WalkDetailsMapView(this.walk, this.onTapMap, this.location, {Key? key})
-      : super(key: key);
+  const WalkDetailsMapView(this.walk, this.onTapMap, this.location, {super.key});
 
   final Walk walk;
   final Function onTapMap;

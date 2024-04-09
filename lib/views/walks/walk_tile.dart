@@ -3,11 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/views/walks/walk_info.dart';
 
-import '../tile_icon.dart';
 import '../../models/walk.dart';
 import 'geo_button.dart';
 import 'walk_details_view.dart';
-import 'walk_icon.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
@@ -16,7 +14,7 @@ DateFormat fullDate = DateFormat("dd/MM", "fr_BE");
 enum TileType { calendar, directory, map }
 
 class WalkTile extends StatelessWidget {
-  const WalkTile(this.walk, this.tileType, {Key? key}) : super(key: key);
+  const WalkTile(this.walk, this.tileType, {super.key});
 
   final Walk walk;
   final TileType tileType;
@@ -29,10 +27,11 @@ class WalkTile extends StatelessWidget {
       explicitChildNodes: true,
       child: Stack(
         children: [
-          Card(
+          Card.outlined(
+            elevation: 2.0,
             semanticContainer: false,
             margin: tileType == TileType.map
-                ? const EdgeInsets.all(0)
+                ? const EdgeInsets.only()
                 : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
             shape: tileType == TileType.map
                 ? const RoundedRectangleBorder(
@@ -72,7 +71,7 @@ class WalkTile extends StatelessWidget {
   List<Widget> getChildren(BuildContext context) {
     List<Widget> list = [
       ListTile(
-        leading: TileIcon(WalkIcon(walk)),
+        enabled: !walk.isCancelled,
         title: _title,
         subtitle: _subtitle,
         trailing: tileType == TileType.directory
@@ -151,7 +150,7 @@ class WalkTile extends StatelessWidget {
 }
 
 class _WeatherChip extends StatelessWidget {
-  const _WeatherChip(this.weather, {Key? key}) : super(key: key);
+  const _WeatherChip(this.weather);
 
   final Weather weather;
 
@@ -163,7 +162,8 @@ class _WeatherChip extends StatelessWidget {
         avatar: getWeatherIcon(weather,
             iconSize: 15.0,
             iconColor: Theme.of(context).textTheme.bodyLarge?.color),
-        label: Text("${weather.temperature.round()}°"),
+        label: Text("${weather.temperature.round()}°",
+            style: const TextStyle(fontSize: 12.0)),
         visualDensity: VisualDensity.compact,
       ),
     );

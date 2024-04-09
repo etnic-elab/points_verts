@@ -12,8 +12,7 @@ const countryLabels = ['Belgique', 'France', 'Luxembourg'];
 
 class SettingsHomeSelect extends StatefulWidget {
   const SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback,
-      {this.sessionToken, Key? key})
-      : super(key: key);
+      {this.sessionToken, super.key});
 
   final Function(AddressSuggestion, String?) setHomeCallback;
   final Function removeHomeCallback;

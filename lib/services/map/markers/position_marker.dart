@@ -21,7 +21,7 @@ class PositionMarker implements MarkerInterface {
   flutter.Marker buildFlutterMarker() {
     return flutter.Marker(
       point: latlong.LatLng(latitude, longitude),
-      builder: (ctx) => IgnorePointer(
+      child: IgnorePointer(
         child: Icon(currentPlace.icon),
       ),
     );
