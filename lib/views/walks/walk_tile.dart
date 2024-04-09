@@ -27,10 +27,11 @@ class WalkTile extends StatelessWidget {
       explicitChildNodes: true,
       child: Stack(
         children: [
-          Card.filled(
+          Card.outlined(
+            elevation: 2.0,
             semanticContainer: false,
             margin: tileType == TileType.map
-                ? const EdgeInsets.all(0)
+                ? const EdgeInsets.only()
                 : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
             shape: tileType == TileType.map
                 ? const RoundedRectangleBorder(
