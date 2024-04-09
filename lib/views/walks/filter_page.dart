@@ -6,8 +6,7 @@ import '../list_header.dart';
 import 'walks_view.dart';
 
 class FilterPage extends StatefulWidget {
-  const FilterPage(this.currentFilter, this.showPlaces, {Key? key})
-      : super(key: key);
+  const FilterPage(this.currentFilter, this.showPlaces, {super.key});
 
   final WalkFilter currentFilter;
   final bool showPlaces;
