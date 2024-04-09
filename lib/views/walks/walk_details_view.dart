@@ -189,7 +189,7 @@ class __BottomSheet extends State<_BottomSheet> {
             ? SwitchListTile(
                 title: Text(
                     path.description != null ? path.description! : path.title),
-                subtitle: Text('${path.elevation}'),
+                subtitle: Text('${path.getElevation()}'),
                 value: path.visible,
                 onChanged: (bool newValue) {
                   widget.togglePathVisibility(path, newValue);

@@ -21,6 +21,7 @@ class Path implements Comparable<Path> {
   final String? type;
   bool visible = false;
   List<GpxPoint> gpxPoints = [];
+  Elevation? elevation;
 
   Path.fromJson(Map<String, dynamic> json)
       : url = json['fichier'],
@@ -61,7 +62,13 @@ class Path implements Comparable<Path> {
     }
   }
 
-  Elevation get elevation {
+  Elevation getElevation() {
+    elevation ??= calculateElevation();
+
+    return elevation!;
+  }
+
+  Elevation calculateElevation() {
     double? previous;
     double positive = 0;
     double negative = 0;
