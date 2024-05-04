@@ -38,19 +38,16 @@ class WalkTile extends StatelessWidget {
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(20)))
                 : null,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 8.0, 18.0, 8.0),
-              child: MergeSemantics(
-                child: Semantics(
-                  button: true,
-                  hint: "Ouvrir la page de détail de l'évènement",
-                  child: InkWell(
-                    onTap: () => Navigator.push(context, _pageRoute()),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: getChildren(context),
-                    ),
+            child: MergeSemantics(
+              child: Semantics(
+                button: true,
+                hint: "Ouvrir la page de détail de l'évènement",
+                child: InkWell(
+                  onTap: () => Navigator.push(context, _pageRoute()),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: getChildren(context),
                   ),
                 ),
               ),
