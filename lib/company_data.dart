@@ -42,8 +42,8 @@ class CompanyColors {
 
 class CompanyTheme {
   static final ColorScheme companyColorSchemeLight = ColorScheme.fromSeed(
-      seedColor: CompanyColors.greenPrimary, brightness: Brightness.light);
+      seedColor: CompanyColors.greenSecondary, brightness: Brightness.light);
 
   static final ColorScheme companyColorSchemeDark = ColorScheme.fromSeed(
-      seedColor: CompanyColors.greenPrimary, brightness: Brightness.dark);
+      seedColor: CompanyColors.greenSecondary, brightness: Brightness.dark);
 }
