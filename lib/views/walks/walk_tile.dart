@@ -57,7 +57,7 @@ class WalkTile extends StatelessWidget {
               ? const SizedBox.shrink()
               : Positioned(
                   right: 20,
-                  top: 20,
+                  top: 15,
                   child: GeoButton(walk),
                 ),
         ],
