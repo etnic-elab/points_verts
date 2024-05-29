@@ -40,7 +40,7 @@ jobs:
       - name: Generate splash screens
         run: flutter pub run flutter_native_splash:create
       - name: Generate launcher icons
-        run: flutter pub run flutter_launcher_icons:main
+        run: flutter pub run flutter_launcher_icons
       - name: Run tests
         run: flutter test
       - name: Run code analysis
@@ -82,9 +82,9 @@ jobs:
           json: '{"file_generated_by": "FlutterFire CLI","purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory","GOOGLE_APP_ID": "1:1111111111111:ios:5b796ce177d1c60e6fa46e","FIREBASE_PROJECT_ID": "project_id","GCM_SENDER_ID": "1111111111111"}'
           dir: "ios/"
       - name: Generate splash screens
-        run: flutter pub run flutter_native_splash
+        run: flutter pub run flutter_native_splash:create
       - name: Generate launcher icons
-        run: flutter pub run flutter_launcher_icons:main
+        run: flutter pub run flutter_launcher_icons
       - name: Run tests
         run: flutter test
       - name: Run code analysis
