@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/background_fetch.dart';
@@ -101,19 +102,24 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: const [
-        Locale('fr', 'BE'),
-        Locale('fr', 'FR'),
-        Locale('fr', 'LU'),
-      ],
-      navigatorKey: MyApp.navigatorKey,
-      title: applicationName,
-      theme: CompanyTheme.companyLight,
-      darkTheme: CompanyTheme.companyDark,
-      home: const WalksHomeScreen(),
-      debugShowCheckedModeBanner: false,
-    );
+    return DynamicColorBuilder(
+        builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
+      return MaterialApp(
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: const [
+          Locale('fr', 'BE'),
+          Locale('fr', 'FR'),
+          Locale('fr', 'LU'),
+        ],
+        navigatorKey: MyApp.navigatorKey,
+        title: applicationName,
+        theme: ThemeData(
+            colorScheme: lightColorScheme ?? CompanyTheme.companyColorSchemeLight),
+        darkTheme: ThemeData(
+            colorScheme: darkColorScheme ?? CompanyTheme.companyColorSchemeDark),
+        home: const WalksHomeScreen(),
+        debugShowCheckedModeBanner: false,
+      );
+    });
   }
 }
