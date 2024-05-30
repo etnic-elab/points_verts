@@ -3,12 +3,14 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/background_fetch.dart';
@@ -101,19 +103,54 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: const [
-        Locale('fr', 'BE'),
-        Locale('fr', 'FR'),
-        Locale('fr', 'LU'),
-      ],
-      navigatorKey: MyApp.navigatorKey,
-      title: applicationName,
-      theme: CompanyTheme.companyLight,
-      darkTheme: CompanyTheme.companyDark,
-      home: const WalksHomeScreen(),
-      debugShowCheckedModeBanner: false,
-    );
+    redoSystemStyle(
+        MediaQuery.of(context).platformBrightness == Brightness.dark);
+    return DynamicColorBuilder(
+        builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
+      return MaterialApp(
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: const [
+          Locale('fr', 'BE'),
+          Locale('fr', 'FR'),
+          Locale('fr', 'LU'),
+        ],
+        navigatorKey: MyApp.navigatorKey,
+        title: applicationName,
+        theme: ThemeData(
+            colorScheme:
+                lightColorScheme ?? CompanyTheme.companyColorSchemeLight),
+        darkTheme: ThemeData(
+            colorScheme:
+                darkColorScheme ?? CompanyTheme.companyColorSchemeDark),
+        home: const WalksHomeScreen(),
+        debugShowCheckedModeBanner: false,
+      );
+    });
+  }
+
+  Future<void> redoSystemStyle(bool darkMode) async {
+    if (Platform.isAndroid) {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      final bool edgeToEdge = androidInfo.version.sdkInt >= 29;
+
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // Not relevant to this issue
+        systemNavigationBarColor: edgeToEdge
+            ? Colors.transparent
+            : darkMode
+                ? Colors.black
+                : Colors.white,
+        systemNavigationBarContrastEnforced: true,
+        systemNavigationBarIconBrightness:
+            darkMode ? Brightness.light : Brightness.dark,
+      ));
+    } else {
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // Not relevant to this issue
+      ));
+    }
   }
 }
