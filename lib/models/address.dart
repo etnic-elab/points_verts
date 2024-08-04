@@ -14,8 +14,11 @@ class AddressSuggestion {
   final String placeId;
   final String name;
   final String description;
+  final double? longitude;
+  final double? latitude;
 
-  AddressSuggestion(this.placeId, this.name, this.description);
+  AddressSuggestion(
+      this.placeId, this.name, this.description, this.longitude, this.latitude);
 
   @override
   String toString() {

@@ -71,7 +71,7 @@ class MapBox extends MapInterface {
       for (var result in decoded['features']) {
         print(results);
         results.add(AddressSuggestion(
-            result['id'], result['test'], result['place_name']));
+            result['id'], result['test'], result['place_name'], null, null));
       }
     }
     return results;
@@ -94,7 +94,8 @@ class MapBox extends MapInterface {
     Function? onTapMap,
     Function(Path)? onTapPath,
   }) {
-    return FlutterMap(markers, apiKey!, centerLat, centerLong, zoom);
+    return FlutterMap(
+        Maps.mapbox, markers, apiKey!, centerLat, centerLong, zoom);
   }
 
   String _getEncodedPath(List<Path> paths, Brightness brightness) {

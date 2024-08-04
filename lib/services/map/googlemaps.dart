@@ -94,8 +94,12 @@ class GoogleMaps extends MapInterface {
       if (result['status'] == 'OK') {
         // compose suggestions in a list
         return result['predictions']
-            .map<AddressSuggestion>((p) => AddressSuggestion(p['place_id'],
-                p['structured_formatting']['main_text'], p['description']))
+            .map<AddressSuggestion>((p) => AddressSuggestion(
+                p['place_id'],
+                p['structured_formatting']['main_text'],
+                p['description'],
+                null,
+                null))
             .toList();
       }
     }

@@ -63,14 +63,24 @@ class _SettingsState extends State<Settings> {
 
   Future<void> _setHome(
       AddressSuggestion suggestion, String? sessionToken) async {
-    Address? address = await kMap.instance.retrievePlaceDetailFromId(
-        suggestion.placeId,
-        sessionToken: sessionToken);
-    if (address != null) {
+    String? label, homeCoords;
+    if (suggestion.latitude == null) {
+      Address? address = await kMap.instance.retrievePlaceDetailFromId(
+          suggestion.placeId,
+          sessionToken: sessionToken);
+      if (address != null) {
+        label = address.address;
+        homeCoords = "${address.latitude},${address.longitude}";
+      }
+    } else {
+      label = suggestion.description;
+      homeCoords = "${suggestion.latitude},${suggestion.longitude}";
+    }
+
+    if (label != null && homeCoords != null) {
       final futures = await Future.wait([
-        PrefsProvider.prefs.setString(
-            Prefs.homeCoords, "${address.latitude},${address.longitude}"),
-        PrefsProvider.prefs.setString(Prefs.homeLabel, address.address)
+        PrefsProvider.prefs.setString(Prefs.homeCoords, homeCoords),
+        PrefsProvider.prefs.setString(Prefs.homeLabel, label)
       ]);
       if (mounted) setState(() => _home = futures[1]);
       NotificationManager.instance.scheduleNextNearestWalkNotifications();
@@ -136,8 +146,8 @@ class _SettingsState extends State<Settings> {
             GestureDetector(
                 excludeFromSemantics: true,
                 child: const Text("Paramètres"),
-                onLongPress: () => Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) => const Debug()))),
+                onLongPress: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const Debug()))),
           ],
         ),
       ),

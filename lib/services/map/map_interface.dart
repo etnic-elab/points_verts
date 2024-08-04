@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:points_verts/models/path.dart';
+import 'package:points_verts/services/map/azure_maps.dart';
 import 'package:points_verts/services/map/googlemaps.dart';
 import 'package:points_verts/services/map/mapbox.dart';
 import 'package:points_verts/services/map/markers/marker_interface.dart';
@@ -9,7 +10,7 @@ import '../../models/address.dart';
 
 import '../../models/walk.dart';
 
-enum Maps { google, mapbox }
+enum Maps { google, mapbox, azure }
 
 extension MapsX on Maps {
   MapInterface get instance {
@@ -18,6 +19,8 @@ extension MapsX on Maps {
         return GoogleMaps();
       case Maps.mapbox:
         return MapBox();
+      case Maps.azure:
+        return AzureMaps();
     }
   }
 }
