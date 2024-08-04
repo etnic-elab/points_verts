@@ -57,7 +57,7 @@ jobs:
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.19.x"
+          flutter-version: "3.22.x"
           architecture: x64
       - name: Install dependencies
         run: flutter pub get
