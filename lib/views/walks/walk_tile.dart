@@ -25,45 +25,31 @@ class WalkTile extends StatelessWidget {
       header: true,
       label: walk.city,
       explicitChildNodes: true,
-      child: Stack(
-        children: [
-          Card.outlined(
-            elevation: 2.0,
-            semanticContainer: false,
-            margin: tileType == TileType.map
-                ? const EdgeInsets.only()
-                : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-            shape: tileType == TileType.map
-                ? const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(20)))
-                : null,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 8.0, 18.0, 8.0),
-              child: MergeSemantics(
-                child: Semantics(
-                  button: true,
-                  hint: "Ouvrir la page de détail de l'évènement",
-                  child: InkWell(
-                    onTap: () => Navigator.push(context, _pageRoute()),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: getChildren(context),
-                    ),
-                  ),
-                ),
+      child: Card.outlined(
+        elevation: 2.0,
+        semanticContainer: false,
+        margin: tileType == TileType.map
+            ? const EdgeInsets.only()
+            : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+        shape: tileType == TileType.map
+            ? const RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(20)))
+            : null,
+        child: MergeSemantics(
+          child: Semantics(
+            button: true,
+            hint: "Ouvrir la page de détail de l'évènement",
+            child: InkWell(
+              onTap: () => Navigator.push(context, _pageRoute()),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: getChildren(context),
               ),
             ),
           ),
-          tileType == TileType.directory || walk.isCancelled
-              ? const SizedBox.shrink()
-              : Positioned(
-                  right: 20,
-                  top: 20,
-                  child: GeoButton(walk),
-                ),
-        ],
+        ),
       ),
     );
   }
@@ -84,7 +70,7 @@ class WalkTile extends StatelessWidget {
                           color: CompanyColors.contextualRed(context)),
                     ),
                   )
-                : const SizedBox.shrink(),
+                : GeoButton(walk),
       ),
     ];
 
