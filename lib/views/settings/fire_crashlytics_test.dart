@@ -39,7 +39,7 @@ class _FireCrashlyticsTestState extends State<FireCrashlyticsTest> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvoked: (bool didPop) async {
+      onPopInvokedWithResult: (bool didPop, _) async {
         bool crashlyticsEnabled =
             await PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled);
         if (!crashlyticsEnabled) {
