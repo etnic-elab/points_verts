@@ -175,8 +175,11 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
   Future<void> _retrieveCurrentPosition() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.medium,
-          timeLimit: const Duration(seconds: 4));
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 4),
+        ),
+      );
       _currentPosition = LatLng(position.latitude, position.longitude);
     } catch (e) {
       if (e is PlatformException) {
