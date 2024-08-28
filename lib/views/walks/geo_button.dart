@@ -26,7 +26,7 @@ class GeoButton extends StatelessWidget {
               shape: const RoundedRectangleBorder(),
               foregroundColor: Theme.of(context).textTheme.bodyLarge!.color,
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-              textStyle: const TextStyle(fontSize: 13.0)),
+              textStyle: const TextStyle(fontSize: 12.0)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
