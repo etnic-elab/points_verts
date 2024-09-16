@@ -54,9 +54,7 @@ key.jks
 /android/app/src/main/ic_launcher-playstore.png
 
 # Ignore .lock files in packages folder
-packages/**/*.lock
+/packages/*/pubspec.lock
 
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-!pubspec.lock
-!ios/Podfile.lock
