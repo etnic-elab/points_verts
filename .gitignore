@@ -3,7 +3,6 @@
 *.log
 *.pyc
 *.swp
-*.lock
 .DS_Store
 .atom/
 .buildlog/
@@ -53,6 +52,9 @@ key.jks
 /ios/Runner/Assets.xcassets/**/*.png
 /android/app/src/main/res/**/*.png
 /android/app/src/main/ic_launcher-playstore.png
+
+# Ignore .lock files in packages folder
+packages/**/*.lock
 
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
