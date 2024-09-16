@@ -48,7 +48,7 @@ key.jks
 /assets/light/*.png
 /assets/dark/*.png
 /assets/google_static_markers/
-/assets/launcher_icons/
+/assets/launcher_icons/*
 /ios/Runner/Assets.xcassets/**/*.png
 /android/app/src/main/res/**/*.png
 /android/app/src/main/ic_launcher-playstore.png
@@ -58,3 +58,4 @@ key.jks
 
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+!/assets/launcher_icons/.keep
