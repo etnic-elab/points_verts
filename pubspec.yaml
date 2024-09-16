@@ -79,6 +79,11 @@ flutter:
     - assets/light/
     - assets/dark/
     - assets/raw/
+
+  fonts:
+    - family: PointsVertsIcons
+      fonts:
+        - asset: fonts/PointsVertsIcons.ttf
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

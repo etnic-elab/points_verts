@@ -18,6 +18,7 @@ const String publicLogoCancelledDark =
 class CompanyColors {
   static const greenPrimary = Color(0xFF6CB233);
   static const greenSecondary = Color(0xFF5B9434);
+  static const orange = Color(0xFFE57710);
   static const lightGreen = Color(0xFF3FBA44);
   static const lightestGreen = Color(0xFF7ECC2F);
   static const darkGreen = Color(0xFF246739);
@@ -30,7 +31,6 @@ class CompanyColors {
   static const pink = Color(0xFFED0D8E);
   static const yellow = Color(0xFFC3C83A);
   static const purple = Color(0xFF84547A);
-  static const orange = Color(0xFFF3612B);
   static const red = Color(0xFFD7272E);
   static const lightRed = Color(0xFFF03B33);
   static const darkRed = Color(0xFF811620);
@@ -44,11 +44,18 @@ class CompanyTheme {
   static final greenSecondaryMatCol =
       _createMaterialColor(CompanyColors.greenSecondary);
 
-  static final ThemeData companyLight =
-      ThemeData(colorSchemeSeed: greenSecondaryMatCol);
+  static final orangeMatCol = _createMaterialColor(
+    CompanyColors.orange,
+  );
+
+  static final ThemeData companyLight = ThemeData(
+    colorSchemeSeed: orangeMatCol,
+  );
 
   static final ThemeData companyDark = ThemeData(
-      brightness: Brightness.dark, colorSchemeSeed: greenSecondaryMatCol);
+    brightness: Brightness.dark,
+    colorSchemeSeed: orangeMatCol,
+  );
 
   static MaterialColor _createMaterialColor(Color color) {
     List strengths = <double>[.05];
