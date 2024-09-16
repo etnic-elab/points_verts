@@ -36,6 +36,9 @@
 # Web related
 lib/generated_plugin_registrant.dart
 
+# Exceptions to above rules.
+!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
 /android/key*.properties
 /ios/Runner/GoogleMaps.plist
 key.jks
@@ -43,6 +46,7 @@ key.jks
 /app_icons/
 /ios/firebase_app_id_file.json
 /android/app/google-services.json
+ 
 
 # assets
 /assets/walk_data.json
@@ -53,7 +57,3 @@ key.jks
 /ios/Runner/Assets.xcassets/**/*.png
 /android/app/src/main/res/**/*.png
 /android/app/src/main/ic_launcher-playstore.png
-
-# Exceptions to above rules.
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-!pubspec.lock
