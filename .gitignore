@@ -57,3 +57,4 @@ key.jks
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !pubspec.lock
+!ios/Podfile.lock
