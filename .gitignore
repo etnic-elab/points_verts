@@ -46,7 +46,6 @@ key.jks
 /app_icons/
 /ios/firebase_app_id_file.json
 /android/app/google-services.json
- 
 
 # assets
 /assets/walk_data.json

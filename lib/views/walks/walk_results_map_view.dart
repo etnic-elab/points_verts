@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:points_verts/constants.dart';
-import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/services/map/markers/marker_interface.dart';
+import 'package:points_verts/views/maps/dynamic_map.dart';
+import 'package:points_verts/views/maps/markers/marker_interface.dart';
 
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/models/walk.dart';
-import 'package:points_verts/services/map/markers/walk_marker.dart';
-import 'package:points_verts/services/map/markers/position_marker.dart';
+import 'package:points_verts/views/maps/markers/walk_marker.dart';
+import 'package:points_verts/views/maps/markers/position_marker.dart';
 import 'walks_view.dart';
 import 'walk_list_error.dart';
 import 'walk_tile.dart';
@@ -32,6 +31,7 @@ class WalkResultsMapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dynamicMap = DynamicMap();
     return FutureBuilder(
         future: walks,
         builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
@@ -45,10 +45,15 @@ class WalkResultsMapView extends StatelessWidget {
                     ? Semantics(
                         label: 'La carte visualisant les Points Verts',
                         excludeSemantics: true,
-                        child: kMap.instance
-                            .retrieveMap(markers: markers, onTapMap: onTapMap))
-                    : kMap.instance
-                        .retrieveMap(markers: markers, onTapMap: onTapMap),
+                        child: dynamicMap.getMap(
+                          markers: markers,
+                          onTapMap: onTapMap,
+                        ),
+                      )
+                    : dynamicMap.getMap(
+                        markers: markers,
+                        onTapMap: onTapMap,
+                      ),
                 _buildWalkInfo(),
               ],
             );

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:app_cache_registry/app_cache_registry.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:points_verts/constants.dart';
+import 'package:points_verts/locator.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/services/background_fetch.dart';
 import 'package:points_verts/services/prefs.dart';
@@ -59,6 +61,9 @@ void main() async {
       if (kDeleteData) _deleteData(),
       _addTrustedCert(Assets.letsEncryptCert)
     ]);
+    setupLocator();
+    AppCacheRegistry.initializeCaches();
+    await AppCacheRegistry.cleanupAllCaches();
     runApp(const MyApp());
     BackgroundFetch.registerHeadlessTask(BackgroundFetchProvider.headlessTask);
   },

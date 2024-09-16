@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as flutter;
-import 'package:points_verts/services/map/markers/marker_interface.dart';
+import 'package:maps_api/maps_api.dart';
+import 'package:points_verts/views/maps/dynamic_map.dart';
+import 'package:points_verts/views/maps/markers/marker_interface.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../services/map/map_interface.dart';
-
-String getUrlTemplate(Maps maps) {
-  if (maps == Maps.mapbox) {
+String getUrlTemplate(DisplayMapProvider maps) {
+  if (maps == DisplayMapProvider.mapbox) {
     return "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}@2x?access_token={accessToken}";
-  } else if (maps == Maps.azure) {
+  } else if (maps == DisplayMapProvider.azure) {
     return "https://atlas.microsoft.com/map/tile?api-version=2022-08-01&tilesetId={tilesetId}&zoom={z}&x={x}&y={y}&tileSize={tileSize}&language={language}&view={view}&subscription-key={subscriptionKey}";
   } else {
     throw UnsupportedError("flutter_map does not support $maps.");
@@ -16,15 +16,15 @@ String getUrlTemplate(Maps maps) {
 }
 
 Map<String, String> getAdditionalOptions(
-    Maps maps, BuildContext context, String token) {
-  if (maps == Maps.mapbox) {
+    DisplayMapProvider maps, BuildContext context, String token) {
+  if (maps == DisplayMapProvider.mapbox) {
     return {
       'accessToken': token,
       'id': Theme.of(context).brightness == Brightness.light
           ? "light-v10"
           : "dark-v10"
     };
-  } else if (maps == Maps.azure) {
+  } else if (maps == DisplayMapProvider.azure) {
     return {
       'tileSize': '512',
       'language': 'fr',
@@ -40,16 +40,21 @@ Map<String, String> getAdditionalOptions(
   }
 }
 
+///TODO: Should support paths. Not sure if it is possible
 class FlutterMap extends StatelessWidget {
-  const FlutterMap(this.maps, this.markers, this.token, this.centerLat,
-      this.centerLong, this.zoom,
-      {super.key});
+  const FlutterMap(
+    this.displayMapProvider,
+    this.markers,
+    this.token,
+    this.center,
+    this.zoom, {
+    super.key,
+  });
 
-  final Maps maps;
+  final DisplayMapProvider displayMapProvider;
   final List<MarkerInterface> markers;
   final String token;
-  final double centerLat;
-  final double centerLong;
+  final Geolocation center;
   final double zoom;
 
   @override
@@ -60,14 +65,19 @@ class FlutterMap extends StatelessWidget {
     }
     return flutter.FlutterMap(
       options: flutter.MapOptions(
-          initialCenter: LatLng(centerLat, centerLong), initialZoom: zoom),
+          initialCenter: LatLng(
+            center.latitude,
+            center.longitude,
+          ),
+          initialZoom: zoom),
       children: [
         flutter.TileLayer(
-          urlTemplate: getUrlTemplate(maps),
+          urlTemplate: getUrlTemplate(displayMapProvider),
           tileSize: 512,
           maxZoom: 18,
-          zoomOffset: maps == Maps.mapbox ? -1 : 0,
-          additionalOptions: getAdditionalOptions(maps, context, token),
+          zoomOffset: displayMapProvider == DisplayMapProvider.mapbox ? -1 : 0,
+          additionalOptions:
+              getAdditionalOptions(displayMapProvider, context, token),
         ),
         flutter.MarkerLayer(markers: flutterMarkers),
       ],

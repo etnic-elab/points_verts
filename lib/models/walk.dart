@@ -1,15 +1,17 @@
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:maps_api/maps_api.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/weather.dart';
-
-import 'trip.dart';
+import 'package:collection/collection.dart';
 
 final dateFormat = DateFormat("yyyy-MM-dd");
 
-//const TRACES_GPX =
-//    "[{\"titre\":\"Parcours 5 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"1\"},{\"titre\":\"Parcours 10 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=271&fichier=Parcours+10kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"2\"},{\"titre\":\"Parcours 15 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=272&fichier=Parcours+15kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"5\"},{\"titre\":\"Parcours 20 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=273&fichier=Parcours+20kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"3\"}]";
+// const TEST_TRACES_GPX =
+//     "[{\"titre\":\"Parcours 5 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=270&fichier=Parcours+5kms%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"1\"},{\"titre\":\"Parcours 10 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=271&fichier=Parcours+10kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"2\"},{\"titre\":\"Parcours 15 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=272&fichier=Parcours+15kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"5\"},{\"titre\":\"Parcours 20 kms\",\"fichier\":\"https://www.am-sport.cfwb.be/adeps/pv_traces.asp?id=273&fichier=Parcours+20kms+%2Egpx\",\"jourdemarche\":\"0\",\"couleur\":\"3\"}]";
+// const TEST_LATITUDE = 50.410940;
+// const TEST_LONGITUDE = 4.164020;
 
 class Walk {
   Walk(
@@ -76,7 +78,7 @@ class Walk {
   final List<Path> paths;
 
   double? distance;
-  Trip? trip;
+  TripInfo? trip;
   List<Weather> weathers = [];
 
   factory Walk.fromJson(Map<String, dynamic> json) {
@@ -89,6 +91,8 @@ class Walk {
         date: dateFormat.parse(json['fields']['date']),
         long: json['fields']['geopoint'][1],
         lat: json['fields']['geopoint'][0],
+        // long: TEST_LONGITUDE,
+        // lat: TEST_LATITUDE,
         status: json['fields']['statut'],
         meetingPoint: json['fields']['lieu_de_rendez_vous'],
         meetingPointInfo: json['fields']['infos_rendez_vous'],
@@ -123,6 +127,8 @@ class Walk {
       date: DateTime.parse(maps[i]['date']),
       long: maps[i]['longitude'],
       lat: maps[i]['latitude'],
+      // long: TEST_LONGITUDE,
+      // lat: TEST_LATITUDE,
       status: maps[i]['status'],
       meetingPoint: maps[i]['meeting_point'],
       meetingPointInfo: maps[i]['meeting_point_info'],
@@ -183,12 +189,13 @@ class Walk {
     };
   }
 
-  static List<Path> _decodePaths(json) {
+  static List<Path> _decodePaths(Map<String, dynamic> json) {
     try {
-      // if (json['fields']['localite'] == 'BINCHE') {
-      //   return _pathsFromJson(jsonDecode(TRACES_GPX));
-      // }
-      return _pathsFromJson(jsonDecode(json['fields']['traces_gpx']));
+      final tracesGpx = json['fields']['traces_gpx'];
+      if (tracesGpx == null) {
+        return [];
+      }
+      return _pathsFromJson(jsonDecode(tracesGpx));
     } catch (err) {
       print("Cannot decode paths for walk '${json['fields']['id']}': $err");
       return [];
@@ -196,14 +203,19 @@ class Walk {
   }
 
   static List<Path> _pathsFromJson(dynamic json) {
-    if (json is List && json.isNotEmpty) {
-      List<Path> paths =
-          (json).map<Path>((json) => Path.fromJson(json)).toList();
-      paths.sort();
-      return paths;
+    // json = jsonDecode(TEST_TRACES_GPX);
+    if (json is! List) {
+      return [];
     }
 
-    return <Path>[];
+    final paths = json
+        .whereType<Map<String, dynamic>>()
+        .map(Path.fromJsonIfGpx)
+        .whereType<Path>()
+        .toList();
+
+    paths.sort();
+    return paths;
   }
 
   bool get isCancelled => status == "Annulé";
@@ -221,8 +233,8 @@ class Walk {
     }
   }
 
-  String? get navigationLabel => (trip != null && trip!.duration != null)
-      ? '${Duration(seconds: trip!.duration!.round()).inMinutes} min'
+  String? get navigationLabel => (trip != null)
+      ? '${Duration(seconds: trip!.duration.round()).inMinutes} min'
       : formattedDistance;
 
   bool get isPositionable => hasPosition && !isCancelled;
@@ -236,4 +248,7 @@ class Walk {
   bool get isWalk => type == 'Marche';
 
   bool get isOrientation => type == 'Orientation';
+
+  bool get hasPaths =>
+      paths.firstWhereOrNull((path) => path.gpxPoints.isNotEmpty) != null;
 }
