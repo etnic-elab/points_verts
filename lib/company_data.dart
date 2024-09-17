@@ -41,8 +41,9 @@ class CompanyColors {
 }
 
 class CompanyTheme {
-  static final greenSecondaryMatCol =
-      _createMaterialColor(CompanyColors.greenSecondary);
+  static final greenSecondaryMatCol = _createMaterialColor(
+    CompanyColors.greenSecondary,
+  );
 
   static final orangeMatCol = _createMaterialColor(
     CompanyColors.orange,
