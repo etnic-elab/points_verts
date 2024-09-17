@@ -99,7 +99,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _viewType == _ViewType.map
+      floatingActionButton: _viewType == _ViewType.map && widget.walk.hasPaths
           ? _sheetOpen
               ? FloatingActionButton(
                   child: const Icon(

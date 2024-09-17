@@ -78,7 +78,7 @@ class NotificationManager {
       if (walk.trip != null) {
         title = 'Point le plus proche le ${fullDate.format(walk.date)}';
         description =
-            "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip!.duration!.round()).inMinutes} min. en voiture";
+            "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip!.duration.round()).inMinutes} min. en voiture";
       } else {
         title = 'Point le plus proche le ${fullDate.format(walk.date)}';
         description = "${walk.city} - ${walk.province}";

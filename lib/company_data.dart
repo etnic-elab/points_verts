@@ -9,11 +9,11 @@ const String _publicUrl = "https://adeps-points-verts.innovation-etnic.be";
 const String assistanceUrl = "$_publicUrl/assistance.html";
 const String privacyUrl = "$_publicUrl/privacy.html";
 const String accessibilityUrl = "$_publicUrl/accessibilite.html";
-const String publicLogo = "$_publicUrl/logo_64x64.png";
+const String publicLogo = "$_publicUrl/logo_50x50.png";
 const String publicLogoCancelledLight =
-    "$_publicUrl/logo_cancelled_light_64x64.png";
+    "$_publicUrl/logo_cancelled_light_50x50.png";
 const String publicLogoCancelledDark =
-    "$_publicUrl/logo_cancelled_dark_64x64.png";
+    "$_publicUrl/logo_cancelled_dark_50x50.png";
 
 class CompanyColors {
   static const greenPrimary = Color(0xFF6CB233);
