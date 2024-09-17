@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:points_verts/views/maps/dynamic_map.dart';
+import 'package:points_verts/views/maps/interactive_map.dart';
 import 'package:points_verts/views/maps/markers/marker_interface.dart';
 
 import 'package:points_verts/views/loading.dart';
@@ -31,7 +31,7 @@ class WalkResultsMapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dynamicMap = DynamicMap();
+    final interactiveMap = InteractiveMap();
     return FutureBuilder(
         future: walks,
         builder: (BuildContext context, AsyncSnapshot<List<Walk>> snapshot) {
@@ -45,12 +45,12 @@ class WalkResultsMapView extends StatelessWidget {
                     ? Semantics(
                         label: 'La carte visualisant les Points Verts',
                         excludeSemantics: true,
-                        child: dynamicMap.getMap(
+                        child: interactiveMap.getMap(
                           markers: markers,
                           onTapMap: onTapMap,
                         ),
                       )
-                    : dynamicMap.getMap(
+                    : interactiveMap.getMap(
                         markers: markers,
                         onTapMap: onTapMap,
                       ),

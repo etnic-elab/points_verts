@@ -148,7 +148,7 @@ class AzureMapsApi implements MapsApi {
     List<MapPath> paths = const [],
     List<MapMarker> markers = const [],
     Geolocation? center,
-    num zoom = 10,
+    num zoom = 11,
     MapType mapType = MapType.road,
     Brightness brightness = Brightness.light,
     String format = 'png',

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maps_api/maps_api.dart';
 import 'package:points_verts/models/walk.dart';
-import 'package:points_verts/views/maps/dynamic_map.dart';
+import 'package:points_verts/views/maps/interactive_map.dart';
 import 'package:points_verts/views/maps/markers/marker_interface.dart';
 import 'package:points_verts/views/maps/markers/walk_marker.dart';
 import 'package:collection/collection.dart';
@@ -49,7 +49,7 @@ class WalkDetailsMapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dynamicMap = DynamicMap();
+    final interactiveMap = InteractiveMap();
     return FutureBuilder<LocationPermission>(
       future: location(),
       builder:
@@ -59,7 +59,7 @@ class WalkDetailsMapView extends StatelessWidget {
               ? Semantics(
                   label: 'La carte visualisant les parcours',
                   excludeSemantics: true,
-                  child: dynamicMap.getMap(
+                  child: interactiveMap.getMap(
                     center: center,
                     zoom: 11.5,
                     locationEnabled: true,
@@ -68,7 +68,7 @@ class WalkDetailsMapView extends StatelessWidget {
                     onTapMap: onTapMap,
                   ),
                 )
-              : dynamicMap.getMap(
+              : interactiveMap.getMap(
                   center: center,
                   zoom: 11.5,
                   locationEnabled: true,

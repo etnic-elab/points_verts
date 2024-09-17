@@ -11,8 +11,7 @@ import 'package:points_verts/views/walks/walk_details_info.dart';
 
 // Constants
 const double minMapHeight = 200.0;
-const double portraitMapHeightRatioWithPaths = 0.35;
-const double portraitMapHeightRatioWithoutPaths = 0.25;
+const double portraitMapHeightRatio = 0.35;
 
 class WalkDetailsInfoView extends StatelessWidget {
   const WalkDetailsInfoView(
@@ -47,7 +46,7 @@ class WalkDetailsInfoView extends StatelessWidget {
 
   Widget _buildMapContainer(BuildContext context, {required bool isLandscape}) {
     final size = MediaQuery.of(context).size;
-    final mapSize = MapUtils.calculateMapSize(size, isLandscape, walk.hasPaths);
+    final mapSize = MapUtils.calculateMapSize(size, isLandscape);
 
     return SizedBox(
       width: mapSize.width,
@@ -65,24 +64,24 @@ class WalkDetailsInfoView extends StatelessWidget {
     return _buildStaticImage(url: url, onTap: onTapMap);
   }
 
-  Widget _buildStaticImage({required String url, Function? onTap}) {
+  Widget _buildStaticImage({required String url, required Function onTap}) {
     return CachedNetworkImage(
       fit: BoxFit.cover,
       imageUrl: url,
-      imageBuilder: onTap == null
-          ? null
-          : (context, imageProvider) =>
-              _buildTappableImage(imageProvider, onTap),
-      progressIndicatorBuilder: (context, url, progress) =>
-          Center(child: CircularProgressIndicator(value: progress.progress)),
+      imageBuilder: (context, imageProvider) =>
+          _buildTappableImage(context, imageProvider, onTap),
+      progressIndicatorBuilder: (context, url, progress) => Center(
+        child: CircularProgressIndicator(value: progress.progress),
+      ),
       errorWidget: (context, url, error) => const Icon(Icons.error),
     );
   }
 
-  Widget _buildTappableImage(ImageProvider imageProvider, Function onTap) {
+  Widget _buildTappableImage(
+      BuildContext context, ImageProvider imageProvider, Function onTap) {
     return Semantics(
       excludeSemantics: true,
-      label: "Voir les parcours sur une carte",
+      label: "Ouvrir la carte interactive",
       button: true,
       child: Ink.image(
         image: imageProvider,
@@ -94,9 +93,44 @@ class WalkDetailsInfoView extends StatelessWidget {
               right: 10.0,
               child: FloatingActionButton.small(
                 onPressed: null,
-                child: Icon(Icons.open_in_full),
+                child: Icon(Icons.zoom_out_map),
               ),
             ),
+            if (walk.hasPaths)
+              Positioned(
+                top: 10.0,
+                right: 10.0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 8.0),
+                  decoration: BoxDecoration(
+                    color: CompanyColors.orange.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(8.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    'Parcours disponibles',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          offset: const Offset(1.0, 1.0),
+                          blurRadius: 2.0,
+                          color: Colors.black.withOpacity(0.5),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             InkWell(onTap: () => onTap())
           ],
         ),
@@ -106,17 +140,13 @@ class WalkDetailsInfoView extends StatelessWidget {
 }
 
 class MapUtils {
-  static Size calculateMapSize(
-      Size screenSize, bool isLandscape, bool hasPaths) {
+  static Size calculateMapSize(Size screenSize, bool isLandscape) {
     if (isLandscape) {
       return Size(screenSize.width / 2, screenSize.height);
     }
-    final heightRatio = hasPaths
-        ? portraitMapHeightRatioWithPaths
-        : portraitMapHeightRatioWithoutPaths;
     return Size(
       screenSize.width,
-      max(minMapHeight, screenSize.height * heightRatio),
+      max(minMapHeight, screenSize.height * portraitMapHeightRatio),
     );
   }
 

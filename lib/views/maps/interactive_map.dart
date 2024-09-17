@@ -10,13 +10,13 @@ import 'package:points_verts/models/path.dart';
 
 enum DisplayMapProvider { google, mapbox, azure }
 
-class DynamicMap {
-  DynamicMap({
+class InteractiveMap {
+  InteractiveMap({
     String? mapProvider,
     String? apiKey,
     AddressRepository? addressRepository,
-  })  : _mapProvider = mapProvider ?? dotenv.env['DISPLAY_MAP'] ?? '',
-        _apiKey = apiKey ?? dotenv.env['DISPLAY_MAP_API_KEY'] ?? '';
+  })  : _mapProvider = mapProvider ?? dotenv.env['INTERACTIVE_MAP'] ?? '',
+        _apiKey = apiKey ?? dotenv.env['INTERACTIVE_MAP_API_KEY'] ?? '';
 
   final String _mapProvider;
   final String _apiKey;

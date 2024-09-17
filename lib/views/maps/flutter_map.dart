@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as flutter;
 import 'package:maps_api/maps_api.dart';
-import 'package:points_verts/views/maps/dynamic_map.dart';
+import 'package:points_verts/views/maps/interactive_map.dart';
 import 'package:points_verts/views/maps/markers/marker_interface.dart';
 import 'package:latlong2/latlong.dart';
 
