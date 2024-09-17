@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:points_verts/company_data.dart';
-import 'package:points_verts/constants.dart';
 import 'package:points_verts/services/assets.dart';
 import 'package:points_verts/views/tile_icon.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
-import 'package:points_verts/services/map/map_interface.dart';
 
 class About extends StatelessWidget {
   const About({super.key});
@@ -52,8 +51,8 @@ class About extends StatelessWidget {
                         ),
                         _AboutRow(
                             "Données de navigation",
-                            kMap.instance.name,
-                            kMap.instance.website,
+                            dotenv.env['MAP_API_NAME'] ?? 'Non spécifié',
+                            dotenv.env['MAP_API_WEBSITE'] ?? 'Non spécifié',
                             const Icon(
                               Icons.open_in_browser,
                               semanticLabel: "Ouvrir dans un navigateur",

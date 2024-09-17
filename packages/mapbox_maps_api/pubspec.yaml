@@ -1,0 +1,23 @@
+name: mapbox_maps_api
+description: An implementation of the MapsApi thats uses the Mapbox API
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+  flutter: ^3.24.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  jsonable:
+    path: ../jsonable
+  maps_api:
+    path: ../maps_api
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  very_good_analysis: ^6.0.0

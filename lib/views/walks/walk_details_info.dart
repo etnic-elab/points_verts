@@ -248,7 +248,7 @@ class _GeoTile extends StatelessWidget {
 
     if (walk.trip != null) {
       text =
-          "À ${walk.formattedDistance}, ~${Duration(seconds: walk.trip!.duration!.round()).inMinutes} min. en voiture";
+          "À ${walk.formattedDistance}, ~${Duration(seconds: walk.trip!.duration.round()).inMinutes} min. en voiture";
     } else if (walk.distance != null && walk.distance != double.maxFinite) {
       text = "À ${walk.formattedDistance} (à vol d'oiseau)";
     } else {

@@ -53,6 +53,13 @@ dependencies:
   uuid: ^4.2.0
   firebase_remote_config: ^4.2.4
   firebase_analytics: ^10.4.4
+  get_it: ^7.7.0
+  address_repository:
+    path: packages/address_repository
+  maps_api:
+    path: packages/maps_api
+  app_cache_registry:
+    path: packages/app_cache_registry
 
 dev_dependencies:
   flutter_lints: ^4.0.0
