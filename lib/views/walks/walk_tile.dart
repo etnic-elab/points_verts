@@ -33,8 +33,7 @@ class WalkTile extends StatelessWidget {
             : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
         shape: tileType == TileType.map
             ? const RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(20)))
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)))
             : null,
         child: MergeSemantics(
           child: Semantics(
@@ -124,7 +123,7 @@ class WalkTile extends StatelessWidget {
         .toList());
 
     if (walk.paths.isNotEmpty) {
-      info.add(const _ChipIcon(Icons.near_me, 'Tracé GPX disponible'));
+      info.add(const _ChipIcon(Icons.gps_fixed, 'Tracé GPX disponible'));
     }
 
     return info;

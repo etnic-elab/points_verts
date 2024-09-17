@@ -1,80 +1,128 @@
 # ADEPS - Points Verts
 
-Small Flutter application displaying future ADEPS' walks.
+A Flutter application for displaying future ADEPS walks.
 
-Uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de-ladeps/) to retrieve data.
+This app uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points-verts-de-ladeps/) to retrieve walk data.
 
-# Features
+## Features
 
-- Display walks list by date, either in list form or on a map
-- Display walks list alphabetically, in directory-style
-- Calculate distance between your position and the walks (requires to allow the app to use your position)
-- Calculate distance and time between your home and the walks (requires to set home address in settings)
-- Display forecast weathers 5 days before the walks
-- Launch navigation to the selected walk
-- Display a notification the day before with the nearest walk (requires to set home address in settings)
+- Display walks by date in list or map view
+- Show walks alphabetically in a directory-style list
+- Calculate distance between your current position and walks (requires location permission)
+- Calculate distance and time from your home to walks (requires setting home address in app settings)
+- Display 5-day weather forecasts for walks
+- Launch navigation to selected walks
+- Receive notifications about the nearest walk one day in advance (requires setting home address in app settings)
 
-# Planned features
+## Planned Features
 
-- Share walk infos button?
+- Share walk information
 
-# Releasing the application
+## Setup and Configuration
 
-1. Google Map API:
+### Map API Configuration
 
-1.1 Generate 3 API keys:
+The app supports multiple map providers for different functionalities. You can configure separate providers for API calls (MAP_API) and for displaying the interactive map (INTERACTIVE_MAP).
 
-- API key restricted to Android App. Select `Maps SDK for Android` API. Define the key in `android/local.properties`:
+#### Map API Provider (for API calls)
+
+Choose one of the following providers and add the corresponding configuration to your `.env` file:
+
+1. Google Maps
+
+   ```properties
+   MAP_API=google
+   MAP_API_KEY=your_google_api_key
+   MAP_API_WEBSITE=https://developers.google.com/maps?hl=fr
+   MAP_API_NAME=Google Maps
+   ```
+
+2. Mapbox
+
+   ```properties
+   MAP_API=mapbox
+   MAP_API_KEY=your_mapbox_token
+   MAP_API_WEBSITE=https://www.mapbox.com/
+   MAP_API_NAME=Mapbox
+   ```
+
+3. Azure Maps
+   ```properties
+   MAP_API=azure
+   MAP_API_KEY=your_azure_maps_key
+   MAP_API_WEBSITE=https://azure.microsoft.com/fr-fr/products/azure-maps/
+   MAP_API_NAME=Azure Maps
+   ```
+
+#### Interactive Map Provider
+
+Choose one of the following providers for the interactive map display and add the configuration to your `.env` file:
+
+1. Google Maps
+
+   ```properties
+   INTERACTIVE_MAP=google
+   INTERACTIVE_MAP_API=your_google_api_key
+   ```
+
+2. Mapbox
+
+   ```properties
+   INTERACTIVE_MAP=mapbox
+   INTERACTIVE_MAP_API=your_mapbox_token
+   ```
+
+3. Azure Maps
+   ```properties
+   INTERACTIVE_MAP=azure
+   INTERACTIVE_MAP_API=your_azure_maps_key
+   ```
+
+Note: The MAP_API and INTERACTIVE_MAP providers do not need to be the same. You can mix and match based on your requirements and preferences.
+
+### Additional Google Maps Configuration
+
+If you're using Google Maps for either MAP_API or INTERACTIVE_MAP, you'll need to set up platform-specific API keys:
+
+1. Android-restricted key:
+
+   - Enable `Maps SDK for Android` API
+   - Add to `android/local.properties`:
+     ```properties
+     googleMaps.apiKey=your_android_api_key
+     ```
+
+2. iOS-restricted key:
+
+   - Enable `Maps SDK for iOS` API
+   - Create `ios/Runner/GoogleMaps.plist`:
+     ```xml
+     <?xml version="1.0" encoding="UTF-8"?>
+     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+     <plist version="1.0">
+     <dict>
+     <key>API_KEY</key>
+     <string>your_ios_api_key</string>
+     </dict>
+     </plist>
+     ```
+
+3. Unrestricted key (if using Google for MAP_API):
+   - Enable `Distance Matrix API`, `Geocoding API`, `Maps Static API`, and `Places API`
+   - Use this key for the MAP_API_KEY in the `.env` file
+
+### Weather API Configuration
+
+Add your OpenWeather API key to `.env`:
 
 ```properties
-googleMaps.apiKey=api_key
+OPENWEATHER_TOKEN=your_openweather_api_key
 ```
 
-- API key restricted to IOS App. Select `Maps SDK for IOS` API. Define the key in a `GoogleMaps.plist` file in `ios/Runner` folder:
+### Firebase Configuration
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-<key>API_KEY</key>
-<string>api_key</string>
-</dict>
-</plist>
-```
-
-- API key with no platform restriction. Select `Distance Matrix API`, `Geocoding API`, `Maps Static API`, `Places API` API's. Define the key in a `.env` file in root folder:
-
-```properties
-GOOGLEMAPS_API_KEY=api_key
-```
-
-1.2 Define the MAP_API as `Google` in a `.env` file in root folder:
-
-```properties
-MAP_API=Google
-```
-
-2. MapBox API:
-
-Define the MAP_API as `MapBox` and the API token in a `.env` file in root folder:
-
-```properties
-MAP=MapBox
-MAPBOX_TOKEN=token
-```
-
-3. The OpenWeather API key should be defined in a `.env` file in root folder:
-
-```properties
-OPENWEATHER_TOKEN=token
-```
-
-4. Configure Firebase:
-
-   Follow this guide: https://firebase.google.com/docs/flutter/setup
-   Define following keys in `.env` file in root folder:
-
+1. Follow the [Firebase Flutter setup guide](https://firebase.google.com/docs/flutter/setup)
+2. Add Firebase configuration to `.env`:
    ```properties
    FIREBASE_ANDROID_APP_ID=android_app_id
    FIREBASE_ANDROID_API_KEY=android_api_key
@@ -87,63 +135,68 @@ OPENWEATHER_TOKEN=token
    FIREBASE_STORAGE_BUCKET=storage_bucket
    ```
 
-5. Information about the keystore should be set in the `android/key.properties`:
+### Android Keystore Configuration
+
+Add keystore information to `android/key.properties`:
 
 ```properties
-storePassword=<password>
-keyPassword=<password>
+storePassword=your_store_password
+keyPassword=your_key_password
 keyAlias=key
-storeFile=<path>/key.jks
+storeFile=/path/to/your/key.jks
 ```
 
-5. To generate the splash screen before release, use the following command:
+## Building and Releasing
 
-```bash
-flutter pub run flutter_native_splash:create
-```
+1. Generate splash screen:
 
-6. To generate the launcher_icons before release, use the following command:
+   ```bash
+   flutter pub run flutter_native_splash:create
+   ```
 
-```bash
-flutter pub run flutter_launcher_icons:main
-```
+2. Generate launcher icons:
 
-7. The release can then be build with the following command for android (use Xcode for iOS):
+   ```bash
+   flutter pub run flutter_launcher_icons:main
+   ```
 
-```bash
-flutter build appbundle
-```
+3. Build release version:
+   - Android:
+     ```bash
+     flutter build appbundle
+     ```
+   - iOS: Use Xcode to build and release
 
-# Initial walk dataset
+## Initial Walk Dataset
 
-If you want the app to load an initial dataset without connecting to the internet, place a JSON
-file called `walk_data.json` in `assets` folder. This JSON must follows the schema of ODWB.
+To include an initial offline dataset, place a JSON file named `walk_data.json` in the `assets` folder. This file should follow the ODWB schema.
 
-# App assets and icons
+## Missing Assets
 
-Due to copyright issues => below assets, files and folders are not included:
+Due to copyright restrictions, the following assets are not included in the repository:
 
-Android:
+- Android:
 
-```
-android/app/src/main/res/drawable*/ic_notification.png
-android/app/src/main/res/mimap*/ic_launcher_foreground.png
-android/app/src/main/ic_launcher-playstore.png
-```
+  ```
+  android/app/src/main/res/drawable*/ic_notification.png
+  android/app/src/main/res/mimap*/ic_launcher_foreground.png
+  android/app/src/main/ic_launcher-playstore.png
+  ```
 
-iOS:
+- iOS:
 
-```
-ios/Runner/Assets.xcassets/AppIcon.appiconset
-```
+  ```
+  ios/Runner/Assets.xcassets/AppIcon.appiconset
+  ```
 
-Flutter:
+- Flutter:
+  ```
+  assets/dark/logo.png
+  assets/dark/logo-annule.png
+  assets/dark/splash.png
+  assets/light/logo.png
+  assets/light/logo-annule.png
+  assets/light/splash.png
+  ```
 
-```
-assets/dark/logo.png
-assets/dark/logo-annule.png
-assets/dark/splash.png
-assets/light/logo.png
-assets/light/logo-annule.png
-assets/light/splash.png
-```
+Please ensure you have the necessary rights to use any replacement assets.

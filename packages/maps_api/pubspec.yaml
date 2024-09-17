@@ -1,0 +1,21 @@
+name: maps_api
+description: The interface and models for an API providing map functionality
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+  flutter: ^3.24.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  jsonable:
+    path: ../jsonable
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  very_good_analysis: ^6.0.0

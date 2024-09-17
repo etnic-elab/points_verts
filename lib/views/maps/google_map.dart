@@ -5,8 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:points_verts/models/gpx_point.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/assets.dart';
-import 'package:points_verts/services/map/markers/marker_generator.dart';
-import 'package:points_verts/services/map/markers/marker_interface.dart';
+import 'package:points_verts/views/maps/markers/marker_generator.dart';
+import 'package:points_verts/views/maps/markers/marker_interface.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
 import 'package:points_verts/extensions.dart';
 
