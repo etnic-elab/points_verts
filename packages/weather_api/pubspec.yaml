@@ -1,0 +1,19 @@
+name: weather_api
+description: The interface for an API that provides access to weahter-related services
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  http: ^1.2.2
+  jsonable:
+    path: ../jsonable
+  maps_api:
+    path: ../maps_api
+
+dev_dependencies:
+  mocktail: ^1.0.4
+  test: ^1.25.8
+  very_good_analysis: ^6.0.0
