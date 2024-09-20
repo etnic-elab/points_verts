@@ -134,11 +134,15 @@ class AzureMapsApi implements MapsApi {
     }
 
     final trips = matrix[0] as List<dynamic>;
-    return trips
-        .map(
-          (trip) => AzureTripInfoFactory.fromJson(trip as JsonMap),
-        )
-        .toList();
+    return trips.asMap().entries.map((entry) {
+      final index = entry.key;
+      final trip = entry.value as JsonMap;
+      return AzureTripInfoFactory.fromJson(
+        trip,
+        origin: origin,
+        destination: destinations[index],
+      );
+    }).toList();
   }
 
   @override

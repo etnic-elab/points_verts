@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:address_repository/address_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:maps_api/maps_api.dart';
+import 'package:maps_repository/maps_repository.dart';
 import 'package:points_verts/locator.dart';
 
 import '../loading.dart';
@@ -41,12 +41,12 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
 
   _onSearchChanged() {
     if (!mounted) return;
-    final addressRepository = locator<AddressRepository>();
+    final mapsRepository = locator<MapsRepository>();
 
     setState(() {
       _suggestions = _homeSearchController.text.isEmpty
           ? Future.value([])
-          : addressRepository.getAddressSuggestions(
+          : mapsRepository.getAddressSuggestions(
               _homeSearchController.text,
               country: countryCodes[_countryIndex],
             );

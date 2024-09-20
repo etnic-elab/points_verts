@@ -1,23 +1,27 @@
 import 'dart:ui';
 
-import 'package:address_repository/src/session_strategy/session_strategy.dart';
 import 'package:app_cache_registry/app_cache_registry.dart';
 import 'package:azure_maps_api/azure_maps_api.dart';
 import 'package:google_maps_api/google_maps_api.dart';
 import 'package:mapbox_maps_api/mapbox_maps_api.dart';
 import 'package:maps_api/maps_api.dart';
+import 'package:maps_repository/src/session_strategy/session_strategy.dart';
 
-///TODO: At the moment, this is used as a connector to the maps api, but we should have one addressrepository and one pointvertrepository
-// AddressRepository
-class AddressRepository {
-  AddressRepository({
+// MapsRepository
+class MapsRepository {
+  MapsRepository({
     required MapsApi mapsApi,
     required SessionStrategy sessionStrategy,
+    required int maxTrips,
   })  : _mapsApi = mapsApi,
-        _sessionStrategy = sessionStrategy;
+        _sessionStrategy = sessionStrategy,
+        _maxTrips = maxTrips;
 
   final MapsApi _mapsApi;
   final SessionStrategy _sessionStrategy;
+
+  /// Based on map API pricing
+  final int _maxTrips;
 
   Future<List<AddressSuggestion>> getAddressSuggestions(
     String query, {
@@ -40,7 +44,7 @@ class AddressRepository {
     if (addressSuggestion.geolocation != null) {
       // If the addressSuggestion has geolocation, transpose it into an Address
       return Address(
-        mainText: addressSuggestion.mainText,
+        mainText: addressSuggestion.description,
         geolocation: addressSuggestion.geolocation!,
       );
     } else {
@@ -56,17 +60,20 @@ class AddressRepository {
     }
   }
 
-  ///TODO: Temporary implementation of this method. I think a better way would be to have a WalksRepository, where we store our walks as a stream, and we can adapt them with trip information when newly fetched/upon location change, we can insert weather info etc.
   Future<List<TripInfo>> getTrips(
     Geolocation origin,
-    List<Geolocation> destinations,
-  ) {
+    List<Geolocation> destinations, {
+    required DateTime cacheExpirationDateTime,
+  }) {
     final tripsCacheManager = AppCacheRegistry.get<TripsCacheManager>();
-    final cacheKey = tripsCacheManager.generateCacheKey(origin, destinations);
 
-    return tripsCacheManager.get(
-      cacheKey,
-      () => _mapsApi.getTrips(origin, destinations),
+    final limitedDestinations = destinations.take(_maxTrips).toList();
+
+    return tripsCacheManager.getTrips(
+      origin,
+      limitedDestinations,
+      _mapsApi.getTrips,
+      expiration: cacheExpirationDateTime,
     );
   }
 
@@ -89,27 +96,34 @@ class AddressRepository {
   }
 }
 
-/// Factory for creating appropriate AddressRepository
-class AddressRepositoryFactory {
-  static AddressRepository create(String provider, String apiKey) {
+/// Factory for creating appropriate MapsRepository
+class MapsRepositoryFactory {
+  static MapsRepository create(String provider, String apiKey) {
     late MapsApi mapsApi;
     late SessionStrategy sessionStrategy;
+    late int maxTrips;
 
     switch (provider.toLowerCase()) {
       case 'google':
         mapsApi = GoogleMapsApi(apiKey: apiKey);
         sessionStrategy = GoogleSessionStrategy();
+        maxTrips = 3;
       case 'azure':
         mapsApi = AzureMapsApi(apiKey: apiKey);
         sessionStrategy = NullSessionStrategy();
+        maxTrips = 4;
       case 'mapbox':
         mapsApi = MapboxMapsApi(apiKey: apiKey);
         sessionStrategy = NullSessionStrategy();
+        maxTrips = 3;
       default:
         throw ArgumentError('Unsupported map provider: $provider');
     }
 
-    return AddressRepository(
-        mapsApi: mapsApi, sessionStrategy: sessionStrategy,);
+    return MapsRepository(
+      mapsApi: mapsApi,
+      sessionStrategy: sessionStrategy,
+      maxTrips: maxTrips,
+    );
   }
 }

@@ -54,8 +54,8 @@ dependencies:
   firebase_remote_config: ^4.2.4
   firebase_analytics: ^10.4.4
   get_it: ^7.7.0
-  address_repository:
-    path: packages/address_repository
+  maps_repository:
+    path: packages/maps_repository
   maps_api:
     path: packages/maps_api
   app_cache_registry:

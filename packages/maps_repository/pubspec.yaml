@@ -1,4 +1,4 @@
-name: address_repository
+name: maps_repository
 description: A repository that handles address related requests.
 version: 0.1.0+1
 publish_to: none

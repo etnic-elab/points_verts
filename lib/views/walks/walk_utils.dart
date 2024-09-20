@@ -1,23 +1,23 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:address_repository/address_repository.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:maps_api/maps_api.dart';
+import 'package:maps_repository/maps_repository.dart';
 import 'package:points_verts/locator.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/adeps.dart';
 import 'package:points_verts/services/database.dart';
-import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/openweather.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
+import 'package:collection/collection.dart';
 
 import 'dart:developer' as developer;
 
@@ -111,11 +111,8 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
 Future<void> retrieveTrips(LatLng position, List<Walk> walks) async {
   final origin =
       Geolocation(latitude: position.latitude, longitude: position.longitude);
-  final numberOfTrips =
-      FirebaseLocalService.firebaseRemoteConfigService!.getNumberOfTrips();
 
-  final positionableWalks =
-      walks.where((walk) => walk.isPositionable).take(numberOfTrips).toList();
+  final positionableWalks = walks.where((walk) => walk.isPositionable).toList();
 
   if (positionableWalks.isEmpty) return;
 
@@ -124,16 +121,27 @@ Future<void> retrieveTrips(LatLng position, List<Walk> walks) async {
       .toList();
 
   try {
-    final trips =
-        await locator<AddressRepository>().getTrips(origin, destinations);
+    final trips = await locator<MapsRepository>().getTrips(
+      origin,
+      destinations,
+      cacheExpirationDateTime: walks[0].date.add(const Duration(days: 1)),
+    );
 
-    for (int i = 0; i < trips.length; i++) {
-      positionableWalks[i].trip = trips[i];
+    // Match trips to walks
+    for (var trip in trips) {
+      final matchingWalk = positionableWalks.firstWhereOrNull(
+        (walk) =>
+            walk.lat == trip.destination.latitude &&
+            walk.long == trip.destination.longitude,
+      );
+      if (matchingWalk != null) {
+        matchingWalk.trip = trip;
+      }
     }
   } catch (e, stackTrace) {
     print('Error retrieving trips: $e');
     developer.log('Stack trace:', error: e, stackTrace: stackTrace);
-    rethrow; // Rethrow the error to be caught in the calling function
+    rethrow;
   }
 }
 
