@@ -44,7 +44,7 @@ class MapsRepository {
     if (addressSuggestion.geolocation != null) {
       // If the addressSuggestion has geolocation, transpose it into an Address
       return Address(
-        mainText: addressSuggestion.mainText,
+        mainText: addressSuggestion.description,
         geolocation: addressSuggestion.geolocation!,
       );
     } else {
