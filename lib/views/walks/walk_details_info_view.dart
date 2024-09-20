@@ -1,8 +1,8 @@
 import 'dart:math';
-import 'package:address_repository/address_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:maps_api/maps_api.dart';
+import 'package:maps_repository/maps_repository.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/locator.dart';
 import 'package:points_verts/models/walk.dart';
@@ -151,10 +151,10 @@ class MapUtils {
   }
 
   static String getStaticMapUrl(BuildContext context, Walk walk, Size mapSize) {
-    final addressRepository = locator<AddressRepository>();
+    final mapsRepository = locator<MapsRepository>();
     final brightness = Theme.of(context).brightness;
 
-    return addressRepository.getStaticMapUrl(
+    return mapsRepository.getStaticMapUrl(
       width: mapSize.width.round(),
       height: mapSize.height.round(),
       markers: [

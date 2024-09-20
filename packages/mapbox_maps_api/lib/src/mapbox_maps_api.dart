@@ -132,6 +132,8 @@ class MapboxMapsApi implements MapsApi {
       return TripInfo(
         distance: distances[index],
         duration: durations[index],
+        origin: origin,
+        destination: destinations[index],
       );
     });
   }

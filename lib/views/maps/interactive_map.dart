@@ -1,4 +1,3 @@
-import 'package:address_repository/address_repository.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:maps_api/maps_api.dart';
@@ -14,7 +13,6 @@ class InteractiveMap {
   InteractiveMap({
     String? mapProvider,
     String? apiKey,
-    AddressRepository? addressRepository,
   })  : _mapProvider = mapProvider ?? dotenv.env['INTERACTIVE_MAP'] ?? '',
         _apiKey = apiKey ?? dotenv.env['INTERACTIVE_MAP_API_KEY'] ?? '';
 

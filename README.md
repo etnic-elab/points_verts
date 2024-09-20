@@ -14,10 +14,6 @@ This app uses the [ODWB platform API](https://www.odwb.be/explore/dataset/points
 - Launch navigation to selected walks
 - Receive notifications about the nearest walk one day in advance (requires setting home address in app settings)
 
-## Planned Features
-
-- Share walk information
-
 ## Setup and Configuration
 
 ### Map API Configuration
