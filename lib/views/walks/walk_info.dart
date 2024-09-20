@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/models/walk_filter.dart';
+import 'package:points_verts/presentation/points_verts_icons.dart';
 
 class Range {
   static IconData icon = Icons.route;
@@ -40,29 +41,29 @@ extension WalkInfoExt on WalkInfo {
   IconData get icon {
     switch (this) {
       case WalkInfo.fifteenKm:
-        return Icons.add_circle;
+        return PointsVertsIcons.fifteen;
       case WalkInfo.transport:
         return Icons.train;
       case WalkInfo.wheelchair:
-        return Icons.accessible_forward;
+        return PointsVertsIcons.wheelchair;
       case WalkInfo.stroller:
-        return Icons.child_friendly;
+        return PointsVertsIcons.baby_carriage;
       case WalkInfo.extraOrientation:
-        return Icons.map;
+        return PointsVertsIcons.compass;
       case WalkInfo.extraWalk:
-        return Icons.directions_walk;
+        return PointsVertsIcons.shoe_prints;
       case WalkInfo.guided:
-        return Icons.nature_people;
+        return PointsVertsIcons.leaf;
       case WalkInfo.bike:
-        return Icons.directions_bike;
+        return PointsVertsIcons.bike;
       case WalkInfo.mountainBike:
-        return Icons.directions_bike;
+        return PointsVertsIcons.mountain_bike;
       case WalkInfo.waterSupply:
-        return Icons.water_drop;
+        return PointsVertsIcons.water_bottle;
       case WalkInfo.beWapp:
-        return Icons.eco;
+        return Icons.recycling;
       case WalkInfo.adepSante:
-        return Icons.fitness_center;
+        return PointsVertsIcons.dumbbell;
     }
   }
 

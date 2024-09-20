@@ -100,13 +100,15 @@ class NotificationManager {
 
   NotificationDetails _generateNotificationDetails() {
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-        'NEXT_NEAREST_WALK', 'Prochain point à proximité',
-        channelDescription:
-            'Indique la veille le prochain point vert ADEPS le plus proche de votre domicile',
-        importance: Importance.max,
-        priority: Priority.high,
-        color: CompanyColors.greenPrimary,
-        ticker: 'ticker');
+      'NEXT_NEAREST_WALK',
+      'Prochain point à proximité',
+      channelDescription:
+          'Indique la veille le prochain point vert ADEPS le plus proche de votre domicile',
+      importance: Importance.max,
+      priority: Priority.high,
+      color: CompanyColors.orange,
+      ticker: 'ticker',
+    );
     var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
     return NotificationDetails(
         android: androidPlatformChannelSpecifics,
