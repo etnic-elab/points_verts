@@ -1,4 +1,4 @@
-import 'package:address_repository/src/session_strategy/session_strategy.dart';
+import 'package:maps_repository/src/session_strategy/session_strategy.dart';
 import 'package:uuid/uuid.dart';
 
 // Google Maps session strategy

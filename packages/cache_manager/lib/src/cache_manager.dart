@@ -16,14 +16,20 @@ abstract class CacheManager<T> {
     int? maxCacheSize,
   })  : _persistentCacheKey = persistentCacheKey,
         _defaultExpiration = defaultExpiration,
-        _maxCacheSize = maxCacheSize ?? 100;
+        _maxCacheSize = maxCacheSize;
 
   final Map<String, CachedItem<dynamic>> _memoryCache = {};
   final String _persistentCacheKey;
   final Duration? _defaultExpiration;
-  final int _maxCacheSize;
+  final int? _maxCacheSize;
 
   T fromJsonT(dynamic json);
+
+  DateTime? get defaultExpirationDateTime {
+    if (_defaultExpiration == null) return null;
+
+    return DateTime.now().add(_defaultExpiration);
+  }
 
   Future<T> get(
     String key,
@@ -67,12 +73,20 @@ abstract class CacheManager<T> {
   Future<void> set(
     String key,
     T data, {
-    Duration? expiration,
+    DateTime? expirationDateTime,
   }) async {
+    expirationDateTime ??= defaultExpirationDateTime;
+
+    // Check if we have a valid expiration or if maxCacheSize is set
+    if (expirationDateTime == null && _maxCacheSize == null) {
+      log('Warning: No expiration set and maxCacheSize is null. Item will not be cached.');
+      return;
+    }
+
     final cachedItem = CachedItem(
       data: data,
-      timestamp: DateTime.now(),
-      expiration: expiration ?? _defaultExpiration,
+      createdOn: DateTime.now(),
+      expiration: expirationDateTime,
     );
 
     // Update memory cache
@@ -81,23 +95,24 @@ abstract class CacheManager<T> {
     // Update persistent cache
     final prefs = await SharedPreferences.getInstance();
     final existingCache = prefs.getString(_persistentCacheKey);
-    final JsonMap allCachedItems =
-        existingCache != null ? (jsonDecode(existingCache) as JsonMap) : {};
+    final allCachedItems = existingCache != null
+        ? (jsonDecode(existingCache) as JsonMap)
+        : JsonMap();
 
     allCachedItems[key] = cachedItem.toJson();
 
     // Limit cache size
-    if (allCachedItems.length > _maxCacheSize) {
+    if (_maxCacheSize != null && allCachedItems.length > _maxCacheSize) {
       final sortedEntries = allCachedItems.entries.toList()
         ..sort(
           (a, b) => CachedItem.fromJson<dynamic>(
             b.value as JsonMap,
             (json) => json,
-          ).timestamp.compareTo(
+          ).createdOn.compareTo(
                 CachedItem.fromJson<dynamic>(
                   a.value as JsonMap,
                   (json) => json,
-                ).timestamp,
+                ).createdOn,
               ),
         );
       allCachedItems
@@ -142,3 +157,5 @@ abstract class CacheManager<T> {
     }
   }
 }
+
+class CacheMiss implements Exception {}

@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:address_repository/address_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maps_api/maps_api.dart';
+import 'package:maps_repository/maps_repository.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/locator.dart';
 import 'package:points_verts/services/firebase.dart';
@@ -61,8 +61,8 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _setHome(AddressSuggestion suggestion) async {
-    final addressRepopository = locator<AddressRepository>();
-    final address = await addressRepopository.getGeolocatedAddress(suggestion);
+    final mapsRepository = locator<MapsRepository>();
+    final address = await mapsRepository.getGeolocatedAddress(suggestion);
 
     final futures = await Future.wait([
       PrefsProvider.prefs.setString(Prefs.homeCoords,
