@@ -24,6 +24,7 @@ class AppCacheRegistry {
 
   static void initializeCaches() {
     register(TripsCacheManager());
+    register(WeatherCacheManager());
     // Register more caches as needed
   }
 

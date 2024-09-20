@@ -13,6 +13,8 @@ dependencies:
     path: ../jsonable
   maps_api:
     path: ../maps_api
+  weather_api:
+    path: ../weather_api
 
 dev_dependencies:
   mocktail: ^1.0.4

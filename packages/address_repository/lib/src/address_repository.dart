@@ -110,6 +110,8 @@ class AddressRepositoryFactory {
     }
 
     return AddressRepository(
-        mapsApi: mapsApi, sessionStrategy: sessionStrategy,);
+      mapsApi: mapsApi,
+      sessionStrategy: sessionStrategy,
+    );
   }
 }

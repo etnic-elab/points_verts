@@ -1,7 +1,9 @@
 import 'package:http/http.dart' as http;
+import 'package:maps_api/maps_api.dart' show Geolocation;
+import 'package:weather_api/src/models/models.dart';
 
 /// {@template weather_api}
-/// The interface for an API that provides access to weahter-related services
+/// The interface for an API that provides access to weather-related services
 /// {@endtemplate}
 abstract class WeatherApi {
   /// {@macro weather_api}
@@ -19,10 +21,11 @@ abstract class WeatherApi {
   /// The HTTP client used for making requests.
   http.Client get httpClient;
 
-  Future<Map<String, dynamic>> getForecast({
-    required double lat,
-    required double lon,
-    String units = 'standard',
+  Future<List<WeatherForecast>> getForecast({
+    required Geolocation geolocation,
+    TemperatureUnits units = TemperatureUnits.kelvin,
     String lang = 'en',
   });
 }
+
+class WeatherForecastException implements Exception {}

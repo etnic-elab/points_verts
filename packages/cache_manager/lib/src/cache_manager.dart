@@ -16,12 +16,18 @@ abstract class CacheManager<T> {
     int? maxCacheSize,
   })  : _persistentCacheKey = persistentCacheKey,
         _defaultExpiration = defaultExpiration,
-        _maxCacheSize = maxCacheSize ?? 100;
+        _maxCacheSize = maxCacheSize {
+    if (_defaultExpiration == null && _maxCacheSize == null) {
+      throw ArgumentError(
+        'At least one of defaultExpiration or maxCacheSize must be non-null',
+      );
+    }
+  }
 
   final Map<String, CachedItem<dynamic>> _memoryCache = {};
   final String _persistentCacheKey;
   final Duration? _defaultExpiration;
-  final int _maxCacheSize;
+  final int? _maxCacheSize;
 
   T fromJsonT(dynamic json);
 
@@ -31,7 +37,7 @@ abstract class CacheManager<T> {
   ) async {
     // Check memory cache
     if (_memoryCache.containsKey(key) && !_memoryCache[key]!.isExpired()) {
-      log('Retrieved from memory cache');
+      log('CacheManager: Retrieved from memory cache');
       return _memoryCache[key]!.data as T;
     }
 
@@ -47,7 +53,7 @@ abstract class CacheManager<T> {
         );
         if (!cachedItem.isExpired()) {
           _memoryCache[key] = cachedItem;
-          log('Retrieved from persistent cache');
+          log('CacheManager: Retrieved from persistent cache');
           return cachedItem.data;
         }
       }
@@ -59,7 +65,7 @@ abstract class CacheManager<T> {
     // Cache the new data
     await set(key, data);
 
-    log('Retrieved from API Call');
+    log('CacheManager: Retrieved from API Call');
 
     return data;
   }
@@ -87,7 +93,7 @@ abstract class CacheManager<T> {
     allCachedItems[key] = cachedItem.toJson();
 
     // Limit cache size
-    if (allCachedItems.length > _maxCacheSize) {
+    if (_maxCacheSize != null && allCachedItems.length > _maxCacheSize) {
       final sortedEntries = allCachedItems.entries.toList()
         ..sort(
           (a, b) => CachedItem.fromJson<dynamic>(

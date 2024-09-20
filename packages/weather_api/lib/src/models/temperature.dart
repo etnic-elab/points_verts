@@ -3,6 +3,15 @@ enum TemperatureUnits { kelvin, celsius, fahrenheit }
 class Temperature {
   const Temperature(this.value, this.units);
 
+  factory Temperature.fromJson(Map<String, dynamic> json) {
+    return Temperature(
+      json['value'] as double,
+      TemperatureUnits.values.firstWhere(
+        (e) => e.toString().split('.').last == json['units'],
+      ),
+    );
+  }
+
   final double value;
   final TemperatureUnits units;
 
@@ -62,6 +71,13 @@ class Temperature {
   Temperature toKelvin() => to(TemperatureUnits.kelvin);
   Temperature toCelsius() => to(TemperatureUnits.celsius);
   Temperature toFahrenheit() => to(TemperatureUnits.fahrenheit);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value,
+      'units': units.toString().split('.').last,
+    };
+  }
 
   @override
   String toString() {

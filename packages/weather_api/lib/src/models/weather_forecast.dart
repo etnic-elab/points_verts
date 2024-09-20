@@ -1,10 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:jsonable/jsonable.dart';
-import 'package:weather_api/src/models/temperature.dart';
+import 'package:weather_api/src/models/models.dart';
 
 class WeatherForecast {
   WeatherForecast({
     required this.temperature,
-    required this.weatherCode,
     required this.weatherCondition,
     required this.weatherDescription,
     required this.weatherIcon,
@@ -13,74 +13,47 @@ class WeatherForecast {
     required this.cloudiness,
   });
 
-  factory WeatherForecast.fromJson(
-    JsonMap json,
-    TemperatureUnits temperatureUnits,
-  ) {
-    final main = json['main'] as JsonMap;
-    final weather = (json['weather'] as List<dynamic>).first as JsonMap;
-    final wind = json['wind'] as JsonMap;
-    final clouds = json['clouds'] as JsonMap;
-
+  // Add fromJson method
+  factory WeatherForecast.fromJson(Map<String, dynamic> json) {
     return WeatherForecast(
-      temperature: Temperature(
-        (main['temp'] as num).toDouble(),
-        temperatureUnits,
+      temperature: Temperature.fromJson(json['temperature'] as JsonMap),
+      weatherCondition: WeatherCondition.values.firstWhere(
+        (e) => e.toString().split('.').last == json['weatherCondition'],
+        orElse: () => WeatherCondition.unknown,
       ),
-      weatherCode: weather['id'] as int,
-      weatherCondition: weather['main'] as String,
-      weatherDescription: weather['description'] as String,
-      weatherIcon: weather['icon'] as String,
-      windSpeed: (wind['speed'] as num).toDouble(),
-      timestamp:
-          DateTime.fromMillisecondsSinceEpoch((json['dt'] as int) * 1000),
-      cloudiness: clouds['all'] as int,
+      weatherDescription: json['weatherDescription'] as String,
+      weatherIcon: IconData(
+        json['weatherIcon']['codePoint'] as int,
+        fontFamily: json['weatherIcon']['fontFamily'] as String?,
+        fontPackage: json['weatherIcon']['fontPackage'] as String?,
+      ),
+      windSpeed: json['windSpeed'] as double,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+      cloudiness: json['cloudiness'] as int,
     );
   }
 
   final Temperature temperature;
-  final int weatherCode;
-  final String weatherCondition;
+  final WeatherCondition weatherCondition;
   final String weatherDescription;
-  final String weatherIcon;
+  final IconData weatherIcon;
   final double windSpeed;
   final DateTime timestamp;
   final int cloudiness;
 
-  JsonMap toJson() {
+  Map<String, dynamic> toJson() {
     return {
-      'main': {
-        'temp': temperature,
+      'temperature': temperature.toJson(),
+      'weatherCondition': weatherCondition.toString().split('.').last,
+      'weatherDescription': weatherDescription,
+      'weatherIcon': {
+        'codePoint': weatherIcon.codePoint,
+        'fontFamily': weatherIcon.fontFamily,
+        'fontPackage': weatherIcon.fontPackage,
       },
-      'weather': [
-        {
-          'id': weatherCode,
-          'main': weatherCondition,
-          'description': weatherDescription,
-          'icon': weatherIcon,
-        }
-      ],
-      'wind': {
-        'speed': windSpeed,
-      },
-      'dt': timestamp.millisecondsSinceEpoch ~/ 1000,
-      'clouds': {
-        'all': cloudiness,
-      },
+      'windSpeed': windSpeed,
+      'timestamp': timestamp.toIso8601String(),
+      'cloudiness': cloudiness,
     };
-  }
-
-  @override
-  String toString() {
-    return 'WeatherForecast('
-        'temperature: $temperature, '
-        'weatherCode: $weatherCode, '
-        'weatherCondition: $weatherCondition, '
-        'weatherDescription: $weatherDescription, '
-        'weatherIcon: $weatherIcon, '
-        'windSpeed: $windSpeed, '
-        'timestamp: $timestamp, '
-        'cloudiness: $cloudiness'
-        ')';
   }
 }

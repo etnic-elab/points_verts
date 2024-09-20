@@ -8,7 +8,6 @@ class TripsCacheManager extends CacheManager<List<TripInfo>> {
       : super(
           persistentCacheKey: 'trips_cache',
           defaultExpiration: const Duration(days: 31),
-          maxCacheSize: 50,
         );
 
   @override

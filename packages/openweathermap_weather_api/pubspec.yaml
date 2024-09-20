@@ -13,6 +13,8 @@ dependencies:
   http: ^1.2.2
   jsonable:
     path: ../jsonable
+  maps_api:
+    path: ../maps_api
   weather_api:
     path: ../weather_api
   weather_icons: ^3.0.0
