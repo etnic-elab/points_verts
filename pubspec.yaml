@@ -63,8 +63,7 @@ dependencies:
 
 dev_dependencies:
   flutter_lints: ^4.0.0
-  flutter_launcher_icons:
-    git: https://github.com/fluttercommunity/flutter_launcher_icons
+  flutter_launcher_icons: ^0.14.0
   flutter_test:
     sdk: flutter
 
