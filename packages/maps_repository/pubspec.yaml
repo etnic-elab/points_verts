@@ -1,0 +1,27 @@
+name: maps_repository
+description: A repository that handles address related requests.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  app_cache_registry:
+    path: ../app_cache_registry
+  azure_maps_api:
+    path: ../azure_maps_api
+  google_maps_api:
+    path: ../google_maps_api
+  jsonable:
+    path: ../jsonable
+  mapbox_maps_api:
+    path: ../mapbox_maps_api
+  maps_api:
+    path: ../maps_api
+  uuid: ^4.4.2
+
+dev_dependencies:
+  mocktail: ^1.0.4
+  test: ^1.25.8
+  very_good_analysis: ^6.0.0

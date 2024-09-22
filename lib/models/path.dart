@@ -23,6 +23,19 @@ class Path implements Comparable<Path> {
   List<GpxPoint> gpxPoints = [];
   Elevation? elevation;
 
+  static Path? fromJsonIfGpx(Map<String, dynamic> json) {
+    final url = json['fichier'] as String?;
+    if (url == null || !url.toLowerCase().endsWith('gpx')) {
+      return null;
+    }
+
+    return Path(
+      url: url,
+      title: json['titre'] as String? ?? 'Parcours',
+      type: json['couleur'] as String? ?? '',
+    );
+  }
+
   Path.fromJson(Map<String, dynamic> json)
       : url = json['fichier'],
         title = json['titre'] ?? 'Parcours',
@@ -85,7 +98,6 @@ class Path implements Comparable<Path> {
       }
 
       double difference = current - previous;
-      print('difference: $difference');
 
       if (difference > 0) positive += difference.abs();
       if (difference < 0) negative += difference.abs();

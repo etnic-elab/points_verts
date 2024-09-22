@@ -1,0 +1,129 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "points_verts",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "points_verts (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "points_verts (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "address_repository",
+            "cwd": "packages\\address_repository",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "adeps_website",
+            "cwd": "packages\\adeps_website",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "azure_maps_api",
+            "cwd": "packages\\azure_maps_api",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "azure_maps_api (profile mode)",
+            "cwd": "packages\\azure_maps_api",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "azure_maps_api (release mode)",
+            "cwd": "packages\\azure_maps_api",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "cache_manager",
+            "cwd": "packages\\cache_manager",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "google_maps_api",
+            "cwd": "packages\\google_maps_api",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "google_maps_api (profile mode)",
+            "cwd": "packages\\google_maps_api",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "google_maps_api (release mode)",
+            "cwd": "packages\\google_maps_api",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "mapbox_maps_api",
+            "cwd": "packages\\mapbox_maps_api",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "mapbox_maps_api (profile mode)",
+            "cwd": "packages\\mapbox_maps_api",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "mapbox_maps_api (release mode)",
+            "cwd": "packages\\mapbox_maps_api",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "maps_api",
+            "cwd": "packages\\maps_api",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "maps_api (profile mode)",
+            "cwd": "packages\\maps_api",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "maps_api (release mode)",
+            "cwd": "packages\\maps_api",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "odwb_points_verts_api",
+            "cwd": "packages\\odwb_points_verts_api",
+            "request": "launch",
+            "type": "dart"
+        }
+    ]
+}

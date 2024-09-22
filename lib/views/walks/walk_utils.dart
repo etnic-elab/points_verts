@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:points_verts/constants.dart';
+import 'package:maps_api/maps_api.dart';
+import 'package:maps_repository/maps_repository.dart';
+import 'package:points_verts/locator.dart';
 import 'package:points_verts/models/walk_filter.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:points_verts/models/website_walk.dart';
@@ -15,7 +17,9 @@ import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
-import 'package:points_verts/services/map/map_interface.dart';
+import 'package:collection/collection.dart';
+
+import 'dart:developer' as developer;
 
 import '../../models/walk.dart';
 
@@ -58,7 +62,7 @@ String _generateEventDescription(Walk walk) {
 
 int sortWalks(Walk a, Walk b) {
   if (a.trip != null && b.trip != null) {
-    return a.trip!.duration!.compareTo(b.trip!.duration!);
+    return a.trip!.duration.compareTo(b.trip!.duration);
   } else if (!a.isCancelled && b.isCancelled) {
     return -1;
   } else if (a.isCancelled && !b.isCancelled) {
@@ -75,10 +79,12 @@ int sortWalks(Walk a, Walk b) {
 Future<List<Walk>> retrieveSortedWalks(DateTime? date,
     {LatLng? position, WalkFilter? filter}) async {
   List<Walk> walks = await DBProvider.db.getWalks(date, filter: filter);
+
   if (position == null) {
     walks.sort((a, b) => sortWalks(a, b));
     return walks;
   }
+
   for (Walk walk in walks) {
     if (walk.isPositionable) {
       double distance = Geolocator.distanceBetween(
@@ -87,20 +93,56 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
       walk.trip = null;
     }
   }
+
   walks.sort((a, b) => sortWalks(a, b));
+
   if (filter?.selectedPlace == Places.home) {
     try {
-      await kMap.instance
-          .retrieveTrips(position.longitude, position.latitude, walks)
-          .then((_) {
-        walks.sort((a, b) => sortWalks(a, b));
-      });
+      await retrieveTrips(position, walks);
+      walks.sort((a, b) => sortWalks(a, b));
     } catch (err) {
       print("Cannot retrieve trips: $err");
     }
   }
 
   return walks;
+}
+
+Future<void> retrieveTrips(LatLng position, List<Walk> walks) async {
+  final origin =
+      Geolocation(latitude: position.latitude, longitude: position.longitude);
+
+  final positionableWalks = walks.where((walk) => walk.isPositionable).toList();
+
+  if (positionableWalks.isEmpty) return;
+
+  final destinations = positionableWalks
+      .map((walk) => Geolocation(latitude: walk.lat!, longitude: walk.long!))
+      .toList();
+
+  try {
+    final trips = await locator<MapsRepository>().getTrips(
+      origin,
+      destinations,
+      cacheExpirationDateTime: walks[0].date.add(const Duration(days: 1)),
+    );
+
+    // Match trips to walks
+    for (var trip in trips) {
+      final matchingWalk = positionableWalks.firstWhereOrNull(
+        (walk) =>
+            walk.lat == trip.destination.latitude &&
+            walk.long == trip.destination.longitude,
+      );
+      if (matchingWalk != null) {
+        matchingWalk.trip = trip;
+      }
+    }
+  } catch (e, stackTrace) {
+    print('Error retrieving trips: $e');
+    developer.log('Stack trace:', error: e, stackTrace: stackTrace);
+    rethrow;
+  }
 }
 
 Future<void> launchURL(String? url) async {

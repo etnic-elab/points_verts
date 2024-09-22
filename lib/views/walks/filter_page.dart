@@ -166,7 +166,8 @@ class _FilterPageState extends State<FilterPage> {
           ),
           Semantics(
             container: true,
-            child: ButtonBar(
+            child: OverflowBar(
+              alignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   child: const Text('Réinitialiser'),

@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:points_verts/constants.dart';
-import 'package:points_verts/services/map/map_interface.dart';
-import 'package:points_verts/models/address.dart';
+import 'package:maps_api/maps_api.dart';
+import 'package:maps_repository/maps_repository.dart';
+import 'package:points_verts/locator.dart';
 
 import '../loading.dart';
 
@@ -12,11 +12,10 @@ const countryLabels = ['Belgique', 'France', 'Luxembourg'];
 
 class SettingsHomeSelect extends StatefulWidget {
   const SettingsHomeSelect(this.setHomeCallback, this.removeHomeCallback,
-      {this.sessionToken, super.key});
+      {super.key});
 
-  final Function(AddressSuggestion, String?) setHomeCallback;
+  final Function(AddressSuggestion) setHomeCallback;
   final Function removeHomeCallback;
-  final String? sessionToken;
 
   @override
   State createState() => _SettingsHomeSelectState();
@@ -42,12 +41,15 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
 
   _onSearchChanged() {
     if (!mounted) return;
+    final mapsRepository = locator<MapsRepository>();
+
     setState(() {
       _suggestions = _homeSearchController.text.isEmpty
           ? Future.value([])
-          : kMap.instance.retrieveSuggestions(
-              _homeSearchController.text, countryCodes[_countryIndex],
-              sessionToken: widget.sessionToken);
+          : mapsRepository.getAddressSuggestions(
+              _homeSearchController.text,
+              country: countryCodes[_countryIndex],
+            );
     });
     // if (_debounce?.isActive ?? false) _debounce!.cancel();
     // _debounce = Timer(const Duration(milliseconds: 500), () {});
@@ -107,11 +109,11 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
                 itemBuilder: (context, i) {
                   AddressSuggestion suggestion = suggestions[i];
                   return ListTile(
-                      title: Text(suggestion.name),
+                      title: Text(suggestion.mainText),
                       subtitle: Text(suggestion.description,
                           overflow: TextOverflow.ellipsis),
                       onTap: () {
-                        widget.setHomeCallback(suggestion, widget.sessionToken);
+                        widget.setHomeCallback(suggestion);
                         _homeSearchController.removeListener(_onSearchChanged);
                         Navigator.of(context).pop();
                       });

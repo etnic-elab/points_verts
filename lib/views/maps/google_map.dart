@@ -5,8 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:points_verts/models/gpx_point.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/assets.dart';
-import 'package:points_verts/services/map/markers/marker_generator.dart';
-import 'package:points_verts/services/map/markers/marker_interface.dart';
+import 'package:points_verts/views/maps/markers/marker_generator.dart';
+import 'package:points_verts/views/maps/markers/marker_interface.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
 import 'package:points_verts/extensions.dart';
 
@@ -41,7 +41,6 @@ class GoogleMap extends StatefulWidget {
 }
 
 class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
-  final Completer<google.GoogleMapController> _completer = Completer();
   Map<Brightness, String> _mapStyles = {};
   Map<Brightness, Map<Enum, google.BitmapDescriptor>> _mapIcons = {};
   // int? _selectedPath;
@@ -54,11 +53,6 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     Future.delayed(Duration.zero, () {
       _loadMapIcons();
     });
-  }
-
-  @override
-  void didChangePlatformBrightness() {
-    _setMapStyle();
   }
 
   @override
@@ -115,13 +109,6 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     }
   }
 
-  //Update the mapstyle after a theme (light/dark) change
-  Future<void> _setMapStyle() async {
-    final controller = await _completer.future;
-    final theme = WidgetsBinding.instance.platformDispatcher.platformBrightness;
-    controller.setMapStyle(_mapStyles[theme]);
-  }
-
   Set<google.Polyline> get _polylines {
     final Set<google.Polyline> polylines = {};
     Brightness brightness = Theme.of(context).brightness;
@@ -162,10 +149,7 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       myLocationEnabled: widget.locationEnabled,
-      onMapCreated: (google.GoogleMapController controller) {
-        controller.setMapStyle(_mapStyles[brightness]);
-        _completer.complete(controller);
-      },
+      style: _mapStyles[brightness],
       polylines: _polylines,
       onTap: (_) {
         if (widget.onTapMap != null) {

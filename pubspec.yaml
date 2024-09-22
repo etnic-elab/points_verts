@@ -1,6 +1,6 @@
 name: points_verts
 description: A new Flutter application.
-publish_to: 'none'
+publish_to: "none"
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -12,37 +12,37 @@ publish_to: 'none'
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.4.5+56
+version: 1.6.0+60
 
 environment:
   sdk: ">=3.2.2 <4.0.0"
-  flutter: ^3.19.0
+  flutter: ^3.24.1
 
 dependencies:
   background_fetch: ^1.2.0
   cached_network_image: ^3.3.0
   collection: ^1.15.0-nullsafety.4
-  csv: ^5.1.0
+  csv: ^6.0.0
   flutter:
     sdk: flutter
   flutter_cache_manager: ^3.3.0
   flutter_dotenv: ^5.0.0
-  flutter_local_notifications: ^16.2.0
+  flutter_local_notifications: ^17.0.0
   flutter_native_splash: ^2.2.0
   flutter_localizations:
     sdk: flutter
-  flutter_map: ^6.0.0
-  geolocator: ^10.1.0
+  flutter_map: ^7.0.2
+  geolocator: ^13.0.1
   google_maps_flutter: ^2.0.11
   http: ^1.1.0
-  intl: ^0.18.0
+  intl: ^0.19.0
   shared_preferences: ^2.0.0
   sqflite: ^2.0.0
   url_launcher: ^6.0.0
   weather_icons: ^3.0.0-nullsafety.0
   google_polyline_algorithm: ^3.1.0
   add_2_calendar: ^3.0.0
-  package_info_plus: ^5.0.0
+  package_info_plus: ^8.0.2
   timezone: ^0.9.0
   xml: ^6.1.0
   latlong2: ^0.9.0
@@ -53,9 +53,16 @@ dependencies:
   uuid: ^4.2.0
   firebase_remote_config: ^4.2.4
   firebase_analytics: ^10.4.4
+  get_it: ^7.7.0
+  maps_repository:
+    path: packages/maps_repository
+  maps_api:
+    path: packages/maps_api
+  app_cache_registry:
+    path: packages/app_cache_registry
 
 dev_dependencies:
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
   flutter_launcher_icons:
     git: https://github.com/fluttercommunity/flutter_launcher_icons
   flutter_test:
