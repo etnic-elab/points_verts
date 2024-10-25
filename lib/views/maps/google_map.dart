@@ -5,12 +5,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:points_verts/models/gpx_point.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/services/assets.dart';
+import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/maps/markers/marker_generator.dart';
 import 'package:points_verts/views/maps/markers/marker_interface.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
 import 'package:points_verts/extensions.dart';
 
-//Enum used for walk icon generation
 enum GoogleMapIcons {
   unselectedWalkIcon,
   unselectedCancelIcon,
@@ -26,7 +26,6 @@ class GoogleMap extends StatefulWidget {
     this.markers = const <MarkerInterface>[],
     this.paths = const <Path>[],
     this.onTapMap,
-    // this.onTapPath
   });
 
   final google.CameraPosition initialLocation;
@@ -34,7 +33,6 @@ class GoogleMap extends StatefulWidget {
   final List<MarkerInterface> markers;
   final List<Path> paths;
   final Function? onTapMap;
-  // final Function(Path)? onTapPath;
 
   @override
   State<StatefulWidget> createState() => _GoogleMapState();
@@ -43,13 +41,14 @@ class GoogleMap extends StatefulWidget {
 class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   Map<Brightness, String> _mapStyles = {};
   Map<Brightness, Map<Enum, google.BitmapDescriptor>> _mapIcons = {};
-  // int? _selectedPath;
+  google.MapType _currentMapType = google.MapType.normal;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _loadMapStyles();
+    _loadDefaultMapType();
     Future.delayed(Duration.zero, () {
       _loadMapIcons();
     });
@@ -62,13 +61,23 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   }
 
   Future<void> _loadMapStyles() async {
-    //Load light/dark map styles from assets
     Map<Brightness, String> mapStyles = <Brightness, String>{};
     for (Brightness brightness in [Brightness.dark, Brightness.light]) {
       mapStyles[brightness] =
           await Assets.asset.string(brightness, Assets.googleMapStyle);
     }
     _mapStyles = mapStyles;
+  }
+
+  Future<void> _loadDefaultMapType() async {
+    final defaultTypeIndex =
+        await PrefsProvider.prefs.getInt(Prefs.defaultMapType);
+    if (mounted) {
+      setState(() {
+        _currentMapType = google
+            .MapType.values[defaultTypeIndex ?? google.MapType.normal.index];
+      });
+    }
   }
 
   Future<void> _loadMapIcons() async {
@@ -78,7 +87,6 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
       double size = MediaQuery.of(context).devicePixelRatio * 40;
       MarkerGenerator markerGenerator = MarkerGenerator(size);
 
-      //Generate walk icons
       for (Brightness brightness in [Brightness.dark, Brightness.light]) {
         final Map<Enum, google.BitmapDescriptor> icons = {};
 
@@ -90,7 +98,6 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
           icons[mapEnum] = image;
         }
 
-        //Generate Places icons
         for (Places placeEnum in Places.values) {
           Color color =
               brightness == Brightness.light ? Colors.black : Colors.white;
@@ -139,24 +146,89 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
         .toSet();
   }
 
+  void _onMapTypeButtonPressed() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.map),
+              title: const Text('Normal'),
+              onTap: () {
+                setState(() {
+                  _currentMapType = google.MapType.normal;
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.satellite),
+              title: const Text('Satellite'),
+              onTap: () {
+                setState(() {
+                  _currentMapType = google.MapType.satellite;
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.terrain),
+              title: const Text('Relief'),
+              onTap: () {
+                setState(() {
+                  _currentMapType = google.MapType.terrain;
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.layers),
+              title: const Text('Hybride'),
+              onTap: () {
+                setState(() {
+                  _currentMapType = google.MapType.hybrid;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Brightness brightness = Theme.of(context).brightness;
-    return google.GoogleMap(
-      mapType:
-          google.MapType.normal, // none, normal, hybrid, satellite and terrain
-      initialCameraPosition: widget.initialLocation,
-      myLocationButtonEnabled: false,
-      zoomControlsEnabled: false,
-      myLocationEnabled: widget.locationEnabled,
-      style: _mapStyles[brightness],
-      polylines: _polylines,
-      onTap: (_) {
-        if (widget.onTapMap != null) {
-          widget.onTapMap!();
-        }
-      },
-      markers: _markers,
+    return Stack(
+      children: [
+        google.GoogleMap(
+          mapType: _currentMapType,
+          initialCameraPosition: widget.initialLocation,
+          myLocationButtonEnabled: false,
+          zoomControlsEnabled: false,
+          myLocationEnabled: widget.locationEnabled,
+          style: _mapStyles[brightness],
+          polylines: _polylines,
+          onTap: (_) {
+            if (widget.onTapMap != null) {
+              widget.onTapMap!();
+            }
+          },
+          markers: _markers,
+        ),
+        Positioned(
+          top: 16,
+          right: 16,
+          child: FloatingActionButton(
+            heroTag: "mapType",
+            mini: true,
+            onPressed: _onMapTypeButtonPressed,
+            child: const Icon(Icons.layers),
+          ),
+        ),
+      ],
     );
   }
 }
