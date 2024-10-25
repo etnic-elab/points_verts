@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:maps_api/maps_api.dart';
+import 'package:maps_api/maps_api.dart' hide MapType;
 import 'package:maps_repository/maps_repository.dart';
 import 'package:points_verts/company_data.dart';
 import 'package:points_verts/locator.dart';
@@ -12,6 +12,7 @@ import 'package:points_verts/views/app_bar_logo.dart';
 import 'package:points_verts/views/list_header.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' show MapType;
 
 import '../../services/prefs.dart';
 import '../tile_icon.dart';
@@ -31,6 +32,7 @@ class _SettingsState extends State<Settings> {
   bool _useLocation = false;
   bool _showNotification = false;
   bool _crashlyticsEnabled = false;
+  MapType _defaultMapType = MapType.normal;
 
   _SettingsState();
 
@@ -40,23 +42,28 @@ class _SettingsState extends State<Settings> {
     _retrievePrefs();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Future<void> _retrievePrefs() async {
     final futures = await Future.wait([
       PrefsProvider.prefs.getString(Prefs.homeLabel),
       PrefsProvider.prefs.getBoolean(Prefs.useLocation),
       PrefsProvider.prefs.getBoolean(Prefs.showNotification),
-      PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled)
+      PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled),
+      PrefsProvider.prefs.getInt(Prefs.defaultMapType),
     ]);
     setState(() {
       _home = futures[0] as String?;
       _useLocation = futures[1] as bool;
       _showNotification = futures[2] as bool;
       _crashlyticsEnabled = futures[3] as bool;
+      _defaultMapType =
+          MapType.values[futures[4] as int? ?? MapType.normal.index];
+    });
+  }
+
+  Future<void> _setDefaultMapType(MapType type) async {
+    await PrefsProvider.prefs.setInt(Prefs.defaultMapType, type.index);
+    setState(() {
+      _defaultMapType = type;
     });
   }
 
@@ -190,6 +197,14 @@ class _SettingsState extends State<Settings> {
                   },
           ),
           const Divider(),
+          const ListHeader("Carte"),
+          ListTile(
+            leading: const TileIcon(Icon(Icons.map)),
+            title: const Text('Type de carte par défaut'),
+            subtitle: Text(_getMapTypeLabel(_defaultMapType)),
+            onTap: () => _showMapTypeDialog(),
+          ),
+          const Divider(),
           const ListHeader("Diagnostic"),
           ListTile(
             title: Text(
@@ -273,6 +288,73 @@ Nous vous conseillons d'ouvrir l'application au moins une fois par semaine pour 
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  String _getMapTypeLabel(MapType type) {
+    switch (type) {
+      case MapType.normal:
+        return 'Normal';
+      case MapType.satellite:
+        return 'Satellite';
+      case MapType.terrain:
+        return 'Relief';
+      case MapType.hybrid:
+        return 'Hybride';
+      default:
+        return 'Normal';
+    }
+  }
+
+  Future<void> _showMapTypeDialog() {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Type de carte'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.map),
+                title: const Text('Normal'),
+                selected: _defaultMapType == MapType.normal,
+                onTap: () {
+                  _setDefaultMapType(MapType.normal);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.satellite),
+                title: const Text('Satellite'),
+                selected: _defaultMapType == MapType.satellite,
+                onTap: () {
+                  _setDefaultMapType(MapType.satellite);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.terrain),
+                title: const Text('Relief'),
+                selected: _defaultMapType == MapType.terrain,
+                onTap: () {
+                  _setDefaultMapType(MapType.terrain);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.layers),
+                title: const Text('Hybride'),
+                selected: _defaultMapType == MapType.hybrid,
+                onTap: () {
+                  _setDefaultMapType(MapType.hybrid);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
         );
       },
     );

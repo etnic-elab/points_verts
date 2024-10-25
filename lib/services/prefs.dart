@@ -15,6 +15,7 @@ enum Prefs {
   lastNewsFetch,
   lastDataDeleteBuild,
   crashlyticsEnabled,
+  defaultMapType,
 }
 
 extension PrefsX on Prefs {
@@ -48,6 +49,8 @@ extension PrefsX on Prefs {
         return 'last_data_delete_build';
       case Prefs.crashlyticsEnabled:
         return 'crashlytics_enabled';
+      case Prefs.defaultMapType:
+        return 'default_map_type';
     }
   }
 }
