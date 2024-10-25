@@ -1,6 +1,6 @@
 import 'package:jsonable/jsonable.dart';
-import 'package:openweathermap_weather_api/src/models/weather_condition_factory.dart';
-import 'package:openweathermap_weather_api/src/models/weather_icon_factory.dart';
+import 'package:open_weather_map_weather_api/src/models/models.dart'
+    show WeatherConditionFactory, WeatherIconFactory;
 import 'package:weather_api/weather_api.dart';
 
 class WeatherForecastFactory {

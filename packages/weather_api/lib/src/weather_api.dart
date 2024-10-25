@@ -25,6 +25,8 @@ abstract class WeatherApi {
     required Geolocation geolocation,
     TemperatureUnits units = TemperatureUnits.kelvin,
     String lang = 'en',
+    DateTime? startDate,
+    DateTime? endDate,
   });
 }
 

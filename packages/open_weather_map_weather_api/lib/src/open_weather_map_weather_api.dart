@@ -3,15 +3,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:jsonable/jsonable.dart';
 import 'package:maps_api/maps_api.dart' show Geolocation;
-import 'package:openweathermap_weather_api/src/models/models.dart';
+import 'package:open_weather_map_weather_api/src/models/models.dart';
 import 'package:weather_api/weather_api.dart';
 
 /// {@template openweathermap_weather_api}
 /// A flutter implementation of the weather_api using the OpenWeatherMap services
 /// {@endtemplate}
-class OpenweathermapWeatherApi implements WeatherApi {
+class OpenWeatherMapWeatherApi implements WeatherApi {
   /// {@macro openweathermap_weather_api}
-  OpenweathermapWeatherApi({
+  OpenWeatherMapWeatherApi({
     required this.apiKey,
     http.Client? httpClient,
   }) : _httpClient = httpClient ?? http.Client();
@@ -35,7 +35,17 @@ class OpenweathermapWeatherApi implements WeatherApi {
     required Geolocation geolocation,
     TemperatureUnits units = TemperatureUnits.kelvin,
     String lang = 'fr',
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
+    final now = DateTime.now();
+    final fiveDaysFromNow = now.add(const Duration(days: 5));
+
+    // Check if the startDate is beyond the 5-day forecast period
+    if (startDate != null && startDate.isAfter(fiveDaysFromNow)) {
+      return []; // Return an empty list if startDate is beyond 5 days
+    }
+
     final forecastRequest = Uri.https(
       baseUrl,
       '/data/2.5/forecast',
@@ -43,7 +53,7 @@ class OpenweathermapWeatherApi implements WeatherApi {
         'lat': geolocation.latitude.toString(),
         'lon': geolocation.longitude.toString(),
         'appid': apiKey,
-        'units': units.toOpenweathermapString(),
+        'units': units.toOpenWeatherMapString(),
         'lang': lang,
       },
     );
@@ -62,13 +72,23 @@ class OpenweathermapWeatherApi implements WeatherApi {
 
     final forecastList = result['list'] as List<dynamic>;
 
-    return forecastList
+    final forecasts = forecastList
         .map(
-          (forecast) => WeatherForecastFactory.fromJson(
-            forecast as JsonMap,
-            units,
-          ),
-        )
-        .toList();
+      (forecast) => WeatherForecastFactory.fromJson(
+        forecast as JsonMap,
+        units,
+      ),
+    )
+        .where((forecast) {
+      if (startDate != null && forecast.timestamp.isBefore(startDate)) {
+        return false;
+      }
+      if (endDate != null && forecast.timestamp.isAfter(endDate)) {
+        return false;
+      }
+      return true;
+    }).toList();
+
+    return forecasts;
   }
 }

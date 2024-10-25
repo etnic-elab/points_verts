@@ -3,24 +3,24 @@ import 'package:jsonable/jsonable.dart';
 class CachedItem<T> {
   CachedItem({
     required this.data,
-    required this.timestamp,
+    required this.createdOn,
     required this.expiration,
   });
 
   final T data;
-  final DateTime timestamp;
-  final Duration? expiration;
+  final DateTime createdOn;
+  final DateTime? expiration;
 
   bool isExpired() {
     if (expiration == null) return false;
 
-    return DateTime.now().difference(timestamp) > expiration!;
+    return DateTime.now().isAfter(expiration!);
   }
 
   Map<String, dynamic> toJson() => {
         'data': data,
-        'timestamp': timestamp.toIso8601String(),
-        'expiration': expiration?.inSeconds,
+        'createdOn': createdOn.toIso8601String(),
+        'expiration': expiration?.toIso8601String(),
       };
 
   static CachedItem<T> fromJson<T>(
@@ -29,9 +29,9 @@ class CachedItem<T> {
   ) {
     return CachedItem<T>(
       data: fromJsonT(json['data']),
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      createdOn: DateTime.parse(json['createdOn'] as String),
       expiration: json['expiration'] != null
-          ? Duration(seconds: json['expiration'] as int)
+          ? DateTime.parse(json['expiration'] as String)
           : null,
     );
   }

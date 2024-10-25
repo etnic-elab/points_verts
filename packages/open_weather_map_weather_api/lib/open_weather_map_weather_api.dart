@@ -2,4 +2,4 @@
 /// A flutter implementation of the weather_api using the OpenWeatherMap services
 library;
 
-export 'src/openweathermap_weather_api.dart';
+export 'src/open_weather_map_weather_api.dart';

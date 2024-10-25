@@ -12,7 +12,7 @@ publish_to: "none"
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.4.5+56
+version: 1.6.0+60
 
 environment:
   sdk: ">=3.2.2 <4.0.0"
@@ -54,8 +54,8 @@ dependencies:
   firebase_remote_config: ^4.2.4
   firebase_analytics: ^10.4.4
   get_it: ^7.7.0
-  address_repository:
-    path: packages/address_repository
+  maps_repository:
+    path: packages/maps_repository
   maps_api:
     path: packages/maps_api
   app_cache_registry:

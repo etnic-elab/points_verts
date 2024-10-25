@@ -1,4 +1,4 @@
-name: openweathermap_weather_api
+name: open_weather_map_weather_api
 description: A flutter implementation of the weather_api using the OpenWeatherMap services
 version: 0.1.0+1
 publish_to: none

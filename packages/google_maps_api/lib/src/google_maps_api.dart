@@ -146,9 +146,15 @@ class GoogleMapsApi implements MapsApi {
       return [];
     }
 
-    return elements
-        .map((element) => GoogleTripInfoFactory.fromJson(element as JsonMap))
-        .toList();
+    return elements.asMap().entries.map((entry) {
+      final index = entry.key;
+      final element = entry.value as JsonMap;
+      return GoogleTripInfoFactory.fromJson(
+        element,
+        origin: origin,
+        destination: destinations[index],
+      );
+    }).toList();
   }
 
   @override
