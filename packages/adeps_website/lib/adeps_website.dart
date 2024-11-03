@@ -2,3 +2,4 @@
 library;
 
 export 'src/adeps_website.dart';
+export 'src/models/models.dart';

@@ -17,6 +17,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  adeps_website:
+    dependency: transitive
+    description:
+      path: "packages/adeps_website"
+      relative: true
+    source: path
+    version: "0.1.0+1"
   ansicolor:
     dependency: transitive
     description:
@@ -609,10 +616,10 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.9.0"
-  jsonable:
+  json_map_typedef:
     dependency: transitive
     description:
-      path: "packages/jsonable"
+      path: "packages/json_map_typedef"
       relative: true
     source: path
     version: "0.1.0+1"
@@ -733,6 +740,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  odwb_points_verts_api:
+    dependency: transitive
+    description:
+      path: "packages/odwb_points_verts_api"
+      relative: true
+    source: path
+    version: "0.1.0+1"
   package_info_plus:
     dependency: "direct main"
     description:

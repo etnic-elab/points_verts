@@ -12,8 +12,8 @@ dependencies:
     sdk: flutter
   google_polyline_algorithm: ^3.1.0
   http: ^1.2.2
-  jsonable:
-    path: ../jsonable
+  json_map_typedef:
+    path: ../json_map_typedef
   logger: ^2.4.0
   maps_api:
     path: ../maps_api

@@ -12,8 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.2
-  jsonable:
-    path: ../jsonable
+  json_map_typedef:
+    path: ../json_map_typedef
 
 dev_dependencies:
   flutter_test:

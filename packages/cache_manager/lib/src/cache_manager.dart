@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cache_manager/src/models/models.dart';
-import 'package:jsonable/jsonable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// {@template cache_manager}

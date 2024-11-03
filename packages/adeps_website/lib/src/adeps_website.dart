@@ -26,27 +26,18 @@ class AdepsWebsite {
 
     final response = await _httpClient.get(uri);
 
-    if (response.statusCode == 200) {
-      return _processAdepsData(response.body);
-    } else {
+    if (response.statusCode != 200) {
       throw AdepsWebsiteException();
     }
-  }
 
-  List<WebsitePointVert> _processAdepsData(String data) {
-    final lines = data.split(';');
+    final lines = response.body.split(';');
     final result = <WebsitePointVert>[];
 
     for (var i = 0; i < lines.length; i += 11) {
-      if (i + 10 < lines.length) {
-        final id = int.parse(lines[i]);
-        final status = lines[i + 9];
-        result.add(
-          WebsitePointVert(
-            id: id,
-            statut: WebsitePointVertStatus.fromString(status),
-          ),
-        );
+      try {
+        result.add(WebsitePointVert.fromWebsiteData(lines, i));
+      } catch (e) {
+        continue;
       }
     }
 

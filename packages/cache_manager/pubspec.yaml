@@ -7,8 +7,8 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
-  jsonable:
-    path: ../jsonable
+  json_map_typedef:
+    path: ../json_map_typedef
   shared_preferences: ^2.3.2
 
 dev_dependencies:

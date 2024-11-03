@@ -1,4 +1,4 @@
-name: jsonable
+name: json_map_typedef
 description: Dart interface for simple JSON serialization and deserialization
 version: 0.1.0+1
 publish_to: none

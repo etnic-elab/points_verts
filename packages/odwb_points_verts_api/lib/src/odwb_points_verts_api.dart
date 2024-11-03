@@ -1,8 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:jsonable/jsonable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 import 'package:odwb_points_verts_api/src/models/models.dart';
 
 /// {@template odwb_points_verts_api}
@@ -18,29 +19,71 @@ class OdwbPointsVertsApi {
 
   static const String _baseUrl = 'www.odwb.be';
   static const int _limit = 100; // Maximum allowed by the API
+  static const String _backupAssetPath = 'assets/walk_data.json';
 
-  /// Fetches all Points Verts, handling pagination automatically.
+  /// Fetches all walks scheduled for the specified date.
   ///
-  /// [startDate] filters records from this date onwards.
-  /// [updatedSince] filters records updated since this date.
-  Future<List<OdwbPointVert>> fetchAllPointsVerts({
-    DateTime? startDate,
-    DateTime? updatedSince,
+  /// [date] The date for which to fetch walks. Defaults to today if not specified.
+  Future<List<OdwbPointVert>> fetchWalksForDate({
+    DateTime? date,
   }) async {
-    final formattedFromDate =
-        DateFormat('yyyy-MM-dd').format(startDate ?? DateTime.now());
-    var where = 'date>=$formattedFromDate';
+    final formattedDate =
+        DateFormat('yyyy-MM-dd').format(date ?? DateTime.now());
+    final where = 'date=$formattedDate';
 
-    if (updatedSince != null) {
-      final lastUpdateIso8601Utc = updatedSince.toUtc().toIso8601String();
-      where += ' AND record_timestamp>$lastUpdateIso8601Utc';
+    final uri = Uri.https(_baseUrl,
+        '/api/explore/v2.1/catalog/datasets/points-verts-de-ladeps/records', {
+      'where': where,
+    });
+
+    final response = await _httpClient.get(uri);
+
+    if (response.statusCode != 200) {
+      throw OdwbPointVertApiException();
     }
 
-    return _fetchWithPagination(where);
+    final result = jsonDecode(response.body) as JsonMap;
+    final records = result['records'] as List;
+
+    return records.map((record) {
+      final fields =
+          ((record as JsonMap)['record'] as JsonMap)['fields'] as JsonMap;
+      return OdwbPointVert.fromJson(fields);
+    }).toList();
   }
 
-  Future<List<OdwbPointVert>> _fetchWithPagination(String where) async {
-    final allPointsVerts = <OdwbPointVert>[];
+  /// Fetches all walks from today onwards.
+  ///
+  /// This method handles pagination automatically to fetch all available walks.
+  Future<List<OdwbPointVert>> fetchAllWalks() async {
+    final formattedFromDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final where = 'date>=$formattedFromDate';
+
+    return _fetchAllWalks(where);
+  }
+
+  /// Loads walks from the backup JSON file in assets.
+  ///
+  /// This can be used as a fallback when there's no internet connection
+  /// or when the API is unavailable.
+  Future<List<OdwbPointVert>> loadBackupWalks() async {
+    try {
+      final jsonString = await rootBundle.loadString(_backupAssetPath);
+      final data = jsonDecode(jsonString) as JsonMap;
+      final records = data['records'] as List;
+
+      return records.map((record) {
+        final fields =
+            ((record as JsonMap)['record'] as JsonMap)['fields'] as JsonMap;
+        return OdwbPointVert.fromJson(fields);
+      }).toList();
+    } catch (e) {
+      throw OdwbPointVertBackupException();
+    }
+  }
+
+  Future<List<OdwbPointVert>> _fetchAllWalks(String where) async {
+    final allWalks = <OdwbPointVert>[];
     var offset = 0;
     var hasMoreRecords = true;
 
@@ -48,20 +91,20 @@ class OdwbPointsVertsApi {
       final uri = Uri.https(_baseUrl,
           '/api/explore/v2.1/catalog/datasets/points-verts-de-ladeps/records', {
         'where': where,
-        'limit': _limit,
-        'offset': offset,
+        'limit': _limit.toString(),
+        'offset': offset.toString(),
       });
 
       final response = await _httpClient.get(uri);
 
       if (response.statusCode != 200) {
-        throw OdwbOdwbPointVertApiException();
+        throw OdwbPointVertApiException();
       }
 
       final result = jsonDecode(response.body) as JsonMap;
       final records = result['records'] as List;
 
-      allPointsVerts.addAll(
+      allWalks.addAll(
         records.map((record) {
           final fields =
               ((record as JsonMap)['record'] as JsonMap)['fields'] as JsonMap;
@@ -74,8 +117,11 @@ class OdwbPointsVertsApi {
       hasMoreRecords = offset < totalCount;
     }
 
-    return allPointsVerts;
+    return allWalks;
   }
 }
 
-class OdwbOdwbPointVertApiException implements Exception {}
+/// Exception thrown when the API request fails
+class OdwbPointVertApiException implements Exception {}
+
+class OdwbPointVertBackupException implements Exception {}

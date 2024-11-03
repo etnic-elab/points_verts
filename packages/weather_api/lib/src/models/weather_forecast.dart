@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jsonable/jsonable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 import 'package:weather_api/src/models/models.dart';
 
 class WeatherForecast {
@@ -15,6 +15,8 @@ class WeatherForecast {
 
   // Add fromJson method
   factory WeatherForecast.fromJson(Map<String, dynamic> json) {
+    final weatherIcon = json['weatherIcon'] as JsonMap;
+
     return WeatherForecast(
       temperature: Temperature.fromJson(json['temperature'] as JsonMap),
       weatherCondition: WeatherCondition.values.firstWhere(
@@ -23,9 +25,9 @@ class WeatherForecast {
       ),
       weatherDescription: json['weatherDescription'] as String,
       weatherIcon: IconData(
-        json['weatherIcon']['codePoint'] as int,
-        fontFamily: json['weatherIcon']['fontFamily'] as String?,
-        fontPackage: json['weatherIcon']['fontPackage'] as String?,
+        weatherIcon['codePoint'] as int,
+        fontFamily: weatherIcon['fontFamily'] as String?,
+        fontPackage: weatherIcon['fontPackage'] as String?,
       ),
       windSpeed: json['windSpeed'] as double,
       timestamp: DateTime.parse(json['timestamp'] as String),

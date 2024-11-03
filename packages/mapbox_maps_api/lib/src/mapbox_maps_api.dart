@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:http/http.dart' as http;
-import 'package:jsonable/jsonable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 import 'package:mapbox_maps_api/src/models/models.dart';
 import 'package:maps_api/maps_api.dart';
 

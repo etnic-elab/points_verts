@@ -5,7 +5,7 @@ enum WebsitePointVertStatus {
   unknown;
 
   /// Factory method to convert website status string to enum value
-  factory WebsitePointVertStatus.fromString(String webSiteStatus) {
+  factory WebsitePointVertStatus.fromWebsiteData(String webSiteStatus) {
     switch (webSiteStatus) {
       case 'ptvert_annule':
         return WebsitePointVertStatus.annule;

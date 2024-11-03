@@ -17,4 +17,17 @@ enum OdwbPointVertStatus {
         return OdwbPointVertStatus.unknown;
     }
   }
+
+  String toJson() {
+    switch (this) {
+      case OdwbPointVertStatus.annule:
+        return 'Annulé';
+      case OdwbPointVertStatus.modifie:
+        return 'Modifié';
+      case OdwbPointVertStatus.ok:
+        return 'OK';
+      case OdwbPointVertStatus.unknown:
+        return 'Unknown';
+    }
+  }
 }

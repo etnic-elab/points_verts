@@ -7,12 +7,17 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
+  adeps_website:
+    path: ../adeps_website
   cache_manager:
     path: ../cache_manager
-  jsonable:
-    path: ../jsonable
+  intl: ^0.19.0
+  json_map_typedef:
+    path: ../json_map_typedef
   maps_api:
     path: ../maps_api
+  odwb_points_verts_api:
+    path: ../odwb_points_verts_api
   weather_api:
     path: ../weather_api
 

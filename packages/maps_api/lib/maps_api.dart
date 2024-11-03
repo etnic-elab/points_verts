@@ -3,3 +3,4 @@ library;
 
 export 'src/maps_api.dart';
 export 'src/models/models.dart';
+export 'src/utilities/utilities.dart';

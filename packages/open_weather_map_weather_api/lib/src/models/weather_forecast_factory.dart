@@ -1,4 +1,4 @@
-import 'package:jsonable/jsonable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 import 'package:open_weather_map_weather_api/src/models/models.dart'
     show WeatherConditionFactory, WeatherIconFactory;
 import 'package:weather_api/weather_api.dart';

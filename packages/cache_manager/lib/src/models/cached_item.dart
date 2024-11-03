@@ -1,4 +1,4 @@
-import 'package:jsonable/jsonable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 
 class CachedItem<T> {
   CachedItem({

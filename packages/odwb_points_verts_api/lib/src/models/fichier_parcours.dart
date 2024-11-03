@@ -1,18 +1,27 @@
-class TraceGpx {
-  TraceGpx({
+class FichierParcours {
+  FichierParcours({
     required this.titre,
     required this.fichier,
     required this.jourDeMarche,
     required this.couleur,
   });
 
-  factory TraceGpx.fromJson(Map<String, dynamic> json) {
-    return TraceGpx(
+  factory FichierParcours.fromJson(Map<String, dynamic> json) {
+    return FichierParcours(
       titre: json['titre'] as String,
       fichier: json['fichier'] as String,
       jourDeMarche: json['jourdemarche'] as String,
       couleur: json['couleur'] as String,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'titre': titre,
+      'fichier': fichier,
+      'jourdemarche': jourDeMarche,
+      'couleur': couleur,
+    };
   }
 
   final String titre;

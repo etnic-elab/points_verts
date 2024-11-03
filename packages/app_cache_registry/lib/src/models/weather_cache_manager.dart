@@ -1,5 +1,5 @@
 import 'package:cache_manager/cache_manager.dart';
-import 'package:jsonable/jsonable.dart' show JsonMap;
+import 'package:json_map_typedef/json_map_typedef.dart' show JsonMap;
 import 'package:maps_api/maps_api.dart' show Geolocation;
 import 'package:weather_api/weather_api.dart' show WeatherForecast;
 

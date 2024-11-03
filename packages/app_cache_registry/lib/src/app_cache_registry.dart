@@ -1,4 +1,6 @@
+import 'package:app_cache_registry/src/models/adeps_website_cache_manager.dart';
 import 'package:app_cache_registry/src/models/models.dart';
+import 'package:app_cache_registry/src/models/odwb_cache_manager.dart';
 import 'package:cache_manager/cache_manager.dart';
 
 /// {@template app_cache_registry}
@@ -25,6 +27,8 @@ class AppCacheRegistry {
   static void initializeCaches() {
     register(TripsCacheManager());
     register(WeatherCacheManager());
+    register(AdepsWebsiteCacheManager());
+    register(OdwbCacheManager());
     // Register more caches as needed
   }
 

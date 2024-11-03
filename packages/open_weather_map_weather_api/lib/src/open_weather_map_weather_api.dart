@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:jsonable/jsonable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 import 'package:maps_api/maps_api.dart' show Geolocation;
 import 'package:open_weather_map_weather_api/src/models/models.dart';
 import 'package:weather_api/weather_api.dart';

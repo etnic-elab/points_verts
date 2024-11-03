@@ -1,6 +1,6 @@
 // Specific implementation for Trips cache
 import 'package:cache_manager/cache_manager.dart';
-import 'package:jsonable/jsonable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 import 'package:maps_api/maps_api.dart';
 
 class TripsCacheManager extends CacheManager<TripInfo> {

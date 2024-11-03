@@ -1,4 +1,4 @@
-import 'package:jsonable/jsonable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 import 'package:maps_api/maps_api.dart';
 
 class AzureTripInfoFactory {
