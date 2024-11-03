@@ -163,6 +163,13 @@ Future<void> updateWalks() async {
   bool didUpdate = false;
   String? lastUpdateIso8601Utc =
       await PrefsProvider.prefs.getString(Prefs.lastWalkUpdate);
+  final forceRefreshWalks = await PrefsProvider.prefs
+      .getBoolean(Prefs.forceRefreshWalks, defaultValue: true);
+
+  if (forceRefreshWalks) {
+    lastUpdateIso8601Utc = null;
+  }
+
   DateTime nowDateLocal = DateTime.now();
   DateTime nowDateUtc = nowDateLocal.toUtc();
 
@@ -170,23 +177,21 @@ Future<void> updateWalks() async {
     await DBProvider.db.deleteWalks();
     List<Walk> newWalks = fetchJsonWalks(fromDateLocal: nowDateLocal);
 
-    lastUpdateIso8601Utc = getLastUpdateTimestamp(newWalks).toIso8601String();
-    await Future.wait([
-      DBProvider.db.insertWalks(newWalks),
-      PrefsProvider.prefs.setString(Prefs.lastWalkUpdate, lastUpdateIso8601Utc)
-    ]);
+    await DBProvider.db.insertWalks(newWalks);
     didUpdate = true;
   }
 
-  if (nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
-      const Duration(hours: 1)) {
+  if (lastUpdateIso8601Utc == null ||
+      nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
+          const Duration(hours: 1)) {
     try {
       List<Walk> updatedWalks = await fetchApiWalks(lastUpdateIso8601Utc,
           fromDateLocal: nowDateLocal);
       await Future.wait([
         DBProvider.db.insertWalks(updatedWalks),
         PrefsProvider.prefs
-            .setString(Prefs.lastWalkUpdate, nowDateUtc.toIso8601String())
+            .setString(Prefs.lastWalkUpdate, nowDateUtc.toIso8601String()),
+        PrefsProvider.prefs.setBoolean(Prefs.forceRefreshWalks, false)
       ]);
       didUpdate = true;
     } catch (err) {
@@ -206,18 +211,6 @@ Future<void> updateWalks() async {
         .catchError((err) =>
             print("Cannot schedule next nearest walk notification: $err"));
   }
-}
-
-DateTime getLastUpdateTimestamp(List<Walk> walks) {
-  // in case we have no walks (JSON too old), then set by default to a year
-  // ago, so that updateWalks will retrieve them all
-  DateTime lastUpdate = DateTime.now().subtract(const Duration(days: 365));
-  for (Walk walk in walks) {
-    if (walk.lastUpdated.isAfter(lastUpdate)) {
-      lastUpdate = walk.lastUpdated;
-    }
-  }
-  return lastUpdate;
 }
 
 Future<List<DateTime>> retrieveNearestDates() async {

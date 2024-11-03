@@ -24,13 +24,19 @@ List<Walk> fetchJsonWalks({DateTime? fromDateLocal}) {
   return walks;
 }
 
-Future<List<Walk>> fetchApiWalks(String lastUpdateIso8601Utc,
+Future<List<Walk>> fetchApiWalks(String? lastUpdateIso8601Utc,
     {DateTime? fromDateLocal}) async {
   log("Refreshing future walks list since $lastUpdateIso8601Utc", name: tag);
   fromDateLocal ??= DateTime.now();
   DateFormat dateFormat = DateFormat("yyyy/MM/dd");
-  return _retrieveWalks(
-      "$baseUrl&q=(date+>%3D+${dateFormat.format(fromDateLocal)}+AND+record_timestamp+>$lastUpdateIso8601Utc)");
+
+  String query = "(date+>%3D+${dateFormat.format(fromDateLocal)}";
+  if (lastUpdateIso8601Utc != null) {
+    query += "+AND+record_timestamp+>$lastUpdateIso8601Utc";
+  }
+  query += ")";
+
+  return _retrieveWalks("$baseUrl&q=$query");
 }
 
 Future<List<Walk>> _retrieveWalks(String baseUrl) async {

@@ -16,6 +16,7 @@ enum Prefs {
   lastDataDeleteBuild,
   crashlyticsEnabled,
   defaultMapType,
+  forceRefreshWalks,
 }
 
 extension PrefsX on Prefs {
@@ -51,6 +52,8 @@ extension PrefsX on Prefs {
         return 'crashlytics_enabled';
       case Prefs.defaultMapType:
         return 'default_map_type';
+      case Prefs.forceRefreshWalks:
+        return 'force_refresh_walks';
     }
   }
 }

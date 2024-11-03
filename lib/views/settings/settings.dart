@@ -93,6 +93,12 @@ class _SettingsState extends State<Settings> {
       LocationPermission permission = await checkLocationPermission();
       validated = permission == LocationPermission.whileInUse ||
           permission == LocationPermission.always;
+
+      if (permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
+        await _showLocationSettingsDialog();
+        return;
+      }
     }
 
     if (validated) {
@@ -101,6 +107,34 @@ class _SettingsState extends State<Settings> {
         _useLocation = newValue;
       });
     }
+  }
+
+  Future<void> _showLocationSettingsDialog() {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Accès à la localisation'),
+          content: const Text(
+            'L\'accès à votre position est nécessaire pour cette fonctionnalité. '
+            'Vous pouvez l\'activer dans les paramètres de l\'application.',
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Annuler'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Ouvrir les paramètres'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Geolocator.openAppSettings();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _setCrashlyticsEnabled(bool isEnabled) async {
