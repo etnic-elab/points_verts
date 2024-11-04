@@ -44,6 +44,7 @@ class BackgroundFetchProvider {
     }
     try {
       print("[BackgroundFetch] Headless task: $taskId");
+      await FirebaseLocalService.initialize(isForeground: false);
       if (await NotificationManager.instance
           .isScheduleNextNearestWalkNotifications()) {
         await dotenv.load();
@@ -53,7 +54,6 @@ class BackgroundFetchProvider {
           Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
     } catch (error, stack) {
       print("Cannot schedule next nearest walk notification: $error");
-      await FirebaseLocalService.initialize(isForeground: false);
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     } finally {
       BackgroundFetch.finish(taskId);
