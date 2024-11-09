@@ -1,4 +1,4 @@
-flutter_icons:
+flutter_launcher_icons:
   #  image_path: "assets/images/icon-128x128.png"
   image_path_android: "assets/launcher_icons/icon_812x812.png"
   image_path_ios: "assets/launcher_icons/icon_812x812.png"
@@ -6,4 +6,5 @@ flutter_icons:
   ios: true # can specify file name here e.g. "My-Launcher-Icon"
   adaptive_icon_background: "#FFFFFF" # only available for Android 8.0 devices and above
   adaptive_icon_foreground: "assets/launcher_icons/icon_432x432.png" # only available for Android 8.0 devices and above
+  adaptive_icon_monochrome: "assets/launcher_icons/icon_432x432_monochrome.png" # only available for Android 13 devices and above
   remove_alpha_ios: true
