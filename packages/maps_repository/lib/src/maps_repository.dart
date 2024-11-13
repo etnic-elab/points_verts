@@ -1,27 +1,33 @@
 import 'dart:ui';
 
-import 'package:app_cache_registry/app_cache_registry.dart';
-import 'package:azure_maps_api/azure_maps_api.dart';
-import 'package:google_maps_api/google_maps_api.dart';
-import 'package:mapbox_maps_api/mapbox_maps_api.dart';
-import 'package:maps_api/maps_api.dart';
+import 'package:maps_api/maps_api.dart'
+    show
+        Address,
+        AddressSuggestion,
+        GoogleMapsApi,
+        MapMarker,
+        MapPath,
+        MapType,
+        MapsApi;
 import 'package:maps_repository/src/session_strategy/session_strategy.dart';
 
 // MapsRepository
 class MapsRepository {
   MapsRepository({
     required MapsApi mapsApi,
-    required SessionStrategy sessionStrategy,
-    required int maxTrips,
   })  : _mapsApi = mapsApi,
-        _sessionStrategy = sessionStrategy,
-        _maxTrips = maxTrips;
+        _sessionStrategy = _determineSessionStrategy(mapsApi);
 
   final MapsApi _mapsApi;
   final SessionStrategy _sessionStrategy;
 
-  /// Based on map API pricing
-  final int _maxTrips;
+  // Static method to determine the appropriate SessionStrategy based on MapsApi type
+  static SessionStrategy _determineSessionStrategy(MapsApi mapsApi) {
+    if (mapsApi is GoogleMapsApi) {
+      return GoogleSessionStrategy();
+    }
+    return NullSessionStrategy();
+  }
 
   Future<List<AddressSuggestion>> getAddressSuggestions(
     String query, {
@@ -60,23 +66,6 @@ class MapsRepository {
     }
   }
 
-  Future<List<TripInfo>> getTrips(
-    Geolocation origin,
-    List<Geolocation> destinations, {
-    required DateTime cacheExpirationDateTime,
-  }) {
-    final tripsCacheManager = AppCacheRegistry.get<TripsCacheManager>();
-
-    final limitedDestinations = destinations.take(_maxTrips).toList();
-
-    return tripsCacheManager.getTrips(
-      origin,
-      limitedDestinations,
-      _mapsApi.getTrips,
-      expiration: cacheExpirationDateTime,
-    );
-  }
-
   String getStaticMapUrl({
     required int width,
     required int height,
@@ -92,38 +81,6 @@ class MapsRepository {
       paths: paths,
       mapType: mapType,
       brightness: brightness,
-    );
-  }
-}
-
-/// Factory for creating appropriate MapsRepository
-class MapsRepositoryFactory {
-  static MapsRepository create(String provider, String apiKey) {
-    late MapsApi mapsApi;
-    late SessionStrategy sessionStrategy;
-    late int maxTrips;
-
-    switch (provider.toLowerCase()) {
-      case 'google':
-        mapsApi = GoogleMapsApi(apiKey: apiKey);
-        sessionStrategy = GoogleSessionStrategy();
-        maxTrips = 3;
-      case 'azure':
-        mapsApi = AzureMapsApi(apiKey: apiKey);
-        sessionStrategy = NullSessionStrategy();
-        maxTrips = 4;
-      case 'mapbox':
-        mapsApi = MapboxMapsApi(apiKey: apiKey);
-        sessionStrategy = NullSessionStrategy();
-        maxTrips = 3;
-      default:
-        throw ArgumentError('Unsupported map provider: $provider');
-    }
-
-    return MapsRepository(
-      mapsApi: mapsApi,
-      sessionStrategy: sessionStrategy,
-      maxTrips: maxTrips,
     );
   }
 }

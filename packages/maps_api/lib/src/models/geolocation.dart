@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 
 /// Represents a geographical location with coordinates.
 class Geolocation extends Equatable {
@@ -11,8 +12,11 @@ class Geolocation extends Equatable {
     required this.latitude,
   });
 
+  /// Creates an empty [Geolocation] instance with coordinates (0,0).
+  const Geolocation.empty() : this(longitude: 0, latitude: 0);
+
   /// Creates a [Geolocation] instance from a JSON map.
-  factory Geolocation.fromJson(Map<String, dynamic> json) {
+  factory Geolocation.fromJson(JsonMap json) {
     return Geolocation(
       longitude: json['longitude'] as double,
       latitude: json['latitude'] as double,
@@ -40,7 +44,7 @@ class Geolocation extends Equatable {
   List<Object> get props => [longitude, latitude];
 
   /// Converts the [Geolocation] instance to a JSON map.
-  Map<String, dynamic> toJson() {
+  JsonMap toJson() {
     return {
       'longitude': longitude,
       'latitude': latitude,

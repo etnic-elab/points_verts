@@ -1,2 +1,2 @@
-export 'trail.dart';
+export 'trail_info.dart';
 export 'trail_point.dart';

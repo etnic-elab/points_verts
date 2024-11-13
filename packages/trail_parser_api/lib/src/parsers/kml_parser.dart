@@ -1,6 +1,6 @@
 import 'package:maps_api/maps_api.dart' show Geolocation;
 import 'package:trail_parser_api/trail_parser_api.dart'
-    show Trail, TrailParser, TrailParserException, TrailPoint;
+    show TrailInfo, TrailParser, TrailParserException, TrailPoint;
 import 'package:xml/xml.dart';
 
 class KmlParser implements TrailParser {
@@ -8,7 +8,7 @@ class KmlParser implements TrailParser {
   bool canHandle(String fileExtension) => fileExtension.toLowerCase() == '.kml';
 
   @override
-  Future<Trail> parse(String content) async {
+  Future<TrailInfo> parse(String content) async {
     try {
       final xmlDoc = XmlDocument.parse(content);
       final points = _findPoints(xmlDoc);
@@ -17,7 +17,7 @@ class KmlParser implements TrailParser {
         throw const FormatException('No valid coordinates found in KML file');
       }
 
-      return Trail(
+      return TrailInfo(
         points: points,
       );
     } catch (e) {

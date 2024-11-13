@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:points_verts/main.dart';
+import '../lib2/main.dart';
 
 void main() {
   testWidgets('placeholder', (WidgetTester tester) async {

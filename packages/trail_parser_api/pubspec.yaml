@@ -1,5 +1,5 @@
 name: trail_parser_api
-description: A dart service which fetches and parses trail files
+description: A dart api which fetches and parses trail files
 version: 0.1.0+1
 publish_to: none
 
@@ -18,5 +18,5 @@ dependencies:
     path: ../json_map_typedef
   maps_api:
     path: ../maps_api
-  path: ^1.9.1
+  path: ^1.9.0
   xml: ^6.5.0

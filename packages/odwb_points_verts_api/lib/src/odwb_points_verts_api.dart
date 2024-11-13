@@ -24,7 +24,7 @@ class OdwbPointsVertsApi {
   /// Fetches all walks scheduled for the specified date.
   ///
   /// [date] The date for which to fetch walks. Defaults to today if not specified.
-  Future<List<OdwbPointVert>> fetchWalksForDate({
+  Future<List<OdwbPointVert>> getPointsVertsForDate({
     DateTime? date,
   }) async {
     final formattedDate =
@@ -55,7 +55,7 @@ class OdwbPointsVertsApi {
   /// Fetches all walks from today onwards.
   ///
   /// This method handles pagination automatically to fetch all available walks.
-  Future<List<OdwbPointVert>> fetchAllWalks() async {
+  Future<List<OdwbPointVert>> getAllPointsVerts() async {
     final formattedFromDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final where = 'date>=$formattedFromDate';
 
@@ -66,7 +66,7 @@ class OdwbPointsVertsApi {
   ///
   /// This can be used as a fallback when there's no internet connection
   /// or when the API is unavailable.
-  Future<List<OdwbPointVert>> loadBackupWalks() async {
+  Future<List<OdwbPointVert>> getBackupPointsVerts() async {
     try {
       final jsonString = await rootBundle.loadString(_backupAssetPath);
       final data = jsonDecode(jsonString) as JsonMap;

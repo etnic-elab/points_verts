@@ -1,0 +1,32 @@
+name: points_verts_repository
+description: A dart repository to fetch, manipulate and store the walks data
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dev_dependencies:
+  mocktail: ^1.0.4
+  test: ^1.25.8
+  very_good_analysis: ^6.0.0
+
+dependencies:
+  adeps_website_api:
+    path: ../adeps_website_api
+  app_cache_registry:
+    path: ../app_cache_registry
+  app_user_preferences_registry:
+    path: ../app_user_preferences_registry
+  equatable: ^2.0.5
+  json_map_typedef:
+    path: ../json_map_typedef
+  maps_api:
+    path: ../maps_api
+  odwb_points_verts_api:
+    path: ../odwb_points_verts_api
+  rxdart: ^0.28.0
+  trail_parser_api:
+    path: ../trail_parser_api
+  weather_api:
+    path: ../weather_api

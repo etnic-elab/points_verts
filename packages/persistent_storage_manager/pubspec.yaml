@@ -1,0 +1,20 @@
+name: persistent_storage_manager
+description: A service which gives access to local persistent storage
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  json_map_typedef:
+    path: ../json_map_typedef
+  meta: ^1.15.0
+  service_registry:
+    path: ../service_registry
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  mocktail: ^1.0.4
+  test: ^1.25.8
+  very_good_analysis: ^6.0.0

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:json_map_typedef/json_map_typedef.dart';
 import 'package:maps_api/maps_api.dart' show Geolocation;
 
 class TrailPoint extends Equatable {
@@ -7,9 +8,9 @@ class TrailPoint extends Equatable {
     this.elevation,
   });
 
-  factory TrailPoint.fromJson(Map<String, dynamic> json) {
+  factory TrailPoint.fromJson(JsonMap json) {
     return TrailPoint(
-      location: Geolocation.fromJson(json['location'] as Map<String, dynamic>),
+      location: Geolocation.fromJson(json['location'] as JsonMap),
       elevation: json['elevation'] as double?,
     );
   }
@@ -20,7 +21,7 @@ class TrailPoint extends Equatable {
   @override
   List<Object?> get props => [location, elevation];
 
-  Map<String, dynamic> toJson() {
+  JsonMap toJson() {
     return {
       'location': location.toJson(),
       'elevation': elevation,

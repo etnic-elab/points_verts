@@ -1,0 +1,22 @@
+name: app_user_preferences_registry
+description: A dart package to handle in app persistent user preferences
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dev_dependencies:
+  mocktail: ^1.0.4
+  test: ^1.25.8
+  very_good_analysis: ^6.0.0
+
+dependencies:
+  json_map_typedef:
+    path: ../json_map_typedef
+  maps_api:
+    path: ../maps_api
+  persistent_storage_manager:
+    path: ../persistent_storage_manager
+  service_registry:
+    path: ../service_registry

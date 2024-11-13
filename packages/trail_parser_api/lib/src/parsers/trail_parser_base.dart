@@ -1,7 +1,7 @@
-import 'package:trail_parser_api/trail_parser_api.dart' show Trail;
+import 'package:trail_parser_api/trail_parser_api.dart' show TrailInfo;
 
 abstract class TrailParser {
-  Future<Trail> parse(String content);
+  Future<TrailInfo> parse(String content);
   bool canHandle(String fileExtension);
 }
 

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:json_map_typedef/json_map_typedef.dart';
-import 'package:odwb_points_verts_api/src/models/fichier_parcours.dart';
-import 'package:odwb_points_verts_api/src/models/odwb_point_vert_status.dart';
+import 'package:odwb_points_verts_api/odwb_points_verts_api.dart'
+    show FichierParcours, OdwbPointVertStatut;
 
 class OdwbPointVert {
   OdwbPointVert({
@@ -62,7 +62,7 @@ class OdwbPointVert {
       province: json['province'] as String,
       nom: json['nom'] as String,
       prenom: json['prenom'] as String,
-      statut: OdwbPointVertStatus.fromString(json['statut'] as String),
+      statut: OdwbPointVertStatut.fromString(json['statut'] as String),
       date: DateTime.parse(json['date'] as String),
       quinzeKm: boolFromString(json['15km']),
       pmr: boolFromString(json['pmr']),
@@ -133,7 +133,7 @@ class OdwbPointVert {
   final String province;
   final String nom;
   final String prenom;
-  final OdwbPointVertStatus statut;
+  final OdwbPointVertStatut statut;
   final DateTime date;
   final bool quinzeKm;
   final bool pmr;
@@ -147,9 +147,9 @@ class OdwbPointVert {
   final bool bewapp;
   final bool adepSante;
   final List<FichierParcours> parcours;
+  final String latitude;
+  final String longitude;
 
-  final String? latitude;
-  final String? longitude;
   final String? ign;
   final String? gare;
   final String? infosRendezVous;

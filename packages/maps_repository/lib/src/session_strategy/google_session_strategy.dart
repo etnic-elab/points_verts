@@ -1,6 +1,7 @@
 import 'package:maps_repository/src/session_strategy/session_strategy.dart';
 import 'package:uuid/uuid.dart';
 
+//TODO: Move the session to the api
 // Google Maps session strategy
 class GoogleSessionStrategy implements SessionStrategy {
   GoogleSessionStrategy({int sessionTimeoutMinutes = 3})

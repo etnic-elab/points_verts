@@ -1,6 +1,6 @@
 import 'package:maps_api/maps_api.dart' show Geolocation;
 import 'package:trail_parser_api/trail_parser_api.dart'
-    show Trail, TrailParser, TrailParserException, TrailPoint;
+    show TrailInfo, TrailParser, TrailParserException, TrailPoint;
 import 'package:xml/xml.dart';
 
 class GpxParser implements TrailParser {
@@ -8,7 +8,7 @@ class GpxParser implements TrailParser {
   bool canHandle(String fileExtension) => fileExtension.toLowerCase() == '.gpx';
 
   @override
-  Future<Trail> parse(String content) async {
+  Future<TrailInfo> parse(String content) async {
     try {
       final xmlDoc = XmlDocument.parse(content);
 
@@ -19,7 +19,7 @@ class GpxParser implements TrailParser {
         throw const FormatException('No valid track points found in GPX file');
       }
 
-      return Trail(
+      return TrailInfo(
         points: points,
       );
     } catch (e) {

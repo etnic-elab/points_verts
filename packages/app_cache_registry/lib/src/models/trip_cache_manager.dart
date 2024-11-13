@@ -1,52 +1,64 @@
-// Specific implementation for Trips cache
-import 'package:cache_manager/cache_manager.dart';
+import 'dart:async' show FutureOr;
+
 import 'package:json_map_typedef/json_map_typedef.dart';
-import 'package:maps_api/maps_api.dart';
+import 'package:maps_api/maps_api.dart' show Geolocation, TripInfo;
+import 'package:persistent_storage_manager/persistent_storage_manager.dart'
+    show PersistentStorageManager;
 
-class TripsCacheManager extends CacheManager<TripInfo> {
-  TripsCacheManager() : super(persistentCacheKey: 'trips_cache');
+class TripsCacheManager extends PersistentStorageManager<TripInfo> {
+  TripsCacheManager({
+    required super.prefs,
+  }) : super(persistentKey: 'trips_cache');
 
-  @override
-  TripInfo fromJsonT(dynamic json) {
-    if (json is JsonMap) {
-      return TripInfo.fromJson(json);
-    }
-    throw FormatException('Expected a JsonMap, but got ${json.runtimeType}');
-  }
-
-  String generateCacheKey(Geolocation origin, Geolocation destination) {
+  String _generateCacheKey(Geolocation origin, Geolocation destination) {
     return '${origin}_$destination';
   }
 
-  Future<List<TripInfo>> getTrips(
-    Geolocation origin,
-    List<Geolocation> destinations,
-    Future<List<TripInfo>> Function(Geolocation, List<Geolocation>)
-        fetchFunction, {
+  Future<List<TripInfo>> fetchTrips({
+    required Geolocation origin,
+    required List<Geolocation> destinations,
     required DateTime expiration,
+    required FutureOr<List<TripInfo>> Function(
+      Geolocation origin,
+      List<Geolocation> destinations,
+    ) defaultValueProvider,
   }) async {
     final result = <TripInfo>[];
     final missingDestinations = <Geolocation>[];
 
+    // Try to get each trip from cache first
     for (final destination in destinations) {
-      final cacheKey = generateCacheKey(origin, destination);
-      try {
-        final cachedTrip = await get(cacheKey, () => throw CacheMiss());
-        result.add(cachedTrip);
-      } on CacheMiss {
+      final cacheKey = _generateCacheKey(origin, destination);
+      final cachedTrip = await getCachedValue(cacheKey);
+
+      if (cachedTrip != null) {
+        result.add(cachedTrip.data);
+      } else {
         missingDestinations.add(destination);
       }
     }
 
+    // Batch fetch missing trips
     if (missingDestinations.isNotEmpty) {
-      final newTrips = await fetchFunction(origin, missingDestinations);
+      final newTrips = await defaultValueProvider(origin, missingDestinations);
       for (final trip in newTrips) {
-        final cacheKey = generateCacheKey(trip.origin, trip.destination);
-        await set(cacheKey, trip, expirationDateTime: expiration);
+        final cacheKey = _generateCacheKey(trip.origin, trip.destination);
+        await setValue(trip, cacheKey, expirationDateTime: expiration);
         result.add(trip);
       }
     }
 
     return result;
   }
+
+  @override
+  TripInfo fromJson(dynamic json) {
+    if (json is JsonMap) {
+      return TripInfo.fromJson(json);
+    }
+    throw FormatException('Expected a JsonMap, but got ${json.runtimeType}');
+  }
+
+  @override
+  JsonMap toJson(TripInfo value) => value.toJson();
 }

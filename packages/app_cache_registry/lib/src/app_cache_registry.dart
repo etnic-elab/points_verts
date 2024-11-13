@@ -1,49 +1,51 @@
-import 'package:app_cache_registry/src/models/adeps_website_cache_manager.dart';
-import 'package:app_cache_registry/src/models/models.dart';
-import 'package:app_cache_registry/src/models/odwb_cache_manager.dart';
-import 'package:cache_manager/cache_manager.dart';
+import 'package:app_cache_registry/app_cache_registry.dart'
+    show
+        AdepsWebsiteCacheManager,
+        OdwbCacheManager,
+        TrailParserCacheManager,
+        TripsCacheManager,
+        WeatherCacheManager;
+import 'package:persistent_storage_manager/persistent_storage_manager.dart';
+import 'package:service_registry/service_registry.dart' show ServiceRegistry;
 
-/// {@template app_cache_registry}
-/// A registry for all the caches used in the application
-/// {@endtemplate}
-class AppCacheRegistry {
-  /// {@macro app_cache_registry}
-  AppCacheRegistry._();
+/// App specific cache registry
+/// App specific cache registry
+/// App specific cache registry
+class AppCacheRegistry extends ServiceRegistry {
+  AppCacheRegistry._(); // Private constructor
 
-  static final Map<Type, CacheManager<dynamic>> _cacheManagers = {};
+  // Required override of the instance getter
+  static final AppCacheRegistry instance = AppCacheRegistry._();
 
-  static void register<T extends CacheManager<dynamic>>(T cacheManager) {
-    _cacheManagers[T] = cacheManager;
-  }
-
-  static T get<T extends CacheManager<dynamic>>() {
-    final cacheManager = _cacheManagers[T];
-    if (cacheManager == null) {
-      throw CacheManagerNotRegisteredException(T);
+  Future<void> initializeCaches({
+    SharedPreferences? prefs,
+  }) async {
+    if (isInitialized) {
+      throw StateError('Cannot register services after initialization');
     }
-    return cacheManager as T;
+
+    prefs ??= await SharedPreferences.getInstance();
+
+    registerService<TripsCacheManager>(
+      TripsCacheManager(prefs: prefs),
+    );
+
+    registerService<WeatherCacheManager>(
+      WeatherCacheManager(prefs: prefs),
+    );
+
+    registerService<AdepsWebsiteCacheManager>(
+      AdepsWebsiteCacheManager(prefs: prefs),
+    );
+
+    registerService<OdwbCacheManager>(
+      OdwbCacheManager(prefs: prefs),
+    );
+
+    registerService<TrailParserCacheManager>(
+      TrailParserCacheManager(prefs: prefs),
+    );
+
+    await initialize();
   }
-
-  static void initializeCaches() {
-    register(TripsCacheManager());
-    register(WeatherCacheManager());
-    register(AdepsWebsiteCacheManager());
-    register(OdwbCacheManager());
-    // Register more caches as needed
-  }
-
-  static Future<void> cleanupAllCaches() async {
-    for (final cacheManager in _cacheManagers.values) {
-      await cacheManager.removeExpiredEntries();
-    }
-  }
-}
-
-class CacheManagerNotRegisteredException implements Exception {
-  CacheManagerNotRegisteredException(this.type);
-
-  final Type type;
-
-  @override
-  String toString() => 'CacheManager for type $type is not registered.';
 }

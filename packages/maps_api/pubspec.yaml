@@ -8,12 +8,18 @@ environment:
   flutter: ^3.24.0
 
 dependencies:
+  azure_maps_api:
+    path: ../azure_maps_api
   equatable: ^2.0.5
   flutter:
     sdk: flutter
+  google_maps_api:
+    path: ../google_maps_api
   http: ^1.2.2
   json_map_typedef:
     path: ../json_map_typedef
+  mapbox_maps_api:
+    path: ../mapbox_maps_api
 
 dev_dependencies:
   flutter_test:

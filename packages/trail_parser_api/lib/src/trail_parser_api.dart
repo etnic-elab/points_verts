@@ -25,7 +25,7 @@ class TrailParserApi {
   /// Throws [TrailParserException] if a problem was encountered during parsing
   ///
   /// [url] The URL of the trail file to parse.
-  Future<Trail> parseTrailFromUrl(String url) async {
+  Future<TrailInfo> parseTrailFromUrl(String url) async {
     final extension = path.extension(url).toLowerCase();
 
     final parser = _getParserForExtension(extension);
@@ -52,7 +52,7 @@ class TrailParserApi {
   ///
   /// [content] The string content of the trail file.
   /// [fileExtension] The extension of the file format (e.g., '.gpx', '.kml').
-  Future<Trail> parseTrailFromContent(
+  Future<TrailInfo> parseTrailFromContent(
     String content,
     String fileExtension,
   ) async {
