@@ -47,19 +47,19 @@ extension WalkInfoExt on WalkInfo {
       case WalkInfo.wheelchair:
         return PointsVertsIcons.wheelchair;
       case WalkInfo.stroller:
-        return PointsVertsIcons.baby_carriage;
+        return PointsVertsIcons.babyCarriage;
       case WalkInfo.extraOrientation:
         return PointsVertsIcons.compass;
       case WalkInfo.extraWalk:
-        return PointsVertsIcons.shoe_prints;
+        return PointsVertsIcons.shoePrints;
       case WalkInfo.guided:
         return PointsVertsIcons.leaf;
       case WalkInfo.bike:
         return PointsVertsIcons.bike;
       case WalkInfo.mountainBike:
-        return PointsVertsIcons.mountain_bike;
+        return PointsVertsIcons.mountainBike;
       case WalkInfo.waterSupply:
-        return PointsVertsIcons.water_bottle;
+        return PointsVertsIcons.waterBottle;
       case WalkInfo.beWapp:
         return Icons.recycling;
       case WalkInfo.adepSante:

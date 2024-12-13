@@ -15,8 +15,8 @@ publish_to: "none"
 version: 1.6.2+63
 
 environment:
-  sdk: ">=3.2.2 <4.0.0"
-  flutter: ^3.24.1
+  sdk: ^3.6.0
+  flutter: ^3.27.0
 
 dependencies:
   background_fetch: ^1.2.0
@@ -27,7 +27,7 @@ dependencies:
     sdk: flutter
   flutter_cache_manager: ^3.3.0
   flutter_dotenv: ^5.0.0
-  flutter_local_notifications: ^17.0.0
+  flutter_local_notifications: ^18.0.0
   flutter_native_splash: ^2.2.0
   flutter_localizations:
     sdk: flutter
@@ -43,17 +43,17 @@ dependencies:
   google_polyline_algorithm: ^3.1.0
   add_2_calendar: ^3.0.0
   package_info_plus: ^8.0.2
-  timezone: ^0.9.0
+  timezone: ^0.10.0
   xml: ^6.1.0
   latlong2: ^0.9.0
   path: ^1.8.0
-  firebase_core: ^2.3.0
-  firebase_in_app_messaging: ^0.7.0+7
-  firebase_crashlytics: ^3.0.6
+  firebase_core: ^3.8.0
+  firebase_in_app_messaging: ^0.8.0
+  firebase_crashlytics: ^4.2.0
   uuid: ^4.2.0
-  firebase_remote_config: ^4.2.4
-  firebase_analytics: ^10.4.4
-  get_it: ^7.7.0
+  firebase_remote_config: ^5.2.0
+  firebase_analytics: ^11.3.0
+  get_it: ^8.0.0
   maps_repository:
     path: packages/maps_repository
   maps_api:
@@ -62,8 +62,9 @@ dependencies:
     path: packages/app_cache_registry
 
 dev_dependencies:
-  flutter_lints: ^4.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.0
+  very_good_analysis: ^6.0.0
   flutter_test:
     sdk: flutter
 
