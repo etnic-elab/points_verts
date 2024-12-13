@@ -74,7 +74,7 @@ class MapboxMapsApi implements MapsApi {
 
   @override
   Future<Address> getPlaceDetails(String placeId, {String? sessionToken}) {
-    // TODO: implement getPlaceDetails
+    // TODO(matthieu): implement getPlaceDetails
     throw UnimplementedError();
   }
 
@@ -152,7 +152,7 @@ class MapboxMapsApi implements MapsApi {
     String language = 'fr',
     int scale = 2,
   }) {
-    // TODO: implement getStaticMapUrl
+    // TODO(matthieu): implement getStaticMapUrl
     throw UnimplementedError();
   }
 }

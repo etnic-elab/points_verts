@@ -9,10 +9,10 @@ import 'package:points_verts/views/walks/walks_view.dart';
 extension ColorX on Color {
   toHex({bool transparancy = false}) {
     return '0x'
-        '${red.toRadixString(16).padLeft(2, '0')}'
-        '${green.toRadixString(16).padLeft(2, '0')}'
-        '${blue.toRadixString(16).padLeft(2, '0')}'
-        '${transparancy ? alpha.toRadixString(16).padLeft(2, '0') : ''}';
+        '${(r * 255).toInt().toRadixString(16).padLeft(2, '0')}'
+        '${(g * 255).toInt().toRadixString(16).padLeft(2, '0')}'
+        '${(b * 255).toInt().toRadixString(16).padLeft(2, '0')}'
+        '${transparancy ? (a * 255).toInt().toRadixString(16).padLeft(2, '0') : ''}';
   }
 }
 
