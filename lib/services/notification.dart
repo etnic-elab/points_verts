@@ -117,7 +117,15 @@ class NotificationManager {
 
   Future<void> displayNotification(int id, String? title, String? body) async {
     FlutterLocalNotificationsPlugin instance = await plugin;
-    return instance.show(id, title, body, _generateNotificationDetails());
+    tz.initializeTimeZones();
+    tz.TZDateTime scheduledAt =
+        tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5));
+    return instance.zonedSchedule(
+        id, title, body, scheduledAt, _generateNotificationDetails(),
+        payload: id.toString(),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime);
   }
 
   Future<void> cancelNextNearestWalkNotifications() async {
