@@ -173,7 +173,9 @@ class AzureMapsApi implements MapsApi {
     _addCenter(params, center, paths, markers);
     _addZoom(params, zoom);
 
-    ///TODO: Url created like this is too long. Azure Maps Data Storage should be implemented. Not even sure multiple paths are possible
+    // TODO(matthieu): Url created like this is too long.
+    //  Azure Maps Data Storage should be implemented.
+    //  Not even sure multiple paths are possible
     // _addPaths(params, paths);
     _addMarkers(params, markers);
 
@@ -235,6 +237,7 @@ class AzureMapsApi implements MapsApi {
     params['zoom'] = zoom.toInt().toString();
   }
 
+  // ignore: unused_element
   void _addPaths(Map<String, String> params, List<MapPath> paths) {
     if (paths.isEmpty) return;
 

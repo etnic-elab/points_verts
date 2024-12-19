@@ -13,6 +13,7 @@
 ///
 ///
 ///
+library;
 import 'package:flutter/widgets.dart';
 
 class PointsVertsIcons {
@@ -23,15 +24,15 @@ class PointsVertsIcons {
 
   static const IconData leaf =
       IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData mountain_bike =
+  static const IconData mountainBike =
       IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shoe_prints =
+  static const IconData shoePrints =
       IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData water_bottle =
+  static const IconData waterBottle =
       IconData(0xe803, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData wheelchair =
       IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData baby_carriage =
+  static const IconData babyCarriage =
       IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData bike =
       IconData(0xe806, fontFamily: _kFontFam, fontPackage: _kFontPkg);
