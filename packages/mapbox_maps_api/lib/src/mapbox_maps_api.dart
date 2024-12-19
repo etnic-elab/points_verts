@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:http/http.dart' as http;
 import 'package:jsonable/jsonable.dart';
 import 'package:mapbox_maps_api/src/models/models.dart';
@@ -113,25 +114,22 @@ class MapboxMapsApi implements MapsApi {
     }
 
     final result = jsonDecode(tripsResponse.body) as Map<String, dynamic>;
+    final data = MatrixResponse.fromJson(result);
+    final durations = data.castedDurations();
+    final distances = data.castedDistances();
 
     if (result['code'] != 'Ok') {
       throw TripsRetrievalException();
     }
 
-    final durations = result['durations'] as List<num>?;
-    final distances = result['distances'] as List<num>?;
-
-    if (durations == null ||
-        distances == null ||
-        durations.isEmpty ||
-        distances.isEmpty) {
+    if (durations.isEmpty || distances.isEmpty) {
       return [];
     }
 
     return List.generate(durations.length, (index) {
       return TripInfo(
-        distance: distances[index],
-        duration: durations[index],
+        distance: distances[0][index],
+        duration: durations[0][index],
         origin: origin,
         destination: destinations[index],
       );
@@ -152,7 +150,52 @@ class MapboxMapsApi implements MapsApi {
     String language = 'fr',
     int scale = 2,
   }) {
-    // TODO(matthieu): implement getStaticMapUrl
-    throw UnimplementedError();
+    final style = brightness == Brightness.dark ? 'dark-v10' : 'light-v10';
+    final path = _getEncodedPath(paths, brightness);
+    final effectiveCenter = center ?? markers.first.geolocation;
+    return Uri.https(
+      baseUrl,
+      '/styles/v1/mapbox/$style/static/pin-l(${effectiveCenter.longitude},${effectiveCenter.latitude})$path/auto/${width}x$height@2x',
+      {'access_token': apiKey},
+    ).toString();
   }
+
+  String _getEncodedPath(List<MapPath> paths, Brightness brightness) {
+    return paths
+        .map((path) {
+          final encodable = path.points;
+          if (encodable.isNotEmpty) {
+            final encoded = Uri.encodeComponent(encodePolyline(encodable));
+            return 'path-2+${path.color.value.toRadixString(16)}-1($encoded)';
+          } else {
+            return null;
+          }
+        })
+        .whereType<String>()
+        .toList()
+        .join(',');
+  }
+}
+
+class MatrixResponse {
+  MatrixResponse(this.code, this.durations, this.distances);
+
+  MatrixResponse.fromJson(Map<String, dynamic> json)
+      : code = json['code'] as String,
+        durations = json['durations'] as List<dynamic>,
+        distances = json['distances'] as List<dynamic>;
+
+  List<List<num>> castedDurations() {
+    final list = durations! as List<List>;
+    return list.map((e) => List.castFrom<dynamic, num>(e)).toList() ?? [];
+  }
+
+  List<List<num>> castedDistances() {
+    final list = distances! as List<List>;
+    return list.map((e) => List.castFrom<dynamic, num>(e)).toList() ?? [];
+  }
+
+  final String code;
+  final List<dynamic>? durations;
+  final List<dynamic>? distances;
 }
