@@ -89,9 +89,7 @@ class NotificationManager {
       await instance.zonedSchedule(
           id, title, description, scheduledAt, _generateNotificationDetails(),
           payload: walk.id.toString(),
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime);
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle);
       log('Notification scheduled for ${scheduledAt.toString()}', name: tag);
     } catch (err) {
       print("cannot display notification: $err");
@@ -123,9 +121,7 @@ class NotificationManager {
     return instance.zonedSchedule(
         id, title, body, scheduledAt, _generateNotificationDetails(),
         payload: id.toString(),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle);
   }
 
   Future<void> cancelNextNearestWalkNotifications() async {
