@@ -76,7 +76,11 @@ flutter {
 }
 
 fun readProperties(propertiesFile: File) = Properties().apply {
-    propertiesFile.inputStream().use { fis ->
-        load(fis)
+    if (propertiesFile.exists()) {
+        propertiesFile.inputStream().use { fis ->
+            load(fis)
+        }
+    } else {
+        Properties()
     }
 }
