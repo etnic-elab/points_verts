@@ -26,9 +26,10 @@ class WalkMarker implements MarkerInterface {
       child: RawMaterialButton(
         shape: const CircleBorder(),
         elevation: selectedWalk == walk ? 5.0 : 2.0,
-        fillColor: selectedWalk == walk
-            ? CompanyColors.lightestGreen
-            : CompanyColors.darkGreen,
+        fillColor:
+            selectedWalk == walk
+                ? CompanyColors.lightestGreen
+                : CompanyColors.darkGreen,
         onPressed: () {
           if (onWalkSelect != null) {
             onWalkSelect!(walk);
@@ -41,23 +42,27 @@ class WalkMarker implements MarkerInterface {
 
   @override
   google.Marker buildGoogleMarker(Map<Enum, google.BitmapDescriptor> mapIcons) {
-    google.MarkerId markerId =
-        google.MarkerId(walk.lat!.toString() + walk.long!.toString());
+    google.MarkerId markerId = google.MarkerId(
+      walk.lat!.toString() + walk.long!.toString(),
+    );
     google.BitmapDescriptor icon;
     if (walk.isCancelled) {
-      icon = mapIcons[selectedWalk == walk
-          ? GoogleMapIcons.selectedCancelIcon
-          : GoogleMapIcons.unselectedCancelIcon]!;
+      icon =
+          mapIcons[selectedWalk == walk
+              ? GoogleMapIcons.selectedCancelIcon
+              : GoogleMapIcons.unselectedCancelIcon]!;
     } else {
-      icon = mapIcons[selectedWalk == walk
-          ? GoogleMapIcons.selectedWalkIcon
-          : GoogleMapIcons.unselectedWalkIcon]!;
+      icon =
+          mapIcons[selectedWalk == walk
+              ? GoogleMapIcons.selectedWalkIcon
+              : GoogleMapIcons.unselectedWalkIcon]!;
     }
 
     return google.Marker(
       markerId: markerId,
       position: google.LatLng(walk.lat!, walk.long!),
       icon: icon,
+      anchor: Offset(0.5, 0.5),
       consumeTapEvents: onWalkSelect != null,
       infoWindow: google.InfoWindow(title: walk.city),
       onTap: () {

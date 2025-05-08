@@ -166,7 +166,7 @@ class MapboxMapsApi implements MapsApi {
           final encodable = path.points;
           if (encodable.isNotEmpty) {
             final encoded = Uri.encodeComponent(encodePolyline(encodable));
-            return 'path-2+${path.color.value.toRadixString(16)}-1($encoded)';
+            return 'path-2+${path.color.toARGB32().toRadixString(16)}-1($encoded)';
           } else {
             return null;
           }
@@ -187,12 +187,12 @@ class MatrixResponse {
 
   List<List<num>> castedDurations() {
     final list = durations! as List<List>;
-    return list.map((e) => List.castFrom<dynamic, num>(e)).toList() ?? [];
+    return list.map((e) => List.castFrom<dynamic, num>(e)).toList();
   }
 
   List<List<num>> castedDistances() {
     final list = distances! as List<List>;
-    return list.map((e) => List.castFrom<dynamic, num>(e)).toList() ?? [];
+    return list.map((e) => List.castFrom<dynamic, num>(e)).toList();
   }
 
   final String code;

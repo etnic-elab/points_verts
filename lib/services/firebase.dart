@@ -16,21 +16,35 @@ class FirebaseLocalService {
 
   static initialize({required bool isForeground}) async {
     try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      // Check if Firebase is already initialized
+      if (Firebase.apps.isNotEmpty) {
+        log(
+          'Firebase already initialized, skipping initialization',
+          name: _firebaseTag,
+        );
+      } else {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        log(
+          'Firebase initialized for isForeground: $isForeground',
+          name: _firebaseTag,
+        );
+      }
+
+      // These can run regardless of whether we just initialized Firebase or not
       CrashlyticsLocalService.initialize(isForeground);
       if (firebaseRemoteConfigService == null) {
         firebaseRemoteConfigService = FirebaseRemoteConfigService(
-            firebaseRemoteConfig: FirebaseRemoteConfig.instance);
+          firebaseRemoteConfig: FirebaseRemoteConfig.instance,
+        );
         await firebaseRemoteConfigService!.init();
       }
-
-      log('Firebase initialized for isForeground: $isForeground',
-          name: _firebaseTag);
     } catch (err) {
-      log('Could not initilaze firebase for isForeground: $isForeground, $err',
-          name: _firebaseTag);
+      log(
+        'Could not initilaze firebase for isForeground: $isForeground, $err',
+        name: _firebaseTag,
+      );
     }
   }
 }
@@ -46,30 +60,37 @@ class CrashlyticsLocalService {
     FirebaseCrashlytics.instance.setCustomKey('test', false);
     FirebaseCrashlytics.instance.setCustomKey('debug', kDebugMode);
     _initializeOptIn();
-    Isolate.current.addErrorListener(RawReceivePort((pair) async {
-      final List<dynamic> errorAndStacktrace = pair;
-      await FirebaseCrashlytics.instance.recordError(
-        errorAndStacktrace.first,
-        errorAndStacktrace.last,
-      );
-    }).sendPort);
+    Isolate.current.addErrorListener(
+      RawReceivePort((pair) async {
+        final List<dynamic> errorAndStacktrace = pair;
+        await FirebaseCrashlytics.instance.recordError(
+          errorAndStacktrace.first,
+          errorAndStacktrace.last,
+        );
+      }).sendPort,
+    );
   }
 
   static Future<void> _initializeOptIn() async {
-    bool enabled =
-        await PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled);
+    bool enabled = await PrefsProvider.prefs.getBoolean(
+      Prefs.crashlyticsEnabled,
+    );
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(enabled);
 
-    log('Crashlytics is ${enabled ? 'enabled' : 'disabled'}',
-        name: _crashlyticsTag);
+    log(
+      'Crashlytics is ${enabled ? 'enabled' : 'disabled'}',
+      name: _crashlyticsTag,
+    );
   }
 
   static Future<void> toggleCrashlyticsEnabled(bool enabled) async {
     FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(enabled);
     await PrefsProvider.prefs.setBoolean(Prefs.crashlyticsEnabled, enabled);
 
-    log('Crashlytics is now ${enabled ? 'enabled' : 'disabled'}',
-        name: _crashlyticsTag);
+    log(
+      'Crashlytics is now ${enabled ? 'enabled' : 'disabled'}',
+      name: _crashlyticsTag,
+    );
   }
 }
 
@@ -79,9 +100,7 @@ class RemoteConfig {
 }
 
 class FirebaseRemoteConfigService {
-  const FirebaseRemoteConfigService({
-    required this.firebaseRemoteConfig,
-  });
+  const FirebaseRemoteConfigService({required this.firebaseRemoteConfig});
 
   final FirebaseRemoteConfig firebaseRemoteConfig;
 
@@ -107,10 +126,7 @@ class FirebaseRemoteConfigService {
         .loadString('assets/walk_data.json')
         .catchError((e) => '');
 
-    return {
-      RemoteConfig.numberOfTrips: 5,
-      RemoteConfig.walkData: walkData,
-    };
+    return {RemoteConfig.numberOfTrips: 5, RemoteConfig.walkData: walkData};
   }
 
   int getNumberOfTrips() =>

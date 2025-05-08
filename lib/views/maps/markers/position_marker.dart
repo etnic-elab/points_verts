@@ -21,22 +21,24 @@ class PositionMarker implements MarkerInterface {
   flutter.Marker buildFlutterMarker() {
     return flutter.Marker(
       point: latlong.LatLng(latitude, longitude),
-      child: IgnorePointer(
-        child: Icon(currentPlace.icon),
-      ),
+      child: IgnorePointer(child: Icon(currentPlace.icon)),
     );
   }
 
   @override
   google.Marker buildGoogleMarker(
-      Map<dynamic, google.BitmapDescriptor> mapIcons) {
-    google.MarkerId markerId =
-        google.MarkerId(latitude.toString() + longitude.toString());
+    Map<dynamic, google.BitmapDescriptor> mapIcons,
+  ) {
+    google.MarkerId markerId = google.MarkerId(
+      latitude.toString() + longitude.toString(),
+    );
 
     return google.Marker(
-        markerId: markerId,
-        position: google.LatLng(latitude, longitude),
-        infoWindow: InfoWindow(title: "Votre ${currentPlace.text}"),
-        icon: mapIcons[currentPlace]!);
+      markerId: markerId,
+      position: google.LatLng(latitude, longitude),
+      anchor: Offset(0.5, 0.5),
+      infoWindow: InfoWindow(title: "Votre ${currentPlace.text}"),
+      icon: mapIcons[currentPlace]!,
+    );
   }
 }
