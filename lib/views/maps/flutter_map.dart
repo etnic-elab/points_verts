@@ -73,7 +73,7 @@ class FlutterMap extends StatelessWidget {
       children: [
         flutter.TileLayer(
           urlTemplate: getUrlTemplate(displayMapProvider),
-          tileSize: 512,
+          tileDimension: 512,
           maxZoom: 18,
           zoomOffset: displayMapProvider == DisplayMapProvider.mapbox ? -1 : 0,
           additionalOptions:
