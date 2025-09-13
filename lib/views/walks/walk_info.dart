@@ -5,7 +5,7 @@ import 'package:points_verts/presentation/points_verts_icons.dart';
 
 class Range {
   static IconData icon = Icons.route;
-  static label(Walk walk, {bool compact = false}) {
+  static String label(Walk walk, {bool compact = false}) {
     if (walk.isWalk) {
       return walk.fifteenKm
           ? compact

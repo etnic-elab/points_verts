@@ -34,7 +34,7 @@ class BackgroundFetchProvider {
   }
 
   @pragma('vm:entry-point')
-  static headlessTask(HeadlessTask task) async {
+  static Future<void> headlessTask(HeadlessTask task) async {
     String taskId = task.taskId;
     bool isTimeout = task.timeout;
     if (isTimeout) {

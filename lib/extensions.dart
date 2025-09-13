@@ -7,7 +7,7 @@ import 'package:points_verts/views/maps/google_map.dart';
 import 'package:points_verts/views/walks/walks_view.dart';
 
 extension ColorX on Color {
-  toHex({bool transparancy = false}) {
+  String toHex({bool transparancy = false}) {
     return '0x'
         '${(r * 255).toInt().toRadixString(16).padLeft(2, '0')}'
         '${(g * 255).toInt().toRadixString(16).padLeft(2, '0')}'

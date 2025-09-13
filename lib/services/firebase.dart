@@ -14,7 +14,7 @@ const String _firebaseTag = "dev.alpagaga.points_verts.FirebaseLocalService";
 class FirebaseLocalService {
   static FirebaseRemoteConfigService? firebaseRemoteConfigService;
 
-  static initialize({required bool isForeground}) async {
+  static Future<void> initialize({required bool isForeground}) async {
     try {
       // Check if Firebase is already initialized
       if (Firebase.apps.isNotEmpty) {
@@ -53,7 +53,7 @@ const String _crashlyticsTag =
     "dev.alpagaga.points_verts.CrashlyticsLocalService";
 
 class CrashlyticsLocalService {
-  static initialize(bool isForeground) {
+  static void initialize(bool isForeground) {
     // Pass all uncaught errors from the framework to Crashlytics.
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     FirebaseCrashlytics.instance.setCustomKey('foreground', isForeground);

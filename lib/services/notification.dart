@@ -53,7 +53,7 @@ class NotificationManager {
     return plugin;
   }
 
-  _redirectToWalkDetails(int walkId) async {
+  Future<void> _redirectToWalkDetails(int walkId) async {
     Walk? walk = await DBProvider.db.getWalk(walkId);
     if (walk != null) {
       MyApp.navigatorKey.currentState!
