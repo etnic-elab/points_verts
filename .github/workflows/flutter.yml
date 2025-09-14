@@ -81,7 +81,7 @@ jobs:
         uses: jsdaniell/create-json@v1.2.3
         with:
           name: "google-services.json"
-          json: '{"project_info":{"project_number":"111111111111","project_id":"project_id","storage_bucket":"project_id.appspot.com"},"client":[{"client_info":{"mobilesdk_app_id":"1:1111111111111:android:0000000000000000","android_client_info":{"package_name":"com.example.app"}},"oauth_client":[],"api_key":[{"current_key":"placeholder_api_key"}],"services":{}}]}'
+          json: '{"project_info":{"project_number":"111111111111","project_id":"project_id","storage_bucket":"project_id.appspot.com"},"client":[{"client_info":{"mobilesdk_app_id":"1:1111111111111:android:0000000000000000","android_client_info":{"package_name":"dev.alpagaga.points_verts"}},"oauth_client":[],"api_key":[{"current_key":"placeholder_api_key"}],"services":{}}]}'
           dir: "android/app/"
       - name: Generate splash screens
         run: flutter pub run flutter_native_splash:create
