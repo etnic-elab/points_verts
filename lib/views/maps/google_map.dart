@@ -15,7 +15,7 @@ enum GoogleMapIcons {
   unselectedWalkIcon,
   unselectedCancelIcon,
   selectedWalkIcon,
-  selectedCancelIcon
+  selectedCancelIcon,
 }
 
 class GoogleMap extends StatefulWidget {
@@ -63,19 +63,23 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
   Future<void> _loadMapStyles() async {
     Map<Brightness, String> mapStyles = <Brightness, String>{};
     for (Brightness brightness in [Brightness.dark, Brightness.light]) {
-      mapStyles[brightness] =
-          await Assets.asset.string(brightness, Assets.googleMapStyle);
+      mapStyles[brightness] = await Assets.asset.string(
+        brightness,
+        Assets.googleMapStyle,
+      );
     }
     _mapStyles = mapStyles;
   }
 
   Future<void> _loadDefaultMapType() async {
-    final defaultTypeIndex =
-        await PrefsProvider.prefs.getInt(Prefs.defaultMapType);
+    final defaultTypeIndex = await PrefsProvider.prefs.getInt(
+      Prefs.defaultMapType,
+    );
     if (mounted) {
       setState(() {
-        _currentMapType = google
-            .MapType.values[defaultTypeIndex ?? google.MapType.normal.index];
+        _currentMapType =
+            google.MapType.values[defaultTypeIndex ??
+                google.MapType.normal.index];
       });
     }
   }
@@ -84,27 +88,35 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     if (widget.markers.isNotEmpty) {
       final Map<Brightness, Map<Enum, google.BitmapDescriptor>> mapIcons = {};
 
-      double size = MediaQuery.of(context).devicePixelRatio * 40;
+      // Use MarkerGenerator with a fixed size for better control
+      double size = 40;
       MarkerGenerator markerGenerator = MarkerGenerator(size);
 
       for (Brightness brightness in [Brightness.dark, Brightness.light]) {
         final Map<Enum, google.BitmapDescriptor> icons = {};
 
+        // Load walk icons with color differentiation for selection state
         for (GoogleMapIcons mapEnum in GoogleMapIcons.values) {
-          final byteData =
-              await Assets.asset.bytedata(brightness, mapEnum.logo);
+          final byteData = await Assets.asset.bytedata(
+            brightness,
+            mapEnum.logo,
+          );
+          // Keep the color distinction for selection state
           final google.BitmapDescriptor image = await markerGenerator
               .fromByteData(byteData, mapEnum.color, mapEnum.color);
           icons[mapEnum] = image;
         }
 
+        // Load place icons (home, current location)
         for (Places placeEnum in Places.values) {
           Color color =
               brightness == Brightness.light ? Colors.black : Colors.white;
-          final google.BitmapDescriptor image =
-              await markerGenerator.fromIconData(placeEnum.icon, color);
+          // Use the icon data directly as before
+          final google.BitmapDescriptor image = await markerGenerator
+              .fromIconData(placeEnum.icon, color);
           icons[placeEnum] = image;
         }
+
         mapIcons[brightness] = icons;
       }
 
@@ -142,7 +154,8 @@ class _GoogleMapState extends State<GoogleMap> with WidgetsBindingObserver {
     if (mapIcons == null) return {};
     return widget.markers
         .map<google.Marker>(
-            (MarkerInterface marker) => marker.buildGoogleMarker(mapIcons))
+          (MarkerInterface marker) => marker.buildGoogleMarker(mapIcons),
+        )
         .toSet();
   }
 

@@ -193,7 +193,7 @@ class _FilterPageState extends State<FilterPage> {
   }
 }
 
-_infoPaddedChip(WalkFilter filter, WalkInfo walkInfo, Function(bool) callback) {
+_PaddedChip _infoPaddedChip(WalkFilter filter, WalkInfo walkInfo, Function(bool) callback) {
   return _PaddedChip(
     walkInfo.filterValue(filter),
     walkInfo.label,

@@ -15,8 +15,9 @@ Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
     String url =
         "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$long&lang=fr&units=metric&appid=$_token";
     try {
-      final http.Response response =
-          await WeatherCacheManager.weather.getData(url);
+      final http.Response response = await WeatherCacheManager.weather.getData(
+        url,
+      );
       final decoded = json.decode(response.body);
       final list = decoded['list'];
 
@@ -40,14 +41,15 @@ Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
   return [];
 }
 
-Weather _createWeather(var forecast) {
+Weather _createWeather(Map<String, dynamic> forecast) {
   return Weather(
-      temperature: forecast['main']['temp'].toDouble(),
-      weatherId: forecast['weather'][0]['id'],
-      weather: forecast['weather'][0]['description'],
-      weatherIcon: forecast['weather'][0]['icon'],
-      windSpeed: forecast['wind']['speed'] * 3.6,
-      timestamp: DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000));
+    temperature: forecast['main']['temp'].toDouble(),
+    weatherId: forecast['weather'][0]['id'],
+    weather: forecast['weather'][0]['description'],
+    weatherIcon: forecast['weather'][0]['icon'],
+    windSpeed: forecast['wind']['speed'] * 3.6,
+    timestamp: DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000),
+  );
 }
 
 Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
@@ -163,6 +165,9 @@ Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
     default:
       icon = WeatherIcons.na;
   }
-  return BoxedIcon(icon,
-      color: iconColor ?? CompanyColors.blue, size: iconSize);
+  return BoxedIcon(
+    icon,
+    color: iconColor ?? CompanyColors.blue,
+    size: iconSize,
+  );
 }

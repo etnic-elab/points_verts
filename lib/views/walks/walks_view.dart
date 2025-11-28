@@ -114,7 +114,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     });
   }
 
-  _retrievePosition() async {
+  Future<void> _retrievePosition() async {
     bool useLocation = await PrefsProvider.prefs.getBoolean(Prefs.useLocation);
     _homePosition = await retrieveHomePosition();
 
@@ -139,7 +139,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     }
   }
 
-  _retrieveWalks() {
+  void _retrieveWalks() {
     setState(() {
       _currentWalks = null;
       _selectedWalk = null;
@@ -147,7 +147,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
     _retrieveWalksHelper();
   }
 
-  _retrieveWalksHelper() async {
+  Future<void> _retrieveWalksHelper() async {
     if (_filter!.selectedPlace == Places.current && _currentPosition == null) {
       await _retrieveCurrentPosition();
     }
