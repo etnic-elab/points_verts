@@ -39,11 +39,11 @@ class About extends StatelessWidget {
                         const _AboutRow(
                           "Adresse de contact",
                           companyMail,
-                          "mailto:$companyMail?subject=Points Verts",
+                          "mailto:$companyMail?subject=Marches Adeps",
                           Icon(Icons.email, semanticLabel: "Envoyer un mail"),
                         ),
                         const _AboutRow(
-                          "Données des Points Verts",
+                          "Données des Marches Adeps",
                           "Open Data Wallonie-Bruxelles",
                           opendataUrl,
                           Icon(Icons.open_in_browser,

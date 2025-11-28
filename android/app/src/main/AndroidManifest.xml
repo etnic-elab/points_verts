@@ -35,7 +35,7 @@
         android:allowBackup="false"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="ADEPS\nPoints Verts">
+        android:label="Marches\nAdeps">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

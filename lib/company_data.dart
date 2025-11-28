@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const String applicationName = "ADEPS - Points Verts";
+const String applicationName = "Marches Adeps";
 const String companyMail = "innovation@etnic.be";
 const String githubUrl = "https://github.com/etnic-elab/points_verts";
 const String opendataUrl =

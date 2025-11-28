@@ -37,7 +37,7 @@ class WalkResultsListView extends StatelessWidget {
             const Loading(),
             Container(
                 padding: const EdgeInsets.all(10),
-                child: const Text("Chargement des points..."))
+                child: const Text("Chargement des marches..."))
           ],
         );
       },

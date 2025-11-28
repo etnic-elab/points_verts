@@ -43,7 +43,7 @@ class WalkResultsMapView extends StatelessWidget {
               children: <Widget>[
                 Platform.isIOS
                     ? Semantics(
-                        label: 'La carte visualisant les Points Verts',
+                        label: 'La carte visualisant les Marches Adeps',
                         excludeSemantics: true,
                         child: interactiveMap.getMap(
                           markers: markers,

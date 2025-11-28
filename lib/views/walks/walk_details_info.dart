@@ -193,7 +193,7 @@ class _StatusTile extends StatelessWidget {
               leading: TileIcon(Icon(Icons.cancel,
                   color: CompanyColors.contextualRed(context))),
               title: Text(
-                "Ce Point Vert est annulé",
+                "Cette Marche Adeps est annulée",
                 style: TextStyle(color: CompanyColors.contextualRed(context)),
               )),
         ),

@@ -12,7 +12,7 @@ class AppBarLogo extends StatelessWidget {
       child: Image(
         height: 30.0,
         image: Assets.asset.image(Theme.of(context).brightness, Assets.logo),
-        semanticLabel: "Logo Points Verts",
+        semanticLabel: "Logo Marches Adeps",
       ),
     );
   }
