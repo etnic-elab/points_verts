@@ -105,7 +105,7 @@ class _FilterPageState extends State<FilterPage> {
                   ],
                 ),
                 const Divider(),
-                const ListHeader("Afficher uniquement Points ayant..."),
+                const ListHeader("Afficher uniquement Marches ayant..."),
                 Wrap(
                   children: [
                     _infoPaddedChip(editedFilter, WalkInfo.fifteenKm, (value) {

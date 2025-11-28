@@ -180,10 +180,10 @@ class _SettingsState extends State<Settings> {
       ),
       body: ListView(
         children: <Widget>[
-          const ListHeader("Tri des points"),
+          const ListHeader("Tri des marches"),
           ListTile(
               title: Text(
-                  "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les points les plus proches dans la vue 'Calendrier'.",
+                  "Autorisez l'accès à votre position et/ou indiquez votre domicile pour que l'application affiche en premier les marches les plus proches dans la vue 'Calendrier'.",
                   style: Theme.of(context).textTheme.bodySmall)),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.location_on)),
@@ -218,7 +218,7 @@ class _SettingsState extends State<Settings> {
           const ListHeader("Notifications"),
           ListTile(
               title: Text(
-                  "L'application peut afficher une notification indiquant le point le plus proche de votre domicile, si ce dernier est définit.",
+                  "L'application peut afficher une notification indiquant la marche la plus proche de votre domicile, si ce dernier est défini.",
                   style: Theme.of(context).textTheme.bodySmall)),
           SwitchListTile(
             secondary: const TileIcon(Icon(Icons.notifications)),

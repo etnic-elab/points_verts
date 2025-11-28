@@ -84,11 +84,11 @@ class NotificationManager {
       String description;
 
       if (walk.trip != null) {
-        title = 'Point le plus proche le ${fullDate.format(walk.date)}';
+        title = 'Marche la plus proche le ${fullDate.format(walk.date)}';
         description =
             "${walk.city} - ${walk.province} - ${Duration(seconds: walk.trip!.duration.round()).inMinutes} min. en voiture";
       } else {
-        title = 'Point le plus proche le ${fullDate.format(walk.date)}';
+        title = 'Marche la plus proche le ${fullDate.format(walk.date)}';
         description = "${walk.city} - ${walk.province}";
       }
 
@@ -112,9 +112,9 @@ class NotificationManager {
   NotificationDetails _generateNotificationDetails() {
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
       'NEXT_NEAREST_WALK',
-      'Prochain point à proximité',
+      'Prochaine marche à proximité',
       channelDescription:
-          'Indique la veille le prochain point vert ADEPS le plus proche de votre domicile',
+          'Indique la veille la prochaine marche Adeps la plus proche de votre domicile',
       importance: Importance.max,
       priority: Priority.high,
       color: CompanyColors.orange,

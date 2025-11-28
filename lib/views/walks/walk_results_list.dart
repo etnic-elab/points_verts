@@ -47,11 +47,11 @@ class WalkResultsList extends StatelessWidget {
 
   String _defineTopHeader() {
     if (currentPlace == Places.home) {
-      return "Points les plus proches du domicile";
+      return "Marches les plus proches du domicile";
     } else if (currentPlace == Places.current) {
-      return "Points les plus proches de votre position";
+      return "Marches les plus proches de votre position";
     } else {
-      return "Points les plus proches";
+      return "Marches les plus proches";
     }
   }
 
