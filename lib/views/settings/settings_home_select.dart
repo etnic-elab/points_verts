@@ -39,7 +39,7 @@ class _SettingsHomeSelectState extends State<SettingsHomeSelect> {
     super.dispose();
   }
 
-  _onSearchChanged() {
+  void _onSearchChanged() {
     if (!mounted) return;
     final mapsRepository = locator<MapsRepository>();
 

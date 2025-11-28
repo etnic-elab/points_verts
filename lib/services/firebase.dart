@@ -14,23 +14,49 @@ const String _firebaseTag = "dev.alpagaga.points_verts.FirebaseLocalService";
 class FirebaseLocalService {
   static FirebaseRemoteConfigService? firebaseRemoteConfigService;
 
-  static initialize({required bool isForeground}) async {
+  static Future<void> initialize({required bool isForeground}) async {
+    // Step 1: Initialize Firebase (handle duplicate-app gracefully)
     try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        log(
+          'Firebase initialized for isForeground: $isForeground',
+          name: _firebaseTag,
+        );
+      } else {
+        log(
+          'Firebase already initialized, skipping initialization',
+          name: _firebaseTag,
+        );
+      }
+    } on FirebaseException catch (e) {
+      if (e.code == 'duplicate-app') {
+        log('Firebase duplicate-app caught, continuing...', name: _firebaseTag);
+      } else {
+        log('Firebase initialization error: $e', name: _firebaseTag);
+        return;
+      }
+    } catch (err) {
+      log(
+        'Could not initialize firebase for isForeground: $isForeground, $err',
+        name: _firebaseTag,
       );
+      return;
+    }
+
+    // Step 2: Initialize dependent services (always runs if Firebase is available)
+    try {
       CrashlyticsLocalService.initialize(isForeground);
       if (firebaseRemoteConfigService == null) {
         firebaseRemoteConfigService = FirebaseRemoteConfigService(
-            firebaseRemoteConfig: FirebaseRemoteConfig.instance);
+          firebaseRemoteConfig: FirebaseRemoteConfig.instance,
+        );
         await firebaseRemoteConfigService!.init();
       }
-
-      log('Firebase initialized for isForeground: $isForeground',
-          name: _firebaseTag);
     } catch (err) {
-      log('Could not initilaze firebase for isForeground: $isForeground, $err',
-          name: _firebaseTag);
+      log('Could not initialize Firebase services: $err', name: _firebaseTag);
     }
   }
 }
@@ -39,37 +65,44 @@ const String _crashlyticsTag =
     "dev.alpagaga.points_verts.CrashlyticsLocalService";
 
 class CrashlyticsLocalService {
-  static initialize(bool isForeground) {
+  static void initialize(bool isForeground) {
     // Pass all uncaught errors from the framework to Crashlytics.
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     FirebaseCrashlytics.instance.setCustomKey('foreground', isForeground);
     FirebaseCrashlytics.instance.setCustomKey('test', false);
     FirebaseCrashlytics.instance.setCustomKey('debug', kDebugMode);
     _initializeOptIn();
-    Isolate.current.addErrorListener(RawReceivePort((pair) async {
-      final List<dynamic> errorAndStacktrace = pair;
-      await FirebaseCrashlytics.instance.recordError(
-        errorAndStacktrace.first,
-        errorAndStacktrace.last,
-      );
-    }).sendPort);
+    Isolate.current.addErrorListener(
+      RawReceivePort((pair) async {
+        final List<dynamic> errorAndStacktrace = pair;
+        await FirebaseCrashlytics.instance.recordError(
+          errorAndStacktrace.first,
+          errorAndStacktrace.last,
+        );
+      }).sendPort,
+    );
   }
 
   static Future<void> _initializeOptIn() async {
-    bool enabled =
-        await PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled);
+    bool enabled = await PrefsProvider.prefs.getBoolean(
+      Prefs.crashlyticsEnabled,
+    );
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(enabled);
 
-    log('Crashlytics is ${enabled ? 'enabled' : 'disabled'}',
-        name: _crashlyticsTag);
+    log(
+      'Crashlytics is ${enabled ? 'enabled' : 'disabled'}',
+      name: _crashlyticsTag,
+    );
   }
 
   static Future<void> toggleCrashlyticsEnabled(bool enabled) async {
     FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(enabled);
     await PrefsProvider.prefs.setBoolean(Prefs.crashlyticsEnabled, enabled);
 
-    log('Crashlytics is now ${enabled ? 'enabled' : 'disabled'}',
-        name: _crashlyticsTag);
+    log(
+      'Crashlytics is now ${enabled ? 'enabled' : 'disabled'}',
+      name: _crashlyticsTag,
+    );
   }
 }
 
@@ -79,9 +112,7 @@ class RemoteConfig {
 }
 
 class FirebaseRemoteConfigService {
-  const FirebaseRemoteConfigService({
-    required this.firebaseRemoteConfig,
-  });
+  const FirebaseRemoteConfigService({required this.firebaseRemoteConfig});
 
   final FirebaseRemoteConfig firebaseRemoteConfig;
 
@@ -107,10 +138,7 @@ class FirebaseRemoteConfigService {
         .loadString('assets/walk_data.json')
         .catchError((e) => '');
 
-    return {
-      RemoteConfig.numberOfTrips: 5,
-      RemoteConfig.walkData: walkData,
-    };
+    return {RemoteConfig.numberOfTrips: 5, RemoteConfig.walkData: walkData};
   }
 
   int getNumberOfTrips() =>

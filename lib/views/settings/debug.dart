@@ -94,7 +94,7 @@ class _PendingNotificationsTile extends StatelessWidget {
         });
   }
 
-  _testNotification(List<PendingNotificationRequest> requests) {
+  void _testNotification(List<PendingNotificationRequest> requests) {
     PendingNotificationRequest request = requests[0];
     NotificationManager.instance
         .displayNotification(-1, "[TEST] ${request.title}", request.body);
