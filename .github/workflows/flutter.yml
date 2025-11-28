@@ -13,9 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.x"
+          flutter-version: "3.35.x"
           channel: "stable"
-          architecture: x64
       - name: Install dependencies
         run: flutter pub get
       - name: Touch placeholder files
@@ -27,10 +26,9 @@ jobs:
           cp assets/dummy_icon.png assets/launcher_icons/icon_812x812.png
           cp assets/dummy_icon.png assets/launcher_icons/icon_432x432.png
           touch ios/Runner/GoogleMaps.plist
-          touch android/app/google-services.json
           echo "" >> ios/Runner/GoogleMaps.plist
-      - name: create-json
-        id: create-json
+      - name: create-json-ios
+        id: create-json-ios
         uses: jsdaniell/create-json@v1.2.3
         with:
           name: "firebase_app_id_file.json"
@@ -57,7 +55,7 @@ jobs:
           java-version: "17"
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.x"
+          flutter-version: "3.35.x"
           architecture: x64
       - name: Install dependencies
         run: flutter pub get
@@ -70,15 +68,21 @@ jobs:
           cp assets/dummy_icon.png assets/launcher_icons/icon_812x812.png
           cp assets/dummy_icon.png assets/launcher_icons/icon_432x432.png
           touch ios/Runner/GoogleMaps.plist
-          touch android/app/google-services.json
           echo "" >> ios/Runner/GoogleMaps.plist
-      - name: create-json
-        id: create-json
+      - name: create-json-ios
+        id: create-json-ios
         uses: jsdaniell/create-json@v1.2.3
         with:
           name: "firebase_app_id_file.json"
           json: '{"file_generated_by": "FlutterFire CLI","purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory","GOOGLE_APP_ID": "1:1111111111111:ios:5b796ce177d1c60e6fa46e","FIREBASE_PROJECT_ID": "project_id","GCM_SENDER_ID": "1111111111111"}'
           dir: "ios/"
+      - name: create-google-services-json
+        id: create-google-services-json
+        uses: jsdaniell/create-json@v1.2.3
+        with:
+          name: "google-services.json"
+          json: '{"project_info":{"project_number":"111111111111","project_id":"project_id","storage_bucket":"project_id.appspot.com"},"client":[{"client_info":{"mobilesdk_app_id":"1:1111111111111:android:0000000000000000","android_client_info":{"package_name":"dev.alpagaga.points_verts"}},"oauth_client":[],"api_key":[{"current_key":"placeholder_api_key"}],"services":{}}]}'
+          dir: "android/app/"
       - name: Generate splash screens
         run: flutter pub run flutter_native_splash:create
       - name: Generate launcher icons

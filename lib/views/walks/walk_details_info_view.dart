@@ -104,11 +104,11 @@ class WalkDetailsInfoView extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12.0, vertical: 8.0),
                   decoration: BoxDecoration(
-                    color: CompanyColors.orange.withOpacity(0.9),
+                    color: CompanyColors.orange.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(8.0),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -124,7 +124,7 @@ class WalkDetailsInfoView extends StatelessWidget {
                         Shadow(
                           offset: const Offset(1.0, 1.0),
                           blurRadius: 2.0,
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha: 0.5),
                         ),
                       ],
                     ),

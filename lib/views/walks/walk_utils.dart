@@ -31,7 +31,8 @@ Future<void> launchGeoApp(Walk walk) async {
       launchURL('https://maps.apple.com/?q=${walk.lat},${walk.long}');
     } else {
       launchURL(
-          'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})');
+        'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})',
+      );
     }
   }
 }
@@ -76,8 +77,11 @@ int sortWalks(Walk a, Walk b) {
   }
 }
 
-Future<List<Walk>> retrieveSortedWalks(DateTime? date,
-    {LatLng? position, WalkFilter? filter}) async {
+Future<List<Walk>> retrieveSortedWalks(
+  DateTime? date, {
+  LatLng? position,
+  WalkFilter? filter,
+}) async {
   List<Walk> walks = await DBProvider.db.getWalks(date, filter: filter);
 
   if (position == null) {
@@ -88,7 +92,11 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
   for (Walk walk in walks) {
     if (walk.isPositionable) {
       double distance = Geolocator.distanceBetween(
-          position.latitude, position.longitude, walk.lat!, walk.long!);
+        position.latitude,
+        position.longitude,
+        walk.lat!,
+        walk.long!,
+      );
       walk.distance = distance;
       walk.trip = null;
     }
@@ -109,16 +117,21 @@ Future<List<Walk>> retrieveSortedWalks(DateTime? date,
 }
 
 Future<void> retrieveTrips(LatLng position, List<Walk> walks) async {
-  final origin =
-      Geolocation(latitude: position.latitude, longitude: position.longitude);
+  final origin = Geolocation(
+    latitude: position.latitude,
+    longitude: position.longitude,
+  );
 
   final positionableWalks = walks.where((walk) => walk.isPositionable).toList();
 
   if (positionableWalks.isEmpty) return;
 
-  final destinations = positionableWalks
-      .map((walk) => Geolocation(latitude: walk.lat!, longitude: walk.long!))
-      .toList();
+  final destinations =
+      positionableWalks
+          .map(
+            (walk) => Geolocation(latitude: walk.lat!, longitude: walk.long!),
+          )
+          .toList();
 
   try {
     final trips = await locator<MapsRepository>().getTrips(
@@ -159,57 +172,60 @@ Future<void> launchURL(String? url) async {
 
 Future<void> updateWalks() async {
   log("Updating walks", name: tag);
-
   bool didUpdate = false;
-  String? lastUpdateIso8601Utc =
-      await PrefsProvider.prefs.getString(Prefs.lastWalkUpdate);
-  final forceRefreshWalks = await PrefsProvider.prefs
-      .getBoolean(Prefs.forceRefreshWalks, defaultValue: true);
-
-  if (forceRefreshWalks) {
-    lastUpdateIso8601Utc = null;
-  }
-
   DateTime nowDateLocal = DateTime.now();
   DateTime nowDateUtc = nowDateLocal.toUtc();
 
-  if (lastUpdateIso8601Utc == null) {
+  // Check if we have walks in the database
+  bool hasWalks = !await DBProvider.db.isWalkTableEmpty();
+
+  // If we don't have walks or a forced refresh is needed, load from JSON file
+  final forceRefreshWalks = await PrefsProvider.prefs.getBoolean(
+    Prefs.forceRefreshWalks,
+    defaultValue: true,
+  );
+
+  if (!hasWalks || forceRefreshWalks) {
     await DBProvider.db.deleteWalks();
     List<Walk> newWalks = fetchJsonWalks(fromDateLocal: nowDateLocal);
-
     await DBProvider.db.insertWalks(newWalks);
     didUpdate = true;
   }
 
-  if (lastUpdateIso8601Utc == null ||
-      nowDateUtc.difference(DateTime.parse(lastUpdateIso8601Utc)) >
-          const Duration(hours: 1)) {
-    try {
-      List<Walk> updatedWalks = await fetchApiWalks(lastUpdateIso8601Utc,
-          fromDateLocal: nowDateLocal);
-      await Future.wait([
-        DBProvider.db.insertWalks(updatedWalks),
-        PrefsProvider.prefs
-            .setString(Prefs.lastWalkUpdate, nowDateUtc.toIso8601String()),
-        PrefsProvider.prefs.setBoolean(Prefs.forceRefreshWalks, false)
-      ]);
-      didUpdate = true;
-    } catch (err) {
-      print("Cannot refresh walks list: $err");
+  // Always fetch current and future walks from API without using lastUpdate filter
+  // This ensures we always get complete data including year boundaries
+  try {
+    List<Walk> updatedWalks = await fetchApiWalks(
+      null,
+      fromDateLocal: nowDateLocal,
+    );
+    await DBProvider.db.insertWalks(updatedWalks);
+
+    // Only update timestamps and flags if API call was successful
+    await PrefsProvider.prefs.setString(
+      Prefs.lastWalkUpdate,
+      nowDateUtc.toIso8601String(),
+    );
+    await PrefsProvider.prefs.setBoolean(Prefs.forceRefreshWalks, false);
+    didUpdate = true;
+  } catch (err) {
+    print("Cannot refresh walks list: $err");
+    // If API call fails and we have no walks, throw error
+    if (!hasWalks && await DBProvider.db.isWalkTableEmpty()) {
+      return Future.error(Exception('walk table is empty'));
     }
   }
 
-  if (await DBProvider.db.isWalkTableEmpty()) {
-    return Future.error(Exception('walk table is empty'));
-  }
-
+  // Proceed with post-update operations if needed
   if (didUpdate) {
     await _fixNextWalks();
     DBProvider.db.deleteOldWalks(nowDateLocal);
     NotificationManager.instance
         .scheduleNextNearestWalkNotifications()
-        .catchError((err) =>
-            print("Cannot schedule next nearest walk notification: $err"));
+        .catchError(
+          (err) =>
+              print("Cannot schedule next nearest walk notification: $err"),
+        );
   }
 }
 
@@ -218,7 +234,8 @@ Future<List<DateTime>> retrieveNearestDates() async {
   DateTime now = DateTime.now();
   DateTime inAWeek = now.add(const Duration(days: 10));
   walkDates.retainWhere(
-      (element) => element.isAfter(now) && element.isBefore(inAWeek));
+    (element) => element.isAfter(now) && element.isBefore(inAWeek),
+  );
   return walkDates;
 }
 

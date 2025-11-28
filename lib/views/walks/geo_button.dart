@@ -23,10 +23,11 @@ class GeoButton extends StatelessWidget {
         child: OutlinedButton(
           onPressed: () => launchGeoApp(walk),
           style: OutlinedButton.styleFrom(
-              shape: const RoundedRectangleBorder(),
-              foregroundColor: Theme.of(context).textTheme.bodyLarge!.color,
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-              textStyle: const TextStyle(fontSize: 12.0)),
+            shape: const RoundedRectangleBorder(),
+            foregroundColor: Theme.of(context).textTheme.bodyLarge!.color,
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            textStyle: const TextStyle(fontSize: 12.0),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -44,7 +45,11 @@ class GeoButton extends StatelessWidget {
             'Ouvrir lieu de rendez-vous ${walk.city} dans une application de cartes externe',
         excludeSemantics: true,
         child: OutlineIconButton(
-            onPressed: () => launchGeoApp(walk), iconData: Icons.directions),
+          onPressed: () => launchGeoApp(walk),
+          iconData: Icons.directions,
+          semanticLabel:
+              'Ouvrir lieu de rendez-vous ${walk.city} dans une application de cartes externe',
+        ),
       );
     }
   }
