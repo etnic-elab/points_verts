@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'dart:ui' as ui;
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -112,42 +111,15 @@ class MarkerGenerator {
     );
     textPainter.layout();
 
-    // Save the current canvas state
-    canvas.save();
-
-    // Translate to the center point where we want to draw the icon
-    canvas.translate(_circleOffset, _circleOffset);
-
-    // Rotate the canvas by 180 degrees (pi radians)
-    canvas.rotate(pi);
-
-    // Calculate the offset to center the text properly after rotation
-    final dx = -textPainter.width / 2;
-    final dy = -textPainter.height / 2;
-
-    // Draw the text at the rotated and translated position
+    final dx = _circleOffset - textPainter.width / 2;
+    final dy = _circleOffset - textPainter.height / 2;
     textPainter.paint(canvas, Offset(dx, dy));
-
-    // Restore the canvas to its original state
-    canvas.restore();
   }
 
   void _paintImage(Canvas canvas, ui.Image image) {
     final paint = Paint();
-
-    // Save the current canvas state
-    canvas.save();
-
-    // Translate to the center point where we want to draw the image
-    canvas.translate(_circleOffset, _circleOffset);
-
-    // Rotate the canvas by 180 degrees (pi radians)
-    canvas.rotate(pi);
-
-    // Draw the image at the origin (which is now translated and rotated)
-    canvas.drawImage(image, Offset(-image.width / 2, -image.height / 2), paint);
-
-    // Restore the canvas to its original state
-    canvas.restore();
+    final dx = _circleOffset - image.width / 2;
+    final dy = _circleOffset - image.height / 2;
+    canvas.drawImage(image, Offset(dx, dy), paint);
   }
 }

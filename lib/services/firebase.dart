@@ -15,14 +15,9 @@ class FirebaseLocalService {
   static FirebaseRemoteConfigService? firebaseRemoteConfigService;
 
   static Future<void> initialize({required bool isForeground}) async {
+    // Step 1: Initialize Firebase (handle duplicate-app gracefully)
     try {
-      // Check if Firebase is already initialized
-      if (Firebase.apps.isNotEmpty) {
-        log(
-          'Firebase already initialized, skipping initialization',
-          name: _firebaseTag,
-        );
-      } else {
+      if (Firebase.apps.isEmpty) {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
@@ -30,9 +25,29 @@ class FirebaseLocalService {
           'Firebase initialized for isForeground: $isForeground',
           name: _firebaseTag,
         );
+      } else {
+        log(
+          'Firebase already initialized, skipping initialization',
+          name: _firebaseTag,
+        );
       }
+    } on FirebaseException catch (e) {
+      if (e.code == 'duplicate-app') {
+        log('Firebase duplicate-app caught, continuing...', name: _firebaseTag);
+      } else {
+        log('Firebase initialization error: $e', name: _firebaseTag);
+        return;
+      }
+    } catch (err) {
+      log(
+        'Could not initialize firebase for isForeground: $isForeground, $err',
+        name: _firebaseTag,
+      );
+      return;
+    }
 
-      // These can run regardless of whether we just initialized Firebase or not
+    // Step 2: Initialize dependent services (always runs if Firebase is available)
+    try {
       CrashlyticsLocalService.initialize(isForeground);
       if (firebaseRemoteConfigService == null) {
         firebaseRemoteConfigService = FirebaseRemoteConfigService(
@@ -41,10 +56,7 @@ class FirebaseLocalService {
         await firebaseRemoteConfigService!.init();
       }
     } catch (err) {
-      log(
-        'Could not initilaze firebase for isForeground: $isForeground, $err',
-        name: _firebaseTag,
-      );
+      log('Could not initialize Firebase services: $err', name: _firebaseTag);
     }
   }
 }
