@@ -62,3 +62,4 @@ key.jks
 /ios/Runner/Assets.xcassets/**/*.png
 /android/app/src/main/res/**/*.png
 /android/app/src/main/ic_launcher-playstore.png
+ios/Runner/GoogleService-Info.plist
