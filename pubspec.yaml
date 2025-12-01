@@ -52,7 +52,6 @@ dependencies:
   firebase_crashlytics: ^5.0.0
   uuid: ^4.2.0
   firebase_remote_config: ^6.0.0
-  firebase_analytics: ^12.0.0
   get_it: ^9.0.5
   maps_repository:
     path: packages/maps_repository
