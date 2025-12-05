@@ -28,11 +28,7 @@ const String tag = "dev.alpagaga.points_verts.WalksUtils";
 Future<void> launchGeoApp(Walk walk) async {
   if (walk.hasPosition) {
     if (Platform.isIOS) {
-<<<<<<< HEAD
-      launchURL('maps://?q=${walk.lat},${walk.long}');
-=======
       launchURL('https://maps.apple.com/?q=${walk.lat},${walk.long}');
->>>>>>> 4ca5f050f1d26c1697e990a35d9a265933318c11
     } else {
       launchURL(
         'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})',
