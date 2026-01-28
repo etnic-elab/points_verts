@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:points_verts/models/website_walk.dart';
 import 'package:points_verts/services/firebase.dart';
+import 'package:points_verts/services/http_client.dart';
 
 import '../models/walk.dart';
 
@@ -66,7 +67,8 @@ Future<List<Walk>> _retrieveWalks(String baseUrl) async {
 Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
   DateFormat dateFormat = DateFormat("dd-MM-yyyy");
   List<WebsiteWalk> newList = [];
-  var response = await http.get(Uri.parse(
+  final client = createTrustedHttpClient();
+  var response = await client.get(Uri.parse(
       "https://www.am-sport.cfwb.be/adeps/pv_data.asp?type=map&dt=${dateFormat.format(date)}&activites=M,O"));
   if (response.statusCode != 200) {
     throw Exception(
