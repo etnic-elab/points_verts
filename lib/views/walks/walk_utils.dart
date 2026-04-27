@@ -26,13 +26,21 @@ import '../../models/walk.dart';
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
 Future<void> launchGeoApp(Walk walk) async {
-  if (walk.hasPosition) {
-    if (Platform.isIOS) {
-      launchURL('maps://?q=${walk.lat},${walk.long}');
+  if (!walk.hasPosition) return;
+  if (Platform.isIOS) {
+    // Apple Maps directions to the meeting point. `daddr` opens the routing
+    // sheet with the user's current location as origin.
+    await launchURL('maps://?daddr=${walk.lat},${walk.long}');
+  } else {
+    // Prefer Google Maps turn-by-turn navigation; fall back to a geo: pin
+    // if the navigation intent isn't handled (e.g. Maps not installed).
+    final navigation = 'google.navigation:q=${walk.lat},${walk.long}&mode=d';
+    final geoFallback =
+        'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})';
+    if (await canLaunchUrl(Uri.parse(navigation))) {
+      await launchURL(navigation);
     } else {
-      launchURL(
-        'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})',
-      );
+      await launchURL(geoFallback);
     }
   }
 }
