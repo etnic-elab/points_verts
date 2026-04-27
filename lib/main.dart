@@ -21,13 +21,15 @@ import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/walks_home_screen.dart';
 import 'package:points_verts/company_data.dart';
 
+const String _tag = "dev.alpagaga.points_verts.Main";
+
 Future<void> _addTrustedCert(String certPath) async {
   ByteData data = await Assets.asset.load(certPath);
   SecurityContext context = SecurityContext.defaultContext;
   try {
     context.setTrustedCertificatesBytes(data.buffer.asUint8List());
   } catch (err) {
-    print("Cannot add certificate: $err");
+    log("Cannot add certificate: $err", name: _tag);
   }
 }
 
@@ -99,7 +101,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       try {
         updateWalks();
       } catch (err) {
-        print('updateWalks on resuming foreground gave error: $err');
+        log('updateWalks on resuming foreground gave error: $err', name: _tag);
       }
     }
   }

@@ -105,7 +105,7 @@ class NotificationManager {
       );
       log('Notification scheduled for ${scheduledAt.toString()}', name: tag);
     } catch (err) {
-      print("cannot display notification: $err");
+      log("cannot display notification: $err", name: tag);
     }
   }
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -7,6 +8,8 @@ import 'package:points_verts/services/firebase.dart';
 import 'package:points_verts/services/notification.dart';
 import 'package:points_verts/services/prefs.dart';
 import 'package:points_verts/views/walks/walk_utils.dart';
+
+const String _tag = "dev.alpagaga.points_verts.BackgroundFetch";
 
 class BackgroundFetchProvider {
   static Future<void> task(bool mounted) async {
@@ -18,14 +21,14 @@ class BackgroundFetchProvider {
             enableHeadless: true,
             requiredNetworkType: NetworkType.ANY,
             startOnBoot: true), (String taskId) async {
-      print("[BackgroundFetch] taskId: $taskId");
+      log("taskId: $taskId", name: _tag);
     }, (String taskId) async {
-      print("[BackgroundFetch] TIMEOUT taskId: $taskId");
+      log("TIMEOUT taskId: $taskId", name: _tag);
       BackgroundFetch.finish(taskId);
     }).then((int status) {
-      print('[BackgroundFetch] configure success: $status');
+      log('configure success: $status', name: _tag);
     }).catchError((e) {
-      print('[BackgroundFetch] configure ERROR: $e');
+      log('configure ERROR: $e', name: _tag);
     });
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
@@ -38,12 +41,12 @@ class BackgroundFetchProvider {
     String taskId = task.taskId;
     bool isTimeout = task.timeout;
     if (isTimeout) {
-      print("[BackgroundFetch] Headless TIMEOUT: $taskId");
+      log("Headless TIMEOUT: $taskId", name: _tag);
       BackgroundFetch.finish(taskId);
       return;
     }
     try {
-      print("[BackgroundFetch] Headless task: $taskId");
+      log("Headless task: $taskId", name: _tag);
       await FirebaseLocalService.initialize(isForeground: false);
       if (await NotificationManager.instance
           .isScheduleNextNearestWalkNotifications()) {
@@ -53,7 +56,8 @@ class BackgroundFetchProvider {
       PrefsProvider.prefs.setString(
           Prefs.lastBackgroundFetch, DateTime.now().toUtc().toIso8601String());
     } catch (error, stack) {
-      print("Cannot schedule next nearest walk notification: $error");
+      log("Cannot schedule next nearest walk notification: $error",
+          name: _tag, error: error, stackTrace: stack);
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     } finally {
       BackgroundFetch.finish(taskId);

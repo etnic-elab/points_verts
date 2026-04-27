@@ -1,12 +1,16 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:points_verts/company_data.dart';
 import 'package:weather_icons/weather_icons.dart';
-import 'dart:convert';
 
 import '../models/weather.dart';
 import 'cache_managers/weather_cache_manager.dart';
+
+const String _tag = "dev.alpagaga.points_verts.OpenWeather";
 
 String? _token = dotenv.env['OPENWEATHER_TOKEN'];
 
@@ -34,7 +38,7 @@ Future<List<Weather>> getWeather(double long, double lat, DateTime date) async {
         return results;
       }
     } catch (err) {
-      print("Couldn't retrieve weather, $err");
+      log("Couldn't retrieve weather, $err", name: _tag);
     }
   }
 
