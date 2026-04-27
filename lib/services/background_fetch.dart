@@ -34,9 +34,9 @@ class BackgroundFetchProvider {
   }
 
   @pragma('vm:entry-point')
-  static Future<void> headlessTask(HeadlessTask task) async {
-    String taskId = task.taskId;
-    bool isTimeout = task.timeout;
+  static Future<void> headlessTask(HeadlessEvent event) async {
+    String taskId = event.taskId;
+    bool isTimeout = event.timeout;
     if (isTimeout) {
       print("[BackgroundFetch] Headless TIMEOUT: $taskId");
       BackgroundFetch.finish(taskId);
