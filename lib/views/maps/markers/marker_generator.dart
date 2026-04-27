@@ -9,19 +9,15 @@ import 'package:points_verts/services/assets.dart';
 
 class MarkerGenerator {
   final num _markerSize;
-  late double _circleStrokeWidth;
   late double _circleOffset;
-  // late double _outlineCircleWidth;
   late double _fillCircleWidth;
   late double _iconSize;
 
   MarkerGenerator(this._markerSize) {
-    // calculate marker dimensions
-    _circleStrokeWidth = _markerSize / 100.0;
+    final circleStrokeWidth = _markerSize / 100.0;
     _circleOffset = _markerSize / 2;
-    // _outlineCircleWidth = _circleOffset - (_circleStrokeWidth / 2);
     _fillCircleWidth = _markerSize / 2.35;
-    final outlineCircleInnerWidth = _markerSize - (2 * _circleStrokeWidth);
+    final outlineCircleInnerWidth = _markerSize - (2 * circleStrokeWidth);
     _iconSize = sqrt(pow(outlineCircleInnerWidth, 2) / 2);
   }
 
@@ -39,7 +35,6 @@ class MarkerGenerator {
     );
 
     _paintCircleFill(canvas, backgroundColor);
-    // _paintCircleStroke(canvas, circleColor);
     _paintImage(canvas, assetImage);
 
     final picture = pictureRecorder.endRecording();
@@ -84,17 +79,6 @@ class MarkerGenerator {
       paint,
     );
   }
-
-  /// Paints a circle around the icon
-
-  // void _paintCircleStroke(Canvas canvas, Color color) {
-  //   final paint = Paint()
-  //     ..style = PaintingStyle.stroke
-  //     ..color = color
-  //     ..strokeWidth = _circleStrokeWidth;
-  //   canvas.drawCircle(
-  //       Offset(_circleOffset, _circleOffset), _outlineCircleWidth, paint);
-  // }
 
   /// Paints the icon
   void _paintIcon(Canvas canvas, Color color, IconData iconData) {

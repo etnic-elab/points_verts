@@ -19,8 +19,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:collection/collection.dart';
 
-import 'dart:developer' as developer;
-
 import '../../models/walk.dart';
 
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
@@ -117,7 +115,7 @@ Future<List<Walk>> retrieveSortedWalks(
       await retrieveTrips(position, walks);
       walks.sort((a, b) => sortWalks(a, b));
     } catch (err) {
-      print("Cannot retrieve trips: $err");
+      log("Cannot retrieve trips: $err", name: tag);
     }
   }
 
@@ -160,8 +158,8 @@ Future<void> retrieveTrips(LatLng position, List<Walk> walks) async {
       }
     }
   } catch (e, stackTrace) {
-    print('Error retrieving trips: $e');
-    developer.log('Stack trace:', error: e, stackTrace: stackTrace);
+    log('Error retrieving trips: $e',
+        name: tag, error: e, stackTrace: stackTrace);
     rethrow;
   }
 }
@@ -173,7 +171,7 @@ Future<void> launchURL(String? url) async {
     try {
       await launchUrl(uri);
     } catch (err) {
-      print("Cannot launch URL: $err");
+      log("Cannot launch URL: $err", name: tag);
     }
   }
 }
@@ -217,7 +215,7 @@ Future<void> updateWalks() async {
     await PrefsProvider.prefs.setBoolean(Prefs.forceRefreshWalks, false);
     didUpdate = true;
   } catch (err) {
-    print("Cannot refresh walks list: $err");
+    log("Cannot refresh walks list: $err", name: tag);
     // If API call fails and we have no walks, throw error
     if (!hasWalks && await DBProvider.db.isWalkTableEmpty()) {
       return Future.error(Exception('walk table is empty'));
@@ -231,8 +229,8 @@ Future<void> updateWalks() async {
     NotificationManager.instance
         .scheduleNextNearestWalkNotifications()
         .catchError(
-          (err) =>
-              print("Cannot schedule next nearest walk notification: $err"),
+          (err) => log("Cannot schedule next nearest walk notification: $err",
+              name: tag),
         );
   }
 }
@@ -292,6 +290,6 @@ Future<void> _fixNextWalks() async {
       await DBProvider.db.insertWalks(fromDbUpdated);
     }
   } catch (err) {
-    print("Couldn't fix next walks, $err");
+    log("Couldn't fix next walks, $err", name: tag);
   }
 }

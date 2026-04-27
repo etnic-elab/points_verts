@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:intl/intl.dart';
 import 'package:maps_api/maps_api.dart';
 import 'package:points_verts/models/path.dart';
 import 'package:points_verts/models/weather.dart';
 import 'package:collection/collection.dart';
+
+const String _tag = "dev.alpagaga.points_verts.Walk";
 
 final dateFormat = DateFormat("yyyy-MM-dd");
 
@@ -197,7 +200,8 @@ class Walk {
       }
       return _pathsFromJson(jsonDecode(tracesGpx));
     } catch (err) {
-      print("Cannot decode paths for walk '${json['fields']['id']}': $err");
+      log("Cannot decode paths for walk '${json['fields']['id']}': $err",
+          name: _tag);
       return [];
     }
   }

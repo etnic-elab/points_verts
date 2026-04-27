@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
 import 'package:points_verts/extensions.dart';
@@ -5,6 +7,8 @@ import 'package:points_verts/extensions.dart';
 import '../models/gpx_point.dart';
 
 import 'package:points_verts/services/cache_managers/gpx_cache_manager.dart';
+
+const String _tag = "dev.alpagaga.points_verts.Gpx";
 
 enum GpxCourse { track, route, waypoints }
 
@@ -32,16 +36,16 @@ Future<List<GpxPoint>> retrieveGpxPoints(String url) async {
           GpxPoint point = GpxPoint.fromXmlElement(element);
           gpxPoints.add(point);
         } catch (err) {
-          print("Cannot create GpxPoint from XmlElement: $err");
+          log("Cannot create GpxPoint from XmlElement: $err", name: _tag);
         }
       }
 
       return gpxPoints;
     } else {
-      print('Failed to load gpx-file: $response');
+      log('Failed to load gpx-file: $response', name: _tag);
     }
   } catch (err) {
-    print("A problem occured parsing gpx file: $err");
+    log("A problem occured parsing gpx file: $err", name: _tag);
   }
 
   return [];

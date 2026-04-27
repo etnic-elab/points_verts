@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -105,7 +106,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
       }
       _retrieveWalks();
     }).catchError((err) {
-      print("Cannot retrieve dates: $err");
+      log("Cannot retrieve dates: $err", name: tag);
       if (mounted) {
         setState(() {
           _currentWalks = Future.error(err);
@@ -160,7 +161,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         }
       });
     } catch (err) {
-      print("Cannot retrieve weather info: $err");
+      log("Cannot retrieve weather info: $err", name: tag);
     }
 
     if (mounted) {
@@ -191,7 +192,7 @@ class _WalksViewState extends State<WalksView> with WidgetsBindingObserver {
         _locationExceptionMessage();
       }
 
-      print("Cannot retrieve current position: $e");
+      log("Cannot retrieve current position: $e", name: tag);
     }
   }
 
