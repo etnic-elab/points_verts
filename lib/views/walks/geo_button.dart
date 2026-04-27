@@ -21,7 +21,7 @@ class GeoButton extends StatelessWidget {
         label:
             "Lieu de rendez-vous ${walk.city} est à ${label.replaceAll(r'min', 'minutes')} en voiture. Ouvrir dans une application de cartes externe",
         child: OutlinedButton(
-          onPressed: () => launchGeoApp(walk),
+          onPressed: () => launchGeoApp(context, walk),
           style: OutlinedButton.styleFrom(
             shape: const RoundedRectangleBorder(),
             foregroundColor: Theme.of(context).textTheme.bodyLarge!.color,
@@ -45,7 +45,7 @@ class GeoButton extends StatelessWidget {
             'Ouvrir lieu de rendez-vous ${walk.city} dans une application de cartes externe',
         excludeSemantics: true,
         child: OutlineIconButton(
-          onPressed: () => launchGeoApp(walk),
+          onPressed: () => launchGeoApp(context, walk),
           iconData: Icons.directions,
           semanticLabel:
               'Ouvrir lieu de rendez-vous ${walk.city} dans une application de cartes externe',

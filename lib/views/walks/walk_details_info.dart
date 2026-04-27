@@ -226,12 +226,12 @@ class _GeoTile extends StatelessWidget {
                   title: Text(walk.meetingPoint ?? ""),
                   subtitle: geotext,
                   trailing: OutlineIconButton(
-                    onPressed: () => launchGeoApp(walk),
+                    onPressed: () => launchGeoApp(context, walk),
                     iconData: Icons.directions,
                     semanticLabel:
                         "Ouvrir dans une application de cartes externe",
                   ),
-                  onTap: () => launchGeoApp(walk),
+                  onTap: () => launchGeoApp(context, walk),
                 ),
               ),
               _MeetingPointTile(walk),
