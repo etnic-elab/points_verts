@@ -1,8 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:maps_api/maps_api.dart';
 import 'package:maps_repository/maps_repository.dart';
 import 'package:points_verts/locator.dart';
@@ -23,23 +25,74 @@ import '../../models/walk.dart';
 
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
-Future<void> launchGeoApp(Walk walk) async {
+/// Opens directions to the walk's meeting point.
+///
+/// Asks the OS which map apps are installed; if more than one supports
+/// directions, shows a bottom sheet so the user can choose
+/// (Plan/Apple Maps, Google Maps, Waze, …). With a single map, launches it
+/// directly. Falls back to the platform default URL scheme if detection
+/// returns nothing (rare — usually only on emulators without Play Services).
+Future<void> launchGeoApp(BuildContext context, Walk walk) async {
   if (!walk.hasPosition) return;
-  if (Platform.isIOS) {
-    // Apple Maps directions to the meeting point. `daddr` opens the routing
-    // sheet with the user's current location as origin.
-    await launchURL('maps://?daddr=${walk.lat},${walk.long}');
-  } else {
-    // Prefer Google Maps turn-by-turn navigation; fall back to a geo: pin
-    // if the navigation intent isn't handled (e.g. Maps not installed).
-    final navigation = 'google.navigation:q=${walk.lat},${walk.long}&mode=d';
-    final geoFallback =
-        'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})';
-    if (await canLaunchUrl(Uri.parse(navigation))) {
-      await launchURL(navigation);
-    } else {
-      await launchURL(geoFallback);
+
+  final destination = ml.Coords(walk.lat!, walk.long!);
+
+  try {
+    final installed = await ml.MapLauncher.installedMaps;
+
+    if (installed.isEmpty) {
+      // Defensive: if no maps are detected (emulator without Maps app etc.),
+      // fall back to the platform default URL scheme so we still do something.
+      if (Platform.isIOS) {
+        await launchURL('maps://?daddr=${walk.lat},${walk.long}');
+      } else {
+        await launchURL(
+          'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})',
+        );
+      }
+      return;
     }
+
+    if (installed.length == 1) {
+      await installed.first.showDirections(
+        destination: destination,
+        destinationTitle: walk.city,
+      );
+      return;
+    }
+
+    if (!context.mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text(
+                "Ouvrir l'itinéraire avec…",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            for (final map in installed)
+              ListTile(
+                leading: const Icon(Icons.directions),
+                title: Text(map.mapName),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  map.showDirections(
+                    destination: destination,
+                    destinationTitle: walk.city,
+                  );
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  } catch (err) {
+    log("Cannot open maps app: $err", name: tag);
   }
 }
 
