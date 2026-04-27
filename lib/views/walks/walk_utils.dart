@@ -1,8 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:maps_api/maps_api.dart';
 import 'package:maps_repository/maps_repository.dart';
 import 'package:points_verts/locator.dart';
@@ -19,21 +21,78 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:collection/collection.dart';
 
-import 'dart:developer' as developer;
-
 import '../../models/walk.dart';
 
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
-Future<void> launchGeoApp(Walk walk) async {
-  if (walk.hasPosition) {
-    if (Platform.isIOS) {
-      launchURL('maps://?q=${walk.lat},${walk.long}');
-    } else {
-      launchURL(
-        'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})',
-      );
+/// Opens directions to the walk's meeting point.
+///
+/// Asks the OS which map apps are installed; if more than one supports
+/// directions, shows a bottom sheet so the user can choose
+/// (Plan/Apple Maps, Google Maps, Waze, …). With a single map, launches it
+/// directly. Falls back to the platform default URL scheme if detection
+/// returns nothing (rare — usually only on emulators without Play Services).
+Future<void> launchGeoApp(BuildContext context, Walk walk) async {
+  if (!walk.hasPosition) return;
+
+  final destination = ml.Coords(walk.lat!, walk.long!);
+
+  try {
+    final installed = await ml.MapLauncher.installedMaps;
+
+    if (installed.isEmpty) {
+      // Defensive: if no maps are detected (emulator without Maps app etc.),
+      // fall back to the platform default URL scheme so we still do something.
+      if (Platform.isIOS) {
+        await launchURL('maps://?daddr=${walk.lat},${walk.long}');
+      } else {
+        await launchURL(
+          'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})',
+        );
+      }
+      return;
     }
+
+    if (installed.length == 1) {
+      await installed.first.showDirections(
+        destination: destination,
+        destinationTitle: walk.city,
+      );
+      return;
+    }
+
+    if (!context.mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text(
+                "Ouvrir l'itinéraire avec…",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            for (final map in installed)
+              ListTile(
+                leading: const Icon(Icons.directions),
+                title: Text(map.mapName),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  map.showDirections(
+                    destination: destination,
+                    destinationTitle: walk.city,
+                  );
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  } catch (err) {
+    log("Cannot open maps app: $err", name: tag);
   }
 }
 
@@ -109,7 +168,7 @@ Future<List<Walk>> retrieveSortedWalks(
       await retrieveTrips(position, walks);
       walks.sort((a, b) => sortWalks(a, b));
     } catch (err) {
-      print("Cannot retrieve trips: $err");
+      log("Cannot retrieve trips: $err", name: tag);
     }
   }
 
@@ -152,8 +211,8 @@ Future<void> retrieveTrips(LatLng position, List<Walk> walks) async {
       }
     }
   } catch (e, stackTrace) {
-    print('Error retrieving trips: $e');
-    developer.log('Stack trace:', error: e, stackTrace: stackTrace);
+    log('Error retrieving trips: $e',
+        name: tag, error: e, stackTrace: stackTrace);
     rethrow;
   }
 }
@@ -165,7 +224,7 @@ Future<void> launchURL(String? url) async {
     try {
       await launchUrl(uri);
     } catch (err) {
-      print("Cannot launch URL: $err");
+      log("Cannot launch URL: $err", name: tag);
     }
   }
 }
@@ -209,7 +268,7 @@ Future<void> updateWalks() async {
     await PrefsProvider.prefs.setBoolean(Prefs.forceRefreshWalks, false);
     didUpdate = true;
   } catch (err) {
-    print("Cannot refresh walks list: $err");
+    log("Cannot refresh walks list: $err", name: tag);
     // If API call fails and we have no walks, throw error
     if (!hasWalks && await DBProvider.db.isWalkTableEmpty()) {
       return Future.error(Exception('walk table is empty'));
@@ -223,8 +282,8 @@ Future<void> updateWalks() async {
     NotificationManager.instance
         .scheduleNextNearestWalkNotifications()
         .catchError(
-          (err) =>
-              print("Cannot schedule next nearest walk notification: $err"),
+          (err) => log("Cannot schedule next nearest walk notification: $err",
+              name: tag),
         );
   }
 }
@@ -284,6 +343,6 @@ Future<void> _fixNextWalks() async {
       await DBProvider.db.insertWalks(fromDbUpdated);
     }
   } catch (err) {
-    print("Couldn't fix next walks, $err");
+    log("Couldn't fix next walks, $err", name: tag);
   }
 }

@@ -36,6 +36,9 @@
 	<array>
 		<string>comgooglemaps</string>
 		<string>waze</string>
+		<string>mapswithme</string>
+		<string>osmandmaps</string>
+		<string>here-location</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
