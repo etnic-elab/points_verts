@@ -100,7 +100,12 @@ class DBProvider {
     String where = "1=1";
     if (filter.filterByProvince()) {
       List<String> provinces = filter.provinceFilter();
-      where = "$where and province in ${provinces.map((e) => "?")}";
+      if (provinces.isEmpty) {
+        where = "$where and 0=1";
+      } else {
+        final placeholders = List.filled(provinces.length, '?').join(', ');
+        where = "$where and lower(trim(province)) in ($placeholders)";
+      }
     }
     if (!filter.cancelledWalks) {
       where = "$where and status != ?";
@@ -123,8 +128,11 @@ class DBProvider {
   List<dynamic> _generateArgsFromFilter(WalkFilter filter) {
     List<dynamic> args = [];
     if (filter.filterByProvince()) {
+      // Upstream odwb dataset has both "Brabant Wallon" and "Brabant wallon"
+      // (and we don't want one bad import to silently drop a whole province),
+      // so match case-insensitively and trimmed.
       List<String> provinces = filter.provinceFilter();
-      args.addAll(provinces);
+      args.addAll(provinces.map((p) => p.toLowerCase().trim()));
     }
     if (!filter.cancelledWalks) {
       args.add("Annulé");

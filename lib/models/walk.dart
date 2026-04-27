@@ -87,7 +87,7 @@ class Walk {
         city: json['fields']['localite'],
         entity: json['fields']['entite'],
         type: json['fields']['activite'],
-        province: json['fields']['province'],
+        province: (json['fields']['province'] as String).trim(),
         date: dateFormat.parse(json['fields']['date']),
         long: json['fields']['geopoint'][1],
         lat: json['fields']['geopoint'][0],
