@@ -164,27 +164,30 @@ class _FilterPageState extends State<FilterPage> {
               ],
             ),
           ),
-          Semantics(
-            container: true,
-            child: OverflowBar(
-              alignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  child: const Text('Réinitialiser'),
-                  onPressed: () {
-                    WalkFilter resetFilter = WalkFilter();
-                    resetFilter.selectedPlace =
-                        widget.currentFilter.selectedPlace;
-                    Navigator.of(context).pop(resetFilter);
-                  },
-                ),
-                TextButton(
-                  child: const Text('Filtrer'),
-                  onPressed: () {
-                    Navigator.of(context).pop(editedFilter);
-                  },
-                ),
-              ],
+          SafeArea(
+            top: false,
+            child: Semantics(
+              container: true,
+              child: OverflowBar(
+                alignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: const Text('Réinitialiser'),
+                    onPressed: () {
+                      WalkFilter resetFilter = WalkFilter();
+                      resetFilter.selectedPlace =
+                          widget.currentFilter.selectedPlace;
+                      Navigator.of(context).pop(resetFilter);
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('Filtrer'),
+                    onPressed: () {
+                      Navigator.of(context).pop(editedFilter);
+                    },
+                  ),
+                ],
+              ),
             ),
           )
         ],
