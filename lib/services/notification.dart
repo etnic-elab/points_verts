@@ -48,7 +48,7 @@ class NotificationManager {
     );
     final plugin = FlutterLocalNotificationsPlugin();
     await plugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse details) {
         int? walkId = int.tryParse(details.payload!);
         if (walkId != null) _redirectToWalkDetails(walkId);
@@ -95,11 +95,11 @@ class NotificationManager {
       int id = int.parse(formatter.format(scheduledAt));
 
       await instance.zonedSchedule(
-        id,
-        title,
-        description,
-        scheduledAt,
-        _generateNotificationDetails(),
+        id: id,
+        title: title,
+        body: description,
+        scheduledDate: scheduledAt,
+        notificationDetails: _generateNotificationDetails(),
         payload: walk.id.toString(),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
@@ -134,11 +134,11 @@ class NotificationManager {
       tz.local,
     ).add(const Duration(seconds: 5));
     return instance.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledAt,
-      _generateNotificationDetails(),
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledAt,
+      notificationDetails: _generateNotificationDetails(),
       payload: id.toString(),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );
