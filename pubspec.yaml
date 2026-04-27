@@ -27,7 +27,7 @@ dependencies:
     sdk: flutter
   flutter_cache_manager: ^3.3.0
   flutter_dotenv: ^6.0.1
-  flutter_local_notifications: ^19.5.0
+  flutter_local_notifications: ^21.0.0
   flutter_native_splash: ^2.2.0
   flutter_localizations:
     sdk: flutter
@@ -43,8 +43,8 @@ dependencies:
   google_polyline_algorithm: ^3.1.0
   add_2_calendar: ^3.0.0
   package_info_plus: ^9.0.1
-  timezone: ^0.10.1
-  xml: ^6.1.0
+  timezone: ^0.11.0
+  xml: ^6.6.1
   latlong2: ^0.9.0
   path: ^1.8.0
   firebase_core: ^4.7.0
