@@ -7,7 +7,7 @@ flutter_launcher_icons:
 
   # iOS: brand-coloured corners (no white halo around the green disc) plus
   # iOS 18+ dark/tinted variants so the icon adapts to system appearance.
-  background_color_ios: "#246739"
+  background_color_ios: "#C3C83A"
   image_path_ios_dark_transparent: "assets/launcher_icons/icon_812x812.png"
   image_path_ios_tinted_grayscale: "assets/launcher_icons/icon_432x432_monochrome.png"
   desaturate_tinted_to_grayscale_ios: true
@@ -15,6 +15,6 @@ flutter_launcher_icons:
 
   # Android: brand-coloured adaptive-icon background + monochrome layer for
   # Android 13+ themed icons.
-  adaptive_icon_background: "#246739"
+  adaptive_icon_background: "#C3C83A"
   adaptive_icon_foreground: "assets/launcher_icons/icon_432x432.png"
   adaptive_icon_monochrome: "assets/launcher_icons/icon_432x432_monochrome.png"
