@@ -31,7 +31,7 @@ val keystoreProperties = readProperties(file("../key.properties"));
 android {
     namespace = "dev.alpagaga.points_verts"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
