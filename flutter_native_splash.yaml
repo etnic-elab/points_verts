@@ -19,7 +19,7 @@ flutter_native_splash:
 
   # The image parameter allows you to specify an image used in the splash screen.  It must be a
   # png file and should be sized for 4x pixel density.
-  image: assets/light/splash.png
+  image: assets/launcher_icons/icon_812x812.png
 
   # This property allows you to specify an image used as branding in the splash screen. It must be
   # a png file. Currently, it is only supported for Android and iOS.
@@ -42,7 +42,7 @@ flutter_native_splash:
   # set.
   color_dark: "#121212"
   #background_image_dark: "assets/dark-background.png"
-  image_dark: assets/dark/splash.png
+  image_dark: assets/launcher_icons/icon_812x812.png
 
   # The android, ios and web parameters can be used to disable generating a splash screen on a given
   # platform.
@@ -57,7 +57,7 @@ flutter_native_splash:
   # https://developer.android.com/reference/android/view/Gravity): bottom, center,
   # center_horizontal, center_vertical, clip_horizontal, clip_vertical, end, fill, fill_horizontal,
   # fill_vertical, left, right, start, or top.
-  android_gravity: fill_horizontal
+  android_gravity: center
   #
   # ios_content_mode can be one of the following iOS UIView.ContentMode (see
   # https://developer.apple.com/documentation/uikit/uiview/contentmode): scaleToFill,
