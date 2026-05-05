@@ -25,17 +25,19 @@ import '../../models/walk.dart';
 
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
-/// Opens directions to the walk's meeting point.
+/// Opens the walk's meeting point as a marker (place) in an external map app.
 ///
-/// Asks the OS which map apps are installed; if more than one supports
-/// directions, shows a bottom sheet so the user can choose
-/// (Plan/Apple Maps, Google Maps, Waze, …). With a single map, launches it
-/// directly. Falls back to the platform default URL scheme if detection
-/// returns nothing (rare — usually only on emulators without Play Services).
+/// Shows the destination as a pin with the address visible — the user can
+/// then read or copy it, and start directions from inside the map app if
+/// they want to. Asks the OS which map apps are installed; if more than one
+/// is available, shows a bottom sheet so the user can choose. Falls back to
+/// the platform default URL scheme if detection returns nothing (rare —
+/// usually only on emulators without Play Services).
 Future<void> launchGeoApp(BuildContext context, Walk walk) async {
   if (!walk.hasPosition) return;
 
   final destination = ml.Coords(walk.lat!, walk.long!);
+  final markerTitle = walk.meetingPoint ?? walk.city;
 
   try {
     final installed = await ml.MapLauncher.installedMaps;
@@ -44,7 +46,10 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
       // Defensive: if no maps are detected (emulator without Maps app etc.),
       // fall back to the platform default URL scheme so we still do something.
       if (Platform.isIOS) {
-        await launchURL('maps://?daddr=${walk.lat},${walk.long}');
+        final label = Uri.encodeComponent(walk.city);
+        await launchURL(
+          'https://maps.apple.com/?ll=${walk.lat},${walk.long}&q=$label',
+        );
       } else {
         await launchURL(
           'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})',
@@ -54,9 +59,10 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
     }
 
     if (installed.length == 1) {
-      await installed.first.showDirections(
-        destination: destination,
-        destinationTitle: walk.city,
+      await installed.first.showMarker(
+        coords: destination,
+        title: markerTitle,
+        description: walk.city,
       );
       return;
     }
@@ -71,19 +77,20 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Text(
-                "Ouvrir l'itinéraire avec…",
+                "Ouvrir dans une carte avec…",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
             for (final map in installed)
               ListTile(
-                leading: const Icon(Icons.directions),
+                leading: const Icon(Icons.location_on),
                 title: Text(map.mapName),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
-                  map.showDirections(
-                    destination: destination,
-                    destinationTitle: walk.city,
+                  map.showMarker(
+                    coords: destination,
+                    title: markerTitle,
+                    description: walk.city,
                   );
                 },
               ),
