@@ -153,8 +153,18 @@ storeFile=/path/to/your/key.jks
 2. Generate launcher icons:
 
    ```bash
-   flutter pub run flutter_launcher_icons:main
+   dart run flutter_launcher_icons
    ```
+
+   **This is not optional, and it is not something git can do for you.** The
+   generated PNGs are gitignored (see [Missing Assets](#missing-assets)), so a
+   machine that has never run this — a fresh clone, or the Mac you archive
+   from — still has whatever icons were left on disk from last time. Version
+   1.7.1 shipped the old white, non-adapting icon exactly this way.
+
+   The `Verify App Icons` build phase on the Runner target fails any non-debug
+   iOS build when the icons don't match `Contents.json`, so you cannot archive
+   a stale icon by accident. If it fires, run the command above and rebuild.
 
 3. Build release version:
    - Android:

@@ -2,19 +2,34 @@ flutter_launcher_icons:
   android: "ic_launcher"
   ios: true
 
-  image_path_android: "assets/launcher_icons/icon_812x812.png"
-  image_path_ios: "assets/launcher_icons/icon_812x812.png"
+  # All three masters are rendered from logo.svg by tool/build_icon_masters.dart
+  # at a true 1024x1024, so nothing here is upscaled any more.
+  image_path_android: "assets/launcher_icons/icon_1024x1024.png"
+  image_path_ios: "assets/launcher_icons/icon_1024x1024.png"
 
   # iOS: brand-coloured corners (no white halo around the green disc) plus
   # iOS 18+ dark/tinted variants so the icon adapts to system appearance.
   background_color_ios: "#246739"
-  image_path_ios_dark_transparent: "assets/launcher_icons/icon_812x812.png"
-  image_path_ios_tinted_grayscale: "assets/launcher_icons/icon_432x432_monochrome.png"
-  desaturate_tinted_to_grayscale_ios: true
   remove_alpha_ios: true
 
+  # The dark variant is inset so the system's dark background frames the disc.
+  # Reusing the full-bleed light artwork here only turned the corners
+  # transparent, which read as "the icon doesn't adapt".
+  image_path_ios_dark_transparent: "assets/launcher_icons/icon_1024x1024_dark.png"
+
+  # Tinted takes the *colour* master, not the monochrome one. iOS maps this
+  # image's luminance onto the user's tint: white areas take the tint fully,
+  # black areas stay dark. The monochrome silhouette is black-on-transparent -
+  # correct for Android, where only alpha matters, but on iOS it rendered a
+  # dark mark on a dark background. Desaturating the colour artwork gives a
+  # mid-grey disc with white furrows, which reads the right way round.
+  image_path_ios_tinted_grayscale: "assets/launcher_icons/icon_1024x1024.png"
+  desaturate_tinted_to_grayscale_ios: true
+
   # Android: brand-coloured adaptive-icon background + monochrome layer for
-  # Android 13+ themed icons.
+  # Android 13+ themed icons. The monochrome master is full-bleed; the 16%
+  # safe-zone inset is applied by mipmap-anydpi-v26/ic_launcher.xml, so baking
+  # a second inset into the artwork would leave the themed icon tiny.
   adaptive_icon_background: "#246739"
-  adaptive_icon_foreground: "assets/launcher_icons/icon_432x432.png"
-  adaptive_icon_monochrome: "assets/launcher_icons/icon_432x432_monochrome.png"
+  adaptive_icon_foreground: "assets/launcher_icons/icon_1024x1024.png"
+  adaptive_icon_monochrome: "assets/launcher_icons/icon_1024x1024_monochrome.png"
