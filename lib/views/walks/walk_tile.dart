@@ -122,7 +122,7 @@ class WalkTile extends StatelessWidget {
         .whereType<Widget>()
         .toList());
 
-    if (walk.paths.isNotEmpty) {
+    if (walk.visiblePaths.isNotEmpty) {
       info.add(const _ChipIcon(Icons.gps_fixed, 'Tracé GPX disponible'));
     }
 

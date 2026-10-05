@@ -166,7 +166,7 @@ class MapUtils {
           iconUrl: _getIconUrl(walk, brightness),
         )
       ],
-      paths: walk.paths
+      paths: walk.visiblePaths
           .where((path) => path.encodablePoints.isNotEmpty)
           .map((path) => MapPath(
                 points: path.encodablePoints,
