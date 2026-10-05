@@ -167,12 +167,8 @@ class _WalkDayOnlyPathsChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      child: Tooltip(
+      child: PathsTooltip(
         message: walkDayOnlyPathsExplanation(walk),
-        triggerMode: TooltipTriggerMode.tap,
-        showDuration: const Duration(seconds: 8),
-        margin: const EdgeInsets.symmetric(horizontal: 16.0),
-        textStyle: const TextStyle(fontSize: 15.0, color: Colors.white),
         child: Chip(
           avatar: Icon(Icons.gps_fixed,
               size: 15.0,
