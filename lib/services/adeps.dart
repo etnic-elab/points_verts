@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:csv/csv.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:points_verts/models/website_walk.dart';
@@ -75,14 +76,22 @@ Future<List<WebsiteWalk>> retrieveWalksFromWebSite(DateTime date) async {
         "Couldn't load walks from website, statusCode: ${response.statusCode}");
   }
 
-  var fixed = _fixCsv(response.body);
-  List<List<dynamic>> rowsAsListOfValues =
-      const CsvToListConverter(fieldDelimiter: ';').convert(fixed);
-  for (List<dynamic> walk in rowsAsListOfValues) {
-    newList.add(WebsiteWalk(id: walk[0], status: _convertStatus(walk[9])));
-  }
-
+  newList.addAll(parseWebsiteWalks(response.body));
   return newList;
+}
+
+/// Parses the website's walk list: one flat `;`-separated line holding
+/// 10 fields per walk (id first, status last).
+@visibleForTesting
+List<WebsiteWalk> parseWebsiteWalks(String body) {
+  final rows = Csv(fieldDelimiter: ';', autoDetect: false).decode(_fixCsv(body));
+  return [
+    for (final walk in rows)
+      WebsiteWalk(
+        id: int.parse(walk[0].toString().trim()),
+        status: _convertStatus(walk[9].toString()),
+      ),
+  ];
 }
 
 List<Walk> _convertWalks(Map<String, dynamic> data) {

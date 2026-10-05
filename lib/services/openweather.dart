@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:points_verts/company_data.dart';
-import 'package:weather_icons/weather_icons.dart';
+import 'package:points_verts/presentation/weather_icons.dart';
 
 import '../models/weather.dart';
 import 'cache_managers/weather_cache_manager.dart';
@@ -96,7 +96,7 @@ Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
     case 615:
     case 616:
     case 620:
-      icon = WeatherIcons.rain_mix;
+      icon = WeatherIcons.rainMix;
       break;
     case 313:
     case 520:
@@ -107,7 +107,7 @@ Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
       break;
     case 531:
     case 901:
-      icon = WeatherIcons.storm_showers;
+      icon = WeatherIcons.stormShowers;
       break;
     case 600:
     case 601:
@@ -122,7 +122,7 @@ Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
       icon = WeatherIcons.smoke;
       break;
     case 721:
-      icon = WeatherIcons.day_haze;
+      icon = WeatherIcons.dayHaze;
       break;
     case 731:
     case 761:
@@ -136,14 +136,14 @@ Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
     case 801:
     case 802:
     case 803:
-      icon = WeatherIcons.cloudy_gusts;
+      icon = WeatherIcons.cloudyGusts;
       break;
     case 781:
     case 900:
       icon = WeatherIcons.tornado;
       break;
     case 800:
-      icon = WeatherIcons.day_sunny;
+      icon = WeatherIcons.daySunny;
       break;
     case 804:
       icon = WeatherIcons.cloudy;
@@ -152,7 +152,7 @@ Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
       icon = WeatherIcons.hurricane;
       break;
     case 903:
-      icon = WeatherIcons.snowflake_cold;
+      icon = WeatherIcons.snowflakeCold;
       break;
     case 904:
       icon = WeatherIcons.hot;
@@ -164,12 +164,12 @@ Widget getWeatherIcon(Weather weather, {double? iconSize, Color? iconColor}) {
       icon = WeatherIcons.hail;
       break;
     case 957:
-      icon = WeatherIcons.strong_wind;
+      icon = WeatherIcons.strongWind;
       break;
     default:
       icon = WeatherIcons.na;
   }
-  return BoxedIcon(
+  return WeatherIcon(
     icon,
     color: iconColor ?? CompanyColors.blue,
     size: iconSize,
