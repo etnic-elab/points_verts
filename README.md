@@ -144,6 +144,16 @@ storeFile=/path/to/your/key.jks
 
 ## Building and Releasing
 
+`tool/release.sh` runs all of the steps below in order, after checking the icon
+sources against `../points_verts_assets`:
+
+```bash
+tool/release.sh ios        # on macOS; produces build/ios/archive/Runner.xcarchive
+bash tool/release.sh android   # from Git Bash on Windows, or directly on macOS/Linux
+```
+
+Extra arguments are passed to `flutter build`. To do it by hand:
+
 1. Generate splash screen:
 
    ```bash
@@ -153,8 +163,18 @@ storeFile=/path/to/your/key.jks
 2. Generate launcher icons:
 
    ```bash
-   flutter pub run flutter_launcher_icons:main
+   dart run flutter_launcher_icons
    ```
+
+   **This is not optional, and it is not something git can do for you.** The
+   generated PNGs are gitignored (see [Missing Assets](#missing-assets)), so a
+   machine that has never run this — a fresh clone, or the Mac you archive
+   from — still has whatever icons were left on disk from last time. Version
+   1.7.1 shipped the old white, non-adapting icon exactly this way.
+
+   The `Verify App Icons` build phase on the Runner target fails any non-debug
+   iOS build when the icons don't match `Contents.json`, so you cannot archive
+   a stale icon by accident. If it fires, run the command above and rebuild.
 
 3. Build release version:
    - Android:

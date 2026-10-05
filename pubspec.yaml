@@ -64,6 +64,8 @@ dependencies:
 dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.0
+  # Used by the scripts in tool/ that derive the launcher-icon variants.
+  image: ^4.8.0
   very_good_analysis: ^10.0.0
   flutter_test:
     sdk: flutter
