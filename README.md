@@ -144,6 +144,16 @@ storeFile=/path/to/your/key.jks
 
 ## Building and Releasing
 
+`tool/release.sh` runs all of the steps below in order, after checking the icon
+sources against `../points_verts_assets`:
+
+```bash
+tool/release.sh ios        # on macOS; produces build/ios/archive/Runner.xcarchive
+bash tool/release.sh android   # from Git Bash on Windows, or directly on macOS/Linux
+```
+
+Extra arguments are passed to `flutter build`. To do it by hand:
+
 1. Generate splash screen:
 
    ```bash
