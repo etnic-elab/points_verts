@@ -363,3 +363,27 @@ String pathsAvailableExplanation() =>
 
 String walkDayOnlyPathsExplanation(Walk walk) =>
     "Les parcours de cette marche seront visibles sur la carte digitale de l'application le jour de la marche, le ${DateFormat.MMMMEEEEd("fr_BE").format(walk.date)}.";
+
+class PathsTooltip extends StatelessWidget {
+  const PathsTooltip({required this.message, required this.child, super.key});
+
+  final String message;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: message,
+      triggerMode: TooltipTriggerMode.tap,
+      showDuration: const Duration(seconds: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      decoration: BoxDecoration(
+        color: colorScheme.inverseSurface,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      textStyle: TextStyle(fontSize: 15.0, color: colorScheme.onInverseSurface),
+      child: child,
+    );
+  }
+}
