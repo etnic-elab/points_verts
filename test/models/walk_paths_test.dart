@@ -72,5 +72,12 @@ void main() {
           _walk(today.add(const Duration(days: 1)), [always, walkDayOnly]);
       expect(walk.visiblePaths, [always]);
     });
+
+    test('flags walk-day-only paths only before the day of the walk', () {
+      final tomorrow = today.add(const Duration(days: 1));
+      expect(_walk(tomorrow, [walkDayOnly]).hasWalkDayOnlyPaths, isTrue);
+      expect(_walk(tomorrow, [always]).hasWalkDayOnlyPaths, isFalse);
+      expect(_walk(today, [walkDayOnly]).hasWalkDayOnlyPaths, isFalse);
+    });
   });
 }

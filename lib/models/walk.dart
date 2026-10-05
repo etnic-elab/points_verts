@@ -263,6 +263,10 @@ class Walk {
   List<Path> get visiblePaths =>
       paths.where((path) => !path.walkDayOnly || isToday).toList();
 
+  // Paths that exist but will only be revealed on the day of the walk
+  bool get hasWalkDayOnlyPaths =>
+      !isToday && paths.any((path) => path.walkDayOnly);
+
   bool get hasPaths =>
       visiblePaths.firstWhereOrNull((path) => path.gpxPoints.isNotEmpty) !=
       null;

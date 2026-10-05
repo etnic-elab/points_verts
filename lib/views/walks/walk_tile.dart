@@ -6,6 +6,7 @@ import 'package:points_verts/views/walks/walk_info.dart';
 import '../../models/walk.dart';
 import 'geo_button.dart';
 import 'walk_details_view.dart';
+import 'walk_utils.dart';
 import '../../models/weather.dart';
 import '../../services/openweather.dart';
 
@@ -124,6 +125,8 @@ class WalkTile extends StatelessWidget {
 
     if (walk.visiblePaths.isNotEmpty) {
       info.add(const _ChipIcon(Icons.gps_fixed, 'Tracé GPX disponible'));
+    } else if (walk.hasWalkDayOnlyPaths) {
+      info.add(_WalkDayOnlyPathsChip(walk));
     }
 
     return info;
@@ -150,6 +153,34 @@ class _WeatherChip extends StatelessWidget {
         label: Text("${weather.temperature.round()}°",
             style: const TextStyle(fontSize: 12.0)),
         visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+}
+
+class _WalkDayOnlyPathsChip extends StatelessWidget {
+  const _WalkDayOnlyPathsChip(this.walk);
+
+  final Walk walk;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Tooltip(
+        message: walkDayOnlyPathsExplanation(walk),
+        triggerMode: TooltipTriggerMode.tap,
+        showDuration: const Duration(seconds: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 16.0),
+        textStyle: const TextStyle(fontSize: 15.0, color: Colors.white),
+        child: Chip(
+          avatar: Icon(Icons.gps_fixed,
+              size: 15.0,
+              color: Theme.of(context).textTheme.bodyLarge?.color),
+          label:
+              Text(pathsShortDate(walk), style: const TextStyle(fontSize: 12.0)),
+          visualDensity: VisualDensity.compact,
+        ),
       ),
     );
   }
