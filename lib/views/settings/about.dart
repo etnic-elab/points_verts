@@ -23,7 +23,7 @@ class About extends StatelessWidget {
                       context: context,
                       applicationIcon: Image(
                           image: Assets.asset
-                              .image(Theme.of(context).brightness, Assets.logo),
+                              .image(Theme.of(context).brightness, Assets.appLogo),
                           height: 50),
                       applicationName: applicationName,
                       applicationVersion: snapshot.data!.version,
