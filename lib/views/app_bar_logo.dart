@@ -11,7 +11,7 @@ class AppBarLogo extends StatelessWidget {
       padding: const EdgeInsets.only(right: 8.0),
       child: Image(
         height: 30.0,
-        image: Assets.asset.image(Theme.of(context).brightness, Assets.logo),
+        image: Assets.asset.image(Theme.of(context).brightness, Assets.appLogo),
         semanticLabel: "Logo Marches Adeps",
       ),
     );

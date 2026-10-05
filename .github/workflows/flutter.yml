@@ -21,11 +21,13 @@ jobs:
         run: |
           touch .env
           touch assets/walk_data.json
-          cp assets/dummy.png assets/light/splash.png
-          cp assets/dummy.png assets/dark/splash.png
-          cp assets/dummy_icon.png assets/launcher_icons/icon_1024x1024.png
-          cp assets/dummy_icon.png assets/launcher_icons/icon_1024x1024_dark.png
-          cp assets/dummy_icon.png assets/launcher_icons/icon_1024x1024_monochrome.png
+          mkdir -p assets/splash
+          cp assets/dummy_icon.png assets/splash/splash_icon.png
+          cp assets/dummy_icon.png assets/light/app_logo.png
+          cp assets/dummy_icon.png assets/dark/app_logo.png
+          cp assets/dummy_icon.png assets/launcher_icons/icon_1024.png
+          cp assets/dummy_icon.png assets/launcher_icons/icon_1024_foreground.png
+          cp assets/dummy_icon.png assets/launcher_icons/icon_1024_monochrome.png
           touch ios/Runner/GoogleMaps.plist
           echo "" >> ios/Runner/GoogleMaps.plist
       - name: create-json-ios
@@ -64,11 +66,13 @@ jobs:
         run: |
           touch .env
           touch assets/walk_data.json
-          cp assets/dummy.png assets/light/splash.png
-          cp assets/dummy.png assets/dark/splash.png
-          cp assets/dummy_icon.png assets/launcher_icons/icon_1024x1024.png
-          cp assets/dummy_icon.png assets/launcher_icons/icon_1024x1024_dark.png
-          cp assets/dummy_icon.png assets/launcher_icons/icon_1024x1024_monochrome.png
+          mkdir -p assets/splash
+          cp assets/dummy_icon.png assets/splash/splash_icon.png
+          cp assets/dummy_icon.png assets/light/app_logo.png
+          cp assets/dummy_icon.png assets/dark/app_logo.png
+          cp assets/dummy_icon.png assets/launcher_icons/icon_1024.png
+          cp assets/dummy_icon.png assets/launcher_icons/icon_1024_foreground.png
+          cp assets/dummy_icon.png assets/launcher_icons/icon_1024_monochrome.png
           touch ios/Runner/GoogleMaps.plist
           echo "" >> ios/Runner/GoogleMaps.plist
       - name: create-json-ios
