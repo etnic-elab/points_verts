@@ -253,6 +253,21 @@ class Walk {
 
   bool get isOrientation => type == 'Orientation';
 
+  bool get isToday {
+    final now = DateTime.now();
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
+  }
+
+  List<Path> get visiblePaths =>
+      paths.where((path) => !path.walkDayOnly || isToday).toList();
+
+  // Paths that exist but will only be revealed on the day of the walk
+  bool get hasWalkDayOnlyPaths =>
+      !isToday && paths.any((path) => path.walkDayOnly);
+
   bool get hasPaths =>
-      paths.firstWhereOrNull((path) => path.gpxPoints.isNotEmpty) != null;
+      visiblePaths.firstWhereOrNull((path) => path.gpxPoints.isNotEmpty) !=
+      null;
 }

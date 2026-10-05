@@ -34,7 +34,7 @@ class WalkDetailsMapView extends StatelessWidget {
       return Geolocation(latitude: walk.lat!, longitude: walk.long!);
     }
 
-    final firstPath = walk.paths.firstOrNull;
+    final firstPath = walk.visiblePaths.firstOrNull;
     final firstPoint = firstPath?.gpxPoints.firstOrNull;
 
     if (firstPoint != null) {
@@ -64,7 +64,7 @@ class WalkDetailsMapView extends StatelessWidget {
                     zoom: 11.5,
                     locationEnabled: true,
                     markers: _markers,
-                    paths: walk.paths,
+                    paths: walk.visiblePaths,
                     onTapMap: onTapMap,
                   ),
                 )
@@ -73,7 +73,7 @@ class WalkDetailsMapView extends StatelessWidget {
                   zoom: 11.5,
                   locationEnabled: true,
                   markers: _markers,
-                  paths: walk.paths,
+                  paths: walk.visiblePaths,
                   onTapMap: onTapMap,
                 );
         } else {

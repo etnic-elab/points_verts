@@ -8,6 +8,7 @@ import 'package:points_verts/locator.dart';
 import 'package:points_verts/models/walk.dart';
 import 'package:points_verts/views/loading.dart';
 import 'package:points_verts/views/walks/walk_details_info.dart';
+import 'package:points_verts/views/walks/walk_utils.dart';
 
 // Constants
 const double minMapHeight = 200.0;
@@ -79,59 +80,93 @@ class WalkDetailsInfoView extends StatelessWidget {
 
   Widget _buildTappableImage(
       BuildContext context, ImageProvider imageProvider, Function onTap) {
-    return Semantics(
-      excludeSemantics: true,
-      label: "Ouvrir la carte interactive",
-      button: true,
-      child: Ink.image(
-        image: imageProvider,
-        fit: BoxFit.cover,
-        child: Stack(
-          children: [
-            const Positioned(
-              bottom: 15.0,
-              right: 10.0,
-              child: FloatingActionButton.small(
-                onPressed: null,
-                child: Icon(Icons.zoom_out_map),
-              ),
-            ),
-            if (walk.hasPaths)
-              Positioned(
-                top: 10.0,
-                right: 10.0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0, vertical: 8.0),
-                  decoration: BoxDecoration(
-                    color: CompanyColors.orange.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    'Parcours disponibles',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          offset: const Offset(1.0, 1.0),
-                          blurRadius: 2.0,
-                          color: Colors.black.withValues(alpha: 0.5),
-                        ),
-                      ],
-                    ),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Semantics(
+          excludeSemantics: true,
+          label: "Ouvrir la carte interactive",
+          button: true,
+          child: Ink.image(
+            image: imageProvider,
+            fit: BoxFit.cover,
+            child: Stack(
+              children: [
+                const Positioned(
+                  bottom: 15.0,
+                  right: 10.0,
+                  child: FloatingActionButton.small(
+                    onPressed: null,
+                    child: Icon(Icons.zoom_out_map),
                   ),
                 ),
+                InkWell(onTap: () => onTap())
+              ],
+            ),
+          ),
+        ),
+        if (walk.hasPaths || walk.hasWalkDayOnlyPaths)
+          Positioned(
+            top: 10.0,
+            right: 10.0,
+            child: _PathsBadge(walk),
+          ),
+      ],
+    );
+  }
+}
+
+class _PathsBadge extends StatelessWidget {
+  const _PathsBadge(this.walk);
+
+  final Walk walk;
+
+  @override
+  Widget build(BuildContext context) {
+    const shadow = Shadow(
+      offset: Offset(1.0, 1.0),
+      blurRadius: 2.0,
+      color: Color(0x80000000),
+    );
+
+    return Tooltip(
+      message: walk.hasPaths
+          ? pathsAvailableExplanation()
+          : walkDayOnlyPathsExplanation(walk),
+      triggerMode: TooltipTriggerMode.tap,
+      showDuration: const Duration(seconds: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      textStyle: const TextStyle(fontSize: 15.0, color: Colors.white),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        decoration: BoxDecoration(
+          color: CompanyColors.orange.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              walk.hasPaths
+                  ? 'Parcours disponibles'
+                  : 'Parcours visibles le ${pathsShortDate(walk)}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+                shadows: [shadow],
               ),
-            InkWell(onTap: () => onTap())
+            ),
+            const SizedBox(width: 6.0),
+            const Icon(Icons.info_outline,
+                color: Colors.white, size: 18.0, shadows: [shadow]),
           ],
         ),
       ),
@@ -166,7 +201,7 @@ class MapUtils {
           iconUrl: _getIconUrl(walk, brightness),
         )
       ],
-      paths: walk.paths
+      paths: walk.visiblePaths
           .where((path) => path.encodablePoints.isNotEmpty)
           .map((path) => MapPath(
                 points: path.encodablePoints,

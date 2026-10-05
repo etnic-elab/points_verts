@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:maps_api/maps_api.dart';
 import 'package:maps_repository/maps_repository.dart';
@@ -353,3 +354,12 @@ Future<void> _fixNextWalks() async {
     log("Couldn't fix next walks, $err", name: tag);
   }
 }
+
+String pathsShortDate(Walk walk) =>
+    DateFormat("dd/MM", "fr_BE").format(walk.date);
+
+String pathsAvailableExplanation() =>
+    "Touchez la carte pour voir les parcours de la marche sur la carte digitale de l'application.";
+
+String walkDayOnlyPathsExplanation(Walk walk) =>
+    "Les parcours de cette marche seront visibles sur la carte digitale de l'application le jour de la marche, le ${DateFormat.MMMMEEEEd("fr_BE").format(walk.date)}.";

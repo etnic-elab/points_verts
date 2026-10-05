@@ -43,7 +43,7 @@ class _WalkDetailsViewState extends State<WalkDetailsView> {
   Future<List> _retrievePaths() {
     List<Future> futures = [];
     if (!widget.walk.isCancelled) {
-      for (Path path in widget.walk.paths) {
+      for (Path path in widget.walk.visiblePaths) {
         if ((path.url?.isNotEmpty ?? false) && path.gpxPoints.isEmpty) {
           Future<List<GpxPoint>> future = retrieveGpxPoints(path.url!);
           future.then((List<GpxPoint> gpxPoints) {
@@ -184,7 +184,7 @@ class __BottomSheet extends State<_BottomSheet> {
       leading: Icon(Icons.route),
       title: Text('Les parcours'),
     );
-    List<Widget> paths = widget.walk.paths.reversed
+    List<Widget> paths = widget.walk.visiblePaths.reversed
         .map((path) => path.gpxPoints.isNotEmpty
             ? SwitchListTile(
                 title: Text(
