@@ -14,11 +14,17 @@ class Elevation {
 }
 
 class Path implements Comparable<Path> {
-  Path({required this.url, required this.title, required this.type});
+  Path(
+      {required this.url,
+      required this.title,
+      required this.type,
+      this.walkDayOnly = false});
 
   final String? url;
   final String title;
   final String? type;
+  // 'jourdemarche' = 1: only shown on the day of the walk
+  final bool walkDayOnly;
   bool visible = false;
   List<GpxPoint> gpxPoints = [];
   Elevation? elevation;
@@ -33,18 +39,24 @@ class Path implements Comparable<Path> {
       url: url,
       title: json['titre'] as String? ?? 'Parcours',
       type: json['couleur'] as String? ?? '',
+      walkDayOnly: _parseWalkDayOnly(json),
     );
   }
 
   Path.fromJson(Map<String, dynamic> json)
       : url = json['fichier'],
         title = json['titre'] ?? 'Parcours',
-        type = json['couleur'];
+        type = json['couleur'],
+        walkDayOnly = _parseWalkDayOnly(json);
+
+  static bool _parseWalkDayOnly(Map<String, dynamic> json) =>
+      json['jourdemarche']?.toString() == '1';
 
   Map<String, dynamic> toJson() => {
         'fichier': url,
         'titre': title,
         'couleur': type,
+        'jourdemarche': walkDayOnly ? '1' : '0',
       };
 
   // 1=Bleu (Parcours 5km)
