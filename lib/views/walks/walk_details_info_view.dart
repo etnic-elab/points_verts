@@ -180,9 +180,9 @@ class MapUtils {
   static String _getIconUrl(Walk walk, Brightness brightness) {
     if (walk.isCancelled) {
       return (brightness == Brightness.dark)
-          ? publicLogoCancelledDark
-          : publicLogoCancelledLight;
+          ? cancelledWalkMarkerUrlDark
+          : cancelledWalkMarkerUrlLight;
     }
-    return publicLogo;
+    return walkMarkerUrl;
   }
 }

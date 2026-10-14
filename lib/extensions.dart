@@ -56,10 +56,10 @@ extension GoogleMapIconsX on GoogleMapIcons {
     switch (this) {
       case GoogleMapIcons.unselectedWalkIcon:
       case GoogleMapIcons.unselectedCancelIcon:
-        return CompanyColors.darkGreen;
+        return CompanyColors.walkMarkerRing(selected: false);
       case GoogleMapIcons.selectedWalkIcon:
       case GoogleMapIcons.selectedCancelIcon:
-        return CompanyColors.lightestGreen;
+        return CompanyColors.walkMarkerRing(selected: true);
     }
   }
 }

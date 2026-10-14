@@ -183,9 +183,13 @@ Commit the results in points_verts_assets, then run a release build as above.
 The generator renders with [resvg](https://github.com/yisibl/resvg-js) through
 `npx`, so it needs Node.js. Builds themselves don't.
 
-The Play Store listing icon (`assets/store/play_store_icon_512.png` in
-points_verts_assets) is uploaded by hand in the Play Console. The App Store
-takes its icon from the build.
+Two outputs are uploaded by hand, since nothing in the build carries them:
+
+- `assets/store/play_store_icon_512.png`: the Play Store listing icon, in the
+  Play Console. The App Store takes its icon from the build.
+- `web/walk_marker*_32.png`: the walk markers on the static map of a walk's
+  details, at the root of the public site (`_publicUrl` in
+  `lib/company_data.dart`). The map provider fetches them by URL.
 
 ## Initial Walk Dataset
 
@@ -200,7 +204,7 @@ It lives in points_verts_assets, and `tool/sync_assets.sh` copies it here:
 
   ```
   assets/{light,dark}/app_logo.png         app icon tile (app bar, About)
-  assets/{light,dark}/logo.png             green disc, the walk symbol
+  assets/{light,dark}/logo.png             walk symbol (walk icons, map markers)
   assets/{light,dark}/logo-annule.png      the same, for cancelled walks
   assets/launcher_icons/                   launcher-icon masters
   assets/splash/                           splash image

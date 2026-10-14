@@ -51,17 +51,17 @@ mirror() {
   done
 }
 
-# Rendered from assets/brand/app_icon.svg by tool/build_brand_assets.dart.
+# All rendered from assets/brand/app_icon.svg by tool/build_brand_assets.dart.
 mirror assets/launcher_icons
 mirror assets/splash
 for theme in light dark; do
   copy "assets/$theme/app_logo.png"
-  # The green disc: the Points Verts walk symbol (walk icons, map markers).
+  # Walk symbol (walk icons, map markers), plain and cancelled.
   copy "assets/$theme/logo.png"
   copy "assets/$theme/logo-annule.png"
 done
 
-# Hand-made Android notification icon.
+# Android notification icon.
 for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
   copy "android/app/src/main/res/drawable-$density/ic_notification.png"
 done
