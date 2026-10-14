@@ -216,6 +216,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		02F792529056304A318017F1 /* [firebase_crashlytics] Crashlytics Upload Symbols */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -232,7 +233,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$PODS_ROOT/FirebaseCrashlytics/upload-symbols\" --flutter-project \"$PROJECT_DIR/firebase_app_id_file.json\" ";
+			shellScript = "/bin/sh \"$SRCROOT/Scripts/crashlytics_upload_symbols.sh\"\n";
 		};
 		1C0FE1CA0000000000000001 /* Verify App Icons */ = {
 			isa = PBXShellScriptBuildPhase;
