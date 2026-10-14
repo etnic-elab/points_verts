@@ -26,6 +26,17 @@ import '../../models/walk.dart';
 
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
+/// Map apps offered by [launchGeoApp]. Keep in sync with
+/// LSApplicationQueriesSchemes in ios/Runner/Info.plist (Apple Maps needs none).
+const List<ml.MapApp> _supportedMapApps = [
+  ml.MapApp.apple,
+  ml.MapApp.google,
+  ml.MapApp.waze,
+  ml.MapApp.mapswithme,
+  ml.MapApp.osmand,
+  ml.MapApp.here,
+];
+
 /// Opens the walk's meeting point as a marker (place) in an external map app.
 ///
 /// Shows the destination as a pin with the address visible — the user can
@@ -37,11 +48,18 @@ const String tag = "dev.alpagaga.points_verts.WalksUtils";
 Future<void> launchGeoApp(BuildContext context, Walk walk) async {
   if (!walk.hasPosition) return;
 
-  final destination = ml.Coords(walk.lat!, walk.long!);
-  final markerTitle = walk.meetingPoint ?? walk.city;
+  final marker = ml.MapLauncher.marker(
+    ml.Location.coords(
+      walk.lat!,
+      walk.long!,
+      title: walk.meetingPoint ?? walk.city,
+    ),
+  );
 
   try {
-    final installed = await ml.MapLauncher.installedMaps;
+    final installed = (await marker.getSupportedMaps(_supportedMapApps))
+        .where((map) => map.isInstalled)
+        .toList();
 
     if (installed.isEmpty) {
       // Defensive: if no maps are detected (emulator without Maps app etc.),
@@ -60,11 +78,7 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
     }
 
     if (installed.length == 1) {
-      await installed.first.showMarker(
-        coords: destination,
-        title: markerTitle,
-        description: walk.city,
-      );
+      await installed.first.show();
       return;
     }
 
@@ -85,14 +99,10 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
             for (final map in installed)
               ListTile(
                 leading: const Icon(Icons.location_on),
-                title: Text(map.mapName),
+                title: Text(map.name),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
-                  map.showMarker(
-                    coords: destination,
-                    title: markerTitle,
-                    description: walk.city,
-                  );
+                  map.show();
                 },
               ),
           ],
