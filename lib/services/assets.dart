@@ -8,6 +8,7 @@ class Assets {
   Assets._();
   static final Assets asset = Assets._();
 
+  static const String appLogo = 'app_logo.png';
   static const String logo = 'logo.png';
   static const String logoAnnule = 'logo-annule.png';
   static const String googleMapStyle = 'google_map_style.json';

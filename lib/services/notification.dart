@@ -117,7 +117,7 @@ class NotificationManager {
           'Indique la veille la prochaine marche Adeps la plus proche de votre domicile',
       importance: Importance.max,
       priority: Priority.high,
-      color: CompanyColors.orange,
+      color: CompanyColors.navy,
       ticker: 'ticker',
     );
     var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();

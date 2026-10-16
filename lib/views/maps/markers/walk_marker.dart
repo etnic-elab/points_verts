@@ -26,10 +26,7 @@ class WalkMarker implements MarkerInterface {
       child: RawMaterialButton(
         shape: const CircleBorder(),
         elevation: selectedWalk == walk ? 5.0 : 2.0,
-        fillColor:
-            selectedWalk == walk
-                ? CompanyColors.lightestGreen
-                : CompanyColors.darkGreen,
+        fillColor: CompanyColors.walkMarkerRing(selected: selectedWalk == walk),
         onPressed: () {
           if (onWalkSelect != null) {
             onWalkSelect!(walk);

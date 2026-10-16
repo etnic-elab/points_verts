@@ -13,9 +13,10 @@
 # generator against the new config. This script makes regenerating part of
 # building, so that can't be forgotten.
 #
-# It can't make the *sources* current: assets/launcher_icons/ comes from the
-# points_verts_assets repo. When that repo is checked out next to this one, the
-# masters are compared against it and the build stops if they differ.
+# The artwork itself lives in the points_verts_assets repo, which must be
+# checked out next to this one. The script stops if that repo is behind its
+# remote or its images no longer match the SVG master, then copies the artwork
+# across with tool/sync_assets.sh instead of trusting what is on disk.
 
 set -euo pipefail
 
@@ -43,32 +44,34 @@ cd "$(dirname "$0")/.."
 
 step() { printf '\n==> %s\n' "$1"; }
 
-step "Checking icon sources"
-# Every master the generator reads, taken from its own config so the two can't
-# disagree.
-masters=$(grep -o 'assets/launcher_icons/[^"]*' flutter_launcher_icons.yaml | sort -u)
 ASSETS_REPO="../points_verts_assets"
-for master in $masters; do
-  if [ ! -f "$master" ]; then
-    echo "error: $master is missing. Copy assets/launcher_icons/ from points_verts_assets." >&2
+
+step "Checking $ASSETS_REPO is up to date"
+if [ ! -d "$ASSETS_REPO/.git" ]; then
+  echo "error: $ASSETS_REPO not found. Clone points_verts_assets next to this repo." >&2
+  exit 1
+fi
+if git -C "$ASSETS_REPO" fetch -q 2>/dev/null; then
+  behind=$(git -C "$ASSETS_REPO" rev-list --count 'HEAD..@{u}' 2>/dev/null || echo 0)
+  if [ "$behind" -gt 0 ]; then
+    echo "error: $ASSETS_REPO is $behind commit(s) behind its remote. Pull it first." >&2
     exit 1
   fi
-  if [ -d "$ASSETS_REPO" ] && ! cmp -s "$master" "$ASSETS_REPO/$master"; then
-    echo "error: $master differs from $ASSETS_REPO/$master." >&2
-    echo "       Pull points_verts_assets and copy assets/launcher_icons/ across." >&2
-    exit 1
-  fi
-done
-if [ -d "$ASSETS_REPO" ]; then
-  echo "Masters match $ASSETS_REPO (make sure it is pulled)."
+  echo "Up to date with its remote."
 else
-  echo "warning: $ASSETS_REPO not found, so the masters can't be checked for staleness." >&2
+  echo "warning: couldn't reach $ASSETS_REPO's remote; using it as it is." >&2
 fi
 
-tracked_before=$(git status --porcelain --untracked-files=no)
+tracked_before=$(git status --porcelain --untracked-files=no | sort)
 
 step "Fetching packages"
 flutter pub get
+
+step "Checking brand images against the SVG master"
+dart run tool/build_brand_assets.dart --check --assets-repo "$ASSETS_REPO"
+
+step "Syncing artwork from $ASSETS_REPO"
+bash tool/sync_assets.sh "$ASSETS_REPO"
 
 step "Generating splash screens"
 dart run flutter_native_splash:create
@@ -85,12 +88,13 @@ fi
 
 # The generators also write a few tracked files (Contents.json, ic_launcher.xml,
 # styles.xml...). They normally come out identical; if not, say so rather than
-# leaving a surprise in git status.
-tracked_after=$(git status --porcelain --untracked-files=no)
-if [ "$tracked_after" != "$tracked_before" ]; then
+# leaving a surprise in git status. Only files this run changed are listed.
+tracked_after=$(git status --porcelain --untracked-files=no | sort)
+changed_by_run=$(comm -13 <(echo "$tracked_before") <(echo "$tracked_after"))
+if [ -n "$changed_by_run" ]; then
   echo
   echo "warning: generating changed tracked files - review and commit them:" >&2
-  echo "$tracked_after" >&2
+  echo "$changed_by_run" >&2
 fi
 
 step "Building: ${BUILD[*]}"

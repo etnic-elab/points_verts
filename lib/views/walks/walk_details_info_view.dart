@@ -61,20 +61,34 @@ class WalkDetailsInfoView extends StatelessWidget {
     BuildContext context, {
     required Size mapSize,
   }) {
-    final url = MapUtils.getStaticMapUrl(context, walk, mapSize);
-    return _buildStaticImage(url: url, onTap: onTapMap);
+    // The walk marker is hosted on the public site and fetched by the map
+    // provider, which rejects the whole image when it can't get it. Fall back
+    // to the provider's own pin rather than lose the map. (A provider without
+    // custom markers gives the same URL twice; the set keeps one.)
+    final urls = {
+      MapUtils.getStaticMapUrl(context, walk, mapSize),
+      MapUtils.getStaticMapUrl(context, walk, mapSize, customMarker: false),
+    }.toList();
+    return _buildStaticImage(urls: urls, onTap: onTapMap);
   }
 
-  Widget _buildStaticImage({required String url, required Function onTap}) {
+  /// Shows the first of [urls] that loads; if none does, a placeholder that
+  /// still opens the interactive map.
+  Widget _buildStaticImage({
+    required List<String> urls,
+    required Function onTap,
+  }) {
     return CachedNetworkImage(
       fit: BoxFit.cover,
-      imageUrl: url,
+      imageUrl: urls.first,
       imageBuilder: (context, imageProvider) =>
           _buildTappableImage(context, imageProvider, onTap),
       progressIndicatorBuilder: (context, url, progress) => Center(
         child: CircularProgressIndicator(value: progress.progress),
       ),
-      errorWidget: (context, url, error) => const Icon(Icons.error),
+      errorWidget: (context, url, error) => urls.length > 1
+          ? _buildStaticImage(urls: urls.sublist(1), onTap: onTap)
+          : _MapUnavailable(onTap: onTap),
     );
   }
 
@@ -112,6 +126,43 @@ class WalkDetailsInfoView extends StatelessWidget {
             child: _PathsBadge(walk),
           ),
       ],
+    );
+  }
+}
+
+class _MapUnavailable extends StatelessWidget {
+  const _MapUnavailable({required this.onTap});
+
+  final Function onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Material(
+      color: colors.surfaceContainerHighest,
+      child: InkWell(
+        onTap: () => onTap(),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.map_outlined, color: colors.onSurfaceVariant),
+              const SizedBox(height: 8.0),
+              Text(
+                "Aperçu de la carte indisponible",
+                style: textTheme.bodyMedium
+                    ?.copyWith(color: colors.onSurfaceVariant),
+              ),
+              Text(
+                "Touchez pour ouvrir la carte interactive",
+                style: textTheme.bodySmall
+                    ?.copyWith(color: colors.onSurfaceVariant),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -181,7 +232,14 @@ class MapUtils {
     );
   }
 
-  static String getStaticMapUrl(BuildContext context, Walk walk, Size mapSize) {
+  /// With [customMarker] false the walk gets the map provider's own pin
+  /// instead of our hosted marker image.
+  static String getStaticMapUrl(
+    BuildContext context,
+    Walk walk,
+    Size mapSize, {
+    bool customMarker = true,
+  }) {
     final mapsRepository = locator<MapsRepository>();
     final brightness = Theme.of(context).brightness;
 
@@ -194,7 +252,7 @@ class MapUtils {
             longitude: walk.long ?? 0,
             latitude: walk.lat ?? 0,
           ),
-          iconUrl: _getIconUrl(walk, brightness),
+          iconUrl: customMarker ? _getIconUrl(walk, brightness) : null,
         )
       ],
       paths: walk.visiblePaths
@@ -211,9 +269,9 @@ class MapUtils {
   static String _getIconUrl(Walk walk, Brightness brightness) {
     if (walk.isCancelled) {
       return (brightness == Brightness.dark)
-          ? publicLogoCancelledDark
-          : publicLogoCancelledLight;
+          ? cancelledWalkMarkerUrlDark
+          : cancelledWalkMarkerUrlLight;
     }
-    return publicLogo;
+    return walkMarkerUrl;
   }
 }

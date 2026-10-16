@@ -1,0 +1,11 @@
+# Files rewritten by flutter_launcher_icons / flutter_native_splash. The
+# generators always write LF; checking these out as CRLF on Windows made every
+# regeneration show up as a change in git status.
+android/app/src/main/res/**/launch_background.xml text eol=lf
+android/app/src/main/res/**/styles.xml text eol=lf
+android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml text eol=lf
+android/app/src/main/res/values/colors.xml text eol=lf
+ios/Runner/Info.plist text eol=lf
+ios/Runner/Base.lproj/LaunchScreen.storyboard text eol=lf
+ios/Runner.xcodeproj/project.pbxproj text eol=lf
+ios/Runner/Assets.xcassets/**/Contents.json text eol=lf

@@ -9,11 +9,15 @@ const String _publicUrl = "https://adeps-points-verts.innovation-etnic.be";
 const String assistanceUrl = "$_publicUrl/assistance.html";
 const String privacyUrl = "$_publicUrl/privacy.html";
 const String accessibilityUrl = "$_publicUrl/accessibilite.html";
-const String publicLogo = "$_publicUrl/logo_50x50.png";
-const String publicLogoCancelledLight =
-    "$_publicUrl/logo_cancelled_light_50x50.png";
-const String publicLogoCancelledDark =
-    "$_publicUrl/logo_cancelled_dark_50x50.png";
+// Walk markers for static map images: the map provider fetches them by URL,
+// so they are hosted on the public site. Rendered by
+// tool/build_brand_assets.dart (web/ in points_verts_assets) and uploaded by
+// hand.
+const String walkMarkerUrl = "$_publicUrl/walk_marker_32.png";
+const String cancelledWalkMarkerUrlLight =
+    "$_publicUrl/walk_marker_cancelled_light_32.png";
+const String cancelledWalkMarkerUrlDark =
+    "$_publicUrl/walk_marker_cancelled_dark_32.png";
 
 class CompanyColors {
   static const greenPrimary = Color(0xFF6CB233);
@@ -35,8 +39,18 @@ class CompanyColors {
   static const lightRed = Color(0xFFF03B33);
   static const darkRed = Color(0xFF811620);
 
+  /// The app icon's navy and orange.
+  static const navy = Color(0xFF002F69);
+  static const lightOrange = Color(0xFFED9E41);
+
   static Color contextualRed(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark ? lightRed : red;
+  }
+
+  /// Ring around a walk marker on the map: navy, like the marker itself, or
+  /// orange to pick out the selected walk.
+  static Color walkMarkerRing({required bool selected}) {
+    return selected ? lightOrange : navy;
   }
 }
 
