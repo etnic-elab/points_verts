@@ -1,12 +1,11 @@
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart' as http;
-import 'package:points_verts/services/http_client.dart';
 
 class CacheHttpFileService extends FileService {
   late http.Client _httpClient;
   int? _maxAge;
   CacheHttpFileService(Duration duration, {http.Client? httpClient}) {
-    _httpClient = httpClient ?? createTrustedHttpClient();
+    _httpClient = httpClient ?? http.Client();
     _maxAge = duration.inSeconds;
   }
 

@@ -61,7 +61,8 @@ void main() async {
     await FirebaseLocalService.initialize(isForeground: true);
     await Future.wait([
       if (kDeleteData) _deleteData(),
-      _addTrustedCert(Assets.letsEncryptCert)
+      _addTrustedCert(Assets.letsEncryptCert),
+      _addTrustedCert(Assets.sectigoRootR46Cert),
     ]);
     setupLocator();
     AppCacheRegistry.initializeCaches();

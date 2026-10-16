@@ -15,6 +15,10 @@ class Assets {
   static const String googleMapStaticStyle = 'google_map_style_static.txt';
   static const String letsEncryptCert = 'assets/raw/isrgrootx1.pem';
 
+  /// Root of www.am-sport.cfwb.be's certificate chain. Recent, so missing
+  /// from the trust store of older Android versions.
+  static const String sectigoRootR46Cert = 'assets/raw/sectigo_r46.pem';
+
   String _path(Brightness brightness, String asset) {
     return 'assets/${brightness.toString().split('.').last}/$asset';
   }
