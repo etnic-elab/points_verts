@@ -14,7 +14,7 @@ class FireCrashlyticsTest extends StatefulWidget {
 }
 
 class _FireCrashlyticsTestState extends State<FireCrashlyticsTest> {
-  late Future<void> _initializeFlutterFireFuture;
+  late Future<bool> _initializeFlutterFireFuture;
 
   Future<void> _testAsyncErrorOnInit() async {
     Future<void>.delayed(const Duration(seconds: 2), () {
@@ -23,11 +23,15 @@ class _FireCrashlyticsTestState extends State<FireCrashlyticsTest> {
     });
   }
 
-  // Define an async function to initialize FlutterFire
-  Future<void> _initializeFlutterFire() async {
+  /// Never overrides the user's choice: with diagnostics turned off in the
+  /// settings, this page sends nothing to Crashlytics. Returns whether it may.
+  Future<bool> _initializeFlutterFire() async {
+    final enabled =
+        await PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled);
+    if (!enabled) return false;
     FirebaseCrashlytics.instance.setCustomKey('test', true);
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     await _testAsyncErrorOnInit();
+    return true;
   }
 
   @override
@@ -37,21 +41,19 @@ class _FireCrashlyticsTestState extends State<FireCrashlyticsTest> {
   }
 
   @override
+  void dispose() {
+    // Errors reported after leaving this page are real ones again.
+    FirebaseCrashlytics.instance.setCustomKey('test', false);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return PopScope(
-      onPopInvokedWithResult: (bool didPop, _) async {
-        bool crashlyticsEnabled =
-            await PrefsProvider.prefs.getBoolean(Prefs.crashlyticsEnabled);
-        if (!crashlyticsEnabled) {
-          _closeAppDialog();
-          return;
-        }
-      },
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: const Text('Crashlytics example app'),
         ),
-        body: FutureBuilder(
+        body: FutureBuilder<bool>(
           future: _initializeFlutterFireFuture,
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
@@ -59,6 +61,18 @@ class _FireCrashlyticsTestState extends State<FireCrashlyticsTest> {
                 if (snapshot.hasError) {
                   return Center(
                     child: Text('Error: ${snapshot.error}'),
+                  );
+                }
+                if (snapshot.data != true) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text(
+                        "L'envoi des données de diagnostic est désactivé. "
+                        "Activez-le dans les paramètres pour utiliser cette page.",
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   );
                 }
                 return Center(
@@ -191,27 +205,6 @@ class _FireCrashlyticsTestState extends State<FireCrashlyticsTest> {
                 return const Center(child: Text('Loading'));
             }
           },
-        ),
-      ),
-    );
-  }
-
-  Future<void> _closeAppDialog() {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: const Text('Diagnostic'),
-              content:
-                  const Text("Veuillez fermer l'application pour continuer"),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ]);
-        });
+        ));
   }
 }
