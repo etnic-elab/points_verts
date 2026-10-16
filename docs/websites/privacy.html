@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>ADEPS Points Verts - Charte de la vie privée</title>
+  <title>Marches Adeps - Charte de la vie privée</title>
 
   <script type="text/javascript" src="assets/beacon.js"></script>
   <link rel="stylesheet" href="assets/bulma.css" />
@@ -15,7 +15,7 @@
     <div class="container">
       <div class="navbar-brand">
         <div class="navbar-item">
-          <strong>ADEPS Points Verts - Charte de la vie privée</strong>
+          <strong>Marches Adeps - Charte de la vie privée</strong>
         </div>
       </div>
     </div>
@@ -24,50 +24,198 @@
     <div class="section">
       <div class="content">
         <p>
-          La présente (courte) charte indique de quelle façon vos données
-          personnelles sont traitées lors de l'utilisation de l'application
-          "ADEPS Points Verts".
+          Cette charte explique quelles données l'application "Marches Adeps" utilise,
+          à quels services elles sont transmises et ce qui reste sur votre appareil.
         </p>
 
         <p>
-          L'application "ADEPS Points Verts" ne récolte aucune information personnelle.
-          L'exception suivante s'applique afin de vous fournir un service amélioré.
+          L'application ne demande aucun compte, ni nom, ni adresse e-mail. Aucun serveur
+          de l'ETNIC ne reçoit vos données&nbsp;: elles restent sur votre appareil, sauf
+          dans les cas décrits ci-dessous, où elles sont envoyées directement au service
+          concerné. Comme pour toute connexion à internet, chacun de ces services reçoit
+          aussi l'adresse IP de votre appareil.
         </p>
 
         <p>
-          Pour plus d'information concernant la charte de la vie privée :
-          <a href="mailto:anita.mathieu@cfwb.be">anita.mathieu@cfwb.be</a>
+          Pour toute question concernant cette charte ou vos données&nbsp;:
+          <a href="mailto:innovation@etnic.be">innovation@etnic.be</a>
         </p>
       </div>
 
-      <h2 class="subtitle">Position</h2>
+      <h2 class="subtitle">Votre position actuelle</h2>
 
       <div class="content">
         <p>
-          Afin de personnaliser la liste des points verts, l'application peut vous
-          demander d'utiliser votre position actuelle ou de lui indiquer l'adresse de votre domicile.
+          Lorsque vous activez l'option "Ma position actuelle" ou que vous ouvrez la carte
+          interactive d'une marche, l'application vous demande l'accès à votre position,
+          uniquement pendant son utilisation. Cette position sert à trier les marches de la
+          plus proche à la plus éloignée et à l'afficher sur la carte.
         </p>
 
         <p>
-          Cette information est utilisée à la suite de votre consentement (position actuelle)
-          ou à l'encodage d'une adresse (ex: domicile).
+          Le calcul se fait sur votre appareil&nbsp;: l'application n'enregistre pas votre
+          position et ne l'envoie à aucun service. Lorsque vous ouvrez la carte interactive
+          d'une marche, votre position peut y être affichée par le service de carte de
+          Google (voir plus bas).
+        </p>
+      </div>
+
+      <h2 class="subtitle">Votre domicile</h2>
+
+      <div class="content">
+        <p>
+          Vous pouvez indiquer l'adresse de votre domicile pour trier les marches par
+          distance et recevoir des notifications.
+        </p>
+
+        <ul>
+          <li>
+            Pendant que vous tapez l'adresse, le texte saisi et le pays choisi sont envoyés
+            au service Azure Maps de Microsoft, qui propose des adresses correspondantes.
+          </li>
+          <li>
+            L'adresse choisie et ses coordonnées sont enregistrées sur votre appareil.
+          </li>
+          <li>
+            Pour afficher la distance et la durée en voiture jusqu'aux marches les plus
+            proches, les coordonnées de votre domicile et celles de quatre marches au plus
+            sont envoyées à Azure Maps. Les résultats sont conservés sur votre appareil
+            jusqu'au lendemain de la date des marches concernées.
+          </li>
+        </ul>
+
+        <p>
+          Vous pouvez supprimer votre domicile à tout moment dans les paramètres de
+          l'application.
+        </p>
+      </div>
+
+      <h2 class="subtitle">Notifications</h2>
+
+      <div class="content">
+        <p>
+          Si vous activez "Notifier la veille", l'application choisit sur votre appareil la
+          marche la plus proche de votre domicile et vous la signale la veille. Pour garder
+          la liste à jour, elle télécharge régulièrement les marches en arrière-plan. Aucune
+          donnée vous concernant n'est envoyée pour cela, en dehors de la demande de météo
+          pour la marche choisie (voir ci-dessous).
+        </p>
+      </div>
+
+      <h2 class="subtitle">Marches, cartes et météo</h2>
+
+      <div class="content">
+        <ul>
+          <li>
+            La liste des marches provient de l'Open Data Wallonie-Bruxelles et du site de
+            l'Adeps. Ces requêtes ne contiennent aucune donnée vous concernant.
+          </li>
+          <li>
+            Les prévisions météo sont demandées à OpenWeather pour les coordonnées des
+            marches affichées en tête de liste. Comme la liste est triée par distance, ces
+            marches sont celles qui sont proches de vous.
+          </li>
+          <li>
+            La carte affichée dans le détail d'une marche est produite par Azure Maps à
+            partir des coordonnées de la marche.
+          </li>
+          <li>
+            La carte interactive est fournie par Google Maps. Google reçoit les demandes
+            d'affichage de la zone que vous consultez, ainsi que les données techniques que
+            son service collecte selon ses propres conditions.
+          </li>
+        </ul>
+      </div>
+
+      <h2 class="subtitle">Rapports de plantage (Firebase Crashlytics)</h2>
+
+      <div class="content">
+        <p>
+          Au premier lancement, l'application vous demande si vous acceptez l'envoi de
+          données de diagnostic. Uniquement si vous l'acceptez, elle envoie à Firebase
+          Crashlytics (Google) un rapport lorsqu'elle rencontre une erreur&nbsp;: la
+          description de l'erreur, le modèle de l'appareil, la version du système et de
+          l'application, et un identifiant aléatoire de l'installation. Ces rapports ne
+          contiennent ni votre adresse ni votre position.
         </p>
 
         <p>
-          La localisation est ensuite transmise au service Google Maps Platform en vue de
-          calculer les distances entre ces points et le point de départ des marches.
+          Vous pouvez changer d'avis à tout moment dans les paramètres
+          ("Diagnostic", "Envoi de rapports").
+        </p>
+      </div>
+
+      <h2 class="subtitle">Configuration et messages (Firebase)</h2>
+
+      <div class="content">
+        <p>
+          À chaque démarrage, l'application télécharge sa configuration auprès de Firebase
+          Remote Config et vérifie s'il y a un message d'information à afficher (Firebase
+          In-App Messaging). Pour cela, Google reçoit un identifiant aléatoire de
+          l'installation (Firebase Installations), la version de l'application, le type de
+          système et la langue de l'appareil. Ces services fonctionnent indépendamment du
+          choix concernant les rapports de plantage.
+        </p>
+      </div>
+
+      <h2 class="subtitle">Ce qui reste sur votre appareil</h2>
+
+      <div class="content">
+        <ul>
+          <li>votre domicile (adresse et coordonnées), si vous l'avez indiqué&nbsp;;</li>
+          <li>vos préférences (filtres, options, notifications)&nbsp;;</li>
+          <li>la liste des marches et les données téléchargées pour elles (météo, parcours, distances).</li>
+        </ul>
+
+        <p>
+          Ces données ne sont pas sauvegardées par l'application en dehors de votre
+          appareil. Elles sont supprimées si vous désinstallez l'application.
         </p>
 
         <p>
-          La charte de la vie privée de Google Maps Platform est disponible à cette
-          adresse&nbsp;:
-          <a href="https://cloud.google.com/maps-platform/terms"
-            target="_blank">https://cloud.google.com/maps-platform/terms</a>.
+          Lorsque vous ajoutez une marche à votre agenda, l'application ouvre l'agenda de
+          votre appareil avec les informations de la marche. Elle ne lit pas votre agenda.
+          Les liens vers une application de navigation, le téléphone ou un site web ouvrent
+          l'application ou le site concerné, qui applique ses propres règles.
         </p>
+      </div>
+
+      <h2 class="subtitle">Ce site</h2>
+
+      <div class="content">
+        <p>
+          Les pages de ce site utilisent Cloudflare Web Analytics, qui compte les visites
+          sans cookie et sans suivre les visiteurs d'un site à l'autre.
+        </p>
+      </div>
+
+      <h2 class="subtitle">Services utilisés et vos droits</h2>
+
+      <div class="content">
+        <p>Les services cités appliquent leur propre politique de confidentialité&nbsp;:</p>
+
+        <ul>
+          <li>Microsoft (Azure Maps)&nbsp;:
+            <a href="https://privacy.microsoft.com/fr-fr/privacystatement"
+              target="_blank">privacy.microsoft.com/fr-fr/privacystatement</a></li>
+          <li>Google (Google Maps et Firebase)&nbsp;:
+            <a href="https://policies.google.com/privacy?hl=fr"
+              target="_blank">policies.google.com/privacy</a> et
+            <a href="https://firebase.google.com/support/privacy"
+              target="_blank">firebase.google.com/support/privacy</a></li>
+          <li>OpenWeather&nbsp;:
+            <a href="https://openweather.co.uk/privacy-policy"
+              target="_blank">openweather.co.uk/privacy-policy</a></li>
+        </ul>
 
         <p>
-          Cette information reste stockée dans votre appareil et n'est
-          utilisée d'aucune autre façon.
+          Vous pouvez demander l'accès à vos données, leur rectification ou leur
+          suppression en écrivant à
+          <a href="mailto:innovation@etnic.be">innovation@etnic.be</a>. Si vous estimez
+          que vos données ne sont pas traitées correctement, vous pouvez introduire une
+          réclamation auprès de l'Autorité de protection des données&nbsp;:
+          <a href="https://www.autoriteprotectiondonnees.be"
+            target="_blank">www.autoriteprotectiondonnees.be</a>.
         </p>
       </div>
     </div>
@@ -76,7 +224,7 @@
   <footer class="footer">
     <div class="container">
       <div class="content has-text-centered">
-        <p>Dernière mise à jour : 23 novembre 2021</p>
+        <p>Dernière mise à jour : 16 octobre 2026</p>
       </div>
     </div>
   </footer>
