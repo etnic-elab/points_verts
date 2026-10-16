@@ -3,3 +3,5 @@ analyzer:
   errors:
     public_member_api_docs: ignore
     lines_longer_than_80_chars: ignore
+  exclude:
+    - build/**
