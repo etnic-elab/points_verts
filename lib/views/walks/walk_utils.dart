@@ -37,29 +37,48 @@ const List<ml.MapApp> _supportedMapApps = [
   ml.MapApp.here,
 ];
 
-/// Opens directions to the walk's meeting point in an external map app.
+/// Opens the walk's meeting point in an external map app.
 ///
 /// Asks the OS which of [_supportedMapApps] are installed; with more than one,
-/// shows a bottom sheet so the user picks (Waze, Google Maps...). Directions,
-/// not a pin: 1.8.0 opened the point as a pin, and navigation-only apps such
-/// as Waze can't show one, so they silently vanished from the list and users
-/// lost the choice. Falls back to the platform URL scheme if nothing is
-/// detected (rare — emulators without Play Services).
+/// shows a bottom sheet so the user picks. Apps that can show a place get a
+/// pin with the address (Google Maps, Apple Maps...), from which the user can
+/// read or copy the address and ask for directions. Navigation-only apps such
+/// as Waze can't show a pin and get directions straight away.
+///
+/// The installed apps are found through a directions request on purpose:
+/// 1.8.0 looked for apps that can show a pin, which silently dropped Waze from
+/// the list, and with one app left the chooser never appeared.
+///
+/// Falls back to the platform URL scheme if nothing is detected (rare —
+/// emulators without Play Services).
 Future<void> launchGeoApp(BuildContext context, Walk walk) async {
   if (!walk.hasPosition) return;
 
-  final directions = ml.MapLauncher.directions(
-    ml.LocationCoords(walk.lat!, walk.long!, title: walk.meetingPoint ?? walk.city),
+  final location = ml.LocationCoords(
+    walk.lat!,
+    walk.long!,
+    title: walk.meetingPoint ?? walk.city,
   );
+  final marker = ml.MapLauncher.marker(location);
+
+  Future<void> open(ml.SupportedMap map) => map.map.supportsMarkerCoords
+      ? marker.show(map: map.map)
+      : map.show();
 
   try {
-    final installed = (await directions.getSupportedMaps(_supportedMapApps))
-        .where((map) => map.isInstalled)
-        .toList();
+    final installed =
+        (await ml.MapLauncher.directions(location).getSupportedMaps(
+      _supportedMapApps,
+    ))
+            .where((map) => map.isInstalled)
+            .toList();
 
     if (installed.isEmpty) {
       if (Platform.isIOS) {
-        await launchURL('maps://?daddr=${walk.lat},${walk.long}');
+        final label = Uri.encodeComponent(walk.city);
+        await launchURL(
+          'https://maps.apple.com/?ll=${walk.lat},${walk.long}&q=$label',
+        );
       } else {
         await launchURL(
           'geo:${walk.lat},${walk.long}?q=${walk.lat},${walk.long}(${walk.city})',
@@ -69,7 +88,7 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
     }
 
     if (installed.length == 1) {
-      await installed.first.show();
+      await open(installed.first);
       return;
     }
 
@@ -83,7 +102,7 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Text(
-                "Ouvrir l'itinéraire avec…",
+                "Ouvrir le lieu de rendez-vous avec…",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -91,9 +110,12 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
               ListTile(
                 leading: Image.memory(map.map.iconBytes, width: 32, height: 32),
                 title: Text(map.name),
+                subtitle: map.map.supportsMarkerCoords
+                    ? null
+                    : const Text("Itinéraire direct"),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
-                  map.show();
+                  open(map);
                 },
               ),
           ],
