@@ -27,13 +27,16 @@ import '../../models/walk.dart';
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
 /// Map apps offered by [launchGeoApp]. Keep in sync with
-/// LSApplicationQueriesSchemes in ios/Runner/Info.plist (Apple Maps needs none).
+/// LSApplicationQueriesSchemes in ios/Runner/Info.plist (Apple Maps needs none)
+/// and with the <queries> block in android/app/src/main/AndroidManifest.xml.
+/// OsmAnd and OsmAnd+ are separate Android packages, so both are listed.
 const List<ml.MapApp> _supportedMapApps = [
   ml.MapApp.apple,
   ml.MapApp.google,
   ml.MapApp.waze,
   ml.MapApp.mapswithme,
   ml.MapApp.osmand,
+  ml.MapApp.osmandplus,
   ml.MapApp.here,
 ];
 
