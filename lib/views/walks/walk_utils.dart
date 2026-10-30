@@ -27,43 +27,56 @@ import '../../models/walk.dart';
 const String tag = "dev.alpagaga.points_verts.WalksUtils";
 
 /// Map apps offered by [launchGeoApp]. Keep in sync with
-/// LSApplicationQueriesSchemes in ios/Runner/Info.plist (Apple Maps needs none).
+/// LSApplicationQueriesSchemes in ios/Runner/Info.plist (Apple Maps needs none)
+/// and with the `<queries>` block in android/app/src/main/AndroidManifest.xml.
+/// OsmAnd and OsmAnd+ are separate Android packages, so both are listed.
 const List<ml.MapApp> _supportedMapApps = [
   ml.MapApp.apple,
   ml.MapApp.google,
   ml.MapApp.waze,
   ml.MapApp.mapswithme,
   ml.MapApp.osmand,
+  ml.MapApp.osmandplus,
   ml.MapApp.here,
 ];
 
-/// Opens the walk's meeting point as a marker (place) in an external map app.
+/// Opens the walk's meeting point in an external map app.
 ///
-/// Shows the destination as a pin with the address visible — the user can
-/// then read or copy it, and start directions from inside the map app if
-/// they want to. Asks the OS which map apps are installed; if more than one
-/// is available, shows a bottom sheet so the user can choose. Falls back to
-/// the platform default URL scheme if detection returns nothing (rare —
-/// usually only on emulators without Play Services).
+/// Asks the OS which of [_supportedMapApps] are installed; with more than one,
+/// shows a bottom sheet so the user picks. Apps that can show a place get a
+/// pin with the address (Google Maps, Apple Maps...), from which the user can
+/// read or copy the address and ask for directions. Navigation-only apps such
+/// as Waze can't show a pin and get directions straight away.
+///
+/// The installed apps are found through a directions request on purpose:
+/// 1.8.0 looked for apps that can show a pin, which silently dropped Waze from
+/// the list, and with one app left the chooser never appeared.
+///
+/// Falls back to the platform URL scheme if nothing is detected (rare —
+/// emulators without Play Services).
 Future<void> launchGeoApp(BuildContext context, Walk walk) async {
   if (!walk.hasPosition) return;
 
-  final marker = ml.MapLauncher.marker(
-    ml.Location.coords(
-      walk.lat!,
-      walk.long!,
-      title: walk.meetingPoint ?? walk.city,
-    ),
+  final location = ml.LocationCoords(
+    walk.lat!,
+    walk.long!,
+    title: walk.meetingPoint ?? walk.city,
   );
+  final marker = ml.MapLauncher.marker(location);
+
+  Future<void> open(ml.SupportedMap map) => map.map.supportsMarkerCoords
+      ? marker.show(map: map.map)
+      : map.show();
 
   try {
-    final installed = (await marker.getSupportedMaps(_supportedMapApps))
-        .where((map) => map.isInstalled)
-        .toList();
+    final installed =
+        (await ml.MapLauncher.directions(location).getSupportedMaps(
+      _supportedMapApps,
+    ))
+            .where((map) => map.isInstalled)
+            .toList();
 
     if (installed.isEmpty) {
-      // Defensive: if no maps are detected (emulator without Maps app etc.),
-      // fall back to the platform default URL scheme so we still do something.
       if (Platform.isIOS) {
         final label = Uri.encodeComponent(walk.city);
         await launchURL(
@@ -78,7 +91,7 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
     }
 
     if (installed.length == 1) {
-      await installed.first.show();
+      await open(installed.first);
       return;
     }
 
@@ -92,17 +105,20 @@ Future<void> launchGeoApp(BuildContext context, Walk walk) async {
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Text(
-                "Ouvrir dans une carte avec…",
+                "Ouvrir le lieu de rendez-vous avec…",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
             for (final map in installed)
               ListTile(
-                leading: const Icon(Icons.location_on),
+                leading: Image.memory(map.map.iconBytes, width: 32, height: 32),
                 title: Text(map.name),
+                subtitle: map.map.supportsMarkerCoords
+                    ? null
+                    : const Text("Itinéraire direct"),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
-                  map.show();
+                  open(map);
                 },
               ),
           ],
